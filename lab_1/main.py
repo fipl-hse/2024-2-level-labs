@@ -7,3 +7,4 @@ def say_hello_world() -> None:
     """
     Say hello world.
     """
+    print('hello')

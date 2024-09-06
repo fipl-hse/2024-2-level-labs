@@ -1,0 +1,25 @@
+{
+    "labs": [
+        {
+            "name": "lab_1",
+            "coverage": 96
+        }
+    ],
+    "addons": [],
+    "repository": {
+        "admins": [
+            "artyomtugaryov",
+            "demid5111",
+            "WhiteJaeger",
+            "EIzharikov",
+            "NovIrina",
+            "Vasilisa-Blyudova",
+            "vitazaytseva",
+            "sofianurtdinova",
+            "AnPruch",
+            "EkaterinaKhomutova"
+        ],
+        "pr_name_regex": "(Scrapper|Pipeline), \\w+ \\w+ - 2\\dFPL\\d",
+        "pr_name_example": "Scrapper, Andrei Kashchikhin - 21FPL2 \nPipeline, Andrei Kashchikhin - 21FPL2"
+    }
+}

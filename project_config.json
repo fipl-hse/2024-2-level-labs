@@ -1,10 +1,5 @@
 {
-    "labs": [
-        {
-            "name": "lab_1",
-            "coverage": 96
-        }
-    ],
+    "labs": [],
     "addons": [],
     "repository": {
         "admins": [

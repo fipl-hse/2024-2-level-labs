@@ -1,0 +1,6 @@
+/lab_1_classify_by_unigrams/README.rst
+/lab_1_classify_by_unigrams/lab_1_classify_by_unigrams.api.rst
+/lab_1_classify_by_unigrams/stub.py
+/lab_2_tokenize_by_bpe/README.rst
+/lab_2_tokenize_by_bpe/lab_2_tokenize_by_bpe.api.rst
+/lab_2_tokenize_by_bpe/stub.py

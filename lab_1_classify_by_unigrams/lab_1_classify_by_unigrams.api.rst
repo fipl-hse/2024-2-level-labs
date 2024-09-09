@@ -5,7 +5,7 @@ Submodules
 ----------
 
 
-.. automodule:: lab_1.main
+.. automodule:: lab_1_classify_by_unigrams.main
    :members:
    :undoc-members:
    :show-inheritance:

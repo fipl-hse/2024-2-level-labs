@@ -6,6 +6,12 @@ Running python application and debugging
 
 # pylint: disable=invalid-name
 
+a = b = 17
+print(a)
+a = 4/3
+print(round(a, 3))
+b = b % 4
+print(b)
 
 # Three main ideas:
 # 1. Python is a program that launches another program.
@@ -31,7 +37,6 @@ print(f'Numbers: {first_num} and {second_num}')
 second_num = 6
 third_num = first_num / second_num
 print(f'Numbers: {first_num}, {second_num} and {third_num}')
-
 
 # Case 2: the second debugging case:
 if first_num * second_num == third_num:

@@ -2,6 +2,7 @@
 Check lint for code style in Python code.
 """
 # pylint: disable=duplicate-code
+import shutil
 import subprocess
 from os import listdir
 from pathlib import Path
@@ -98,21 +99,23 @@ def main() -> None:
 
     for lab_name in labs_list:
         lab_path = PROJECT_ROOT / lab_name
-        subdirectories = [d for d in lab_path.iterdir() if d.is_dir() and d.name != 'tests']
-        for subdir in subdirectories:
-            if "settings.json" in listdir(subdir):
-                target_score = LabSettings(subdir / "settings.json").target_score
+        tests_subdir = lab_path / 'tests'
+        if tests_subdir.exists() and tests_subdir.is_dir():
+            shutil.rmtree(tests_subdir)
 
-                print(f"Running lint for lab {lab_path}")
-                completed_process = check_lint_on_paths(
-                            [
-                                lab_path
-                            ],
-                            pyproject_path)
-                completed_process = check_lint_level(completed_process.stdout, target_score)
-                print(completed_process.stdout.decode("utf-8"))
-                print(completed_process.stderr.decode("utf-8"))
-                check_result(completed_process.returncode)
+        if "settings.json" in listdir(lab_path):
+            target_score = LabSettings(PROJECT_ROOT / f"{lab_path}/settings.json").target_score
+
+            print(f"Running lint for lab {lab_path}")
+            completed_process = check_lint_on_paths(
+                        [
+                            lab_path
+                        ],
+                        pyproject_path)
+            completed_process = check_lint_level(completed_process.stdout, target_score)
+            print(completed_process.stdout.decode("utf-8"))
+            print(completed_process.stderr.decode("utf-8"))
+            check_result(completed_process.returncode)
 
 
 if __name__ == "__main__":

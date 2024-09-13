@@ -68,7 +68,7 @@ if __name__ == '__main__':
     score = int(args.target_score)
     target_lint_level = transform_score_into_lint(score)
     exit_code = 0
-    if not target_lint_level:
+    if target_lint_level not in [0, 4, 6, 8, 10]:
         print('\nInvalid value for target score: accepted are 4, 6, 8, 10.\n')
         exit_code = 1
     else:

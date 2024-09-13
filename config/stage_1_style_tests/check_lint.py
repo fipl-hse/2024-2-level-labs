@@ -119,7 +119,7 @@ def main() -> None:
 
         if "settings.json" in listdir(lab_path):
             target_score = LabSettings(PROJECT_ROOT / f"{lab_path}/settings.json").target_score
-            if target_score == 0: 
+            if target_score == 0:
                 continue
 
             print(f"Running lint for lab {lab_path}")

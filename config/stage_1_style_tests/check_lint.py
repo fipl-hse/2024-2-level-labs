@@ -99,7 +99,6 @@ def main() -> None:
     for lab_name in labs_list:
         lab_path = PROJECT_ROOT / lab_name
         subdirectories = [d for d in lab_path.iterdir() if d.is_dir() and d.name != 'tests']
-    
         for subdir in subdirectories:
             if "settings.json" in listdir(subdir):
                 target_score = LabSettings(subdir / "settings.json").target_score

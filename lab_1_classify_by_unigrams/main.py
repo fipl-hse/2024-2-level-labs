@@ -7,7 +7,15 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-    """
+    text = text.lower
+    tokenized_list = []
+    for i in text():
+        if i.isalpha():
+            tokenized_list += i
+    en_text = tokenized_list
+    return en_text
+
+"""
     Split a text into tokens.
 
     Convert the tokens into lowercase, remove punctuation, digits and other symbols
@@ -19,7 +27,7 @@ def tokenize(text: str) -> list[str] | None:
         list[str] | None: A list of lower-cased tokens without punctuation
 
     In case of corrupt input arguments, None is returned
-    """
+"""
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:

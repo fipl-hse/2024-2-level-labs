@@ -28,9 +28,7 @@ def main() -> None:
     profile_collection = collect_profiles(list_of_path_to_language_profiles)
     result = detect_language_advanced(unknown_profile, profile_collection)
     print_report(result)
-    # result = None
     assert result, "Detection result is None"
-
 
 if __name__ == "__main__":
     main()

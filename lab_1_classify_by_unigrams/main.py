@@ -169,6 +169,8 @@ def detect_language_advanced(
     """
 
 
+
+
 def print_report(detections: list[tuple[str, float]]) -> None:
     """
     Print report for detection of language.
@@ -178,3 +180,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+print('hi')

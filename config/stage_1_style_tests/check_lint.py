@@ -15,7 +15,7 @@ from config.project_config import ProjectConfig
 
 
 def check_lint_on_paths(paths: list[Path], path_to_config: Path,
-                        exit_zero: bool = False, 
+                        exit_zero: bool = False,
                         ignore_tests: bool = False) -> subprocess.CompletedProcess:
     """
     Run lint checks for the project.
@@ -37,7 +37,7 @@ def check_lint_on_paths(paths: list[Path], path_to_config: Path,
         "--rcfile",
         str(path_to_config)
     ]
-    if ignore_tests: 
+    if ignore_tests:
         lint_args.extend(["--ignore", "tests"])
     if exit_zero:
         lint_args.append("--exit-zero")
@@ -119,7 +119,7 @@ def main() -> None:
         if "settings.json" in listdir(lab_path):
             target_score = LabSettings(PROJECT_ROOT / f"{lab_path}/settings.json").target_score
             if target_score == 0:
-                print(f"Skipping check")
+                print("Skipping check")
                 continue
 
             print(f"Running lint for lab {lab_path}")
@@ -129,7 +129,7 @@ def main() -> None:
                                 lab_path
                             ],
                             pyproject_path, ignore_tests=True)
-            else: 
+            else:
                 completed_process = check_lint_on_paths(
                             [
                                 lab_path

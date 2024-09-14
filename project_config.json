@@ -1,5 +1,10 @@
 {
-    "labs": [],
+    "labs": [
+        {
+            "name" : "lab_1_classify_by_unigrams",
+            "coverage": 10
+        }
+    ],
     "addons": [],
     "repository": {
         "admins": [

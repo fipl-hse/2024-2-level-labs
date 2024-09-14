@@ -3,7 +3,6 @@ Check lint for code style in Python code.
 """
 # pylint: disable=duplicate-code
 import argparse
-import shutil
 import subprocess
 from os import listdir
 from pathlib import Path

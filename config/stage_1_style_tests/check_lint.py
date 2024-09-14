@@ -123,18 +123,11 @@ def main() -> None:
                 continue
 
             print(f"Running lint for lab {lab_path}")
-            if repository_type == "public":
-                completed_process = check_lint_on_paths(
-                            [
-                                lab_path
-                            ],
-                            pyproject_path, ignore_tests=True)
-            else:
-                completed_process = check_lint_on_paths(
-                            [
-                                lab_path
-                            ],
-                            pyproject_path)
+            completed_process = check_lint_on_paths(
+                [
+                    lab_path
+                ],
+                pyproject_path, ignore_tests=repository_type == "public")
             completed_process = check_lint_level(completed_process.stdout, target_score)
             print(completed_process.stdout.decode("utf-8"))
             print(completed_process.stderr.decode("utf-8"))

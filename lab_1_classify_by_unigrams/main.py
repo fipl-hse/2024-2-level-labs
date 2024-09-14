@@ -1,54 +1,37 @@
-"""
-Lab 1.
+from collections import Counter
+from string import punctuation
 
-Language detection
-"""
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
 def tokenize(text: str) -> list[str] | None:
-    """
-    Split a text into tokens.
 
-    Convert the tokens into lowercase, remove punctuation, digits and other symbols
+    text = ''.join(text.split()).lower()
 
-    Args:
-        text (str): A text
+    for char in punctuation + '1234567890º’':
+        text = text.replace(char, '')
 
-    Returns:
-        list[str] | None: A list of lower-cased tokens without punctuation
-
-    In case of corrupt input arguments, None is returned
-    """
+    return list(text)
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    """
-    Calculate frequencies of given tokens.
+    tokens_total = len(tokens)
 
-    Args:
-        tokens (list[str] | None): A list of tokens
+    freq = dict(Counter(tokens))
+    for letter in freq:
+        freq[letter] = freq[letter] / tokens_total
 
-    Returns:
-        dict[str, float] | None: A dictionary with frequencies
-
-    In case of corrupt input arguments, None is returned
-    """
+    return freq
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """
-    Create a language profile.
 
-    Args:
-        language (str): A language
-        text (str): A text
+    language_frequencies = calculate_frequencies(tokenize(text))
 
-    Returns:
-        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
+    profile = {'lang': language, 'freq': language_frequencies}
 
-    In case of corrupt input arguments, None is returned
-    """
+    return profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

@@ -5,7 +5,7 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-# подумать про None + откуда берется language(3) + dict comprehensions? + округлить мсе
+# откуда берется language(3) + округлить мсе
 
 
 def tokenize(text: str) -> list[str] | None:

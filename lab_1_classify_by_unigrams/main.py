@@ -254,7 +254,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         "freq": {}
     }
     for unigram in profile["freq"]:
-        if (len(unigram) == 1 and unigram.isalpha()) or unigram == '²':
+        if len(unigram) == 1:
             if new_profile["freq"].get(unigram.lower()) is None:
                 new_profile["freq"][unigram.lower()] = profile["freq"][unigram] / \
                                                        profile["n_words"][0]

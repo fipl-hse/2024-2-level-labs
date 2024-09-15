@@ -6,15 +6,19 @@ Language detection
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 # подумать про None + откуда берется language(3) + dict comprehensions? + округлить мсе
-def tokenize(text: str) -> list[str] | None:
-    text = text.lower
-    tokenized_list = []
-    for i in text():
-        if i.isalpha():
-            tokenized_list += i
-    en_text = tokenized_list
-    return en_text
 
+
+def tokenize(text: str) -> list[str] | None:
+    if type(text) == str:
+        text = text.lower
+        tokenized_list = []
+        for i in text():
+            if i.isalpha():
+                tokenized_list += i
+        en_text = tokenized_list
+        return en_text
+    else:
+        return None
 """
     Split a text into tokens.
 
@@ -31,10 +35,13 @@ def tokenize(text: str) -> list[str] | None:
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    frequency_dict = {}
-    for i in tokens:
-        frequency_dict[i] = tokens.count(i) / len(tokens)
-    return frequency_dict
+    if type(tokens) == list and all(type(i) == str for i in tokens):
+        frequency_dict = {}
+        for i in tokens:
+            frequency_dict[i] = tokens.count(i) / len(tokens)
+        return frequency_dict
+    else:
+        return None
 
 """
     Calculate frequencies of given tokens.
@@ -50,8 +57,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    lang_profile_dict = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
-    return lang_profile_dict
+    if type(language) == type(text) == str:
+        lang_profile_dict = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+        return lang_profile_dict
+    else:
+        return None
 
 
 """
@@ -69,13 +79,15 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
-    sum_diff = 0
-    for i, k in enumerate(actual):
-        difference_between_values = (k - predicted[i]) ** 2
-        sum_diff += difference_between_values
-    mse = sum_diff / len(predicted)
-    return mse
-
+    if type(predicted) == type(actual) == list and len(predicted) == len(actual):
+        sum_diff = 0
+        for i, k in enumerate(actual):
+            difference_between_values = (k - predicted[i]) ** 2
+            sum_diff += difference_between_values
+        mse = sum_diff / len(predicted)
+        return mse
+    else:
+        return None
 
 """
     Calculate mean squared error between predicted and actual values.
@@ -95,22 +107,24 @@ def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
-    for i in unknown_profile['freq']:
-        if i not in profile_to_compare['freq']:
-            profile_to_compare['freq'][i] = 0
-    for i in profile_to_compare['freq']:
-        if i not in unknown_profile['freq']:
-            unknown_profile['freq'][i] = 0
-    sort_unk = dict(sorted(unknown_profile['freq'].items()))
-    sort_comp = dict(sorted(profile_to_compare['freq'].items()))
-    comp_values_lst = []
-    for i in sort_comp.values():
-        comp_values_lst.append(i)
-    unk_values_lst = []
-    for i in sort_unk.values():
-        unk_values_lst.append(i)
-    return calculate_mse(comp_values_lst, unk_values_lst)
-
+    if type(unknown_profile) == type(profile_to_compare) == dict and len(profile_to_compare) == len(unknown_profile) == 2:
+        for i in unknown_profile['freq']:
+            if i not in profile_to_compare['freq']:
+                profile_to_compare['freq'][i] = 0
+        for i in profile_to_compare['freq']:
+            if i not in unknown_profile['freq']:
+                unknown_profile['freq'][i] = 0
+        sort_unk = dict(sorted(unknown_profile['freq'].items()))
+        sort_comp = dict(sorted(profile_to_compare['freq'].items()))
+        comp_values_lst = []
+        for i in sort_comp.values():
+            comp_values_lst.append(i)
+        unk_values_lst = []
+        for i in sort_unk.values():
+            unk_values_lst.append(i)
+        return calculate_mse(comp_values_lst, unk_values_lst)
+    else:
+        return None
 
 
 """
@@ -134,12 +148,16 @@ def detect_language(
     profile_1: dict[str, str | dict[str, float]],
     profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
-    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
-        closest_profile = profile_1.get('name')
-    elif compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
-        closest_profile = profile_2.get('name')
-    return closest_profile
-
+    if type(unknown_profile) == type(profile_1) == type(profile_2) == dict:
+        if (compare_profiles(unknown_profile, profile_1) or compare_profiles(unknown_profile, profile_2)) is None:
+            return None
+        elif compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+            closest_profile = profile_1.get('name')
+        elif compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
+            closest_profile = profile_2.get('name')
+        return closest_profile
+    else:
+        return None
 
 """
     Detect the language of an unknown profile.

@@ -43,7 +43,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    is_corrupt_input = not (isinstance(tokens, list) and all(isinstance(token, str) for token in tokens))
+    is_corrupt_input = not (
+            isinstance(tokens, list) and all(isinstance(token, str) for token in tokens))
     if is_corrupt_input or tokens is None:
         return None
 
@@ -98,7 +99,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    is_corrupt_input = (isinstance(predicted, list)) and (isinstance(actual, list)) and (len(predicted) == len(actual))
+    is_corrupt_input = (isinstance(predicted, list)) and (isinstance(actual, list)) and (
+            len(predicted) == len(actual))
     if not is_corrupt_input:
         return None
     mse: float = 0
@@ -118,13 +120,9 @@ def is_valid_profile(profile: dict[str, str | dict[str, float]]) -> bool:
     Returns:
         False | True: valid or invalid profile
     """
-    if not isinstance(profile, dict):
+    if not isinstance(profile, dict) or profile.get("name") is None or profile.get("freq") is None:
         return False
-    if profile.get("name") is None or profile.get("freq") is None:
-        return False
-    if not isinstance(profile.get("name"), str):
-        return False
-    if not isinstance(profile.get("freq"), dict):
+    if not isinstance(profile.get("name"), str) or not isinstance(profile.get("freq"), dict):
         return False
     if isinstance(profile["freq"], str):
         return False
@@ -156,7 +154,8 @@ def compare_profiles(
     """
     if not (is_valid_profile(unknown_profile) and is_valid_profile(profile_to_compare)):
         return None
-    if not (isinstance(unknown_profile["freq"], dict) and isinstance(profile_to_compare["freq"], dict)):
+    if not (isinstance(unknown_profile["freq"], dict) and isinstance(profile_to_compare["freq"],
+                                                                     dict)):
         return None
     unknown_tokens = set(unknown_profile["freq"])
     tokens_to_compare = set(profile_to_compare["freq"])
@@ -195,7 +194,8 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not (is_valid_profile(unknown_profile) and is_valid_profile(profile_1) and is_valid_profile(profile_2)):
+    if not (is_valid_profile(unknown_profile) and is_valid_profile(profile_1) and is_valid_profile(
+            profile_2)):
         return None
     if not (isinstance(profile_1["name"], str) and isinstance(profile_2["name"], str)):
         return None
@@ -256,9 +256,11 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     for unigram in profile["freq"]:
         if (len(unigram) == 1 and unigram.isalpha()) or unigram == '²':
             if new_profile["freq"].get(unigram.lower()) is None:
-                new_profile["freq"][unigram.lower()] = profile["freq"][unigram] / profile["n_words"][0]
+                new_profile["freq"][unigram.lower()] = profile["freq"][unigram] / \
+                                                       profile["n_words"][0]
             else:
-                new_profile["freq"][unigram.lower()] += profile["freq"][unigram] / profile["n_words"][0]
+                new_profile["freq"][unigram.lower()] += profile["freq"][unigram] / \
+                                                        profile["n_words"][0]
     return new_profile
 
 
@@ -339,3 +341,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
             return None
     for detection in detections:
         print(f"{detection[0]}: MSE {detection[1]:.5f}")
+
+    return None

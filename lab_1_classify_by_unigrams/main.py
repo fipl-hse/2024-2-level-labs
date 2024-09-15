@@ -1,9 +1,9 @@
+import json
 """
 Lab 1.
 
 Language detection
 """
-import json
 
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable

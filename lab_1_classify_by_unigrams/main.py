@@ -47,13 +47,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if is_corrupt_input:
         return None
 
-    frequencies_of_letters = {}
+    frequencies_of_letters: dict[str, float] = {}
     for token in tokens:
-        if frequencies_of_letters.get(token) == None:
+        if frequencies_of_letters.get(token) is None:
             frequencies_of_letters[token] = 0
         frequencies_of_letters[token] += 1
     for token in frequencies_of_letters:
-        frequencies_of_letters[token] /= len(tokens)
+        frequencies_of_letters[token] /= float(len(tokens))
     return frequencies_of_letters
 
 
@@ -75,7 +75,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     tokens = tokenize(text)
     freq_dict = calculate_frequencies(tokens)
-    language_profile = {
+    language_profile: dict[str, str | dict[str, float]] | None = {
         "name": language,
         "freq": freq_dict,
     }
@@ -99,17 +99,25 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not is_corrupt_input:
         return None
     mse = 0
-    n = len(predicted)
-    for index in range(n):
+    lists_length = len(predicted)
+    for index in range(lists_length):
         mse += (actual[index] - predicted[index]) ** 2
-    mse /= n
+    mse /= lists_length
     return mse
 
 
-def is_valid_profile(profile):
+def is_valid_profile(profile: dict[str, str | dict[str, float]]):
+    """
+
+    Args:
+        profile (dict[str, str | dict[str, float]]): checking profile
+
+    Returns:
+        False | True: valid or invalid profile
+    """
     if not isinstance(profile, dict):
         return False
-    if profile.get("name") == None or profile.get("freq") == None:
+    if profile.get("name") is None or profile.get("freq") is None:
         return False
     if not isinstance(profile.get("name"), str):
         return False
@@ -150,11 +158,11 @@ def compare_profiles(
     values_unknown_tokens = []
     values_tokens_to_compare = []
     for letter in union:
-        if unknown_profile["freq"].get(letter) == None:
+        if unknown_profile["freq"].get(letter) is None:
             values_unknown_tokens.append(0)
         else:
             values_unknown_tokens.append(unknown_profile["freq"].get(letter))
-        if profile_to_compare["freq"].get(letter) == None:
+        if profile_to_compare["freq"].get(letter) is None:
             values_tokens_to_compare.append(0)
         else:
             values_tokens_to_compare.append(profile_to_compare["freq"].get(letter))
@@ -190,8 +198,7 @@ def detect_language(
         return profile_1["name"]
     if mse_2 < mse_1:
         return profile_2["name"]
-    else:
-        return sorted([profile_1["name"], profile_2["name"]])[0]
+    return sorted([profile_1["name"], profile_2["name"]])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -239,7 +246,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     }
     for unigram in profile["freq"]:
         if (len(unigram) == 1 and unigram.isalpha()) or unigram == '²':
-            if new_profile["freq"].get(unigram.lower()) == None:
+            if new_profile["freq"].get(unigram.lower()) is None:
                 new_profile["freq"][unigram.lower()] = profile["freq"][unigram] / profile["n_words"][0]
             else:
                 new_profile["freq"][unigram.lower()] += profile["freq"][unigram] / profile["n_words"][0]

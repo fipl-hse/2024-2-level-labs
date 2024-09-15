@@ -3,7 +3,7 @@ Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-from main import *
+from lab_1_classify_by_unigrams.main import *
 
 list_of_path_to_language_profiles = ["assets/profiles/es.json", "assets/profiles/de.json",
                                      "assets/profiles/en.json", "assets/profiles/fr.json",

@@ -61,7 +61,10 @@ def _run_console_tool(exe: str, /, args: list[str], **kwargs: Any) -> subprocess
     ]
 
     if kwargs.get('debug', False):
-        print(f'Attempting to run with the following arguments: {" ".join(options)}')
+        arguments = []
+        for index, option in enumerate(options[1:]):
+            arguments.append(f'"{option}"' if '--' in options[index] else option)
+        print(f'Attempting to run with the following arguments: {" ".join(arguments)}')
 
     env = kwargs.get('env')
     if env:

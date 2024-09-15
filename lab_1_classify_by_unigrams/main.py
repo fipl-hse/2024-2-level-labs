@@ -116,7 +116,6 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-
     # if (isinstance(unknown_profile, dict) and 'name' in unknown_profile and 'freq' in unknown_profile and
     #         isinstance(profile_to_compare, dict) and 'name' in profile_to_compare and 'freq' in profile_to_compare):
     #     unknown_letters_list = list(unknown_profile['freq'].keys())

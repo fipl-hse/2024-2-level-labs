@@ -9,6 +9,7 @@ list_of_path_to_language_profiles = ["assets/profiles/es.json", "assets/profiles
                                      "assets/profiles/en.json", "assets/profiles/fr.json",
                                      "assets/profiles/it.json", "assets/profiles/tr.json", "assets/profiles/ru.json"]
 
+
 def main() -> None:
     """
     Launches an implementation
@@ -29,6 +30,7 @@ def main() -> None:
     result = detect_language_advanced(unknown_profile, profile_collection)
     print_report(result)
     assert result, "Detection result is None"
+
 
 if __name__ == "__main__":
     main()

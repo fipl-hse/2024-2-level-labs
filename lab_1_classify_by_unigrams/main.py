@@ -7,6 +7,7 @@ Language detection
 
 import json
 
+
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -94,7 +95,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    is_corrupt_input = (isinstance(predicted, list)) and (isinstance(actual, list))
+    is_corrupt_input = (isinstance(predicted, list)) and (isinstance(actual, list)) and (len(predicted) == len(actual))
     if not is_corrupt_input:
         return None
     mse = 0
@@ -104,7 +105,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     mse /= n
     return mse
 
+
 def is_valid_profile(profile):
+    if not isinstance(profile, dict):
+        return False
     if profile.get("name") == None or profile.get("freq") == None:
         return False
     if not isinstance(profile.get("name"), str):
@@ -118,9 +122,10 @@ def is_valid_profile(profile):
             return False
     return True
 
+
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -157,12 +162,10 @@ def compare_profiles(
     return result
 
 
-
-
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -235,8 +238,11 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         "freq": {}
     }
     for unigram in profile["freq"]:
-        if len(unigram) == 1 and unigram.isalpha() and unigram != "가":
-            new_profile["freq"][unigram.lower()] = profile["freq"][unigram] / profile["n_words"][0]
+        if (len(unigram) == 1 and unigram.isalpha()) or unigram == '²':
+            if new_profile["freq"].get(unigram.lower()) == None:
+                new_profile["freq"][unigram.lower()] = profile["freq"][unigram] / profile["n_words"][0]
+            else:
+                new_profile["freq"][unigram.lower()] += profile["freq"][unigram] / profile["n_words"][0]
     return new_profile
 
 
@@ -262,7 +268,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

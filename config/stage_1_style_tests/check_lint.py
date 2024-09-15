@@ -2,6 +2,7 @@
 Check lint for code style in Python code.
 """
 # pylint: disable=duplicate-code
+import argparse
 import subprocess
 from os import listdir
 from pathlib import Path
@@ -14,7 +15,8 @@ from config.project_config import ProjectConfig
 
 
 def check_lint_on_paths(paths: list[Path], path_to_config: Path,
-                        exit_zero: bool = False) -> subprocess.CompletedProcess:
+                        exit_zero: bool = False,
+                        ignore_tests: bool = False) -> subprocess.CompletedProcess:
     """
     Run lint checks for the project.
 
@@ -22,6 +24,7 @@ def check_lint_on_paths(paths: list[Path], path_to_config: Path,
         paths (list[Path]): Paths to the projects.
         path_to_config (Path): Path to the config.
         exit_zero (bool): Exit-zero lint argument.
+        ignore_tests (bool): Ignore lint argument.
 
     Returns:
         subprocess.CompletedProcess: Program execution values
@@ -34,6 +37,8 @@ def check_lint_on_paths(paths: list[Path], path_to_config: Path,
         "--rcfile",
         str(path_to_config)
     ]
+    if ignore_tests:
+        lint_args.extend(["--ignore", "tests"])
     if exit_zero:
         lint_args.append("--exit-zero")
     return _run_console_tool(str(choose_python_exe()), lint_args, debug=True)
@@ -60,11 +65,23 @@ def check_lint_level(lint_output: bytes, target_score: int) -> subprocess.Comple
     ]
     return _run_console_tool(str(choose_python_exe()), lint_level_args, debug=True)
 
+def parse_arguments() -> argparse.Namespace:
+    """
+    Parse command line arguments.
+
+    Returns:
+        argparse.Namespace: Parsed arguments.
+    """
+    parser = argparse.ArgumentParser(description="Run check_lint.py checks for each lab.")
+    parser.add_argument("--repository_type", help="Type of the repository (public/private)")
+    return parser.parse_args()
 
 def main() -> None:
     """
     Run lint checks for the project.
     """
+    args = parse_arguments()
+    repository_type = args.repository_type
     project_config = ProjectConfig(PROJECT_CONFIG_PATH)
     labs_list = project_config.get_labs_paths()
 
@@ -98,15 +115,19 @@ def main() -> None:
 
     for lab_name in labs_list:
         lab_path = PROJECT_ROOT / lab_name
+
         if "settings.json" in listdir(lab_path):
             target_score = LabSettings(PROJECT_ROOT / f"{lab_path}/settings.json").target_score
+            if target_score == 0:
+                print("Skipping check")
+                continue
 
             print(f"Running lint for lab {lab_path}")
             completed_process = check_lint_on_paths(
-                        [
-                            lab_path
-                        ],
-                        pyproject_path)
+                [
+                    lab_path
+                ],
+                pyproject_path, ignore_tests=repository_type == "public")
             completed_process = check_lint_level(completed_process.stdout, target_score)
             print(completed_process.stdout.decode("utf-8"))
             print(completed_process.stderr.decode("utf-8"))

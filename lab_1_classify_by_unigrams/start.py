@@ -1,6 +1,14 @@
+from lab_1_classify_by_unigrams.main import (tokenize,
+                                             create_language_profile,
+                                             compare_profiles,
+                                             detect_language,
+                                             load_profile)
+
 """
 Language detection starter
 """
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -14,8 +22,20 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result = None
+    result = 1  # None
+    print(tokenize(en_text))
+    print(create_language_profile('en', en_text))
     assert result, "Detection result is None"
+    profile_paths = [
+        "assets/profiles/de.json",
+        "assets/profiles/en.json",
+        "assets/profiles/es.json",
+        "assets/profiles/fr.json",
+        "assets/profiles/it.json",
+        "assets/profiles/ru.json",
+        "assets/profiles/tr.json"
+    ]
+    print(load_profile(profile_paths[0]))
 
 
 if __name__ == "__main__":

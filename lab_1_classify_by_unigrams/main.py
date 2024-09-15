@@ -3,6 +3,9 @@ Lab 1.
 
 Language detection
 """
+import json
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -20,6 +23,14 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if type(text) == str:
+        list_of_letters = []
+        for character in text:
+            if character.isalpha():
+                list_of_letters.append(character.lower())
+        return list_of_letters
+    else:
+        return None
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -34,6 +45,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if isinstance(tokens, list) and all(isinstance(token, str) for token in tokens):
+        freq = dict.fromkeys(tokens)
+        for letter in freq:
+            freq[letter] = tokens.count(letter) / len(tokens)
+        return freq
+    else:
+        return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -49,6 +67,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if isinstance(language, str) and isinstance(text, str):
+        language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+        return language_profile
+    else:
+        return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -64,11 +87,20 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if isinstance(predicted, list) and isinstance(actual, list) and len(actual) == len(predicted):
+        n = len(actual)  # CHECK
+        mse = 0
+        for i in range(n):
+            mse += ((actual[i] - predicted[i]) ** 2)
+        mse /= n
+        return mse
+    else:
+        return None
 
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -85,11 +117,32 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
 
+    # if (isinstance(unknown_profile, dict) and 'name' in unknown_profile and 'freq' in unknown_profile and
+    #         isinstance(profile_to_compare, dict) and 'name' in profile_to_compare and 'freq' in profile_to_compare):
+    #     unknown_letters_list = list(unknown_profile['freq'].keys())
+    #     compare_letters_list = list(profile_to_compare['freq'].keys())
+    #     all_letters = sorted(list(set(unknown_letters_list + compare_letters_list)))
+    #     unknown_frequencies_list = compare_frequencies_list = []
+    #     # compare_frequencies_list = [] * len(all_letters)
+    #     for letter in all_letters:
+    #         if letter in unknown_letters_list and letter in compare_letters_list:
+    #             unknown_frequencies_list.append(unknown_profile['freq'][letter])
+    #             compare_frequencies_list.append(profile_to_compare['freq'][letter])
+    #         elif letter in compare_letters_list:
+    #             compare_frequencies_list.append(profile_to_compare['freq'][letter])
+    #             unknown_frequencies_list.append(0)
+    #         else:
+    #             unknown_frequencies_list.append(unknown_profile['freq'][letter])
+    #             compare_frequencies_list.append(0)
+    #     return round(calculate_mse(compare_frequencies_list, unknown_frequencies_list), 3)
+    # else:
+    #     return None
+
 
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -105,6 +158,18 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    potential_languages = []
+    profiles_mse = {profile_1['name']: calculate_mse(list(profile_1['freq'].values()),
+                                                     list(unknown_profile['freq'].values())),
+                    profile_2['name']: calculate_mse(list(profile_2['freq'].values()),
+                                                     list(unknown_profile['freq'].values()))
+                    }
+    sorted(profiles_mse, key=lambda x: x[1])
+    for name, mse in profiles_mse.items():
+        if mse == next(iter(profiles_mse.values())):
+            potential_languages.append(name)
+    potential_languages.sort()
+    return potential_languages[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -119,6 +184,12 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
+    path_to_file_components = path_to_file.split('/')
+    file_name_and_extension = path_to_file_components[-1].rsplit('.', 1)
+    with open(path_to_file, 'r') as profile_file:
+        profile = {'name': file_name_and_extension[0],
+                   'freq': json.load(profile_file)['freq']}
+    return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -152,7 +223,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

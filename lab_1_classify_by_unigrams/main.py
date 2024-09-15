@@ -109,7 +109,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     return mse
 
 
-def is_valid_profile(profile: dict[str, str | dict[str, float]]):
+def is_valid_profile(profile: dict[str, str | dict[str, float]]) -> bool:
     """
 
     Args:
@@ -226,7 +226,7 @@ def load_profile(path_to_file: str) -> dict | None:
     if not is_corrupt_input:
         return None
     with open(path_to_file, encoding='utf-8') as f:
-        profile = json.load(f)
+        profile: dict | None = json.load(f)
     return profile
 
 

@@ -64,7 +64,7 @@ jobs:
         run: |
           source venv/bin/activate
           export PYTHONPATH=$(pwd)
-          python config/stage_1_style_tests/check_lint.py
+          python config/stage_1_style_tests/check_lint.py --repository_type "$REPOSITORY_TYPE"
 
   mypy-checks:
     name: Mypy checks

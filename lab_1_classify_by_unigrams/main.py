@@ -6,7 +6,7 @@ Language detection (...)
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
-def tokens(text: str) -> list[str] | None:
+def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
 

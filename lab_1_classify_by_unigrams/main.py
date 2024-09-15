@@ -4,9 +4,17 @@ Lab 1.
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-print("!")
 
 def tokenize(text: str) -> list[str] | None:
+    text = text.lower()
+    cleaned_text = ""
+    for symbol in text:
+        if symbol.isalpha():
+            cleaned_text += symbol
+    tokens = []
+    for token in cleaned_text:
+        tokens += token
+    return tokens
     """
     Split a text into tokens.
 

@@ -4,36 +4,41 @@ Lab 1.
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-print(id(1))
+"""
+Split a text into tokens.
+Convert the tokens into lowercase, remove punctuation, digits and other symbols
+Args:
+    text (str): A text
+Returns:
+    list[str] | None: A list of lower-cased tokens without punctuation
+In case of corrupt input arguments, None is returned
+"""
+
 
 def tokenize(text: str) -> list[str] | None:
-    """
-    Split a text into tokens.
+    low = text.lower()
+    new_list = list(low)
+    clear_list = []
+    wrong_cases = list("!?/|\.,';:\"\#@()*-+=`~ 1234567890")
+    for i in new_list:
+        if i not in wrong_cases:
+            clear_list.append(i)
+    return clear_list
 
-    Convert the tokens into lowercase, remove punctuation, digits and other symbols
 
-    Args:
-        text (str): A text
-
-    Returns:
-        list[str] | None: A list of lower-cased tokens without punctuation
-
-    In case of corrupt input arguments, None is returned
-    """
+print(tokenize("Hey! How are you?"))
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    """
-    Calculate frequencies of given tokens.
+    frequency = {}
+    for letter in tokens:
+        if letter.isalpha():
+            counter = tokens.count(letter) / len(tokens)
+            frequency[letter] = counter
+    return frequency
 
-    Args:
-        tokens (list[str] | None): A list of tokens
 
-    Returns:
-        dict[str, float] | None: A dictionary with frequencies
-
-    In case of corrupt input arguments, None is returned
-    """
+print(calculate_frequencies(['h', 'e', 'y', 'h', 'o', 'w', 'a', 'r', 'e', 'y', 'o', 'u']))
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

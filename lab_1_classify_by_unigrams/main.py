@@ -23,6 +23,14 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    text = text.lower()
+    split1 = text.split()
+    split2 = []
+    for word in split1:
+        for token in word:
+            if token.isalpha():
+                split2 += token
+    return (split2)
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:

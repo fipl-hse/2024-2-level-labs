@@ -4,6 +4,7 @@ Language detection starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 from main import tokenize
 
+
 def main() -> None:
     """
     Launches an implementation

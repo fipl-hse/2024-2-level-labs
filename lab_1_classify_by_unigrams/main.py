@@ -100,7 +100,7 @@ def detect_language(
         return profile_2['name']
     return profile_1['name']
 
-
+# здесь и далее -- недоделано и непротестировано
 def load_profile(path_to_file: str) -> dict | None:
     # checking input
     if type(path_to_file) != str:

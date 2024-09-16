@@ -33,7 +33,7 @@ def check_skip_conditions(pr_name: str, repository_type: str) -> bool:
     return False
 
 
-def run_start(lab_name: str) -> bool:
+def run_start(lab_name: str) -> tuple[bool, str]:
     """
     Run start.py script in the specified lab directory.
 
@@ -41,15 +41,15 @@ def run_start(lab_name: str) -> bool:
         lab_name (str): Name of the lab directory.
 
     Returns:
-        bool: True if start.py runs successfully, otherwise False.
+        tuple[bool, str]: True if start.py runs successfully, otherwise False.
     """
-    lab_dir = Path(lab_name)
     result = _run_console_tool(
         str(choose_python_exe()),
-        [str(lab_dir / 'start.py')],
-        cwd=PROJECT_ROOT,
-        debug=True)
-    return result.returncode == 0
+        [str('start.py')],
+        cwd=PROJECT_ROOT / lab_name,
+        debug=True
+    )
+    return result.returncode == 0, result.stderr.decode('utf-8')
 
 
 def check_start_content(lab_name: str) -> None:
@@ -108,10 +108,11 @@ def main() -> None:
         if target_score == 0:
             print("Skipping stage")
             continue
-
-        if not run_start(lab_name):
+        status, response = run_start(lab_name)
+        if not status:
             print(f"start.py fails while running for lab {lab_name}")
             print(f"Check for start.py file for lab {lab_name} failed.")
+            print(response)
             sys.exit(1)
 
         print(f"Check calling lab {lab_name} passed")

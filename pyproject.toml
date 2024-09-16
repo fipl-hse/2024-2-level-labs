@@ -4,7 +4,7 @@ markers = [
     "mark6: tests for level 6",
     "mark8: tests for level 8",
     "mark10: tests for level 10",
-    "lab_1: tests for lab 1",
+    "lab_1_classify_by_unigrams: tests for lab 1",
 ]
 norecursedirs = [
     "venv*"
@@ -58,7 +58,7 @@ force_alphabetical_sort_within_sections = true
 src_paths = [
     "core_utils",
     "config",
-    "lab_1"
+    "lab_1_classify_by_unigrams"
 ]
 
 [tool.mypy]

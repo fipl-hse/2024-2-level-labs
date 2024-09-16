@@ -7,48 +7,49 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-    """
-    Split a text into tokens.
-
-    Convert the tokens into lowercase, remove punctuation, digits and other symbols
-
-    Args:
-        text (str): A text
-
-    Returns:
-        list[str] | None: A list of lower-cased tokens without punctuation
-
-    In case of corrupt input arguments, None is returned
-    """
+    if type(text) != str:
+        return None
+    extra = ',.:?!;%$#№"&()[]{}~’º0123456789 -\n><*=@'
+    text_only_letters = ''
+    for symbol in text:
+        if symbol not in extra:
+            text_only_letters += symbol
+    text_only_letters = list(text_only_letters.lower())
+    #print(text_only_letters)
+    return text_only_letters
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    """
-    Calculate frequencies of given tokens.
-
-    Args:
-        tokens (list[str] | None): A list of tokens
-
-    Returns:
-        dict[str, float] | None: A dictionary with frequencies
-
-    In case of corrupt input arguments, None is returned
-    """
+    if type(tokens) is not list:
+        return None
+    if type(tokens) == list:
+        for element in tokens:
+            if type(element) != str:
+                return None
+    dictionary = {}
+    token_number = len(tokens)
+    for letter in tokens:
+        if letter not in dictionary.keys():
+            dictionary[letter] = 1/token_number
+        else:
+            dictionary[letter] = (dictionary[letter]*token_number + 1)/token_number
+    #print(dictionary)
+    return dictionary
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """
-    Create a language profile.
+    if not isinstance(language, str):
+        return None
+    if not isinstance(text, str):
+        return None
 
-    Args:
-        language (str): A language
-        text (str): A text
-
-    Returns:
-        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
-
-    In case of corrupt input arguments, None is returned
-    """
+    text_only_letters = tokenize(text)
+    dictionary = calculate_frequencies(text_only_letters)
+    language_profile = {}
+    language_profile['name'] = language
+    language_profile['freq'] = dictionary
+    print(language_profile)
+    return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -64,6 +65,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+
 
 
 def compare_profiles(

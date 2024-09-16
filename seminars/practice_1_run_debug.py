@@ -4,6 +4,17 @@ Seminar 1
 Running python application and debugging
 """
 
+b = 0
+print(b, id(b))
+
+c = 1.33333333333
+stroka = str(c)
+#a = f'Моё число: {c}'
+a = f'Моё число: {c:.2f}'
+print(a)
+
+exit(0)
+
 # pylint: disable=invalid-name
 
 
@@ -31,7 +42,6 @@ print(f'Numbers: {first_num} and {second_num}')
 second_num = 6
 third_num = first_num / second_num
 print(f'Numbers: {first_num}, {second_num} and {third_num}')
-
 
 # Case 2: the second debugging case:
 if first_num * second_num == third_num:

@@ -5,11 +5,11 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-# откуда берется language(3) + округлить мсе
+# откуда берется language(3) + округлить мсе + closest profile:/
 
 
 def tokenize(text: str) -> list[str] | None:
-    if type(text) == str:
+    if isinstance(text, str):
         text = text.lower
         tokenized_list = []
         for i in text():
@@ -17,8 +17,9 @@ def tokenize(text: str) -> list[str] | None:
                 tokenized_list += i
         en_text = tokenized_list
         return en_text
-    else:
-        return None
+    return None
+
+
 """
     Split a text into tokens.
 
@@ -35,13 +36,13 @@ def tokenize(text: str) -> list[str] | None:
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    if type(tokens) == list and all(type(i) == str for i in tokens):
+    if isinstance(tokens, list) and all(isinstance(i, str) for i in tokens):
         frequency_dict = {}
         for i in tokens:
             frequency_dict[i] = tokens.count(i) / len(tokens)
         return frequency_dict
-    else:
-        return None
+    return None
+
 
 """
     Calculate frequencies of given tokens.
@@ -57,11 +58,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    if type(language) == type(text) == str:
+    if isinstance(language, str) and isinstance(text, str):
         lang_profile_dict = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
         return lang_profile_dict
-    else:
-        return None
+    return None
 
 
 """
@@ -79,15 +79,15 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
-    if type(predicted) == type(actual) == list and len(predicted) == len(actual):
+    if isinstance(predicted, list) and isinstance(actual, list) and len(predicted) == len(actual):
         sum_diff = 0
         for i, k in enumerate(actual):
             difference_between_values = (k - predicted[i]) ** 2
             sum_diff += difference_between_values
         mse = sum_diff / len(predicted)
         return mse
-    else:
-        return None
+    return None
+
 
 """
     Calculate mean squared error between predicted and actual values.
@@ -107,7 +107,7 @@ def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
-    if type(unknown_profile) == type(profile_to_compare) == dict and len(profile_to_compare) == len(unknown_profile) == 2:
+    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and len(profile_to_compare) == len(unknown_profile) == 2:
         for i in unknown_profile['freq']:
             if i not in profile_to_compare['freq']:
                 profile_to_compare['freq'][i] = 0
@@ -123,8 +123,7 @@ def compare_profiles(
         for i in sort_unk.values():
             unk_values_lst.append(i)
         return calculate_mse(comp_values_lst, unk_values_lst)
-    else:
-        return None
+    return None
 
 
 """
@@ -148,16 +147,17 @@ def detect_language(
     profile_1: dict[str, str | dict[str, float]],
     profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
-    if type(unknown_profile) == type(profile_1) == type(profile_2) == dict:
+    if isinstance(profile_1, dict) and isinstance(profile_2, dict) and isinstance(unknown_profile, dict):
         if (compare_profiles(unknown_profile, profile_1) or compare_profiles(unknown_profile, profile_2)) is None:
             return None
-        elif compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+        if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
             closest_profile = profile_1.get('name')
-        elif compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
+            return closest_profile
+        if compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
             closest_profile = profile_2.get('name')
-        return closest_profile
-    else:
-        return None
+            return closest_profile
+    return None
+
 
 """
     Detect the language of an unknown profile.

@@ -7,6 +7,8 @@ from main import calculate_frequencies
 from main import create_language_profile
 from main import compare_profiles
 from main import detect_language
+
+
 def main() -> None:
     """
     Launches an implementation

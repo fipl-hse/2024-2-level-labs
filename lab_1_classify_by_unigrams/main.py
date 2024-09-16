@@ -14,6 +14,7 @@ Returns:
 In case of corrupt input arguments, None is returned
 """
 
+
 def tokenize(text: str) -> list[str] | None:
     low = text.lower()
     new_list = list(low)

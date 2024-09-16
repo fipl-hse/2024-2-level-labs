@@ -26,9 +26,6 @@ def tokenize(text: str) -> list[str] | None:
     return clear_list
 
 
-print(tokenize("Hey! How are you?"))
-
-
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     frequency = {}
     for letter in tokens:
@@ -37,8 +34,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             frequency[letter] = counter
     return frequency
 
-
-print(calculate_frequencies(['h', 'e', 'y', 'h', 'o', 'w', 'a', 'r', 'e', 'y', 'o', 'u']))
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

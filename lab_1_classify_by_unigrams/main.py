@@ -47,6 +47,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    freq = tokenize(text)
+    dictionary = calculate_frequencies(freq)
+    profile = {
+        "name": language,
+        "freq": dictionary
+    }
+    return profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -62,6 +69,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+
 
 
 def compare_profiles(

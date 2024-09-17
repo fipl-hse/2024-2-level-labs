@@ -1,3 +1,13 @@
+'''a = 0
+b = a
+print(b, id(b))
+print(a, id(a))
+a = a+1
+print(a, b, id(b), id(a))
+a += 1
+print(a, id(a))'''
+
+
 """
 Programming 2024
 Seminar 1
@@ -19,7 +29,7 @@ Running python application and debugging
 
 
 # Debugging exercise. Debug the program and fix errors:
-first_num = 15
+first_num = 4
 second_num = 0
 
 print(f'Numbers: {first_num} and {second_num}')
@@ -28,9 +38,13 @@ print(f'Numbers: {first_num} and {second_num}')
 # third_num = first_num / second_num
 
 # Fix the first exception:
-second_num = 6
+second_num = 3
 third_num = first_num / second_num
-print(f'Numbers: {first_num}, {second_num} and {third_num}')
+# print(f'Numbers: {first_num}, {second_num} and {third_num}')
+c = 4/3
+stroka = str(c)
+a = f'Моё число: {c:.2f}'
+print(a)
 
 
 # Case 2: the second debugging case:

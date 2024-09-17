@@ -1,4 +1,3 @@
-from collections import Counter
 from string import punctuation
 from json import load
 

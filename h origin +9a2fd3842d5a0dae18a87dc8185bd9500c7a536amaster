@@ -1,0 +1,72 @@
+[33mcommit 9a2fd3842d5a0dae18a87dc8185bd9500c7a536a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: semtassta <semtassta@gmail.com>
+Date:   Sun Sep 15 23:01:11 2024 +0300
+
+    fixed imports
+
+[33mcommit 7f4d8fd4b72458d8b9af3cf5397761338f86edb1[m
+Author: semtassta <semtassta@gmail.com>
+Date:   Sun Sep 15 22:57:24 2024 +0300
+
+    target score set to 6
+
+[33mcommit f41024abd3b75346391329ad9a5aa4659e045430[m
+Merge: 861150e a59f2a5
+Author: semtassta <semtassta@gmail.com>
+Date:   Sun Sep 15 22:46:04 2024 +0300
+
+    Merge branch 'main' of https://github.com/semtassta/2024-2-level-labs
+
+[33mcommit 861150e5964d955f80d9d2fab684285349ba7d01[m
+Author: semtassta <semtassta@gmail.com>
+Date:   Sun Sep 15 22:45:29 2024 +0300
+
+    mark 6
+
+[33mcommit a59f2a54a0d6ed550187dfdf6c85027ca41546cc[m
+Author: Alexander Demidovskij <monadv@yandex.ru>
+Date:   Sun Sep 15 09:38:01 2024 +0300
+
+    [SYNC] [WW37] Fix for PR name (#52)
+
+[33mcommit 6b4a4b5df5afe156f8362ef0ca47d1978277f127[m
+Author: NovIrina <90452047+NovIrina@users.noreply.github.com>
+Date:   Sat Sep 14 18:57:42 2024 +0300
+
+    [LAB 1] Enable checks (#47)
+
+[33mcommit 7876921497de7d3ac00236262333a9379b6265ba[m
+Author: semtassta <semtassta@gmail.com>
+Date:   Fri Sep 13 14:21:55 2024 +0300
+
+    adding spaces
+
+[33mcommit e53828da94743fc887e04bfa896f7c1594ab5ffc[m
+Author: Artyom Tugaryov <artyom.tugaryov.logins@gmail.com>
+Date:   Fri Sep 13 16:04:17 2024 +0800
+
+    [SEMINAR] Run and Debug python (#48)
+
+[33mcommit a53563b3a73bcacba6c452609e9e6f57d304079c[m
+Author: Alexander Demidovskij <monadv@yandex.ru>
+Date:   Mon Sep 9 20:27:52 2024 +0300
+
+    [DOCS] Roles and Python version (#43)
+
+[33mcommit c146b80c89c89d5ff36a74ae8fc337cd0f73b7cc[m
+Author: Alexander Demidovskij <monadv@yandex.ru>
+Date:   Mon Sep 9 15:47:46 2024 +0300
+
+    [LAB 1] Implementation, description, tests (#42)
+
+[33mcommit ff618945a32a0cda29aa565b9e3fdb0137927e1d[m
+Author: Alexander Demidovskij <monadv@yandex.ru>
+Date:   Fri Sep 6 14:22:22 2024 +0800
+
+    [INIT] Technical framework for course (#1)
+
+[33mcommit 7a9d84c1bc9ebe549cb726142fe45dcb2c6b5a85[m
+Author: Alexander Demidovskij <monadv@yandex.ru>
+Date:   Thu Sep 5 11:25:32 2024 +0800
+
+    Initial commit

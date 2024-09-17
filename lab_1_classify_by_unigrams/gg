@@ -1,0 +1,9 @@
+tokens = ['d', 'f', 'a', 'd']
+d = {}
+for token in tokens:
+    if token in d.keys():
+        d[token] = 1 + d[token]
+    else:
+        d[token] = 1
+
+print(token)

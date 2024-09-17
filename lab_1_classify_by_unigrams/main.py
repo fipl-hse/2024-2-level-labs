@@ -3,17 +3,23 @@ Lab 1.
 
 Language detection
 """
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
 def tokenize(text: str) -> list[str] | None:
-    """
+    tokens = []
+    for symbol in text.lower():
+        if symbol.isalpha():
+            tokens.append(symbol)
+    return tokens
+
+
+"""
     Split a text into tokens.
 
     Convert the tokens into lowercase, remove punctuation, digits and other symbols
-
-    Args:
-        text (str): A text
 
     Returns:
         list[str] | None: A list of lower-cased tokens without punctuation
@@ -22,8 +28,21 @@ def tokenize(text: str) -> list[str] | None:
     """
 
 
-def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    """
+def calculate_frequencies(tokens) -> dict[str, float] | None:
+    d = {}
+    all_tokens = len(tokens)
+    for token in tokens:
+        if token in d.keys():
+            d[token] = 1 + d[token]
+        else:
+            d[token] = 1
+
+    for token in d:
+        d[token] /= all_tokens
+    return d
+
+
+"""
     Calculate frequencies of given tokens.
 
     Args:
@@ -37,7 +56,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """
+    tokens = tokenize(text)
+    dictionary = calculate_frequencies(tokens)
+    language_profile = {'name': language, 'freq': dictionary}
+    return language_profile
+
+
+"""
     Create a language profile.
 
     Args:
@@ -67,8 +92,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -87,9 +112,9 @@ def compare_profiles(
 
 
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -152,7 +177,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.
@@ -169,8 +194,6 @@ def detect_language_advanced(
     """
 
 
-
-
 def print_report(detections: list[tuple[str, float]]) -> None:
     """
     Print report for detection of language.
@@ -180,4 +203,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-print('hi')

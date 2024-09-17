@@ -4,7 +4,10 @@ Lab 1.
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-"""
+
+
+def tokenize(text: str) -> list[str] | None:
+    """
 Split a text into tokens.
 Convert the tokens into lowercase, remove punctuation, digits and other symbols
 Args:
@@ -13,8 +16,6 @@ Returns:
     list[str] | None: A list of lower-cased tokens without punctuation
 In case of corrupt input arguments, None is returned
 """
-
-def tokenize(text: str) -> list[str] | None:
     low = text.lower()
     new_list = list(low)
     clear_list = []
@@ -69,7 +70,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-
+    n = len(predicted)
+    mse = sum((actual[i] - predicted[i])**2 for i in range(n)) / n
+    return mse
 
 
 def compare_profiles(
@@ -90,7 +93,29 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    from_profile1 = unknown_profile["freq"]
+    from_profile2 = profile_to_compare["freq"]
+    keys_for_1 = set([key for key in from_profile1.keys()])
+    keys_for_2 = set([key for key in from_profile2.keys()])
+    letters_need1 = keys_for_1.difference(keys_for_2)
+    letters_need2 = keys_for_2.difference(keys_for_1)
 
+    for i in letters_need1:
+        from_profile2.setdefault(i, 0)
+    for x in letters_need2:
+        from_profile1.setdefault(x, 0)
+
+    sorted1 = dict(sorted(from_profile1.items()))
+    sorted2 = {}
+
+    for key in sorted1:
+        sorted2[key] = from_profile2.get(key, from_profile1[key])
+
+    #get lists with values from two dictionaries
+    list1 = list(sorted1.values())
+    list2 = list(sorted2.values())
+    x = calculate_mse(list2, list1)
+    return round(x, 3)
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],

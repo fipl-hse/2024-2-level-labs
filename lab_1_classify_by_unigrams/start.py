@@ -1,5 +1,6 @@
 from lab_1_classify_by_unigrams.main import (tokenize,
                                              create_language_profile,
+                                             calculate_mse,
                                              load_profile)
 
 """

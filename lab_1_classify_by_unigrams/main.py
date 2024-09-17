@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 """
 Lab 1.
@@ -116,6 +118,26 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    if (isinstance(unknown_profile, dict) and 'name' in unknown_profile and 'freq' in unknown_profile and
+            isinstance(profile_to_compare, dict) and 'name' in profile_to_compare and 'freq' in profile_to_compare):
+        unknown_letters_list = list(unknown_profile['freq'].keys())
+        compare_letters_list = list(profile_to_compare['freq'].keys())
+        all_letters = sorted(list(set(unknown_letters_list + compare_letters_list)))
+        unknown_frequencies_list = []
+        compare_frequencies_list = []
+        for letter in all_letters:
+            if letter in unknown_letters_list and letter in compare_letters_list:
+                unknown_frequencies_list.append(unknown_profile['freq'][letter])
+                compare_frequencies_list.append(profile_to_compare['freq'][letter])
+            elif letter in compare_letters_list:
+                compare_frequencies_list.append(profile_to_compare['freq'][letter])
+                unknown_frequencies_list.append(0)
+            else:
+                unknown_frequencies_list.append(unknown_profile['freq'][letter])
+                compare_frequencies_list.append(0)
+        return calculate_mse(compare_frequencies_list, unknown_frequencies_list)
+    else:
+        return None
     # if (isinstance(unknown_profile, dict) and 'name' in unknown_profile and 'freq' in unknown_profile and
     #         isinstance(profile_to_compare, dict) and 'name' in profile_to_compare and 'freq' in profile_to_compare):
     #     unknown_letters_list = list(unknown_profile['freq'].keys())
@@ -157,18 +179,24 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    potential_languages = []
-    profiles_mse = {profile_1['name']: calculate_mse(list(profile_1['freq'].values()),
-                                                     list(unknown_profile['freq'].values())),
-                    profile_2['name']: calculate_mse(list(profile_2['freq'].values()),
-                                                     list(unknown_profile['freq'].values()))
-                    }
-    sorted(profiles_mse, key=lambda x: x[1])
-    for name, mse in profiles_mse.items():
-        if mse == next(iter(profiles_mse.values())):
-            potential_languages.append(name)
-    potential_languages.sort()
-    return potential_languages[0]
+    if isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict):
+        potential_languages = []
+        # profiles_mse = {profile_1['name']: calculate_mse(list(profile_1['freq'].values()),
+        #                                                  list(unknown_profile['freq'].values())),
+        #                 profile_2['name']: calculate_mse(list(profile_2['freq'].values()),
+        #                                                  list(unknown_profile['freq'].values()))
+        #                 }
+        profiles_mse = {profile_1['name']: compare_profiles(unknown_profile, profile_1),
+                        profile_2['name']: compare_profiles(unknown_profile, profile_2)
+                        }
+        sorted(profiles_mse, key=lambda x: x[1])
+        for name, mse in profiles_mse.items():
+            if mse == next(iter(profiles_mse.values())):
+                potential_languages.append(name)
+        potential_languages.sort()
+        return potential_languages[0]
+    else:
+        return None
 
 
 def load_profile(path_to_file: str) -> dict | None:

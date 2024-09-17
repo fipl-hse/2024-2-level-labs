@@ -6,15 +6,6 @@ Language detection
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 def tokenize(text: str) -> list[str] | None:
-    text = text.lower()
-    cleaned_text = ""
-    for symbol in text:
-        if symbol.isalpha():
-            cleaned_text += symbol
-    tokens = []
-    for token in cleaned_text:
-        tokens += token
-    return tokens
     """
     Split a text into tokens.
 
@@ -28,6 +19,15 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    text = text.lower()
+    cleaned_text = ""
+    for symbol in text:
+        if symbol.isalpha():
+            cleaned_text += symbol
+    tokens = []
+    for token in cleaned_text:
+        tokens += token
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:

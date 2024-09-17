@@ -7,6 +7,7 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
+
     """
     Split a text into tokens.
 
@@ -20,6 +21,15 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+
+    tokens = []
+    if isinstance(text, str):
+        for symb in text:
+            if symb.isalpha():
+                tokens.append(symb.lower())
+        return tokens
+    else:
+        return None
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -178,4 +188,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-

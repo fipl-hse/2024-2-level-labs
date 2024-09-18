@@ -1,3 +1,10 @@
+c = 1.33333333333333
+stroke = str(c)
+'''index = stroke.find('.') + 1
+print('Моё число: {}'.format(stroke[:index+2]))'''
+a = f'Моё число: {c:.2f}'
+print(a)
+exit(0)
 """
 Programming 2024
 Seminar 1

@@ -1,8 +1,12 @@
+import re
+
 """
 Lab 1.
 
 Language detection
 """
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -21,6 +25,9 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
 
+    tokens = re.findall(r'(\w)', text.lower())
+    return tokens
+
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -34,6 +41,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+
+    freq_dict = {}
+    for character in tokens:
+        freq_dict[character] = tokens.count(character) / len(tokens)
+
+    return freq_dict
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -50,6 +63,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
 
+    profile_dict = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    return profile_dict
+
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -65,10 +81,18 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     In case of corrupt input arguments, None is returned
     """
 
+    values_list = []
+    for i, j in actual, predicted:
+        value = (i - j) ^ 2
+        values_list.append(value)
+
+    MSE = sum(values_list) / (len(actual) + len(predicted))
+    return MSE
+
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -85,11 +109,13 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
 
+    return calculate_mse(list(profile_to_compare['freq'].values()), list(unknown_profile['freq'].values()))
+
 
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -152,7 +178,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

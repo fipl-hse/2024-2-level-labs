@@ -5,8 +5,8 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-from string import punctuation
 from json import load
+from string import punctuation
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -113,7 +113,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     # в точности представления float в памяти, а не в неверном коде
     # странно, что это работает у всех, но не у меня
 
-    return round(sum((actual[i] - predicted[i]) ** 2 for i in range(len(actual))) / len(actual), 4)
+    return round(float(sum((actual[i] - predicted[i]) ** 2 for i in range(len(actual))) / len(actual)), 4)
 
 
 def compare_profiles(

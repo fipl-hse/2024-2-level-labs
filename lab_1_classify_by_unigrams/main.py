@@ -10,20 +10,20 @@ Language detection
 
 def tokenize(text: str) -> list[str] | None:
     if isinstance(text, str):
-        if isinstance(text, str):
-            tokens = []
-            for symbol in text:
-                if symbol.isalpha():
-                    tokens.append(symbol.lower())
-            return tokens
-        return None
+        tokens = []
+        for symbol in text:
+            if symbol.isalpha():
+                tokens.append(symbol.lower())
+        return tokens
+    return None
 
 
 """
     Split a text into tokens.
 
     Convert the tokens into lowercase, remove punctuation, digits and other symbols
-
+     Args:
+        text (str): A text
     Returns:
         list[str] | None: A list of lower-cased tokens without punctuation
 

@@ -9,13 +9,14 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-    if not isinstance(text, str):
+    if isinstance(text, str):
+        if isinstance(text, str):
+            tokens = []
+            for symbol in text:
+                if symbol.isalpha():
+                    tokens.append(symbol.lower())
+            return tokens
         return None
-    tokens = []
-    for symbol in text.lower():
-        if symbol.isalpha():
-            tokens.append(symbol)
-    return tokens
 
 
 """
@@ -30,7 +31,7 @@ def tokenize(text: str) -> list[str] | None:
     """
 
 
-def calculate_frequencies(tokens) -> dict[str, float] | None:
+def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if isinstance(tokens, list) and all(isinstance(token, str) for token in tokens):
         d = {}
         for token in tokens:
@@ -59,9 +60,7 @@ def calculate_frequencies(tokens) -> dict[str, float] | None:
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     if isinstance(language, str) and isinstance(text, str):
-        tokens = tokenize(text)
-        dictionary = calculate_frequencies(tokens)
-        language_profile = {'name': language, 'freq': dictionary}
+        language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
         return language_profile
     return None
 
@@ -81,7 +80,19 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
-    """
+    if isinstance(predicted, list) and isinstance(actual, list) and len(predicted) == len(actual):
+        summation = 0
+        n = len(actual)
+        for i in range(0, n):
+            difference = actual[i] - predicted[i]
+            squared_difference = difference ** 2
+            summation = summation + squared_difference
+        mse = summation / n
+        return mse
+    return None
+
+
+"""
     Calculate mean squared error between predicted and actual values.
 
     Args:

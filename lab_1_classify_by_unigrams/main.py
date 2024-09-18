@@ -113,7 +113,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     # в точности представления float в памяти, а не в неверном коде
     # странно, что это работает у всех, но не у меня
 
-    return round(float(sum((actual[i] - predicted[i]) ** 2 for i in range(len(actual))) / len(actual)), 4)
+    return round(float(sum((actual[i] - predicted[i]) ** 2
+                           for i in range(len(actual))) / len(actual)), 4)
 
 
 def compare_profiles(
@@ -138,6 +139,9 @@ def compare_profiles(
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
     if 'name' not in unknown_profile.keys() or 'name' not in profile_to_compare.keys():
+        return None
+    if not all(isinstance(key, str) for key in unknown_profile) \
+            or not all(isinstance(key, str) for key in profile_to_compare):
         return None
 
     # creating lists to pass into calculate_mse function
@@ -171,8 +175,8 @@ def detect_language(
             or not isinstance(profile_2, dict):
         return None
 
-    mse_1 = compare_profiles(unknown_profile, profile_1)
-    mse_2 = compare_profiles(unknown_profile, profile_2)
+    mse_1 = float(compare_profiles(unknown_profile, profile_1))
+    mse_2 = float(compare_profiles(unknown_profile, profile_2))
 
     # if mse values differ
     if mse_1 > mse_2:
@@ -204,7 +208,7 @@ def load_profile(path_to_file: str) -> dict | None:
         return None
 
     with open(path_to_file, 'r', encoding='UTF-8') as file:
-        profile = load(file)
+        profile = dict(load(file))
 
     return profile
 

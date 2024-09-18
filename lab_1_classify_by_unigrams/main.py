@@ -9,6 +9,8 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
+    if not isinstance(text, str):
+        return None
     tokens = []
     for symbol in text.lower():
         if symbol.isalpha():
@@ -29,17 +31,17 @@ def tokenize(text: str) -> list[str] | None:
 
 
 def calculate_frequencies(tokens) -> dict[str, float] | None:
-    d = {}
-    all_tokens = len(tokens)
-    for token in tokens:
-        if token in d.keys():
-            d[token] = 1 + d[token]
-        else:
-            d[token] = 1
-
-    for token in d:
-        d[token] /= all_tokens
-    return d
+    if isinstance(tokens, list) and all(isinstance(token, str) for token in tokens):
+        d = {}
+        for token in tokens:
+            if token in d.keys():
+                d[token] = 1 + d[token]
+            else:
+                d[token] = 1
+        for token in d:
+            d[token] /= len(tokens)
+        return d
+    return None
 
 
 """
@@ -56,10 +58,12 @@ def calculate_frequencies(tokens) -> dict[str, float] | None:
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    tokens = tokenize(text)
-    dictionary = calculate_frequencies(tokens)
-    language_profile = {'name': language, 'freq': dictionary}
-    return language_profile
+    if isinstance(language, str) and isinstance(text, str):
+        tokens = tokenize(text)
+        dictionary = calculate_frequencies(tokens)
+        language_profile = {'name': language, 'freq': dictionary}
+        return language_profile
+    return None
 
 
 """

@@ -174,6 +174,10 @@ def detect_language(
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
             or not isinstance(profile_2, dict):
         return None
+    if not all(isinstance(key, str) for key in unknown_profile) \
+            or not all(isinstance(key, str) for key in profile_1) \
+            or not all(isinstance(key, str) for key in profile_2):
+        return None
 
     mse_1 = float(compare_profiles(unknown_profile, profile_1))
     mse_2 = float(compare_profiles(unknown_profile, profile_2))

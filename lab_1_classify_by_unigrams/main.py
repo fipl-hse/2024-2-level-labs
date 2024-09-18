@@ -1,15 +1,12 @@
-from string import punctuation
-from json import load
-from operator import itemgetter
-
 """
 Lab 1.
 
 Language detection
 """
-
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+
+from string import punctuation
+from json import load
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -111,8 +108,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
         return None
 
-    # опытным путём на меньшем количестве данных выяснила, что дело, кажется, в точности представления float в памяти,
-    # а не в неверном коде
+    # опытным путём на меньшем количестве данных выяснила, что дело, кажется,
+    # в точности представления float в памяти, а не в неверном коде
     # странно, что это работает у всех, но не у меня
 
     return round(sum((actual[i] - predicted[i]) ** 2 for i in range(len(actual))) / len(actual), 4)
@@ -169,7 +166,8 @@ def detect_language(
     """
 
     # checking input
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
+            or not isinstance(profile_2, dict):
         return None
 
     mse_1 = compare_profiles(unknown_profile, profile_1)
@@ -226,7 +224,8 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
 
     # checking input
-    if not isinstance(profile, dict) or not all(key in profile for key in ['name', 'n_words', 'freq']):
+    if not isinstance(profile, dict) or not \
+            all(key in profile for key in ['name', 'n_words', 'freq']):
         return None
 
     profile_preprocessed = {'name': profile['name'], 'freq': {}}
@@ -235,7 +234,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
 
     for key in profile['freq']:
         key = key.strip().lower()
-        if len(key) == 1 and key.isalpha() and key not in profile_preprocessed.keys():
+        if len(key) == 1 and key.isalpha() and key not in profile_preprocessed:
             profile_preprocessed['freq'][key] = profile['freq'][key] / all_unigrams_count
         elif len(key) == 1 and key.isalpha():
             profile_preprocessed['freq'][key] += profile['freq'][key] / all_unigrams_count

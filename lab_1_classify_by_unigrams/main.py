@@ -1,5 +1,6 @@
 from string import punctuation
 from json import load
+from operator import itemgetter
 
 """
 Lab 1.
@@ -110,7 +111,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
         return None
 
-    # опытным путём на меньшем количестве данных выяснила, что дело, кажется, в точности представления float в памяти, а не в неверном коде
+    # опытным путём на меньшем количестве данных выяснила, что дело, кажется, в точности представления float в памяти,
+    # а не в неверном коде
     # странно, что это работает у всех, но не у меня
 
     return round(sum((actual[i] - predicted[i]) ** 2 for i in range(len(actual))) / len(actual), 4)
@@ -202,10 +204,10 @@ def load_profile(path_to_file: str) -> dict | None:
     if not isinstance(path_to_file, str):
         return None
 
-    with open(path_to_file, 'r') as file:
-        file = load(file)
+    with open(path_to_file, 'r', encoding='UTF-8') as file:
+        profile = load(file)
 
-    return file
+    return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -224,7 +226,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
 
     # checking input
-    if isinstance(profile, dict):
+    if not isinstance(profile, dict) or not all(key in profile for key in ['name', 'n_words', 'freq']):
         return None
 
     profile_preprocessed = {'name': profile['name'], 'freq': {}}
@@ -254,10 +256,19 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     In case of corrupt input arguments, None is returned
     """
 
+    # checking input
+    if not isinstance(paths_to_profiles, list):
+        return None
+
+    loaded_profiles = []
+    for path in paths_to_profiles:
+        loaded_profiles.append(preprocess_profile(load_profile(path)))
+
+    return loaded_profiles
+
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
-) -> list | None:
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list) -> list | None:
     """
     Detect the language of an unknown profile.
 
@@ -272,6 +283,18 @@ def detect_language_advanced(
     In case of corrupt input arguments, None is returned
     """
 
+    # checking input
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
+        return None
+
+    distances = []
+    for profile in known_profiles:
+        distances.append(tuple((profile['name'], compare_profiles(unknown_profile, profile))))
+
+    # distances = sorted(distances, key=itemgetter(1, 0))
+    distances = sorted(distances, key=lambda t: t[1])
+    return distances
+
 
 def print_report(detections: list[tuple[str, float]]) -> None:
     """
@@ -282,3 +305,12 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+
+    # checking input
+    if not isinstance(detections, list):
+        return None
+
+    for result in detections:
+        print(f'{result[0]}: MSE {result[1]}')
+
+    return None

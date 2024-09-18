@@ -1,3 +1,4 @@
+import json
 import re
 
 """
@@ -25,7 +26,8 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
 
-    tokens = re.findall(r'(\w)', text.lower())
+    all_letters = re.sub(r'[\W\d_]', '', text.lower())
+    tokens = re.findall(r'(.)', all_letters)
     return tokens
 
 
@@ -81,12 +83,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     In case of corrupt input arguments, None is returned
     """
 
-    values_list = []
-    for i, j in actual, predicted:
-        value = (i - j) ^ 2
-        values_list.append(value)
+    value = 0
+    i = 0
+    while i < len(actual):
+        value += (actual[i] - predicted[i]) ** 2
+        i += 1
 
-    MSE = sum(values_list) / (len(actual) + len(predicted))
+    MSE = value / i
     return MSE
 
 
@@ -132,6 +135,16 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
 
+    MSE_profile_1 = compare_profiles(unknown_profile, profile_1)
+    MSE_profile_2 = compare_profiles(unknown_profile, profile_2)
+    lang_list = [profile_1['name'], profile_2['name']]
+
+    if MSE_profile_1 == MSE_profile_2:
+        return sorted(lang_list)[0]
+    elif MSE_profile_1 > MSE_profile_2:
+        return profile_2['name']
+    return profile_1['name']
+
 
 def load_profile(path_to_file: str) -> dict | None:
     """
@@ -145,6 +158,10 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
+
+    with open(f'assets/profiles/{path_to_file}.json', 'r', encoding='utf-8') as file:
+        load_dict = json.load(file)
+    return load_dict
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -162,6 +179,17 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     'freq' in arguments, None is returned
     """
 
+    profile_freq = profile['freq']
+    for key in list(profile_freq.keys()):
+        if not len(key) == 1 or not key.isalpha():
+            del profile['freq'][key]
+            continue
+        profile_freq[key] /= profile['n_words'][0]
+        profile_freq[key.lower()] = profile_freq.pop(key)
+    del profile['n_words']
+
+    return profile
+
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
@@ -175,6 +203,12 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
+
+    profiles_list = []
+    for path in paths_to_profiles:
+        profiles_list.append(preprocess_profile(load_profile(path)))
+
+    return profiles_list
 
 
 def detect_language_advanced(
@@ -194,6 +228,12 @@ def detect_language_advanced(
     In case of corrupt input arguments, None is returned
     """
 
+    result_list = []
+    for profile in known_profiles:
+        result_list.append((profile['name'], compare_profiles(unknown_profile, profile)))
+    sorted(sorted(result_list, key=lambda x: x[1]), key=lambda x: x[0])
+    return result_list
+
 
 def print_report(detections: list[tuple[str, float]]) -> None:
     """
@@ -204,3 +244,6 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+
+    for profile in detections:
+        print(f'{profile[0]}: MSE {profile[1]:.5f}')

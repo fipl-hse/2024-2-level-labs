@@ -57,7 +57,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     freq = {}
     for char in set(tokens):
-        freq[char] = tokens.count(char)
+        freq[char] = float(tokens.count(char))
 
     for letter in freq:
         freq[letter] = freq[letter] / tokens_total
@@ -105,7 +105,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
 
     # checking input
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if not isinstance(predicted, list) or not isinstance(actual, list) \
+            or len(predicted) != len(actual):
         return None
 
     # опытным путём на меньшем количестве данных выяснила, что дело, кажется,
@@ -140,8 +141,8 @@ def compare_profiles(
         return None
 
     # creating lists to pass into calculate_mse function
-    unknown_sorted = [(unknown_profile['freq'][char] if char in unknown_profile['freq'] else 0.0) for char in
-                      profile_to_compare['freq']]
+    unknown_sorted = [(unknown_profile['freq'][char] if char in unknown_profile['freq'] else 0.0)
+                      for char in profile_to_compare['freq']]
 
     return calculate_mse(unknown_sorted, list(profile_to_compare['freq'].values()))
 

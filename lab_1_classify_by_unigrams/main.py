@@ -184,7 +184,7 @@ def detect_language(
     if mse_2 > mse_1:
         return profile_1['name']
     # if mse values are the same -> return the first one by alphabetical order
-    if profile_1['name'] > profile_2['name']:
+    if str(profile_1['name']) > str(profile_2['name']):
         return profile_2['name']
     return profile_1['name']
 

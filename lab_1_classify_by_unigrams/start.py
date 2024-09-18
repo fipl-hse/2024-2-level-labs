@@ -13,15 +13,6 @@ def main() -> None:
     Launches an implementation
     """
 
-    # lang_names_lst = {'en', 'de', 'unknown'}
-    # texts_dict = {}
-    #
-    # for lang_name in lang_names_lst:
-    #     file_pattern = f'assets/texts/{lang_name}.txt'
-    #     with open(file_pattern, 'r', encoding='utf-8') as file:
-    #         read_text = file.read()
-    #         texts_dict[f'{lang_name}_text'] = read_text
-
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
@@ -52,7 +43,7 @@ def main() -> None:
     #                            m.create_language_profile('en', en_text))
 
     # Step 7.
-    # result = m.load_profile('ru')
+    # result = m.load_profile('assets/profiles/ru.json')
 
     # Step 8.
     # result = m.preprocess_profile(m.load_profile('tr'))

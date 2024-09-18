@@ -14,32 +14,21 @@ def tokenize(text: str) -> list[str] | None:
     return letters
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    """
-    Calculate frequencies of given tokens.
-
-    Args:
-        tokens (list[str] | None): A list of tokens
-
-    Returns:
-        dict[str, float] | None: A dictionary with frequencies
-
-    In case of corrupt input arguments, None is returned
-    """
+    vocabulary = {}
+    lenght = len(tokens)
+    tokens_set = list(set(tokens))
+    for letter in tokens_set:
+        amount_of_appear = tokens.count(letter)
+        vocabulary[letter] = float(amount_of_appear/lenght)
+    return vocabulary
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """
-    Create a language profile.
-
-    Args:
-        language (str): A language
-        text (str): A text
-
-    Returns:
-        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
-
-    In case of corrupt input arguments, None is returned
-    """
+    profile = {}
+    profile['name'] = language
+    frequency = calculate_frequencies(tokenize(text))
+    profile['freq'] = frequency
+    return profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

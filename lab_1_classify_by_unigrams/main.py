@@ -59,7 +59,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         for token in freq:
             freq[token] /= all_tokens
         return freq
-    if len(tokens) == 0:
+    if tokens == 0:
         return None
     else:
         return None

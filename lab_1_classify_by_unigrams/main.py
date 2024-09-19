@@ -28,8 +28,6 @@ def tokenize(text: str) -> list[str] | None:
             if symb.isalpha():
                 tokens.append(symb.lower())
         return tokens
-    if len(text) == 0:
-        return None
     else:
         return None
 

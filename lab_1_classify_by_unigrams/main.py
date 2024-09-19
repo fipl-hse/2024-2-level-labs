@@ -28,8 +28,7 @@ def tokenize(text: str) -> list[str] | None:
             if symb.isalpha():
                 tokens.append(symb.lower())
         return tokens
-    else:
-        return None
+    return None
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -57,8 +56,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         for token in freq:
             freq[token] /= all_tokens
         return freq
-    else:
-        return None
+    return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -80,8 +78,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         freq_dict = calculate_frequencies(tokenize(text))
         language_profile = {'name': language, 'freq': freq_dict}
         return language_profile
-    else:
-        return None
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

@@ -28,11 +28,14 @@ def tokenize(text: str) -> list[str] | None:
             if symb.isalpha():
                 tokens.append(symb.lower())
         return tokens
+    if len(text) == 0:
+        return None
     else:
         return None
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+
     """
     Calculate frequencies of given tokens.
 
@@ -44,6 +47,22 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+
+    if isinstance(tokens, list):
+        freq = {}
+        all_tokens = len(tokens)
+        for token in tokens:
+            if token in freq:
+                freq[token] += 1
+            else:
+                freq[token] = 1
+        for token in freq:
+            freq[token] /= all_tokens
+        return freq
+    if len(tokens) == 0:
+        return None
+    else:
+        return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

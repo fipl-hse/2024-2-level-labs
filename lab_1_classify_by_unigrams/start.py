@@ -4,7 +4,7 @@ Language detection starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 from main import tokenize
-
+from main import calculate_frequencies
 
 def main() -> None:
     """
@@ -21,6 +21,7 @@ def main() -> None:
     result = tokens
     assert result, "Detection result is None"
 
+    print(f'Frequencies: {calculate_frequencies(tokens)}')
 
 if __name__ == "__main__":
     main()

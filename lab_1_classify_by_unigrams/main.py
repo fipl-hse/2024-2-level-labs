@@ -71,7 +71,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     In case of corrupt input arguments, None is returned
     """
     n = len(predicted)
-    mse = sum((actual[i] - predicted[i])**2 for i in range(n)) / n
+    mse = float(sum((actual[i] - predicted[i])**2 for i in range(n)) / n)
     return mse
 
 
@@ -137,6 +137,16 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
 
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 == mse_2:
+        languages = []
+        languages.append(profile_1["name"])
+        languages.append(profile_2["name"])
+        sort = sorted(languages)
+        return sort[0]
+    else:
+        return min(mse_1, mse_2)
 
 def load_profile(path_to_file: str) -> dict | None:
     """

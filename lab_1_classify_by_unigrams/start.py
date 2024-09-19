@@ -49,11 +49,14 @@ def main() -> None:
     # result = m.preprocess_profile(m.load_profile('tr'))
 
     # Step 9.
-    # result = m.collect_profiles(['es', 'fr', 'it', 'ru', 'tr'])
+    # result = m.collect_profiles(['assets/profiles/es.json', 'assets/profiles/fr.json', 'assets/profiles/it.json',
+    #                              'assets/profiles/ru.json', 'assets/profiles/tr.json'])
 
     # Step 10.
     result = m.detect_language_advanced(m.create_language_profile('unknown', unknown_text),
-                                        m.collect_profiles(['es', 'fr', 'it', 'ru', 'tr']))
+                                        m.collect_profiles(['assets/profiles/es.json', 'assets/profiles/fr.json',
+                                                            'assets/profiles/it.json', 'assets/profiles/ru.json',
+                                                            'assets/profiles/tr.json']))
     print(result)
 
     # Step 11.

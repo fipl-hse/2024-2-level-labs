@@ -62,6 +62,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+
     """
     Create a language profile.
 
@@ -74,6 +75,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+
+    if isinstance(language, str) and isinstance(text, str):
+        freq_dict = calculate_frequencies(tokenize(text))
+        language_profile = {'name': language, 'freq': freq_dict}
+        return language_profile
+    else:
+        return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

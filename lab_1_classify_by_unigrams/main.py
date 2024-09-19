@@ -19,15 +19,16 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    text = text.lower()
-    cleaned_text = ""
-    for symbol in text:
-        if symbol.isalpha():
-            cleaned_text += symbol
-    tokens = []
-    for token in cleaned_text:
-        tokens += token
-    return tokens
+    if isinstance(text, str):
+        text = text.lower()
+        cleaned_text = ""
+        for symbol in text:
+            if symbol.isalpha():
+                cleaned_text += symbol
+        tokens = []
+        for token in cleaned_text:
+            tokens += token
+        return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -42,6 +43,23 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    abs_freq = {}
+
+    if not isinstance(tokens, list):
+        return None
+    total_elements = len(tokens)
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+        else:
+            if token in abs_freq:
+                abs_freq[token] += 1
+            else:
+                abs_freq[token] = 1
+    if total_elements == 0:
+        return None
+    rel_freq = {element: freq / total_elements for element, freq in abs_freq.items()}
+    return rel_freq
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -57,7 +75,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-
+    if isinstance(text, str) and isinstance(language, str):
+        preprocessed_text = tokenize(text)
+        relative_frequency = calculate_frequencies(preprocessed_text)
+        language_profile = {"name": language, "freq": relative_frequency}
+        return language_profile
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

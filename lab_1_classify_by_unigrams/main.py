@@ -28,6 +28,8 @@ def tokenize(text: str) -> list[str] | None:
     for symbol in text:
         if symbol.isalpha():
             tokens.append(symbol.lower())
+        else:
+            continue
     return tokens
 
 
@@ -75,15 +77,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not is_corrupt_input:
         return None
     tokens = tokenize(text)
-    freq_dict: dict[str, float] | None = calculate_frequencies(tokens)
+    freq_dict = calculate_frequencies(tokens)
     if freq_dict is None:
         return None
-    language_profile: dict[str, str | dict[str, float]] | None
-    language_profile = {
-        "name": language,
-        "freq": freq_dict,
-    }
-    return language_profile
+    return {"name": language, "freq": freq_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

@@ -4,7 +4,6 @@ Lab 1.
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-print("This is the start of my job")
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -20,6 +19,17 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    tokens_list = []
+
+    if type(text) == str:
+        for i in text:
+            if i.isalpha():
+                unit = i.lower()
+                tokens_list.append(unit)
+    else:
+        tokens_list = None
+
+    return tokens_list
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -34,6 +44,18 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    freq_dict = {}
+    
+    if type(tokens) == list and all(type(x) == str for x in tokens):
+        for i in tokens:
+            freq_dict.setdefault(i, 0)
+            freq_dict[i] += 1
+        for n in freq_dict:
+            freq_dict[n] = freq_dict[n] / len(tokens)
+    else:
+        freq_dict = None
+
+    return freq_dict
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -49,6 +71,17 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    lang_profile = {}
+
+    if type(language) == str and type(text) == str:
+        tokens_list = tokenize(text)
+        freq_dict = calculate_frequencies(tokens_list)
+        lang_profile["name"] = language
+        lang_profile["freq"] = freq_dict
+    else:
+        lang_profile = None
+
+    return lang_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

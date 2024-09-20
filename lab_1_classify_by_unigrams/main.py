@@ -1,4 +1,3 @@
-
 """
 Lab 1.
 
@@ -8,6 +7,15 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
+
+    text = text.lower()
+    letter_lst = []
+    for i in text:
+        if i.isalpha():
+            letter_lst.append(i)
+
+    return letter_lst
+
     """
     Split a text into tokens.
 

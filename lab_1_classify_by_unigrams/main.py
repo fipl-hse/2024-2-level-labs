@@ -19,7 +19,7 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(text) == str:
+    if isinstance(text, str):
         needless = "\n1234567890,.:; -!?'*º’‘"
         text = text.lower()
         tokens = []
@@ -42,7 +42,7 @@ def calculate_frequencies(tokens: list) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(tokens) == list:
+    if isinstance(tokens, list):
         freq = {}
         for i in tokens:
             if i in freq:

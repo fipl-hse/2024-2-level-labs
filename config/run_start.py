@@ -49,7 +49,7 @@ def run_start(lab_name: str) -> tuple[bool, str]:
         cwd=PROJECT_ROOT / lab_name,
         debug=True
     )
-    return result.returncode == 0, result.stderr
+    return result.returncode == 0, result.stderr.decode('utf-8')
 
 
 def check_start_content(lab_name: str) -> None:

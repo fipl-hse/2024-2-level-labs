@@ -2,8 +2,7 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-from main import create_language_profile
-from main import detect_language
+from main import create_language_profile, detect_language
 
 
 def main() -> None:
@@ -21,6 +20,7 @@ def main() -> None:
         unknown_profile = create_language_profile("unknown", unknown_text)
     result = detect_language(unknown_profile, profile_en, profile_de)
     assert result, "Detection result is None"
+
 
 if __name__ == "__main__":
     main()

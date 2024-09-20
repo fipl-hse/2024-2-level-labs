@@ -19,7 +19,7 @@ In case of corrupt input arguments, None is returned
     low = text.lower()
     new_list = list(low)
     clear_list = []
-    wrong_cases = list("!?/|\.,';:\"\#@()*-+=`~ 1234567890")
+    wrong_cases = list("!?/|\.,';:\"#@()*-+=`~ 1234567890")
     for i in new_list:
         if i not in wrong_cases:
             clear_list.append(i)
@@ -27,6 +27,17 @@ In case of corrupt input arguments, None is returned
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+    """
+        Calculate frequencies of given tokens.
+
+        Args:
+            tokens (list[str] | None): A list of tokens
+
+        Returns:
+            dict[str, float] | None: A dictionary with frequencies
+
+        In case of corrupt input arguments, None is returned
+        """
     frequency = {}
     for letter in tokens:
         if letter.isalpha():
@@ -70,8 +81,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    n = len(predicted)
-    mse = float(sum((actual[i] - predicted[i])**2 for i in range(n)) / n)
+    length = len(predicted)
+    mse = float(sum((actual[i] - predicted[i])**2 for i in range(length)) / length)
     return mse
 
 
@@ -95,8 +106,8 @@ def compare_profiles(
     """
     from_profile1 = unknown_profile["freq"]
     from_profile2 = profile_to_compare["freq"]
-    keys_for_1 = set([key for key in from_profile1.keys()])
-    keys_for_2 = set([key for key in from_profile2.keys()])
+    keys_for_1 = {key for key in from_profile1.keys()}
+    keys_for_2 = {key for key in from_profile2.keys()}
     letters_need1 = keys_for_1.difference(keys_for_2)
     letters_need2 = keys_for_2.difference(keys_for_1)
 
@@ -114,8 +125,9 @@ def compare_profiles(
     #get lists with values from two dictionaries
     list1 = list(sorted1.values())
     list2 = list(sorted2.values())
-    x = calculate_mse(list2, list1)
-    return round(x, 3)
+    conclusion = calculate_mse(list2, list1)
+    return round(conclusion, 3)
+
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -145,8 +157,8 @@ def detect_language(
         languages.append(profile_2["name"])
         sort = sorted(languages)
         return sort[0]
-    else:
-        return min(mse_1, mse_2)
+    return min(mse_1, mse_2)
+
 
 def load_profile(path_to_file: str) -> dict | None:
     """

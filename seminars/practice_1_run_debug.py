@@ -6,6 +6,7 @@ Running python application and debugging
 
 # pylint: disable=invalid-name
 
+
 # Three main ideas:
 # 1. Python is a program that launches another program.
 #       We pass the code from main.py into the python virtual machine (PVM),
@@ -31,4 +32,11 @@ second_num = 6
 third_num = first_num / second_num
 print(f'Numbers: {first_num}, {second_num} and {third_num}')
 
+
 # Case 2: the second debugging case:
+if first_num * second_num == third_num:
+    print('First number * second equals third number')
+else:
+    print('First number * second does not equal third number')
+
+print('Program finished')

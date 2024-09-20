@@ -25,7 +25,7 @@ class TokenizeTest(unittest.TestCase):
         """
         expected = ['t', 'h', 'e', 'w', 'e', 'a', 't', 'h', 'e', 'r', 'i', 's',
                     's', 'u', 'n', 'n', 'y']
-        actual = tokenize()
+        actual = tokenize('The weather is sunny.')
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
@@ -41,7 +41,7 @@ class TokenizeTest(unittest.TestCase):
                     's', 'e', 'n', 't', 'e', 'n', 'c', 'e',
                     't', 'h', 'e', 's', 'e', 'c', 'o', 'n',
                     'd', 's', 'e', 'n', 't', 'e', 'n', 'c', 'e']
-        actual = tokenize()
+        actual = tokenize('The first sentence. The second sentence.')
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
@@ -55,7 +55,7 @@ class TokenizeTest(unittest.TestCase):
         """
         expected = ['t', 'h', 'e', 'f', 'i', 'r', 's', 't', 's', 'e',
                     'n', 't', 'e', 'n', 'c', 'e', 'n', 'i', 'c', 'e']
-        actual = tokenize()
+        actual = tokenize('The, first sentence - nice!')
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
@@ -76,7 +76,7 @@ class TokenizeTest(unittest.TestCase):
                     'h', 'm', 'u', 's', 's', 'd', 'a',
                     's', 'ü', 'b', 'e', 'r', 'l', 'e',
                     'g', 'e', 'n']
-        actual = tokenize()
+        actual = tokenize('Ich weiß nicht was ich machen möchte. Vielleicht ich muss das überlegen')
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
@@ -93,7 +93,7 @@ class TokenizeTest(unittest.TestCase):
                     'c', 'e', 't', 'h', 'e', 's', 'e',
                     'c', 'o', 'n', 'd', 's', 'e', 'n',
                     't', 'e', 'n', 'c', 'e']
-        actual = tokenize()
+        actual = tokenize('The first% sentence><. The sec&*ond sent@ence #.')
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
@@ -108,5 +108,5 @@ class TokenizeTest(unittest.TestCase):
         bad_inputs = [[], {}, (), None, 9, 9.34, True]
         expected = None
         for bad_input in bad_inputs:
-            actual = tokenize()
+            actual = tokenize(bad_input)
             self.assertEqual(expected, actual)

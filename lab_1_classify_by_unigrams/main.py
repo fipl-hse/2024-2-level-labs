@@ -1,13 +1,29 @@
 """
 Lab 1.
 
-Language detection (...)
+Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-
-def tokenize(text: str) -> list[str] | None:
-    """
+f = open(r"C:\Users\Николай\Desktop\Proga\2024-2-level-labs\lab_1_classify_by_unigrams\assets\texts\de.txt", encoding='utf-8')
+text_en = f.read()
+f.close()
+f = open(r"C:\Users\Николай\Desktop\Proga\2024-2-level-labs\lab_1_classify_by_unigrams\assets\texts\en.txt", encoding='utf-8')
+text_de = f.read()
+f.close()
+f = open(r"C:\Users\Николай\Desktop\Proga\2024-2-level-labs\lab_1_classify_by_unigrams\assets\texts\unknown.txt", encoding='utf-8')
+text_unknown = f.read()
+f.close()
+def tokenize(text) -> list[str] | None:
+    needless = "\n1234567890,.:; -!?'*º’‘"
+    text = text.lower()
+    tokens = []
+    for i in text:
+        if i not in needless:
+            tokens += i
+    tokens.sort()
+    return tokens
+"""
     Split a text into tokens.
 
     Convert the tokens into lowercase, remove punctuation, digits and other symbols
@@ -22,8 +38,15 @@ def tokenize(text: str) -> list[str] | None:
     """
 
 
-def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    """
+def calculate_frequencies(tokens) -> dict[str, float] | None:
+    freq = {}
+    for i in tokens:
+        if i in freq:
+            continue
+        average_freq = tokens.count(i)/len(tokens)
+        freq[i] = average_freq
+    return freq
+"""
     Calculate frequencies of given tokens.
 
     Args:
@@ -36,8 +59,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
 
 
-def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """
+def create_language_profile(language, text) -> dict[str, str | dict[str, float]] | None:
+    tokens = tokenize(text)
+    freq = calculate_frequencies(tokens)
+    profile = {'name': language, 'freq': freq}
+    return profile
+
+"""
     Create a language profile.
 
     Args:

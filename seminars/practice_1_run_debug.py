@@ -41,18 +41,6 @@ else:
 
 print('Program finished')
 
-a=0
-b=a
-print(a,id(a))
-print(b,id(b))
-a+=1
-print(a,id(a))
-print(b,id(b))
-c=0
-print(id(c))
 #При обычном делении тип изменяется на float, а при умножении - int
-d=4/3
-a = f'Моё число:{d:.2f}'
-print(a)
-exit(0)
+
 

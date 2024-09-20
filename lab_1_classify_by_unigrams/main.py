@@ -5,25 +5,8 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-f = open(r"C:\Users\Николай\Desktop\Proga\2024-2-level-labs\lab_1_classify_by_unigrams\assets\texts\de.txt", encoding='utf-8')
-text_en = f.read()
-f.close()
-f = open(r"C:\Users\Николай\Desktop\Proga\2024-2-level-labs\lab_1_classify_by_unigrams\assets\texts\en.txt", encoding='utf-8')
-text_de = f.read()
-f.close()
-f = open(r"C:\Users\Николай\Desktop\Proga\2024-2-level-labs\lab_1_classify_by_unigrams\assets\texts\unknown.txt", encoding='utf-8')
-text_unknown = f.read()
-f.close()
-def tokenize(text) -> list[str] | None:
-    needless = "\n1234567890,.:; -!?'*º’‘"
-    text = text.lower()
-    tokens = []
-    for i in text:
-        if i not in needless:
-            tokens += i
-    tokens.sort()
-    return tokens
-"""
+def tokenize(text: str) -> list[str] | None:
+    """
     Split a text into tokens.
 
     Convert the tokens into lowercase, remove punctuation, digits and other symbols
@@ -36,17 +19,19 @@ def tokenize(text) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if type(text) == str:
+        needless = "\n1234567890,.:; -!?'*º’‘"
+        text = text.lower()
+        tokens = []
+        for i in text:
+            if i not in needless:
+                tokens += i
+    else:
+        return None
+    return tokens
 
-
-def calculate_frequencies(tokens) -> dict[str, float] | None:
-    freq = {}
-    for i in tokens:
-        if i in freq:
-            continue
-        average_freq = tokens.count(i)/len(tokens)
-        freq[i] = average_freq
-    return freq
-"""
+def calculate_frequencies(tokens: list) -> dict[str, float] | None:
+    """
     Calculate frequencies of given tokens.
 
     Args:
@@ -57,15 +42,19 @@ def calculate_frequencies(tokens) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if type(tokens) == list:
+        freq = {}
+        for i in tokens:
+            if i in freq:
+                continue
+            average_freq = tokens.count(i) / len(tokens)
+            freq[i] = average_freq
+    else:
+        return None
+    return freq
 
-
-def create_language_profile(language, text) -> dict[str, str | dict[str, float]] | None:
-    tokens = tokenize(text)
-    freq = calculate_frequencies(tokens)
-    profile = {'name': language, 'freq': freq}
-    return profile
-
-"""
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+    """
     Create a language profile.
 
     Args:
@@ -77,7 +66,10 @@ def create_language_profile(language, text) -> dict[str, str | dict[str, float]]
 
     In case of corrupt input arguments, None is returned
     """
-
+    tokens = tokenize(text)
+    freq = calculate_frequencies(tokens)
+    profile = {'name': language, 'freq': freq}
+    return profile
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -112,7 +104,6 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],

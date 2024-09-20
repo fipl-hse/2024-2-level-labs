@@ -1,7 +1,7 @@
 """
 Lab 1.
 
-Language detection
+Language detect
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 

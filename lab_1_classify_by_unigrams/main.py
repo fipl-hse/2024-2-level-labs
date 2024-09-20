@@ -81,6 +81,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         language_profile = {"name": language, "freq": relative_frequency}
         return language_profile
 
+
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculate mean squared error between predicted and actual values.
@@ -94,6 +95,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    mse = sum((actual[i] - predicted[i])**2 for i in range(len(actual))) / len(actual)
+    return mse
 
 
 def compare_profiles(

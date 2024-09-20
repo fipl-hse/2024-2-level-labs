@@ -1,7 +1,6 @@
 """
 Generator of stubs for existing lab implementation.
 """
-# pylint: disable=too-many-statements
 import ast
 from _ast import alias, stmt
 from pathlib import Path

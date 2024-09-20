@@ -57,7 +57,7 @@ def check_lint_level(lint_output: bytes, target_score: int) -> subprocess.Comple
     """
     lint_level_args = [
         "-m",
-        "config.stage_1_style_tests.lint_level",
+        "config.static_checks.lint_level",
         "--lint-output",
         str(lint_output),
         "--target-score",
@@ -95,8 +95,8 @@ def main() -> None:
             PROJECT_ROOT / "admin_utils"
         ],
         pyproject_path, True)
-    completed_process = check_lint_level(completed_process.stdout, 10)
-    print(completed_process.stdout.decode("utf-8"))
+    completed_process = check_lint_level(completed_process.stdout.decode("utf-8"), 10)
+    print(completed_process.stdout.decode("utf-8").replace('\r', ''))
     print(completed_process.stderr.decode("utf-8"))
     check_result(completed_process.returncode)
 
@@ -108,8 +108,8 @@ def main() -> None:
                 PROJECT_ROOT / "core_utils"
             ],
             pyproject_path)
-        completed_process = check_lint_level(completed_process.stdout, 10)
-        print(completed_process.stdout.decode("utf-8"))
+        completed_process = check_lint_level(completed_process.stdout.decode("utf-8"), 10)
+        print(completed_process.stdout.decode("utf-8").replace('\r', ''))
         print(completed_process.stderr.decode("utf-8"))
         check_result(completed_process.returncode)
 
@@ -128,8 +128,9 @@ def main() -> None:
                     lab_path
                 ],
                 pyproject_path, ignore_tests=repository_type == "public")
-            completed_process = check_lint_level(completed_process.stdout, target_score)
-            print(completed_process.stdout.decode("utf-8"))
+            completed_process = check_lint_level(completed_process.stdout.decode("utf-8"),
+                                                 target_score)
+            print(completed_process.stdout.decode("utf-8").replace('\r', ''))
             print(completed_process.stderr.decode("utf-8"))
             check_result(completed_process.returncode)
 

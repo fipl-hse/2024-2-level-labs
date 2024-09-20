@@ -26,7 +26,7 @@ def tokenize(text: str) -> list[str] | None:
         for token in text:
             if token.isalpha():
                 tokens_str += token
-        tokens = list(tokens_strgit)
+        tokens = list(tokens_str)
         return tokens
     else:
         return None

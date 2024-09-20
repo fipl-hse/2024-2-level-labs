@@ -83,6 +83,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
+
     """
     Calculate mean squared error between predicted and actual values.
 
@@ -96,11 +97,23 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     In case of corrupt input arguments, None is returned
     """
 
+    if len(actual) != len(predicted):
+        return None
+    summation = 0
+    n = len(actual)
+    for i in range(0, n):
+        difference = actual[i] - predicted[i]
+        squared_difference = difference ** 2
+        summation = summation + squared_difference
+    mse = summation / n
+    return mse
+
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
+
     """
     Compare profiles and calculate the distance using symbols.
 
@@ -115,6 +128,13 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+
+    if not unknown_profile or not profile_to_compare:
+        return None
+    first_lang_freq =
+    second_lang_freq =
+    profile_comparison = calculate_mse( )
+    return profile_comparison
 
 
 def detect_language(

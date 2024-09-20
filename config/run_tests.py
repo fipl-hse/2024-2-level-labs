@@ -49,8 +49,8 @@ def main() -> None:
 
         result = run_tests(pr_name, pr_author, lab_name)
 
-        print(result.stdout)
-        print(result.stderr)
+        print(result.stdout.decode('utf-8'))
+        print(result.stderr.decode('utf-8'))
 
         check_result(result.returncode)
 

@@ -10,7 +10,7 @@ mypy==1.1.1
 pydantic==1.10.7
 pydocstyle==6.3.0
 pydoctest==0.1.22
-pylint==2.15.10
+pylint==3.2.7
 pyspelling==2.7.3
 pytest==6.2.5
 regex==2023.3.23

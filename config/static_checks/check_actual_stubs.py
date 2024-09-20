@@ -1,7 +1,6 @@
 """
 Check the relevance of stubs.
 """
-# pylint: disable=too-many-locals, too-many-statements
 import sys
 from pathlib import Path
 

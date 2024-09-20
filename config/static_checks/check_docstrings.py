@@ -1,7 +1,6 @@
 """
 Check docstrings for conformance to the Google-style-docstrings.
 """
-# pylint: disable=duplicate-code
 import subprocess
 import sys
 from pathlib import Path
@@ -78,7 +77,7 @@ def check_file(path_to_file: Path) -> str:
     """
     errors = ''
     all_errors = ''
-    pydoctest_config = PROJECT_ROOT / 'config' / 'stage_1_style_tests' / 'pydoctest.json'
+    pydoctest_config = PROJECT_ROOT / 'config' / 'static_checks' / 'pydoctest.json'
     pydoctest_checks = check_with_pydoctest(path_to_file, pydoctest_config)
     if pydoctest_checks.returncode == 0:
         # print(f'All docstrings in {path_to_file} conform to Google-style'

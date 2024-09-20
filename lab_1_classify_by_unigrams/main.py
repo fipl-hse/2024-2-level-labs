@@ -5,8 +5,26 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+def tokenize(text):
+    token_list = []
+    for i in text.lower():
+        if i.isalpha():
+            token_list.append(i)
+    if token_list == []:
+        return None
+    else:
+        return token_list
 
-def tokenize(text: str) -> list[str] | None:
+
+
+
+
+
+
+
+
+
+
     """
     Split a text into tokens.
 

@@ -177,18 +177,21 @@ def detect_language(
             or not all(isinstance(key, str) for key in profile_2):
         return None
 
-    mse_1 = float(compare_profiles(unknown_profile, profile_1))
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+
+    if mse_1 is None:
+        return None
     mse_2 = float(compare_profiles(unknown_profile, profile_2))
 
     # if mse values differ
     if mse_1 > mse_2:
-        return profile_2['name']
+        return str(profile_2['name'])
     if mse_2 > mse_1:
-        return profile_1['name']
+        return str(profile_1['name'])
     # if mse values are the same -> return the first one by alphabetical order
     if str(profile_1['name']) > str(profile_2['name']):
-        return profile_2['name']
-    return profile_1['name']
+        return str(profile_2['name'])
+    return str(profile_1['name'])
 
 
 # здесь и далее -- недоделано и непротестировано

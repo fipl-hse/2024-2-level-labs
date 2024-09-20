@@ -2,7 +2,7 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-
+from main import tokenize, calculate_frequencies
 
 def main() -> None:
     """

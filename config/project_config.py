@@ -1,7 +1,6 @@
 """
 Config class implementation: stores the configuration information.
 """
-
 import json
 import re
 from dataclasses import field
@@ -69,7 +68,6 @@ class ProjectConfig(ProjectConfigDTO):
         super().__init__()
         with config_path.open(encoding='utf-8', mode='r') as config_file:
             json_content = json.load(config_file)
-        # pylint: disable=no-member
         self._dto = parse_obj_as(ProjectConfigDTO, json_content)
 
     def get_thresholds(self) -> dict:

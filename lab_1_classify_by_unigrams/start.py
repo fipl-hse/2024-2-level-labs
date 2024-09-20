@@ -1,10 +1,8 @@
 """
 Language detection starter
 """
-# pylint:disable=too-many-locals, unused-argument, unused-variable
-
-
-def main() -> None:
+#pylint:disable=too-many-locals, unused-argument, unused-variable
+def language() -> None:
     """
     Launches an implementation
     """
@@ -18,8 +16,11 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_unk:
         unknown_text = file_unk.read()
     unk_profile = create_language_profile('unk', unknown_text)
+    print(en_profile)
+    print(de_profile)
+    print(unk_profile)
     result = None
     assert result, "Detection result is None"
 
 if __name__ == "__main__":
-    main()
+    language()

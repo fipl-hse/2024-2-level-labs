@@ -19,18 +19,19 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(text, str):
-        needless = "\n1234567890,.:; -!?'*º’‘"
-        text = text.lower()
-        tokens = []
-        for i in text:
-            if i not in needless:
-                tokens += i
+    needless = "\n1234567890,.:; -!?'*º’‘"
+    text = text.lower()
+    tokens = []
+    for i in text:
+        if i not in needless:
+            tokens += i
+    tokens.sort()
+    if isinstance(tokens, list):
+        return tokens
     else:
         return None
-    return tokens
 
-def calculate_frequencies(tokens: list) -> dict[str, float] | None:
+def calculate_frequencies(tokens: list[str]) -> dict[str, float] | None:
     """
     Calculate frequencies of given tokens.
 
@@ -48,7 +49,8 @@ def calculate_frequencies(tokens: list) -> dict[str, float] | None:
             if i in freq:
                 continue
             average_freq = tokens.count(i) / len(tokens)
-            freq[i] = average_freq
+            if isinstance(i, str):
+                freq[i] = average_freq
     else:
         return None
     return freq
@@ -67,7 +69,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
     tokens = tokenize(text)
-    freq = calculate_frequencies(tokens)
+    if isinstance(tokens, list):
+        freq = calculate_frequencies(tokens)
+    else:
+        return None
     profile = {'name': language, 'freq': freq}
     return profile
 
@@ -84,7 +89,29 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-
+    squa_diff = 0
+    if len(actual) > len(predicted):
+        dif = len(actual) - len(predicted)
+        while dif != 0:
+            predicted.append(0)
+            dif -= 1
+        for i, x in enumerate(actual):
+            squa_diff += (x - predicted[i]) ** 2
+    elif len(actual) < len(predicted):
+        dif = len(predicted) - len(actual)
+        while dif != 0:
+            actual.append(0)
+            dif -= 1
+        for i, x in enumerate(actual):
+            squa_diff += (x - predicted[i]) ** 2
+    else:
+        for i, x in enumerate(actual):
+            squa_diff += (x - predicted[i]) ** 2
+    mse = squa_diff/len(actual)
+    if isinstance(mse, float):
+        return mse
+    else:
+        return None
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],

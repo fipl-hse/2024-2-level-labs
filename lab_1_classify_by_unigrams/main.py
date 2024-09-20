@@ -20,14 +20,15 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    clean_text = ""
+    if isinstance(input(), str) is True:
+        clean_text = ""
 
-    for symbol in text.lower().strip():
-        if symbol.isalpha():
-            clean_text += symbol
-    tokens = list(clean_text)
+        for symbol in text.lower().strip():
+            if symbol.isalpha():
+                clean_text += symbol
+        tokens = list(clean_text)
 
-    return tokens
+        return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -82,6 +83,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if len(actual) == len(predicted):
+        n = len(actual)
+        mse = float(sum((a - p) ** 2 for a, p in zip(actual, predicted)) / n)
+
+        return mse
 
 
 def compare_profiles(
@@ -102,6 +108,22 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    all_tokens_set = set(k for k in unknown_profile["freq"]) | set(k for k in profile_to_compare["freq"])
+    new_freq_dict_1, new_freq_dict_2 = {}, {}
+
+    for token in all_tokens_set:
+        if token in unknown_profile["freq"].keys:
+            new_freq_dict_1[token] = unknown_profile["freq"][token]
+        else:
+            new_freq_dict_1[token] = 0
+
+    for token in all_tokens_set:
+        if token in profile_to_compare["freq"].keys:
+            new_freq_dict_2[token] = profile_to_compare["freq"][token]
+        else:
+            new_freq_dict_2[token] = 0
+
+    return round(calculate_mse(new_freq_dict_1, new_freq_dict_2), 3)
 
 
 def detect_language(
@@ -123,6 +145,14 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 < mse_2:
+        return profile_1["name"]
+    elif mse_1 == mse_2:
+        return str(sorted([profile_1["name"], profile_2["name"]]))
+    else:
+        return profile_2["name"]
 
 
 def load_profile(path_to_file: str) -> dict | None:

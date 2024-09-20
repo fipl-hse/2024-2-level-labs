@@ -124,7 +124,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         for tok in frequency.keys():
             if len(tok) == 1 and tok.isalpha:
                 freq_index = frequency.get(tok)
-                tok_correct = {tok:}
+
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:

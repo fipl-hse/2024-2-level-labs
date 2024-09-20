@@ -6,10 +6,10 @@ Language detection
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
-def tokenize(text: str) -> list[str] | None:
-    if type(text) != str:
+def tokenize(text):
+    if not isinstance(text, str):
         return None
-    extra = ',.:?!;%$#№"&()[]{}~’º0123456789 -\n><*=@'
+    extra = ',.:?!;%$#№"&()[]{}~’º01‘23456789 -\n><*=@'
     text_only_letters = ''
     for symbol in text:
         if symbol not in extra:
@@ -19,10 +19,10 @@ def tokenize(text: str) -> list[str] | None:
     return text_only_letters
 
 
-def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    if type(tokens) is not list:
+def calculate_frequencies(tokens):
+    if not isinstance(tokens, list):
         return None
-    if type(tokens) == list:
+    if isinstance(tokens, list):
         for element in tokens:
             if type(element) != str:
                 return None
@@ -37,21 +37,20 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return dictionary
 
 
-def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    if not isinstance(language, str):
+def create_language_profile(language, text):
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
-    if not isinstance(text, str):
-        return None
-    text_only_letters = tokenize(text)
-    dictionary = calculate_frequencies(text_only_letters)
+    dictionary = calculate_frequencies(tokenize(text))
     language_profile = {}
     language_profile['name'] = language
     language_profile['freq'] = dictionary
-    print(language_profile)
+    #print(language_profile)
     return language_profile
 
 
-def calculate_mse(predicted: list, actual: list) -> float | None:
+def calculate_mse(predicted, actual):
+    if not isinstance(predicted, list) or not isinstance(actual, list):
+        return None
     """
     Calculate mean squared error between predicted and actual values.
 
@@ -64,28 +63,73 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    error_score_list = []
+    #mse = sum((predicted[i] - actual[i])**2 for i in range(len(actual))) / len(actual)
+    for i in range(len(predicted)):
+        error_score = (predicted[i] - actual[i])**2
+        error_score_list.append(error_score)
+    mse = sum(error_score_list)/len(actual)
+    return mse
 
 
+def compare_profiles(unknown_profile, profile_to_compare):
+    freq_dict_1 = profile_to_compare['freq']
+    keys_of_dict_1 = freq_dict_1.keys()
+    freq_dict_2 = unknown_profile['freq']
+    keys_of_dict_2 = freq_dict_2.keys()
 
-def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
-) -> float | None:
-    """
-    Compare profiles and calculate the distance using symbols.
+    # bad input check for unknown_profile:
+    if not isinstance(unknown_profile, dict):
+        return None
+    if isinstance(unknown_profile, dict):
+        for i in keys_of_dict_2:
+            if not isinstance(i, int):
+                return None
+            else:
+                continue
 
-    Args:
-        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of an unknown profile
-        profile_to_compare (dict[str, str | dict[str, float]]): A dictionary of a profile
-            to compare the unknown profile to
+    # bad input check for profile_to_compare:
+    if not isinstance(profile_to_compare, dict):
+        return None
+    if isinstance(profile_to_compare, dict):
+        for i in keys_of_dict_1:
+            if not isinstance(i, int):
+                return None
+            else:
+                continue
 
-    Returns:
-        float | None: The distance between the profiles
+    for key1 in keys_of_dict_1:
+        if key1 in keys_of_dict_2:
+            continue
+        if key1 not in keys_of_dict_2:
+            freq_dict_2[key1] = 0
+    for key2 in keys_of_dict_2:
+        if key2 in keys_of_dict_1:
+            continue
+        if key2 not in keys_of_dict_1:
+            freq_dict_1[key2] = 0
+    #print('Словари с нулевыми частотностями:\n', freq_dict_1, '\n', freq_dict_2)
 
-    In case of corrupt input arguments or lack of keys 'name' and
-    'freq' in arguments, None is returned
-    """
+    sorted_keys_of_dict_1_with_zeros = sorted(freq_dict_1.keys()) #getting the list of sorted letters
+    sorted_keys_of_dict_2_with_zeros = sorted(freq_dict_2.keys())
 
+    dict_1_with_zeros = {} #dictionaries where all letters (even with freq zero) are sorted the same way
+    dict_2_with_zeros = {}
+
+    for element in sorted_keys_of_dict_1_with_zeros:
+        dict_1_with_zeros[element] = freq_dict_1[element]
+    for element in sorted_keys_of_dict_2_with_zeros:
+        dict_2_with_zeros[element] = freq_dict_2[element]
+    #print('Словари с нулевыми частотностями и ОТСОРТИРОВАННЫЕ:\n', dict_1_with_zeros, '\n', dict_2_with_zeros)
+
+    #know the task is to get values from these two dictionaries in the right order (which I've created above)
+    values_list_1 = list(dict_1_with_zeros.values())
+    values_list_2 = list(dict_2_with_zeros.values())
+    #print(values_list_1, '\n', values_list_2)
+
+    mse = calculate_mse(values_list_1, values_list_2)
+    print(mse)
+    return mse
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],

@@ -28,7 +28,7 @@ print(f'Numbers: {first_num} and {second_num}')
 # third_num = first_num / second_num
 
 # Fix the first exception:
-second_num = 1
+second_num = 6
 third_num = first_num / second_num
 print(f'Numbers: {first_num}, {second_num} and {third_num}')
 
@@ -40,7 +40,3 @@ else:
     print('First number * second does not equal third number')
 
 print('Program finished')
-
-#При обычном делении тип изменяется на float, а при умножении - int
-
-

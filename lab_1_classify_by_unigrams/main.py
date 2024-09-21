@@ -143,11 +143,13 @@ def compare_profiles(
                 predicted_value = freq2.get(token, 0.0)
                 predicted_values.append(predicted_value)
 
-            if calculate_mse(actual_values, predicted_values) is not None:
-                final_mse = round(calculate_mse(actual_values, predicted_values), 3)
-                return final_mse
-            return None
+            mse = calculate_mse(actual_values, predicted_values)
 
+            if mse is not None:
+                final_mse = round(mse, 3)
+                return final_mse
+
+            return None
         return None
     return None
 
@@ -171,23 +173,25 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if (isinstance(unknown_profile, dict)
-            and isinstance(profile_1, dict) and isinstance(profile_2, dict)):
+    if unknown_profile is not None and profile_1 is not None and profile_2 is not None:
+        if (isinstance(unknown_profile, dict)
+                and isinstance(profile_1, dict) and isinstance(profile_2, dict)):
 
-        name1 = profile_1.get('name')
-        name2 = profile_2.get('name')
-        mse_1 = compare_profiles(unknown_profile, profile_1)
-        mse_2 = compare_profiles(unknown_profile, profile_2)
-        result1 = str(name1)
-        result2 = str(name2)
+            name1 = profile_1.get('name')
+            name2 = profile_2.get('name')
+            mse_1 = compare_profiles(unknown_profile, profile_1)
+            mse_2 = compare_profiles(unknown_profile, profile_2)
+            result1 = str(name1)
+            result2 = str(name2)
 
-        if mse_1 is not None and mse_2 is not None:
-            if mse_1 < mse_2:
-                return result1
-            if mse_1 == mse_2:
-                return str(sorted([result1, result2]))
-            return result2
+            if mse_1 is not None and mse_2 is not None:
+                if mse_1 < mse_2:
+                    return result1
+                if mse_1 == mse_2:
+                    return str(sorted([result1, result2]))
+                return result2
 
+        return None
     return None
 
 

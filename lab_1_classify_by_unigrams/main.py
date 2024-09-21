@@ -5,7 +5,6 @@ Language detection
 """
 import json
 
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -46,11 +45,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
-    else:
-        freq = dict.fromkeys(tokens)
-        for letter in freq:
-            freq[letter] = tokens.count(letter) / len(tokens)
-        return freq
+    freq = dict.fromkeys(tokens)
+    for letter in freq:
+        freq[letter] = tokens.count(letter) / len(tokens)
+    return freq
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -68,9 +66,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    else:
-        language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
-        return language_profile
+    return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -89,13 +85,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if (not isinstance(predicted, list) or not isinstance(actual, list) or
             not len(actual) == len(predicted)):
         return None
-    else:
-        n = len(actual)
-        mse = 0
-        for i in range(n):
-            mse += ((actual[i] - predicted[i]) ** 2)
-        mse /= n
-        return mse
+    n = len(actual)
+    mse = 0
+    for i in range(n):
+        mse += ((actual[i] - predicted[i]) ** 2)
+    mse /= n
+    return mse
 
 
 def compare_profiles(
@@ -121,23 +116,22 @@ def compare_profiles(
             not isinstance(profile_to_compare, dict) or
             'name' not in profile_to_compare or 'freq' not in profile_to_compare):
         return None
-    else:
-        unknown_letters_list = list(unknown_profile['freq'].keys())
-        compare_letters_list = list(profile_to_compare['freq'].keys())
-        all_letters = sorted(list(set(unknown_letters_list + compare_letters_list)))
-        unknown_frequencies_list = []
-        compare_frequencies_list = []
-        for letter in all_letters:
-            if letter in unknown_letters_list and letter in compare_letters_list:
-                unknown_frequencies_list.append(unknown_profile['freq'][letter])
-                compare_frequencies_list.append(profile_to_compare['freq'][letter])
-            elif letter in compare_letters_list:
-                compare_frequencies_list.append(profile_to_compare['freq'][letter])
-                unknown_frequencies_list.append(0)
-            else:
-                unknown_frequencies_list.append(unknown_profile['freq'][letter])
-                compare_frequencies_list.append(0)
-        return calculate_mse(compare_frequencies_list, unknown_frequencies_list)
+    unknown_letters_list = list(unknown_profile['freq'].keys())
+    compare_letters_list = list(profile_to_compare['freq'].keys())
+    all_letters = sorted(list(set(unknown_letters_list + compare_letters_list)))
+    unknown_frequencies_list = []
+    compare_frequencies_list = []
+    for letter in all_letters:
+        if letter in unknown_letters_list and letter in compare_letters_list:
+            unknown_frequencies_list.append(unknown_profile['freq'][letter])
+            compare_frequencies_list.append(profile_to_compare['freq'][letter])
+        elif letter in compare_letters_list:
+            compare_frequencies_list.append(profile_to_compare['freq'][letter])
+            unknown_frequencies_list.append(0)
+        else:
+            unknown_frequencies_list.append(unknown_profile['freq'][letter])
+            compare_frequencies_list.append(0)
+    return calculate_mse(compare_frequencies_list, unknown_frequencies_list)
 
 
 def detect_language(
@@ -162,16 +156,15 @@ def detect_language(
     if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None
-    else:
-        comparison_results = {
-            profile_1['name']: compare_profiles(unknown_profile, profile_1),
-            profile_2['name']: compare_profiles(unknown_profile, profile_2)
-        }
-        potential_languages = []
-        for name in comparison_results:
-            if comparison_results[name] == min(comparison_results.values()):
-                potential_languages.append(name)
-        return sorted(potential_languages)[0]
+    comparison_results = {
+        profile_1['name']: compare_profiles(unknown_profile, profile_1),
+        profile_2['name']: compare_profiles(unknown_profile, profile_2)
+    }
+    potential_languages = []
+    for name in comparison_results:
+        if comparison_results[name] == min(comparison_results.values()):
+            potential_languages.append(name)
+    return sorted(potential_languages)[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -188,9 +181,8 @@ def load_profile(path_to_file: str) -> dict | None:
     """
     if not isinstance(path_to_file, str):
         return None
-    else:
-        with open(path_to_file, 'r') as profile_file:
-            return json.load(profile_file)
+    with open(path_to_file, 'r', encoding="utf8") as profile_file:
+        return json.load(profile_file)
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:

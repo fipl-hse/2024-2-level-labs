@@ -84,7 +84,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or not len(predicted) == len(actual):
+    if (not isinstance(predicted, list) or not isinstance(actual, list)
+            or not len(predicted) == len(actual)):
         return None
     sum_diff = 0
     for i, k in enumerate(actual):
@@ -149,16 +150,13 @@ def detect_language(
         str | None: A language
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(profile_1, dict) or not isinstance(profile_2, dict) or not isinstance(unknown_profile, dict):
-        return None
-    if (compare_profiles(unknown_profile, profile_1) or compare_profiles(unknown_profile, profile_2)) is None:
+    if (not isinstance(profile_1, dict) or not isinstance(profile_2, dict)
+            or not isinstance(unknown_profile, dict)):
         return None
     if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
-        closest_profile = profile_1.get('name')
-        return closest_profile
+        return profile_1.get('name')
     if compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
-        closest_profile = profile_2.get('name')
-        return closest_profile
+        return profile_2.get('name')
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -202,16 +200,16 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     for i in profile['freq']:
         if isinstance(i, str) and len(i) == 1:
             d[i] = profile['freq'][i]
-    letters_list = [i for i in d]
+    letters_list = list(d)
     for j in letters_list:
         if not j.isupper():
             d[j] = d.get(j, 0) + d.get(j.upper(), 0)
             processed_profile['freq'][j] = d[j] / profile['n_words'][0]
             if j.upper() in d:
                 del d[j.upper()]
-    for i in d:
-        if i.isupper():
-            processed_profile['freq'][i.lower()] = d[i] / profile['n_words'][0]
+    for i in d.items():
+        if i[0].isupper():
+            processed_profile['freq'][i[0].lower()] = i[1] / profile['n_words'][0]
     return processed_profile
 
 
@@ -227,7 +225,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(paths_to_profiles, list) and all(isinstance(i, str) for i in paths_to_profiles)):
+    if not (isinstance(paths_to_profiles, list)
+            and all(isinstance(i, str) for i in paths_to_profiles)):
         return None
     profiles_collection = []
     for i in paths_to_profiles:
@@ -261,8 +260,6 @@ def detect_language_advanced(
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
-    for i in detections:
-        print(f'{i[0]}: MSE {i[-1]:.5f}')
     """
     Print report for detection of language.
 
@@ -271,3 +268,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+    for i in detections:
+        print(f'{i[0]}: MSE {i[-1]:.5f}')

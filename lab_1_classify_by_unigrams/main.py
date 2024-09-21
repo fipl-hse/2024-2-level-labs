@@ -9,13 +9,48 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-    if type(text) != str:
+    """
+        Split a text into tokens.
+
+        Convert the tokens into lowercase, remove punctuation, digits and other symbols
+
+        Args:
+            text (str): A text
+
+        Returns:
+            list[str] | None: A list of lower-cased tokens without punctuation
+
+        In case of corrupt input arguments, None is returned
+        """
+
+    if not isinstance(text, str):
         return None
     return [symbol.lower() for symbol in text if symbol.isalpha()]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    if type(tokens) != list or any(type(token) != str for token in tokens):
+    """
+       Calculate frequencies of given tokens.
+
+       Args:
+           tokens (list[str] | None): A list of tokens
+
+       Returns:
+           dict[str, float] | None: A dictionary with frequencies
+
+       In case of corrupt input arguments, None is returned
+       """ """
+    Calculate frequencies of given tokens.
+
+    Args:
+        tokens (list[str] | None): A list of tokens
+
+    Returns:
+        dict[str, float] | None: A dictionary with frequencies
+
+    In case of corrupt input arguments, None is returned
+    """
+    if not isinstance(tokens, list) or any(not isinstance(token, str) for token in tokens):
         return None
     frequency = {}
     for token in tokens:
@@ -36,10 +71,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if type(language) != str:
+    if not isinstance(language, str):
         return None
     tokens = tokenize(text)
-    if type(tokens)!= list or not all(type(token) == str for token in tokens):
+    if tokens is None:
+        return None
+    if not isinstance(text, str) or any(not isinstance(token, str) for token in tokens):
         return None
     language_profile = {'name': language, 'freq': calculate_frequencies(tokens)}
     return language_profile

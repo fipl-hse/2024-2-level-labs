@@ -1,10 +1,10 @@
 """
 Language detection starter
 """
-# pylint:disable=too-many-locals, unused-argument, unused-variable
-import tokenize
 from main import tokenize
+
 from main import calculate_frequencies
+# pylint:disable=too-many-locals, unused-argument, unused-variable
 
 def main() -> None:
     """
@@ -22,10 +22,5 @@ def main() -> None:
     assert result, "Detection result is None"
 
 
-
 if __name__ == "__main__":
     main()
-
-print(tokenize(en_text))
-
-

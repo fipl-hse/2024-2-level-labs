@@ -43,7 +43,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(tokens) is not list:
+    if type(tokens) is not list or None in tokens:
         return None
     frequency_dictionary = {}
     for token in tokens:

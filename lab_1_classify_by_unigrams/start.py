@@ -1,11 +1,7 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import tokenize
-from lab_1_classify_by_unigrams.main import calculate_frequencies
-from lab_1_classify_by_unigrams.main import create_language_profile
-
-
+from lab_1_classify_by_unigrams.main import (tokenize, calculate_frequencies, create_language_profile)
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 

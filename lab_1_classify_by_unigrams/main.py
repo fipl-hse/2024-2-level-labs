@@ -126,31 +126,32 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict):
+        name1 = unknown_profile.get('name')
+        freq1 = unknown_profile.get('freq')
+        name2 = profile_to_compare.get('name')
+        freq2 = profile_to_compare.get('freq')
+
+        if (isinstance(name1, str) and isinstance(freq1, dict)
+                and isinstance(name2, str) and isinstance(freq2, dict)):
+            all_tokens_set = set(freq1.keys()) | set(freq2.keys())
+            actual_values, predicted_values = [], []
+
+            for token in all_tokens_set:
+
+                actual_value = freq1.get(token, 0.0)
+                actual_values.append(actual_value)
+
+                predicted_value = freq2.get(token, 0.0)
+                predicted_values.append(predicted_value)
+
+            if calculate_mse(actual_values, predicted_values) is not None:
+                final_mse = round(calculate_mse(actual_values, predicted_values), 3)
+                return final_mse
+            return None
+
         return None
-
-    name1 = unknown_profile.get('name')
-    freq1 = unknown_profile.get('freq')
-    name2 = profile_to_compare.get('name')
-    freq2 = profile_to_compare.get('freq')
-
-    if (not isinstance(name1, str) or not isinstance(freq1, dict)
-            or not isinstance(name2, str) or not isinstance(freq2, dict)):
-        return None
-
-    all_tokens_set = set(freq1.keys()) | set(freq2.keys())
-    actual_values, predicted_values = [], []
-
-    for token in all_tokens_set:
-
-        actual_value = freq1.get(token, 0.0)
-        actual_values.append(actual_value)
-
-        predicted_value = freq2.get(token, 0.0)
-        predicted_values.append(predicted_value)
-
-    return round(calculate_mse(actual_values, predicted_values), 3)
-
+    return None
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],

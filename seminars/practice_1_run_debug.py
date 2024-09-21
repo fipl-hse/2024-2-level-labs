@@ -4,9 +4,6 @@ Seminar 1
 Running python application and debugging
 """
 
-
-
-
 # pylint: disable=invalid-name
 
 
@@ -34,7 +31,6 @@ print(f'Numbers: {first_num} and {second_num}')
 second_num = 6
 third_num = first_num / second_num
 print(f'Numbers: {first_num}, {second_num} and {third_num}')
-
 
 # Case 2: the second debugging case:
 if first_num * second_num == third_num:

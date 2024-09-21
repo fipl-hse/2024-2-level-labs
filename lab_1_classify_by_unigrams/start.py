@@ -1,7 +1,5 @@
 from lab_1_classify_by_unigrams.main import (tokenize,
-                                             create_language_profile,
-                                             calculate_mse,
-                                             load_profile)
+                                             create_language_profile,)
 
 """
 Language detection starter
@@ -24,7 +22,6 @@ def main() -> None:
     result = 1  # None
     print(tokenize(en_text))
     print(create_language_profile('en', en_text))
-    assert result, "Detection result is None"
     profile_paths = [
         "assets/profiles/de.json",
         "assets/profiles/en.json",
@@ -34,7 +31,7 @@ def main() -> None:
         "assets/profiles/ru.json",
         "assets/profiles/tr.json"
     ]
-    print(load_profile(profile_paths[0]))
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

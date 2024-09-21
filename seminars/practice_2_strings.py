@@ -53,6 +53,7 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
+    return input_string * how_many
 
 
 # Function calls with expected result:
@@ -69,6 +70,7 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
+    return input_string[:3] * how_many
 
 
 # Function calls with expected result:
@@ -86,6 +88,7 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
+    return input_string[-2:] * 3
 
 
 # Function calls with expected result:
@@ -101,6 +104,8 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
+
+    return first_string + second_string + second_string + first_string
 
 
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
@@ -119,6 +124,12 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
+    new_sentence = []
+    for word in sentence.split(' '):
+        if len(word) >= 5:
+            word = word[::-1]
+        new_sentence.append(word)
+    return ' '.join(new_sentence)
 
 
 # reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
@@ -146,6 +157,18 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
+    if input_string != '':
+        words = input_string.split(' ')
+        hashtag = ['#']
+        for word in words:
+            word = word.capitalize()
+            hashtag.append(word)
+        if hashtag != ['#'] and len(hashtag) < 141:
+            return ''.join(hashtag)
+        else:
+            return False
+    else:
+        return False
 
 
 # Task 7:
@@ -154,7 +177,11 @@ def combo_string(first_string: str, second_string: str) -> str:
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
-
+    combo = [first_string, second_string]
+    if combo.index(min(combo)) == 0:
+        combo[0], combo[1] = combo[1], combo[0]
+    combo.append(combo[0])
+    return ''.join(combo)
 
 # combo_string('Hello', 'hi') → 'hiHellohi'
 # combo_string('hi', 'Hello') → 'hiHellohi'
@@ -188,6 +215,8 @@ def string_match(first_string: str, second_string: str) -> int:
     """
     # student realisation goes here
 
+
+
 # Function calls with expected result:
 # string_match('xxcaazz', 'xxbaaz') → 3
 # NOTE: «xx», «aa» and «az» are found at the same position in both strings
@@ -198,3 +227,12 @@ def string_match(first_string: str, second_string: str) -> int:
 # string_match('aabbccdd', 'abbbxxd') → 1
 # string_match('aaxxaaxx', 'iaxxai') → 3
 # string_match('iaxxai', 'aaxxaaxx') → 3
+
+
+print(multiply_string('haii', 2))
+print(front_times('loooool', 2))
+print(extra_end('profk'))
+print(make_abba('gh', 'lo'))
+print(reverse_word("heeloo p pko dolores"))
+print(generate_hashtag('thank you for copmimng tp my ted talk'))
+print(combo_string('Hello', 'hi'))

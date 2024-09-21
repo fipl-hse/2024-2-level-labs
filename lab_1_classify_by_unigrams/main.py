@@ -79,7 +79,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if language is not None and isinstance(language, str) and text is not None and isinstance(text, str):
+    if (language is not None and isinstance(language, str)
+            and text is not None and isinstance(text, str)):
         frequencies_values = calculate_frequencies(tokenize(text))
         if frequencies_values is not None:
             language_profile: dict[str, str | dict[str, float]] \

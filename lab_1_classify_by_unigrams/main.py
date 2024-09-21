@@ -62,8 +62,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-
-
+    if type(text) is not str or type(language) is not str:
+        return None
+    language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    return language_profile
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculate mean squared error between predicted and actual values.

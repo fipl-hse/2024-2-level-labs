@@ -60,7 +60,8 @@ def multiply_string(input_string: str, how_many: int) -> str:
 # multiply_string('Hi', 3) → 'HiHiHi'
 # multiply_string('Hi', 1) → 'Hi'
 # multiply_string('Hi', 0) → ''
-
+    return input_string*how_many
+print (multiply_string('hi', 2))
 
 # Task 2:
 def front_times(input_string: str, how_many: int) -> str:
@@ -78,7 +79,8 @@ def front_times(input_string: str, how_many: int) -> str:
 # front_times('A', 4) → 'AAAA'
 # front_times('', 4) → ''
 # front_times('Abc', 0) → ''
-
+    return input_string[:3]*how_many
+print(front_times('Chocolate', 2))
 
 # Task 3:
 def extra_end(input_string: str) -> str:
@@ -93,7 +95,8 @@ def extra_end(input_string: str) -> str:
 # extra_end('ab') → 'ababab'
 # extra_end('Hi') → 'HiHiHi'
 # extra_end('Code') → 'dedede'
-
+    return input_string[-2:]*3
+print(extra_end('hello'))
 
 # Task 4:
 def make_abba(first_string: str, second_string: str) -> str:
@@ -107,7 +110,11 @@ def make_abba(first_string: str, second_string: str) -> str:
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
 # make_abba('', 'y') → 'yy'
+    a = [first_string, second_string*2,first_string]
+    return ''.join(a)
 
+    #return f'{first_string}{second_string*2}{first_string}'
+print (make_abba('Yo', 'Alice'))
 
 # Task 5
 def reverse_word(sentence: str) -> str:
@@ -126,6 +133,17 @@ def reverse_word(sentence: str) -> str:
 # reverse_word("This is a test") == "This is a test"
 #
 # reverse_word("This is another test") == "This is rehtona test"
+    final = []
+    sentence_split = sentence.split(' ')
+    if len(sentence_split)<1:
+        return False
+    for word in sentence_split:
+        if len(word)>5:
+            word = word[::-1]
+        final.append(word)
+    return ' '.join(final)
+print(reverse_word("Hey fellow warriors"))
+
 
 
 # Task 6
@@ -146,6 +164,8 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
+    input_string = input_string.strip()
+
 
 
 # Task 7:
@@ -170,6 +190,10 @@ def string_splosion(input_string: str) -> str:
     Given the string, format it like in the example.
     """
     # student realisation goes here
+    result = ''
+    for i in range(len(input_string)+1):
+
+
 
 
 # Function calls with expected result:

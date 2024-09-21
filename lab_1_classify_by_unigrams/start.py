@@ -12,6 +12,7 @@ def main() -> None:
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
+        tokens = en_text
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
@@ -20,7 +21,7 @@ def main() -> None:
     print(tokenize(en_text))
     print(create_language_profile("eng", en_text))
     print(detect_language(create_language_profile("unknown", unknown_text), create_language_profile("en", en_text), create_language_profile("de", de_text)))
-    result = 1
+    result = tokens
 
     assert result, "Detection result is None"
 

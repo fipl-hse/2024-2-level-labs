@@ -1,19 +1,9 @@
-from main import (
-    tokenize,
-    calculate_frequencies,
-    create_language_profile,
-    calculate_mse,
-    compare_profiles,
-    detect_language,
-    load_profile,
-    preprocess_profile,
-    collect_profiles,
-    detect_language_advanced,
-    print_report)
-
 """
 Language detection starter
 """
+# pylint:disable=too-many-locals, unused-argument, unused-variable
+
+from main import tokenize, calculate_frequencies, create_language_profile
 
 
 def main() -> None:

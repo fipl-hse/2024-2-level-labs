@@ -84,9 +84,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if text is None or not isinstance(text, str):
         return None
 
-    language_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
-
-    return language_profile
+    frequencies_values = calculate_frequencies(tokenize(text))
+    if frequencies_values is not None:
+        language_profile = {"name": language, "freq": frequencies_values}
+        return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -144,7 +145,7 @@ def compare_profiles(
             or not isinstance(name2, str) or not isinstance(freq2, dict)):
         return None
 
-    all_tokens_set = set(freq1.keys) | set(freq2.keys)
+    all_tokens_set = set(freq1.keys()) | set(freq2.keys())
     actual_values, predicted_values = [], []
 
     for token in all_tokens_set:
@@ -183,17 +184,15 @@ def detect_language(
 
     name1 = profile_1.get('name')
     name2 = profile_2.get('name')
-
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
 
-    if isinstance(mse_1, bool) and isinstance(mse_2, bool):
-        return None
-    elif mse_1 < mse_2:
-        return name1
-    elif mse_1 == mse_2:
-        return str(sorted([name1, name2]))
-    return name2
+    if mse_1 is not None and mse_2 is not None:
+        if mse_1 < mse_2:
+            return name1
+        if mse_1 == mse_2:
+            return str(sorted([name1, name2]))
+        return name2
 
 
 def load_profile(path_to_file: str) -> dict | None:

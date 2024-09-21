@@ -148,7 +148,6 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
-    input_string = input_string.strip()
 
 
 

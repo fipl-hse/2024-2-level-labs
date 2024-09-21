@@ -21,7 +21,7 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
     if type(text) is not str:
-        return False
+        return None
     text = text.lower()
     tokenized_text = []
     for symbol in text:

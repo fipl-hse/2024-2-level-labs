@@ -20,15 +20,17 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(text, str) is True and len(text) > 0:
-        clean_text = ""
+    if not isinstance(text, str) and len(text) <= 0:
+        return None
 
-        for symbol in text.lower().strip():
-            if symbol.isalpha():
-                clean_text += symbol
-        tokens = list(clean_text)
+    clean_text = ""
 
-        return tokens
+    for symbol in text.lower().strip():
+        if symbol.isalpha():
+            clean_text += symbol
+    tokens = list(clean_text)
+
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -138,7 +140,8 @@ def compare_profiles(
     name2 = profile_to_compare.get('name')
     freq2 = profile_to_compare.get('freq')
 
-    if not isinstance(name1, str) or not isinstance(freq1, dict) or isinstance(name2, str) or not isinstance(freq2, dict):
+    if (not isinstance(name1, str) or not isinstance(freq1, dict)
+            or not isinstance(name2, str) or not isinstance(freq2, dict)):
         return None
 
     all_tokens_set = set(freq1.keys) | set(freq2.keys)
@@ -174,7 +177,8 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
 
     name1 = profile_1.get('name')
@@ -185,13 +189,13 @@ def detect_language(
 
     if isinstance(mse_1, bool) and isinstance(mse_2, bool):
         return None
+
+    if mse_1 < mse_2:
+        return name1
+    if mse_1 == mse_2:
+        return str(sorted(name1, name2))
     else:
-        if mse_1 < mse_2:
-            return name1
-        elif mse_1 == mse_2:
-            return str(sorted(name1, name2))
-        else:
-            return name2
+        return name2
 
 
 def load_profile(path_to_file: str) -> dict | None:

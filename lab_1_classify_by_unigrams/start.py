@@ -19,7 +19,8 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
 
     print(create_language_profile("eng", en_text))
-    print(detect_language(create_language_profile("unknown", unknown_text), create_language_profile("en", en_text),
+    print(detect_language(create_language_profile("unknown", unknown_text),
+                          create_language_profile("en", en_text),
                           create_language_profile("de", de_text)))
     result = tokens
 

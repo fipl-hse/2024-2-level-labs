@@ -1,5 +1,5 @@
 from lab_1_classify_by_unigrams.main import (tokenize,
-                                             create_language_profile,)
+                                             create_language_profile)
 
 """
 Language detection starter

@@ -81,9 +81,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
             and text is not None and isinstance(text, str)):
         frequencies_values = calculate_frequencies(tokenize(text))
         if frequencies_values is not None:
-            language_profile: dict[str, str | dict[str, float]] \
-                = {"name": language, "freq": frequencies_values}
-            return language_profile
+            return {"name": language, "freq": frequencies_values}
     return None
 
 

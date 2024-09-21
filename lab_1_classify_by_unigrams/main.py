@@ -193,8 +193,7 @@ def detect_language(
         return name1
     elif mse_1 == mse_2:
         return str(sorted([name1, name2]))
-    else:
-        return name2
+    return name2
 
 
 def load_profile(path_to_file: str) -> dict | None:

@@ -1,7 +1,8 @@
+from main import tokenize, calculate_frequencies, create_language_profile
+
 """
 Language detection starter
 """
-from main import tokenize, calculate_frequencies
 
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable
@@ -19,6 +20,7 @@ def main() -> None:
     result = tokenize(en_text)
     print(result)
     print(calculate_frequencies(result))
+    print(create_language_profile('en', en_text))
     assert result, "Detection result is None"
 
 

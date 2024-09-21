@@ -189,11 +189,10 @@ def detect_language(
 
     if isinstance(mse_1, bool) and isinstance(mse_2, bool):
         return None
-
-    if mse_1 < mse_2:
+    elif mse_1 < mse_2:
         return name1
-    if mse_1 == mse_2:
-        return str(sorted(name1, name2))
+    elif mse_1 == mse_2:
+        return str(sorted([name1, name2]))
     else:
         return name2
 

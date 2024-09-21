@@ -79,15 +79,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if language is None or not isinstance(language, str):
-        return None
-    if text is None or not isinstance(text, str):
-        return None
-
-    frequencies_values = calculate_frequencies(tokenize(text))
-    if frequencies_values is not None:
-        language_profile = {"name": language, "freq": frequencies_values}
-        return language_profile
+    if language is not None and isinstance(language, str) and text is not None and isinstance(text, str):
+        frequencies_values = calculate_frequencies(tokenize(text))
+        if frequencies_values is not None:
+            language_profile: dict[str, str | dict[str, float]] \
+                = {"name": language, "freq": frequencies_values}
+            return language_profile
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -103,16 +101,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(predicted, list):
-        return None
-    if not isinstance(actual, list):
-        return None
-
-    if len(actual) == len(predicted):
-        n = len(actual)
-        mse = float(sum((a - p) ** 2 for a, p in zip(actual, predicted)) / n)
-
-        return mse
+    if isinstance(predicted, list) and isinstance(actual, list):
+        if len(actual) == len(predicted):
+            n = len(actual)
+            mse = float(sum((a - p) ** 2 for a, p in zip(actual, predicted)) / n)
+            return mse
+    return None
 
 
 def compare_profiles(
@@ -178,21 +172,22 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
-            or not isinstance(profile_2, dict)):
-        return None
+    if (isinstance(unknown_profile, dict)
+            and isinstance(profile_1, dict) and isinstance(profile_2, dict)):
 
-    name1 = profile_1.get('name')
-    name2 = profile_2.get('name')
-    mse_1 = compare_profiles(unknown_profile, profile_1)
-    mse_2 = compare_profiles(unknown_profile, profile_2)
+        name1 = profile_1.get('name')
+        name2 = profile_2.get('name')
+        mse_1 = compare_profiles(unknown_profile, profile_1)
+        mse_2 = compare_profiles(unknown_profile, profile_2)
 
-    if mse_1 is not None and mse_2 is not None:
-        if mse_1 < mse_2:
-            return name1
-        if mse_1 == mse_2:
-            return str(sorted([name1, name2]))
-        return name2
+        if mse_1 is not None and mse_2 is not None:
+            if mse_1 < mse_2:
+                return name1
+            if mse_1 == mse_2:
+                return str(sorted([name1, name2]))
+            return name2
+
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:

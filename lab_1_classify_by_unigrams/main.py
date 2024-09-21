@@ -1,10 +1,9 @@
-import json
-
 """
 Lab 1.
 
 Language detection
 """
+import json
 
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable
@@ -24,14 +23,13 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(text) == str:
-        list_of_letters = []
-        for character in text:
-            if character.isalpha():
-                list_of_letters.append(character.lower())
-        return list_of_letters
-    else:
+    if not isinstance(text, str):
         return None
+    list_of_letters = []
+    for character in text:
+        if character.isalpha():
+            list_of_letters.append(character.lower())
+    return list_of_letters
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -46,13 +44,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(tokens, list) and all(isinstance(token, str) for token in tokens):
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
+        return None
+    else:
         freq = dict.fromkeys(tokens)
         for letter in freq:
             freq[letter] = tokens.count(letter) / len(tokens)
         return freq
-    else:
-        return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -68,11 +66,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(language, str) and isinstance(text, str):
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    else:
         language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
         return language_profile
-    else:
-        return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -88,7 +86,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or not len(actual) == len(predicted):
+    if (not isinstance(predicted, list) or not isinstance(actual, list) or
+            not len(actual) == len(predicted)):
         return None
     else:
         n = len(actual)
@@ -142,9 +141,9 @@ def compare_profiles(
 
 
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -160,7 +159,8 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
     else:
         comparison_results = {
@@ -224,7 +224,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

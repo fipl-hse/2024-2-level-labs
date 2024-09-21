@@ -153,6 +153,7 @@ def compare_profiles(
         return None
     return None
 
+
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_1: dict[str, str | dict[str, float]],
@@ -179,13 +180,15 @@ def detect_language(
         name2 = profile_2.get('name')
         mse_1 = compare_profiles(unknown_profile, profile_1)
         mse_2 = compare_profiles(unknown_profile, profile_2)
+        result1 = str(name1)
+        result2 = str(name2)
 
         if mse_1 is not None and mse_2 is not None:
             if mse_1 < mse_2:
-                return name1
+                return result1
             if mse_1 == mse_2:
-                return str(sorted([name1, name2]))
-            return name2
+                return str(sorted([result1, result2]))
+            return result2
 
     return None
 

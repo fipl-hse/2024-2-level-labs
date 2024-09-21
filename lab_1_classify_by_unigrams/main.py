@@ -28,10 +28,8 @@ def tokenize(text: str) -> list[str] | None:
                 tokens += i
         tokens.sort()
         return tokens
-    else:
-        return None
 
-def calculate_frequencies(tokens: list[str]) -> dict[str, float] | None:
+def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculate frequencies of given tokens.
 
@@ -69,12 +67,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
     tokens = tokenize(text)
-    if isinstance(tokens, list):
-        freq = calculate_frequencies(tokens)
-        profile = {'name': language, 'freq': freq}
+    freq = calculate_frequencies(tokens)
+    profile = {'name': language, 'freq': freq}
+    if isinstance(profile, dict):
         return profile
-    else:
-        return None
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

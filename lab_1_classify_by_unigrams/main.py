@@ -20,14 +20,15 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(text) is str:
-        text = text.lower()
-        tokenized_text = []
-        for symbol in text:
-            if symbol.isalpha():
-                tokenized_text.append(symbol)
-        return tokenized_text
-    return False
+    if type(text) is not str:
+        return False
+    text = text.lower()
+    tokenized_text = []
+    for symbol in text:
+        if symbol.isalpha():
+            tokenized_text.append(symbol)
+    return tokenized_text
+
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -42,11 +43,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    frequence_dictionary = {}
+    frequency_dictionary = {}
     for token in tokens:
-        if token not in frequence_dictionary:
-            frequence_dictionary[token] = tokens.count(token)/len(tokens)
-    return frequence_dictionary
+        if token not in frequency_dictionary:
+            frequency_dictionary[token] = tokens.count(token)/len(tokens)
+    return frequency_dictionary
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """

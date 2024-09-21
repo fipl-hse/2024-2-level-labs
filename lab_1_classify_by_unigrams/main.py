@@ -28,8 +28,6 @@ def tokenize(text: str) -> list[str] | None:
     tokens.sort()
     if isinstance(tokens, list):
         return tokens
-    else:
-        return None
 
 def calculate_frequencies(tokens: list[str]) -> dict[str, float] | None:
     """
@@ -110,8 +108,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     mse = squa_diff/len(actual)
     if isinstance(mse, float):
         return mse
-    else:
-        return None
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],

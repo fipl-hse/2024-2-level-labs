@@ -191,7 +191,6 @@ def string_splosion(input_string: str) -> str:
     """
     # student realisation goes here
     result = ''
-    for i in range(len(input_string)+1):
 
 
 

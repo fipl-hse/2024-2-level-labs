@@ -23,14 +23,18 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    text = text.lower()
-    split1 = text.split()
-    split2 = []
-    for word in split1:
-        for token in word:
-            if token.isalpha():
-                split2 += token
-    return (split2)
+    if type(text) == str:
+        text = text.lower().split()
+        split2 = []
+        for word in text:
+            for token in word:
+                if not token.isalpha():
+                    continue
+                else:
+                    split2 += token
+        return (split2)
+    else:
+        return None
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -45,6 +49,20 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if type(tokens) != list:
+        return None
+    else:
+        freq = {}
+        prop = {}
+        total_tokens = len(tokens)
+        for token in tokens:
+            if token in freq:
+                freq[token] += 1
+            else:
+                freq[token] = 1
+        for key, value in freq.items():
+            prop[key] = value / total_tokens
+        return prop
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -60,6 +78,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if type(language) != str or type(text) != str:
+        return None
+    else:
+        return {
+            'name': language,
+            'freq': calculate_frequencies(tokenize(text))
+        }
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

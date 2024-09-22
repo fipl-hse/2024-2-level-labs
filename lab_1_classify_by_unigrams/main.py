@@ -8,6 +8,7 @@ Language detection
 
 def tokenize(text: str) -> list[str] | None:
 
+
     text = text.lower()
     letter_lst = []
     for i in text:

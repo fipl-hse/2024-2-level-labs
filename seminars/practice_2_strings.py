@@ -69,7 +69,11 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
-
+    str_slice = input_string[:3]
+    #print(str)
+    result = str_slice * how_many
+    print(result)
+front_times('Chocolate', 4)
 
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'

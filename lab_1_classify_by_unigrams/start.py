@@ -19,8 +19,9 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
 
     result = en_text
-    paths_to_profiles = ['assets/profiles/de.json', 'assets/profiles/en.json', 'assets/profiles/es.json',
-                         'assets/profiles/fr.json', 'assets/profiles/it.json', 'assets/profiles/ru.json',
+    paths_to_profiles = ['assets/profiles/de.json', 'assets/profiles/en.json',
+                         'assets/profiles/es.json', 'assets/profiles/fr.json',
+                         'assets/profiles/it.json', 'assets/profiles/ru.json',
                          'assets/profiles/tr.json']
     print(tokenize(en_text))
     print(create_language_profile('en', en_text))

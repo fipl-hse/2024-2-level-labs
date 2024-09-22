@@ -153,10 +153,14 @@ def detect_language(
     if (not isinstance(profile_1, dict) or not isinstance(profile_2, dict)
             or not isinstance(unknown_profile, dict)):
         return None
+    if ((compare_profiles(unknown_profile, profile_1) or
+         compare_profiles(unknown_profile, profile_2)) is None):
+        return None
     if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
-        return profile_1.get('name')
+        return profile_1['name']
     if compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
-        return profile_2.get('name')
+        return profile_2['name']
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -175,7 +179,9 @@ def load_profile(path_to_file: str) -> dict | None:
         return None
     with open(path_to_file, 'r', encoding='utf-8') as file_to_profile:
         profile = json.load(file_to_profile)
-    return profile
+    if isinstance(profile, dict):
+        return profile
+    return None
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:

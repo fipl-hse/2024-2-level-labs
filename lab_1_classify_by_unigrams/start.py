@@ -1,4 +1,4 @@
-import lab_1_classify_by_unigrams.main as m
+import main as m
 
 """
 Language detection starter

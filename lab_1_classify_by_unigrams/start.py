@@ -16,11 +16,14 @@ def main() -> None:
     with open("lab_1_classify_by_unigrams/assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
-    en_lang_profile = funcs.create_language_profile("en", en_text)
-    print(en_lang_profile)
+    unknown_profile = funcs.create_language_profile("unk", unknown_text)
+    profile_1 = funcs.create_language_profile("en", en_text)
+    profile_2 = funcs.create_language_profile("de", de_text)
+    res = funcs.detect_language(unknown_profile, profile_1, profile_2)
 
-    result = None
+    result = res
     assert result, "Detection result is None"
+    print(result)
 
 
 if __name__ == "__main__":

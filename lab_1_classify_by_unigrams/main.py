@@ -67,11 +67,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
 
-    lang_profile = {"name": "", "freq": {}}
-    tokens_list = tokenize(text)
+    lang_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
+    """tokens_list = tokenize(text)
     freq_dict = calculate_frequencies(tokens_list)
     lang_profile["name"] = language
-    lang_profile["freq"] = freq_dict
+    lang_profile["freq"] = freq_dict"""
 
     return lang_profile
 
@@ -89,7 +89,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(predicted, list) and isinstance(actual, list)):
+    if not (isinstance(predicted, list) and
+            isinstance(actual, list) and
+            len(predicted) == len(actual)):
         return None
 
     n = len(predicted)
@@ -134,7 +136,8 @@ def compare_profiles(
             else:
                 corresp_output[j].append(corresp_input[j][i])
 
-    return calculate_mse(corresp_output[1], corresp_output[0])
+    mse = calculate_mse(corresp_output[1], corresp_output[0])
+    return mse
 
 
 def detect_language(
@@ -161,8 +164,8 @@ def detect_language(
             isinstance(profile_2, dict)):
         return None
 
-    a = float(compare_profiles(unknown_profile, profile_1))
-    b = float(compare_profiles(unknown_profile, profile_2))
+    a = compare_profiles(unknown_profile, profile_1)
+    b = compare_profiles(unknown_profile, profile_2)
 
     if a < b:
         res = str(profile_1["name"])

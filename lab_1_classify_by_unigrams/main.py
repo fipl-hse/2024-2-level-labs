@@ -218,7 +218,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     profile_freq = profile['freq']
     list_profile_freq_keys = list(profile_freq.keys())
     for key in list_profile_freq_keys:
-        if not len(key) == 1 or (key.isupper() and key.lower() == key):
+        if not len(key) == 1:
             continue
         if key.isupper() and profile_freq.get(key.lower()) is not None:
             profile_freq_key = profile_freq[key] / profile['n_words'][0]
@@ -230,7 +230,6 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             profile_freq_key_upper = profile_freq[key.upper()] / profile['n_words'][0]
             result_freq.update({key.lower(): profile_freq_key + profile_freq_key_upper})
             list_profile_freq_keys.remove(key.upper())
-
         else:
             profile_freq_key = profile_freq[key] / profile['n_words'][0]
             result_freq.update({key.lower(): profile_freq_key})
@@ -261,7 +260,9 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     profiles_list = []
     for path in paths_to_profiles:
-        profiles_list.append(preprocess_profile(load_profile(path)))
+        preprocessed_profile = preprocess_profile(load_profile(path))
+        if preprocessed_profile is not None:
+            profiles_list.append(preprocessed_profile)
 
     return profiles_list
 

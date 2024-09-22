@@ -56,7 +56,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             frequencies_of_letters[token] = 0
         frequencies_of_letters[token] += 1
     for token in frequencies_of_letters:
-        frequencies_of_letters[token] /= float(len(tokens))
+        frequencies_of_letters[token] /= len(tokens)
     return frequencies_of_letters
 
 
@@ -104,8 +104,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     lists_length = len(predicted)
     for index in range(lists_length):
         mse += (actual[index] - predicted[index]) ** 2
-    mse /= float(lists_length)
-    return mse
+    return mse / lists_length
 
 
 def is_valid_profile(profile: dict[str, str | dict[str, float]]) -> bool:
@@ -132,8 +131,8 @@ def is_valid_profile(profile: dict[str, str | dict[str, float]]) -> bool:
 
 
 def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -168,8 +167,7 @@ def compare_profiles(
             values_tokens_to_compare.append(0)
         else:
             values_tokens_to_compare.append(profile_to_compare["freq"][letter])
-    result = calculate_mse(values_unknown_tokens, values_tokens_to_compare)
-    return result
+    return calculate_mse(values_unknown_tokens, values_tokens_to_compare)
 
 
 def detect_language(
@@ -288,8 +286,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
-) -> list[tuple[str, float]] | None:
+    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+) -> list | None:
     """
     Detect the language of an unknown profile.
 

@@ -16,14 +16,20 @@ Returns:
     list[str] | None: A list of lower-cased tokens without punctuation
 In case of corrupt input arguments, None is returned
 """
+    if not isinstance(text, str):
+        return None
     low = text.lower()
-    new_list = list(low)
+    symbols = []
+    for symbol in low:
+        symbols.append(symbol)
     clear_list = []
-    wrong_cases = list("!?/|\.,';:\"#@()*-+=`~ 1234567890")
-    for i in new_list:
+    wrong_cases = list("!?/|&><%\.,';:\"#@()*-+=`~ 1234567890")
+    for i in symbols:
         if i not in wrong_cases:
             clear_list.append(i)
     return clear_list
+
+a = tokenize("Hello, my dear friend! I would like to see you!!! **")
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -38,12 +44,16 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
         In case of corrupt input arguments, None is returned
         """
+    if not isinstance(tokens, list) or not all(isinstance(s, str) for s in tokens):
+        return None
     frequency = {}
     for letter in tokens:
         if letter.isalpha():
             counter = tokens.count(letter) / len(tokens)
             frequency[letter] = counter
     return frequency
+
+print(calculate_frequencies(a))
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -59,6 +69,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(language, str):
+        return None
+    if not isinstance(text, str):
+        return None
     freq = tokenize(text)
     dictionary = calculate_frequencies(freq)
     profile = {
@@ -81,10 +95,38 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(predicted, list):
+        return None
+    if not isinstance(actual, list):
+        return None
+    if len(predicted) != len(actual):
+        return None
+    mse = 0
     length = len(predicted)
-    mse = float(sum((actual[i] - predicted[i])**2 for i in range(length)) / length)
-    return mse
+    for index in range(length):
+        mse += (actual[index] - predicted[index] ** 2)
+    return mse / float(length)
+    #mse = float(sum((actual[i] - predicted[i])**2 for i in range(length)) / length)
 
+
+print(calculate_mse([0.1538, 0.0, 0.0, 0.0769, 0.0769, 0.0769, 0.0, 0.0, 0.0769, 0.0769, 0.0769, 0.1538, 0.2307, 0.0], [0.1666, 0.1666, 0.0333, 0.1333, 0.0, 0.0666, 0.0666, 0.0333, 0.0333, 0.1, 0.0666, 0.0, 0.0666, 0.0666]))
+
+def profiles_bad_input(profile: dict[str, str | dict[str, float]]):
+    if not isinstance(profile, dict):
+        return None
+    if len(profile.keys()) != 2 and set(profile.keys()) != {"name", "freq"}:
+        return None
+    for key, value in profile.items(): #example of profile: { "name": "en", "freq": ["g": 0.89, "t": 0.89] }
+        if not isinstance(profile["name"], str):
+            return None
+        if not isinstance(profile["freq"], dict):
+            return None
+        elif isinstance(profile["freq"], dict):
+            for letter, number in profile["freq"].items():
+                if not isinstance(letter, str):
+                    return None
+                if not isinstance(number, float):
+                    return None
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -104,30 +146,47 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    from_profile1 = unknown_profile["freq"]
+    profiles_bad_input(unknown_profile)
+    profiles_bad_input(profile_to_compare)
+    from_profile1 = unknown_profile["freq"] #here we have dictionaries like ["h": 0.056]
     from_profile2 = profile_to_compare["freq"]
-    keys_for_1 = {key for key in from_profile1.keys()}
+    keys_for_1 = {key for key in from_profile1.keys()} #take all keys from these dictionaries
     keys_for_2 = {key for key in from_profile2.keys()}
-    letters_need1 = keys_for_1.difference(keys_for_2)
+    if keys_for_1.intersection(keys_for_2) == {}:
+        return None
+    letters_need1 = keys_for_1.difference(keys_for_2) #we need to create the rang of keys without value (with 0.0)
     letters_need2 = keys_for_2.difference(keys_for_1)
 
     for i in letters_need1:
-        from_profile2.setdefault(i, 0)
+        from_profile2.setdefault(i, 0.0)
     for x in letters_need2:
-        from_profile1.setdefault(x, 0)
+        from_profile1.setdefault(x, 0.0)
 
     sorted1 = dict(sorted(from_profile1.items()))
     sorted2 = {}
 
     for key in sorted1:
         sorted2[key] = from_profile2.get(key, from_profile1[key])
-
-    #get lists with values from two dictionaries
     list1 = list(sorted1.values())
     list2 = list(sorted2.values())
     conclusion = calculate_mse(list2, list1)
-    return round(conclusion, 3)
+    if conclusion <= 0:
+        return None
+    return conclusion
 
+print(compare_profiles({
+            'freq': {
+                'y': 0.0769, 'n': 0.0769, 'e': 0.0769, 'h': 0.1538, 'm': 0.0769, 'i': 0.0769,
+                'a': 0.2307, 's': 0.0769, 'p': 0.1538
+            }
+        }, {
+            'name': 'de',
+            'freq': {
+                'u': 0.0344, 'e': 0.1724, 'a': 0.0344, 'r': 0.0344, 'i': 0.1034, 'g': 0.0344,
+                'b': 0.0344, 't': 0.0344, 'd': 0.0344, 'm': 0.0344, 's': 0.1034, 'h': 0.0689,
+                'c': 0.0689, 'v': 0.0344, 'l': 0.1034, 'ü': 0.0344, 'n': 0.0344
+            }
+        }))
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -148,7 +207,9 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-
+    profiles_bad_input(unknown_profile)
+    profiles_bad_input(profile_1)
+    profiles_bad_input(profile_2)
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
     if mse_1 == mse_2:

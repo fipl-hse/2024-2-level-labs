@@ -1,5 +1,4 @@
 import json
-import re
 
 """
 Lab 1.
@@ -28,8 +27,10 @@ def tokenize(text: str) -> list[str] | None:
     if type(text) is not str or len(text) == 0:
         return None
 
-    all_letters = re.sub(r'[\W\d_]', '', text.lower())
-    tokens = re.findall(r'(.)', all_letters)
+    tokens = []
+    for symbol in text:
+        if symbol.isalpha():
+            tokens.append(symbol.lower())
     return tokens
 
 
@@ -102,6 +103,14 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     return mse
 
 
+def sort_dict(dictio):
+    sorted_list = sorted(dictio.items())
+    sorted_dict = {}
+    for key, value in sorted_list:
+        sorted_dict[key] = value
+    return sorted_dict
+
+
 def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_to_compare: dict[str, str | dict[str, float]],
@@ -120,25 +129,24 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if (type(unknown_profile) is not dict or type(profile_to_compare) is not dict or len(unknown_profile) == 0
-            or len(profile_to_compare) == 0) or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2:
+    if ((type(unknown_profile) is not dict or type(profile_to_compare) is not dict or len(unknown_profile) == 0
+         or len(profile_to_compare) == 0) or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
         return None
 
-    profile_to_compare_freq = profile_to_compare['freq']
-    unknown_profile_freq = unknown_profile['freq']
+    profile_to_compare_freq = dict(profile_to_compare['freq'])
+    unknown_profile_freq = dict(unknown_profile['freq'])
 
     for key in profile_to_compare_freq.keys():
-        equal_value = unknown_profile_freq.get(key)
-        if equal_value is None:
+        if unknown_profile_freq.get(key) is None:
             unknown_profile_freq.update({key: 0})
 
     for key in unknown_profile_freq.keys():
-        equal_value = profile_to_compare_freq.get(key)
-        if equal_value is None:
+        if profile_to_compare_freq.get(key) is None:
             profile_to_compare_freq.update({key: 0})
 
     sorted_profile_to_compare = list(dict(sorted(profile_to_compare_freq.items(), key=lambda x: x[0])).values())
     sorted_unknown_profile = list(dict(sorted(unknown_profile_freq.items(), key=lambda x: x[0])).values())
+
     return calculate_mse(sorted_profile_to_compare, sorted_unknown_profile)
 
 
@@ -218,22 +226,23 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     profile_freq = profile['freq']
     list_profile_freq_keys = list(profile_freq.keys())
     for key in list_profile_freq_keys:
-        if not len(key) == 1:
+        if not len(key) == 1 or profile_freq.get(key) is None:
             continue
         if key.isupper() and profile_freq.get(key.lower()) is not None:
             profile_freq_key = profile_freq[key] / profile['n_words'][0]
             profile_freq_key_lower = profile_freq[key.lower()] / profile['n_words'][0]
             result_freq.update({key.lower(): profile_freq_key + profile_freq_key_lower})
-            list_profile_freq_keys.remove(key.lower())
+            del profile_freq[key]
+            del profile_freq[key.lower()]
         elif key.islower() and profile_freq.get(key.upper()) is not None:
             profile_freq_key = profile_freq[key] / profile['n_words'][0]
             profile_freq_key_upper = profile_freq[key.upper()] / profile['n_words'][0]
             result_freq.update({key.lower(): profile_freq_key + profile_freq_key_upper})
-            list_profile_freq_keys.remove(key.upper())
+            del profile_freq[key]
+            del profile_freq[key.upper()]
         else:
             profile_freq_key = profile_freq[key] / profile['n_words'][0]
             result_freq.update({key.lower(): profile_freq_key})
-            list_profile_freq_keys.remove(key)
 
     del profile['n_words']
     del profile['freq']
@@ -290,7 +299,11 @@ def detect_language_advanced(
     result_list = []
     for profile in known_profiles:
         result_list.append((profile['name'], compare_profiles(unknown_profile, profile)))
-    sorted(sorted(result_list, key=lambda x: x[1]), key=lambda x: x[0])
+    result_list = sorted(sorted(result_list, key=lambda x: x[0]), key=lambda x: x[1], reverse=False)
+    # for profile in result_list:
+    #     if profile[1] == result_list[result_list.index(profile)+1][1]:
+    #         if
+
     return result_list
 
 

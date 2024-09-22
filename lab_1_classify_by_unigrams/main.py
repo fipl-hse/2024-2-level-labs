@@ -46,17 +46,19 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     In case of corrupt input arguments, None is returned
     """
     if isinstance(tokens, list):
-        number_of_tokens = len(tokens)
-        tokens_quantity = {}
-        for letter in tokens:
-            if letter not in tokens_quantity:
-                tokens_quantity[letter] = 1
-            else:
-                tokens_quantity[letter] = tokens_quantity[letter] + 1
-        tokens_frequency = {}
-        for symbol, value in tokens_quantity.items():
-            tokens_frequency[symbol] = value/number_of_tokens
-        return tokens_frequency
+        for element in tokens:
+            if isinstance(element, str):
+                number_of_tokens = len(tokens)
+                tokens_quantity = {}
+                for letter in tokens:
+                    if letter not in tokens_quantity:
+                        tokens_quantity[letter] = 1
+                    else:
+                        tokens_quantity[letter] = tokens_quantity[letter] + 1
+                tokens_frequency = {}
+                for symbol, value in tokens_quantity.items():
+                    tokens_frequency[symbol] = value/number_of_tokens
+                return tokens_frequency
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -71,7 +73,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-
+    if isinstance(language, str):
+        if isinstance(text, str):
+            language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+            return language_profile
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

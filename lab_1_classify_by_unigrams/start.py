@@ -8,16 +8,14 @@ def main() -> None:
     """
     Launches an implementation
     """
-    from main import tokenize
-    from main import calculate_frequencies
+    from main import create_language_profile
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    tokenized_text = tokenize(en_text)
-    result = calculate_frequencies(tokenized_text)
+    result = create_language_profile('english', en_text)
     print(result)
     assert result, "Detection result is None"
 

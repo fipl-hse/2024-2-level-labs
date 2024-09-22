@@ -53,6 +53,9 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
+    result = input_string * how_many
+    return result
+print(multiply_string('Hello', 8))
 
 
 # Function calls with expected result:
@@ -69,13 +72,17 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
+    new_string = input_string[:3]
+    return new_string * how_many
 
+
+print(front_times('Aleksandra', 5))
 
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'
 # front_times('Chocolate', 3) → 'ChoChoCho'
 # front_times('Abc', 3) → 'AbcAbcAbc'
-# front_times('A', 4) → 'AAAA'
+print(front_times('A', 4))
 # front_times('', 4) → ''
 # front_times('Abc', 0) → ''
 
@@ -86,13 +93,19 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
+    #new_string = input_string[-1:-3:-1]
+    #new_string = new_string[::-1]
+    new_string = input_string[-2:]
+    return new_string * 3
 
+
+print(extra_end('Aleksandra'))
 
 # Function calls with expected result:
 # extra_end('Hello') → 'lololo'
 # extra_end('ab') → 'ababab'
 # extra_end('Hi') → 'HiHiHi'
-# extra_end('Code') → 'dedede'
+print(extra_end('Code'))
 
 
 # Task 4:
@@ -101,12 +114,15 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
+    #return first_string + second_string + second_string + first_string
+    new_string = f'{first_string}{second_string*2}{first_string}'
+    return new_string
 
 
-# make_abba('Hi', 'Bye') → 'HiByeByeHi'
+print(make_abba('Hi', 'Bye'))
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
-# make_abba('', 'y') → 'yy'
+print(make_abba('', 'y'))
 
 
 # Task 5
@@ -119,9 +135,18 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
+    words = sentence.split(' ')
+    new_sentence = ''
+    for word in words:
+        if len(word) >= 5:
+            mirror = word[::-1]
+            new_sentence += mirror
+        else:
+            new_sentence += word
+    return new_sentence
 
 
-# reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
+print(reverse_word("Hey fellow warriors"))
 #
 # reverse_word("This is a test") == "This is a test"
 #
@@ -146,6 +171,10 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
+    result = []
+    for word in input_string.split():
+        result.append(word.capitalize())
+        result_joined = ''.join(result)
 
 
 # Task 7:
@@ -154,7 +183,7 @@ def combo_string(first_string: str, second_string: str) -> str:
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
-
+    
 
 # combo_string('Hello', 'hi') → 'hiHellohi'
 # combo_string('hi', 'Hello') → 'hiHellohi'

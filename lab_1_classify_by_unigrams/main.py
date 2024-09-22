@@ -8,13 +8,16 @@ Language detection
 
 def tokenize(text: str) -> list[str] | None:
 
-    text = text.lower()
-    letter_lst = []
-    for i in text:
-        if i.isalpha():
-            letter_lst.append(i)
+    if type(text) == str:
+        text = text.lower()
+        letter_lst = []
+        for i in text:
+            if i.isalpha():
+                letter_lst.append(i)
 
-    return letter_lst
+        return letter_lst
+    else:
+        return None
 
     """
     Split a text into tokens.

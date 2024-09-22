@@ -17,6 +17,7 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
 
     result = letter_lst
+
     assert result, "Detection result is None"
     print(tokenize(en_text))
 

@@ -66,8 +66,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if type(text) is not str or type(language) is not str:
         return None
-    language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
-    return language_profile
+    return {'name': language,
+            'freq': calculate_frequencies(tokenize(text))}
+
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculate mean squared error between predicted and actual values.
@@ -81,7 +82,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-
+    if type(predicted) is not list or type(actual) is not list and not len(predicted) == len(actual):
+        return None
+    diff = 0
+    for i in range(len(actual)):
+        diff += (actual[i] - predicted[i])**2
+    return diff/len(actual)
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -101,6 +107,26 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    if type(unknown_profile) is not dict or type(profile_to_compare) is not dict or \
+            len(profile_to_compare) != len(unknown_profile) != 2:
+        return None
+    unknown_lst = []
+    compared_lst = []
+    for letter in unknown_profile['freq']:
+        if letter not in profile_to_compare['freq']:
+            profile_to_compare['freq'][letter] = 0
+    for letter in profile_to_compare['freq']:
+        if letter not in unknown_profile['freq']:
+            unknown_profile['freq'][letter] = 0
+    unknown_sorted = dict(sorted(unknown_profile['freq'].items()))
+    compared_sorted = dict(sorted(profile_to_compare['freq'].items()))
+    for i in unknown_sorted.values():
+        unknown_lst.append(i)
+    for i in compared_sorted.values():
+        compared_lst.append(i)
+    return calculate_mse(compared_lst, unknown_lst)
+
+
 
 
 def detect_language(
@@ -122,6 +148,17 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    if type(unknown_profile) is not dict or type(profile_1) is not dict\
+            or type(profile_2) is not dict:
+        return None
+    if compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
+        return profile_2['name']
+    elif compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+        return profile_1['name']
+    elif compare_profiles(unknown_profile, profile_1) == compare_profiles(unknown_profile, profile_2):
+        sort_lang = [profile_1['name'], profile_2['name']]
+        return sort_lang.sort()
+
 
 
 def load_profile(path_to_file: str) -> dict | None:

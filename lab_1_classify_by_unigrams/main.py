@@ -70,7 +70,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if type(language) is not str or type(text) is not str or len(language) == 0 or len(text) == 0:
         return None
-
+    profile_dict: dict[str, str | dict[str, float]] | None
     profile_dict = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
     return profile_dict
 

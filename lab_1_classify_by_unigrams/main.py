@@ -102,8 +102,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     summation = 0
     n = len(actual)
     for i in range(0, n):
-        difference = actual[i] - predicted[i]
-        squared_difference = difference ** 2
+        squared_difference = (actual[i] - predicted[i]) ** 2
         summation = summation + squared_difference
     mse = summation / n
     return mse
@@ -131,10 +130,14 @@ def compare_profiles(
 
     if not unknown_profile or not profile_to_compare:
         return None
-    first_lang_freq =
-    second_lang_freq =
-    profile_comparison = calculate_mse( )
-    return profile_comparison
+    if not ('name' in unknown_profile and 'freq' in unknown_profile and isinstance(unknown_profile['freq'], dict)):
+        return None
+    if not ('name' in profile_to_compare and 'freq' in profile_to_compare and isinstance(profile_to_compare['freq'], dict)):
+        return None
+    all_tokens = set(unknown_profile['freq'].keys()).union(set(profile_to_compare['freq'].keys()))
+    freq_first_lang = [unknown_profile['freq'].get(token, 0) for token in all_tokens]
+    freq_second_lang = [profile_to_compare['freq'].get(token, 0) for token in all_tokens]
+    return calculate_mse(freq_first_lang, freq_second_lang)
 
 
 def detect_language(

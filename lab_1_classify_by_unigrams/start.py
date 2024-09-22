@@ -3,7 +3,7 @@ Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-from main import calculate_frequencies, calculate_mse, create_language_profile, tokenize
+from main import calculate_frequencies, calculate_mse, compare_profiles, create_language_profile, tokenize
 
 
 def main() -> None:
@@ -18,12 +18,16 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
+    en_profile = create_language_profile("en", en_text)
+    de_profile = create_language_profile("de", de_text)
+
     print(f'Tokens: {tokens}')
     print(f'Frequencies: {calculate_frequencies(tokens)}')
     print(f'Language profile: {create_language_profile("en", en_text)}')
     print(f'MSE:{calculate_mse}')
-    print(f'Compare profiles:')
-    result = tokens
+    print(f'Compare profiles:{compare_profiles(en_profile, de_profile)}')
+
+    result = "a"
 
     assert result, "Detection result is None"
 

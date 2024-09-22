@@ -47,19 +47,19 @@ print(example)
 # TASKS
 
 # Task 1:
-def multiply_string(input_string: str, how_many: int) -> str:
+def multiply_string(text: str, number: int) -> str:    # в скобках подсказка, что в функцию нажо передать строчку и число
     """
     Given a string and a non-negative number,
     display the given string the number of times given in the `how_many`.
     """
-    # student realisation goes here
+    return text * number
 
 
 # Function calls with expected result:
-# multiply_string('Hi', 2) → 'HiHi'
-# multiply_string('Hi', 3) → 'HiHiHi'
-# multiply_string('Hi', 1) → 'Hi'
-# multiply_string('Hi', 0) → ''
+print(multiply_string('Hi', 2))
+print(multiply_string('Hi', 3))
+print(multiply_string('Hi', 1))
+print(multiply_string('Hi', 0))
 
 
 # Task 2:
@@ -68,14 +68,15 @@ def front_times(input_string: str, how_many: int) -> str:
     Given the string, take its three leading characters
     and display them that many times as in `how_many`.
     """
-    # student realisation goes here
+    str_slice = input_string[:3]
+    return str_slice * how_many
 
 
 # Function calls with expected result:
-# front_times('Chocolate', 2) → 'ChoCho'
-# front_times('Chocolate', 3) → 'ChoChoCho'
-# front_times('Abc', 3) → 'AbcAbcAbc'
-# front_times('A', 4) → 'AAAA'
+print(front_times('Chocolate', 2))
+print(front_times('Chocolate', 3))
+print(front_times('Abc', 3))
+print(front_times('A', 4))
 # front_times('', 4) → ''
 # front_times('Abc', 0) → ''
 
@@ -85,14 +86,15 @@ def extra_end(input_string: str) -> str:
     """
     Given the string, take its two last characters and display them three times.
     """
-    # student realisation goes here
+    new_slice = input_string[-2:]
+    return new_slice * 3
 
 
 # Function calls with expected result:
-# extra_end('Hello') → 'lololo'
-# extra_end('ab') → 'ababab'
-# extra_end('Hi') → 'HiHiHi'
-# extra_end('Code') → 'dedede'
+print(extra_end('Hello'))
+print(extra_end('ab'))
+print(extra_end('Hi'))
+print(extra_end('Code'))
 
 
 # Task 4:
@@ -100,13 +102,16 @@ def make_abba(first_string: str, second_string: str) -> str:
     """
     Given two strings, concatenate them as a reflection.
     """
-    # student realisation goes here
+    l_string = [first_string, second_string*2, first_string]
+    result = ''
+    return result.join(l_string)
+# ИЛИ f'{first_string}{second_string*2}{first_string}'
 
 
-# make_abba('Hi', 'Bye') → 'HiByeByeHi'
-# make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
-# make_abba('What', 'Up') → 'WhatUpUpWhat'
-# make_abba('', 'y') → 'yy'
+print(make_abba('Hi', 'Bye')) # → 'HiByeByeHi'
+print(make_abba('Yo', 'Alice')) # → 'YoAliceAliceYo'
+print(make_abba('What', 'Up')) # → 'WhatUpUpWhat'
+print(make_abba('', 'y')) # → 'yy'
 
 
 # Task 5
@@ -118,18 +123,23 @@ def reverse_word(sentence: str) -> str:
     Strings passed in will consist of only letters and spaces.
     Spaces will be included only when more than one word is present.
     """
-    # student realisation goes here
+    sp = []
+    for word in sentence.split(' '):
+        if len(word) >= 5:
+            sp.append(word[::-1])
+        else:
+            sp.append(word)
+    print(' '.join(sp))
 
 
-# reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
-#
+print(reverse_word("Hey fellow warriors")) # == "Hey wollef sroirraw"
 # reverse_word("This is a test") == "This is a test"
 #
 # reverse_word("This is another test") == "This is rehtona test"
 
 
 # Task 6
-def generate_hashtag(input_string: str) -> str:
+def generate_hashtag(input_string: str) -> str | bool:
     """
     The marketing team is spending way too much time typing in hashtags.
     Let's help them with our own Hashtag Generator!
@@ -145,7 +155,17 @@ def generate_hashtag(input_string: str) -> str:
     "    Hello     World   "                  =>  "#HelloWorld"
     ""                                        =>  false
     """
-    # student realisation goes here
+    result = []
+    for word in input_string.split():
+        result.append(word.capitalize())
+
+    joined_result = ''.join(result)
+    if len(joined_result) >= 140 or len(joined_result) == 0:
+        return False
+    return f'#{joined_result}'
+
+
+print(generate_hashtag(" Hello there thanks for trying my quiz"))
 
 
 # Task 7:

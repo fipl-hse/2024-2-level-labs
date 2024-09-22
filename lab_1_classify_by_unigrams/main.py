@@ -20,6 +20,15 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(text, str):
+        return None
+    text = text.lower()
+    cleaned_text = ''
+    for i in text:
+        if i.isalpha():
+            cleaned_text += i
+    result = list(cleaned_text)
+    return result
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -34,6 +43,24 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(tokens, list):
+        return None
+    elif isinstance(tokens, list):
+        for element in tokens:
+            if not isinstance(element, str):
+                return None
+    length = len(tokens)
+    freq_dictionary = dict()
+
+    for letter in tokens:
+        if letter in freq_dictionary:
+            freq_dictionary[letter] += 1
+        else:
+            freq_dictionary[letter] = 1
+
+    for letter in freq_dictionary:
+        freq_dictionary[letter] = freq_dictionary[letter] / length
+    return freq_dictionary
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -49,6 +76,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    language_profile_dictionary = dict()
+    language_profile_dictionary['name'] = language
+    language_profile_dictionary['freq'] = calculate_frequencies(tokenize(text))
+    return language_profile_dictionary
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -64,6 +97,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(predicted, list) or not isinstance(actual, list):
+        return None
 
 
 def compare_profiles(

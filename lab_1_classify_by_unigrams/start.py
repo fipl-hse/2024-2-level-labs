@@ -3,7 +3,7 @@ Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-import main as funcs
+import lab_1_classify_by_unigrams.main as funcs
 
 
 def main() -> None:

@@ -67,7 +67,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
 
-    lang_profile = {}
+    lang_profile = {"name": "", "freq": {}}
     tokens_list = tokenize(text)
     freq_dict = calculate_frequencies(tokens_list)
     lang_profile["name"] = language
@@ -156,16 +156,18 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict)):
+    if not (isinstance(unknown_profile, dict) and
+            isinstance(profile_1, dict) and
+            isinstance(profile_2, dict)):
         return None
 
-    a = compare_profiles(unknown_profile, profile_1)
-    b = compare_profiles(unknown_profile, profile_2)
+    a = float(compare_profiles(unknown_profile, profile_1))
+    b = float(compare_profiles(unknown_profile, profile_2))
 
     if a < b:
-        res = profile_1["name"]
+        res = str(profile_1["name"])
         return res
-    res = profile_2["name"]
+    res = str(profile_2["name"])
     return res
 
 

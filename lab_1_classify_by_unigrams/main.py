@@ -107,10 +107,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or len(predicted) != len(actual):
         return None
 
-    # опытным путём на меньшем количестве данных выяснила, что дело, кажется,
-    # в точности представления float в памяти, а не в неверном коде
-    # странно, что это работает у всех, но не у меня
-
     return round(float(sum((actual[i] - predicted[i]) ** 2
                            for i in range(len(actual))) / len(actual)), 4)
 
@@ -142,11 +138,15 @@ def compare_profiles(
             or not all(isinstance(key, str) for key in profile_to_compare):
         return None
 
+    all_chars = set(unknown_profile['freq']).union(set(profile_to_compare['freq']))
     # creating lists to pass into calculate_mse function
     unknown_sorted = [(unknown_profile['freq'][char] if char in unknown_profile['freq'] else 0.0)
-                      for char in profile_to_compare['freq']]
+                      for char in all_chars]
 
-    return calculate_mse(unknown_sorted, list(profile_to_compare['freq'].values()))
+    profile_to_compare_sorted = [(profile_to_compare['freq'][char] if char in profile_to_compare['freq']
+                                  else 0.0) for char in all_chars]
+
+    return calculate_mse(unknown_sorted, profile_to_compare_sorted)
 
 
 def detect_language(
@@ -177,10 +177,7 @@ def detect_language(
             or not all(isinstance(key, str) for key in profile_2):
         return None
 
-    mse_1 = compare_profiles(unknown_profile, profile_1)
-
-    if mse_1 is None:
-        return None
+    mse_1 = float(compare_profiles(unknown_profile, profile_1))
     mse_2 = float(compare_profiles(unknown_profile, profile_2))
 
     # if mse values differ
@@ -242,12 +239,22 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
 
     all_unigrams_count = profile['n_words'][0]
 
+    # for key in profile['freq']:
+    #     key = key.strip().lower()
+    #     if len(key) == 1 and key.isalpha() and key not in profile_preprocessed:
+    #         profile_preprocessed['freq'][key] = profile['freq'][key] / all_unigrams_count
+    #     elif len(key) == 1 and key.isalpha():
+    #         profile_preprocessed['freq'][key] += profile['freq'][key] / all_unigrams_count
+
     for key in profile['freq']:
-        key = key.strip().lower()
-        if len(key) == 1 and key.isalpha() and key not in profile_preprocessed:
-            profile_preprocessed['freq'][key] = profile['freq'][key] / all_unigrams_count
-        elif len(key) == 1 and key.isalpha():
-            profile_preprocessed['freq'][key] += profile['freq'][key] / all_unigrams_count
+        if key.isalpha() and len(key.strip()) == 1:
+            if key.lower() in profile_preprocessed:
+                profile_preprocessed['freq'][key.lower().strip()] += profile['freq'][key]
+            else:
+                profile_preprocessed['freq'][key.lower().strip()] = profile['freq'][key]
+
+    for key in profile_preprocessed['freq']:
+        profile_preprocessed['freq'][key] = round(profile_preprocessed['freq'][key] / all_unigrams_count, 4)
 
     return profile_preprocessed
 

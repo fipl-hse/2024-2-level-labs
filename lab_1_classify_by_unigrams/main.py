@@ -49,9 +49,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(tokens) != list or any(elem for elem in tokens) != str:
+    if type(tokens) != list:
         return None
     else:
+        for token in tokens:
+            if type(token) != str:
+                return None
         freq = {}
         prop = {}
         total_tokens = len(tokens)
@@ -64,9 +67,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             prop[key] = value / total_tokens
         return prop
 
-bad_inputs = ['string', {}, (), None, 9, 9.34, True, [None]]
-for bad_input in bad_inputs:
-    print(calculate_frequencies(bad_input))
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """

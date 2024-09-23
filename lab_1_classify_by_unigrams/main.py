@@ -180,6 +180,8 @@ def detect_language(
                 return profile_2.get('name')
             elif mse_prof_2 is None and mse_prof_1 is not None:
                 return profile_1.get('name')
+            else:
+                return min(profile_1.get('name'), profile_2.get('name'))
     return None
 
 

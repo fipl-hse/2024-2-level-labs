@@ -243,9 +243,11 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     for key in profile['freq']:
         if len(key.strip()) == 1:
             if key.lower() in profile_preprocessed['freq']:
-                profile_preprocessed['freq'][key.lower()] += profile['freq'][key] / all_unigrams_count
+                profile_preprocessed['freq'][key.lower()] += profile['freq'][key] \
+                                                             / all_unigrams_count
             else:
-                profile_preprocessed['freq'][key.lower()] = profile['freq'][key] / all_unigrams_count
+                profile_preprocessed['freq'][key.lower()] = profile['freq'][key] \
+                                                            / all_unigrams_count
 
     return profile_preprocessed
 

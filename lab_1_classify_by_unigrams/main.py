@@ -130,7 +130,8 @@ def compare_profiles(
 
     if not unknown_profile or not profile_to_compare:
         return None
-    if not isinstance(unknown_profile['freq'], dict) and not isinstance(profile_to_compare['freq'], dict):
+    if (not isinstance(unknown_profile['freq'], dict)
+            and not isinstance(profile_to_compare['freq'], dict)):
         return None
     if not ('name' in unknown_profile and 'name' in profile_to_compare):
         return None
@@ -162,13 +163,16 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
 
-    if not isinstance(unknown_profile, dict) and not isinstance(profile_1, dict) and not isinstance(profile_2, dict):
+    if (not isinstance(unknown_profile, dict) and not isinstance(profile_1, dict)
+            and not isinstance(profile_2, dict)):
         return None
     if not unknown_profile and not profile_1 and not profile_2:
         return None
-    if unknown_profile is None or profile_1 is None or profile_2 is None:
+    if (unknown_profile is None or profile_1 is None
+            or profile_2 is None):
         return None
-    if isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict):
+    if (isinstance(unknown_profile, dict) and isinstance(profile_1, dict)
+            and isinstance(profile_2, dict)):
         mse_prof_1 = compare_profiles(unknown_profile, profile_1)
         mse_prof_2 = compare_profiles(unknown_profile, profile_2)
         if mse_prof_1 is not None and mse_prof_2 is not None:

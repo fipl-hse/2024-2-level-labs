@@ -69,6 +69,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
 
+
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculate mean squared error between predicted and actual values.
@@ -86,7 +87,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             not len(actual) == len(predicted)):
         return None
     n = len(actual)
-    mse = 0
+    mse = 0.0
     for i in range(n):
         mse += ((actual[i] - predicted[i]) ** 2)
     mse /= n
@@ -161,10 +162,10 @@ def detect_language(
         profile_2['name']: compare_profiles(unknown_profile, profile_2)
     }
     potential_languages = []
-    for name in comparison_results:
+    for name in comparison_results.keys():
         if comparison_results[name] == min(comparison_results.values()):
             potential_languages.append(name)
-    return sorted(potential_languages)[0]
+    return str(sorted(potential_languages)[0])
 
 
 def load_profile(path_to_file: str) -> dict | None:

@@ -103,6 +103,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(predicted, list) or not isinstance(actual,list) or (len(predicted) != len(actual)):
+        return None
+    else:
+        sum_diff = 0
+        for i, n in enumerate(actual):
+            sum_diff += (n-predicted[i])**2
+        return sum_diff / len(predicted)
 
 
 def compare_profiles(
@@ -123,6 +130,24 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    if not (isinstance(unknown_profile, dict)) or not (isinstance(profile_to_compare, dict)):
+        return None
+    else:
+        for i in unknown_profile['freq']:
+            if i not in profile_to_compare['freq']:
+                profile_to_compare['freq'][i] = 0
+        for i in profile_to_compare['freq']:
+            if i not in unknown_profile['freq']:
+                unknown_profile['freq'][i] = 0
+        sorted_unknown = dict(sorted(unknown_profile['freq'].items()))
+        sorted_compare = dict(sorted(profile_to_compare['freq'].items()))
+        sort_comp_list = []
+        sort_unkn_list = []
+        for i in sorted_unknown.values():
+            sort_unkn_list.append(i)
+        for i in sorted_compare.values():
+            sort_comp_list.append(i)
+        return round(calculate_mse(sort_unkn_list, sort_comp_list),3)
 
 
 def detect_language(

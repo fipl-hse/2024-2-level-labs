@@ -68,10 +68,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     lang_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
-    """tokens_list = tokenize(text)
-    freq_dict = calculate_frequencies(tokens_list)
-    lang_profile["name"] = language
-    lang_profile["freq"] = freq_dict"""
 
     return lang_profile
 

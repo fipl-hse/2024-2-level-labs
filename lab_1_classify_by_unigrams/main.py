@@ -65,8 +65,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
      """
-    if (not isinstance(language, str) or not isinstance(text, str)
-            or calculate_frequencies(tokenize(text)) is None):
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    if calculate_frequencies(tokenize(text)) is None:
         return None
     return {'name': language,
             'freq': calculate_frequencies(tokenize(text))}
@@ -118,7 +119,8 @@ def compare_profiles(
             profile_to_compare) == len(unknown_profile) == 2:
         return None
     copy_unk_profile = copy.deepcopy(unknown_profile)
-    if not isinstance(copy_unk_profile['freq'], dict) or not isinstance(profile_to_compare['freq'], dict):
+    if (not isinstance(copy_unk_profile['freq'], dict)
+            or not isinstance(profile_to_compare['freq'], dict)):
         return None
     for i in copy_unk_profile['freq']:
         if i not in profile_to_compare['freq']:
@@ -156,7 +158,8 @@ def detect_language(
     if (not isinstance(profile_1, dict) or not isinstance(profile_2, dict)
             or not isinstance(unknown_profile, dict)):
         return None
-    if not compare_profiles(unknown_profile, profile_1) or not compare_profiles(unknown_profile, profile_2):
+    if (compare_profiles(unknown_profile, profile_1) is None
+            or compare_profiles(unknown_profile, profile_2) is None):
         return None
     if not isinstance(profile_1['name'], str) or not isinstance(profile_2['name'], str):
         return None
@@ -240,7 +243,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         return None
     profiles_collection = []
     for i in paths_to_profiles:
-        if load_profile(i) is None:
+        if preprocess_profile(load_profile(i)) is None:
             return None
         profiles_collection.append(preprocess_profile(load_profile(i)))
     return profiles_collection
@@ -280,5 +283,7 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(detections, tuple):
+        return None
     for i in detections:
         print(f'{i[0]}: MSE {i[-1]:.5f}')

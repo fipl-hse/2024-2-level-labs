@@ -2,12 +2,9 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-from lab_1_classify_by_unigrams.main import tokenize
-from lab_1_classify_by_unigrams.main import create_language_profile
-from lab_1_classify_by_unigrams.main import detect_language
-from lab_1_classify_by_unigrams.main import collect_profiles
-from lab_1_classify_by_unigrams.main import detect_language_advanced
-from lab_1_classify_by_unigrams.main import print_report
+from lab_1_classify_by_unigrams.main import (tokenize, create_language_profile,
+                                             detect_language, collect_profiles,
+                                             detect_language_advanced, print_report)
 
 
 def main() -> None:
@@ -26,9 +23,9 @@ def main() -> None:
                          'assets/profiles/es.json', 'assets/profiles/fr.json',
                          'assets/profiles/it.json', 'assets/profiles/ru.json',
                          'assets/profiles/tr.json']
-    if not (create_language_profile('unk', unknown_text)
-            or not create_language_profile('en', en_text)
-            or not create_language_profile('de', de_text)):
+    if (create_language_profile('unk', unknown_text) is None or
+            create_language_profile('en', en_text) is None
+            or create_language_profile('de', de_text) is None):
         return None
     print(tokenize(en_text))
     print(create_language_profile('en', en_text))

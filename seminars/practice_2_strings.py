@@ -53,8 +53,11 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
+    new_string = input_string * how_many
+    return new_string
 
 
+print(multiply_string('Hi', 2))
 # Function calls with expected result:
 # multiply_string('Hi', 2) → 'HiHi'
 # multiply_string('Hi', 3) → 'HiHiHi'
@@ -69,7 +72,11 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
+    new_string = input_string[:3] * how_many
+    return new_string
 
+
+print(front_times('chocolate', 2))
 
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'
@@ -86,8 +93,11 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
+    new_string = input_string[-2:] * 3
+    return new_string
 
 
+print(extra_end('Hello'))
 # Function calls with expected result:
 # extra_end('Hello') → 'lololo'
 # extra_end('ab') → 'ababab'
@@ -101,8 +111,12 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
+    strings_list = [first_string, second_string * 2, first_string]
+    new_string = ''.join(strings_list)
+    return new_string
 
 
+print(make_abba('hi', 'bye'))
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
@@ -119,8 +133,20 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
+    sentence_list = sentence.split(' ')
+    strings_list = []
+    if len(sentence_list) < 1:
+        return False
+    if len(sentence_list) >= 1:
+        for word in sentence_list:
+            if len(word) >= 5:
+                word = word[::-1]
+        strings_list.append(word)
+    new_string = ' '.join(strings_list)
+    return new_string
 
 
+print(reverse_word('hey fellow warriors'))
 # reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
 #
 # reverse_word("This is a test") == "This is a test"
@@ -146,6 +172,10 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
+    new_string = '#'.join()
+    new_string_list = list(new_string)
+    if new_string_list >14:
+        return False
 
 
 # Task 7:
@@ -155,8 +185,14 @@ def combo_string(first_string: str, second_string: str) -> str:
     """
     # student realisation goes here
 
+    if len(first_string) > len(second_string):
+        return second_string + first_string + second_string
+    if len(first_string) < len(second_string):
+        return first_string + second_string + first_string
 
-# combo_string('Hello', 'hi') → 'hiHellohi'
+
+
+print(combo_string('Hello', 'hi'))
 # combo_string('hi', 'Hello') → 'hiHellohi'
 # combo_string('aaa', 'b') → 'baaab'
 # combo_string('', 'bb') → 'bb'

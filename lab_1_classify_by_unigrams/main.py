@@ -21,6 +21,25 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
 
+    if text is None or type(text) is not str:
+        return None
+
+    tozenized_text = []
+    punctiation = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '.', '-', '/', ':', ';', '<', '=', '>',
+                        '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ']
+    numbers = '0123456789'
+
+    for symb in text:
+        if symb in punctiation or symb in numbers:
+            continue
+        else:
+            low_symb = symb.lower()
+            tozenized_text.append(low_symb)
+
+    if tozenized_text == []:
+        return None
+    else:
+        return tozenized_text
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -34,6 +53,23 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+
+    if tokens is None or type(tokens) is not list:
+        return  None
+    frequencies = {}
+    for token in tokens:
+        if type(token) is not str:
+            return None
+        elif token in frequencies:
+            frequencies[token] += 1
+        else:
+            frequencies[token] = 1
+
+    for token in frequencies:
+        frequencies[token] = frequencies[token] / len(tokens)
+
+    return frequencies
+
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -49,7 +85,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-
+    profile = {}
+    if type(language) is not str or language not in ['en', 'de'] or type(text) is not str:
+        return None
+    else:
+        profile['name'] = language
+        profile['freq'] = calculate_frequencies(tokenize(text))
+        return profile
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

@@ -7,23 +7,12 @@ Language detection
 
 def tokenize(text):
     token_list = []
-    for i in text.lower():
-        if i.isalpha():
-            token_list.append(i)
-    if token_list == []:
-        return None
-    else:
+    if isinstance(text, str):
+        for i in text.lower():
+            if i.isalpha() and i != 'º':
+                token_list.append(i)
         return token_list
-
-
-
-
-
-
-
-
-
-
+    return None
 
     """
     Split a text into tokens.
@@ -52,6 +41,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    freq_dict = {}
+    if isinstance(tokens, list):
+        for letter in tokens:
+            freq_dict[letter] = tokens.count(letter) / len(tokens)
+        return freq_dict
+    return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -67,7 +62,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-
+    language_profile = {}
+    if isinstance(language, str) and isinstance(text, str):
+        language_profile['name'] = language
+        language_profile['freq'] = calculate_frequencies(tokenize(text))
+        return language_profile
+    return None
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -82,6 +82,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if isinstance(predicted, list) and isinstance(actual, list):
+        mse = 0
+        n = len(predicted)
+        for i in range(n):
+            mse += (actual[i] - predicted[i]) ** 2 / n
+        return mse
+    return None
 
 
 def compare_profiles(
@@ -102,7 +109,23 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-
+    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict):
+      if 'frec' in profile_to_compare and 'frec' in unknown_profile:
+          if 'name' in profile_to_compare and 'name' in unknown_profile:
+            first_language_prof = unknown_profile['freq']
+            second_language_prof = profile_to_compare['freq']
+            for letter in first_language_prof.keys():
+                if not (letter in second_language_prof.keys()):
+                    second_language_prof[
+                        letter] = 0  # приводим словари к одному и тому же количеству букв (на случай, если буква встречается в одном словаре, а в другом её нет)
+            for letter in second_language_prof.keys():
+                if not (letter in first_language_prof.keys()):
+                    first_language_prof[letter] = 0
+            profile_to_compare_sort, unknown_profile_sort = dict(sorted(first_language_prof.items())), dict(
+                sorted(second_language_prof.items()))
+            compare_result = calculate_mse(list(profile_to_compare_sort.values()), list(unknown_profile_sort.values()))
+            return compare_result
+    return None
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],

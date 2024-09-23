@@ -220,3 +220,8 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+git add .
+
+git commit -m 'Attempt for grade 6'
+
+git push

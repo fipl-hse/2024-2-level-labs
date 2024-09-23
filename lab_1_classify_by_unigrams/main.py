@@ -166,8 +166,6 @@ def detect_language(
     if (not isinstance(unknown_profile, dict) and not isinstance(profile_1, dict)
             and not isinstance(profile_2, dict)):
         return None
-    if not unknown_profile and not profile_1 and not profile_2:
-        return None
     if (unknown_profile is None or profile_1 is None
             or profile_2 is None):
         return None
@@ -178,15 +176,10 @@ def detect_language(
         if mse_prof_1 is not None and mse_prof_2 is not None:
             if mse_prof_1 < mse_prof_2:
                 return profile_1.get('name')
-            elif mse_prof_1 > mse_prof_2:
+            if mse_prof_1 > mse_prof_2:
                 return profile_2.get('name')
-            elif mse_prof_1 is None and mse_prof_2 is not None:
-                return profile_2.get('name')
-            elif mse_prof_2 is None and mse_prof_1 is not None:
-                return profile_1.get('name')
             else:
                 return min(profile_1.get('name'), profile_2.get('name'))
-    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:

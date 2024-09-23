@@ -20,7 +20,7 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
     if isinstance(text, str):
-        needless = "\n1234567890,.:; -!?'*º’‘@~#№$%^&<>|\/+-"
+        needless = "\n1234567890,.:; -!?'*º’‘@~#№$%^&<>|+-"
         text = text.lower()
         tokens = []
         for i in text:
@@ -120,23 +120,20 @@ def compare_profiles(
     """
     if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict):
         if 'name' in unknown_profile and profile_to_compare:
-            if 'freq' in unknown_profile and profile_to_compare:
-                for elem in unknown_profile['freq'].keys():
-                    if elem not in profile_to_compare['freq']:
-                        profile_to_compare['freq'][elem] = 0.0
-                for elem in profile_to_compare['freq'].keys():
-                    if elem not in unknown_profile['freq']:
-                        unknown_profile['freq'][elem] = 0.0
-                profile_to_compare['freq'] = dict(sorted(profile_to_compare['freq'].items()))
-                unknown_profile['freq'] = dict(sorted(unknown_profile['freq'].items()))
-                predicted = []
-                for elem in unknown_profile['freq'].values():
-                    predicted.append(elem)
-                actual = []
-                for elem in profile_to_compare['freq'].values():
-                    actual.append(elem)
-            else:
-                return None
+            for elem in unknown_profile['freq'].keys():
+                if elem not in profile_to_compare['freq']:
+                    profile_to_compare['freq'][elem] = 0.0
+            for elem in profile_to_compare['freq'].keys():
+                if elem not in unknown_profile['freq']:
+                    unknown_profile['freq'][elem] = 0.0
+            profile_to_compare['freq'] = dict(sorted(profile_to_compare['freq'].items()))
+            unknown_profile['freq'] = dict(sorted(unknown_profile['freq'].items()))
+            predicted = []
+            for elem in unknown_profile['freq'].values():
+                predicted.append(elem)
+            actual = []
+            for elem in profile_to_compare['freq'].values():
+                actual.append(elem)
         else:
             return None
     else:
@@ -144,8 +141,6 @@ def compare_profiles(
     profile_mse = calculate_mse(predicted, actual)
     if isinstance(profile_mse, float):
         return profile_mse
-    else:
-        return None
 
 
 
@@ -173,14 +168,12 @@ def detect_language(
     if isinstance(detect_1, float) and isinstance(detect_2, float):
         if detect_1 < detect_2:
             return profile_1['name']
-        elif detect_2 < detect_1:
-            return profile_2['name']
         elif detect_1 == detect_2:
             a = [profile_1['name'], profile_2['name']]
             a.sort()
             return a[0]
         else:
-            return None
+            return profile_2['name']
     else:
         return None
 

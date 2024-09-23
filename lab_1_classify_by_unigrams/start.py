@@ -23,16 +23,19 @@ def main() -> None:
                          'assets/profiles/es.json', 'assets/profiles/fr.json',
                          'assets/profiles/it.json', 'assets/profiles/ru.json',
                          'assets/profiles/tr.json']
-    if (create_language_profile('unk', unknown_text) is not None
-            and create_language_profile('en', en_text) is not None
-            and create_language_profile('de', de_text) is not None):
+    if (isinstance(create_language_profile('unk', unknown_text), dict)
+            and isinstance(create_language_profile('en', en_text), dict)
+            and isinstance(create_language_profile('de', de_text), dict)):
         print(tokenize(en_text))
         print(create_language_profile('en', en_text))
         print(detect_language(create_language_profile('unk', unknown_text),
                               create_language_profile('en', en_text),
                               create_language_profile('de', de_text)))
-        print_report(detect_language_advanced(create_language_profile(
-            'unk', unknown_text), collect_profiles(paths_to_profiles)))
+        if isinstance(collect_profiles(paths_to_profiles), list):
+            detection_result = detect_language_advanced(
+                create_language_profile('unk', unknown_text), collect_profiles(paths_to_profiles))
+            if isinstance(detection_result, list):
+                print_report(detection_result)
     assert result, "Detection result is None"
 
 

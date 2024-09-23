@@ -67,7 +67,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
      """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    if not isinstance(calculate_frequencies(tokenize(text)), dict):
+    if tokenize(text) is None or calculate_frequencies(tokenize(text)) is None:
         return None
     return {'name': language,
             'freq': calculate_frequencies(tokenize(text))}
@@ -124,20 +124,18 @@ def compare_profiles(
         return None
     for i in copy_unk_profile['freq']:
         if i not in profile_to_compare['freq']:
-            profile_to_compare['freq'][i] = 0.0
+            profile_to_compare['freq'][i] = 0
     for i in profile_to_compare['freq']:
         if i not in copy_unk_profile['freq']:
-            copy_unk_profile['freq'][i] = 0.0
+            copy_unk_profile['freq'][i] = 0
     sort_unk = dict(sorted(copy_unk_profile['freq'].items()))
     sort_comp = dict(sorted(profile_to_compare['freq'].items()))
     comp_values_lst = []
     for i in sort_comp.values():
-        if isinstance(i, (float, int)):
-            comp_values_lst.append(i)
+        comp_values_lst.append(i)
     unk_values_lst = []
     for i in sort_unk.values():
-        if isinstance(i, (float, int)):
-            unk_values_lst.append(i)
+        unk_values_lst.append(i)
     return calculate_mse(comp_values_lst, unk_values_lst)
 
 
@@ -246,10 +244,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         return None
     profiles_collection = []
     for i in paths_to_profiles:
-        if load_profile(i) is None or preprocess_profile(load_profile(i)) is None:
-            return None
-        profiles_collection.append(preprocess_profile(load_profile(i)))
-        return profiles_collection
+        if load_profile(i) is not None:
+            if preprocess_profile(load_profile(i)) is not None:
+                profiles_collection.append(preprocess_profile(load_profile(i)))
+                return profiles_collection
     return None
 
 

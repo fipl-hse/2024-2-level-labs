@@ -77,14 +77,15 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if (language is None or not isinstance(language, str)
-            or text is None or not isinstance(text, str)):
-        return None
+    if (language is not None and isinstance(language, str)
+            and text is not None and isinstance(text, str)):
+        tokenized_text = tokenize(text)
+        frequencies_values = calculate_frequencies(tokenized_text)
 
-    tokenized_text = tokenize(text)
-    frequencies_values = calculate_frequencies(tokenized_text)
+        if frequencies_values is not None:
+            return {"name": language, "freq": frequencies_values}
 
-    return {"name": language, "freq": frequencies_values}
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

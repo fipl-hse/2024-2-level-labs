@@ -3,7 +3,10 @@ Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-from main import calculate_frequencies, calculate_mse, compare_profiles, create_language_profile, tokenize
+from main import (calculate_frequencies,
+                  calculate_mse, compare_profiles,
+                  create_language_profile,
+                  detect_language, tokenize)
 
 
 def main() -> None:
@@ -20,12 +23,14 @@ def main() -> None:
 
     en_profile = create_language_profile("en", en_text)
     de_profile = create_language_profile("de", de_text)
+    unknown_profile = create_language_profile('unknown', unknown_text)
 
     print(f'Tokens: {tokens}')
     print(f'Frequencies: {calculate_frequencies(tokens)}')
     print(f'Language profile: {create_language_profile("en", en_text)}')
-    print(f'MSE:{calculate_mse}')
-    print(f'Compare profiles:{compare_profiles(en_profile, de_profile)}')
+#    print(f'MSE:{calculate_mse}')
+#    print(f'Compare profiles:{compare_profiles(en_profile, de_profile)}')
+    print(f'Detected Language: {detect_language(unknown_profile, en_profile, de_profile)}')
 
     result = "a"
 

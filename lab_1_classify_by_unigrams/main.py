@@ -130,9 +130,11 @@ def compare_profiles(
 
     if not unknown_profile or not profile_to_compare:
         return None
-    if not ('name' in unknown_profile and 'freq' in unknown_profile and isinstance(unknown_profile['freq'], dict)):
+    if not isinstance(unknown_profile['freq'], dict) and not isinstance(profile_to_compare['freq'], dict):
         return None
-    if not ('name' in profile_to_compare and 'freq' in profile_to_compare and isinstance(profile_to_compare['freq'], dict)):
+    if not ('name' in unknown_profile and 'name' in profile_to_compare):
+        return None
+    if not ('freq' in unknown_profile and 'freq' in profile_to_compare):
         return None
     all_tokens = set(unknown_profile['freq'].keys()).union(set(profile_to_compare['freq'].keys()))
     freq_first_lang = [unknown_profile['freq'].get(token, 0) for token in all_tokens]
@@ -159,6 +161,26 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+
+    if not isinstance(unknown_profile, dict) and not isinstance(profile_1, dict) and not isinstance(profile_2, dict):
+        return None
+    if not unknown_profile and not profile_1 and not profile_2:
+        return None
+    if unknown_profile is None or profile_1 is None or profile_2 is None:
+        return None
+    if isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict):
+        mse_prof_1 = compare_profiles(unknown_profile, profile_1)
+        mse_prof_2 = compare_profiles(unknown_profile, profile_2)
+        if mse_prof_1 is not None and mse_prof_2 is not None:
+            if mse_prof_1 < mse_prof_2:
+                return profile_1.get('name')
+            elif mse_prof_1 > mse_prof_2:
+                return profile_2.get('name')
+            elif mse_prof_1 is None and mse_prof_2 is not None:
+                return profile_2.get('name')
+            elif mse_prof_2 is None and mse_prof_1 is not None:
+                return profile_1.get('name')
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:

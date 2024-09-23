@@ -67,7 +67,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
      """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    if calculate_frequencies(tokenize(text)) is None:
+    if not isinstance(calculate_frequencies(tokenize(text)), dict):
         return None
     return {'name': language,
             'freq': calculate_frequencies(tokenize(text))}
@@ -124,18 +124,20 @@ def compare_profiles(
         return None
     for i in copy_unk_profile['freq']:
         if i not in profile_to_compare['freq']:
-            profile_to_compare['freq'][i] = 0
+            profile_to_compare['freq'][i] = 0.0
     for i in profile_to_compare['freq']:
         if i not in copy_unk_profile['freq']:
-            copy_unk_profile['freq'][i] = 0
+            copy_unk_profile['freq'][i] = 0.0
     sort_unk = dict(sorted(copy_unk_profile['freq'].items()))
     sort_comp = dict(sorted(profile_to_compare['freq'].items()))
     comp_values_lst = []
     for i in sort_comp.values():
-        comp_values_lst.append(i)
+        if isinstance(i, (float, int)):
+            comp_values_lst.append(i)
     unk_values_lst = []
     for i in sort_unk.values():
-        unk_values_lst.append(i)
+        if isinstance(i, (float, int)):
+            unk_values_lst.append(i)
     return calculate_mse(comp_values_lst, unk_values_lst)
 
 
@@ -158,14 +160,15 @@ def detect_language(
     if (not isinstance(profile_1, dict) or not isinstance(profile_2, dict)
             or not isinstance(unknown_profile, dict)):
         return None
-    if (compare_profiles(unknown_profile, profile_1) is None
-            or compare_profiles(unknown_profile, profile_2) is None):
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 is None or mse_2 is None:
         return None
     if not isinstance(profile_1['name'], str) or not isinstance(profile_2['name'], str):
         return None
-    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+    if mse_1 < mse_2:
         return profile_1['name']
-    if compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
+    if mse_1 > mse_2:
         return profile_2['name']
     return None
 
@@ -243,10 +246,11 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         return None
     profiles_collection = []
     for i in paths_to_profiles:
-        if preprocess_profile(load_profile(i)) is None:
+        if load_profile(i) is None or preprocess_profile(load_profile(i)) is None:
             return None
         profiles_collection.append(preprocess_profile(load_profile(i)))
-    return profiles_collection
+        return profiles_collection
+    return None
 
 
 def detect_language_advanced(
@@ -271,7 +275,9 @@ def detect_language_advanced(
     for i in known_profiles:
         profiles_list.append((i['name'], compare_profiles(unknown_profile, i)))
     profiles_list.sort(key=lambda x: (x[-1], x[0]))
-    return profiles_list
+    if profiles_list:
+        return profiles_list
+    return None
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

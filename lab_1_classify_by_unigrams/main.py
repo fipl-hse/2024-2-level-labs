@@ -15,6 +15,20 @@ def tokenize(text):
                 tokens.append(i)
         return tokens
 
+    """
+    Split a text into tokens.
+
+    Convert the tokens into lowercase, remove punctuation, digits and other symbols
+
+    Args:
+        text (str): A text
+
+    Returns:
+        list[str] | None: A list of lower-cased tokens without punctuation
+
+    In case of corrupt input arguments, None is returned
+    """
+
 
 def calculate_frequencies(tokens):
     if type(tokens) is list:
@@ -29,6 +43,18 @@ def calculate_frequencies(tokens):
                     frequency.update(letter_dict)
             return frequency
 
+    """
+    Calculate frequencies of given tokens.
+
+    Args:
+        tokens (list[str] | None): A list of tokens
+
+    Returns:
+        dict[str, float] | None: A dictionary with frequencies
+
+    In case of corrupt input arguments, None is returned
+    """
+
 
 def create_language_profile(language, text) -> dict[str, str | dict[str, float]] | None:
     if type(text) is str and type(language) is str:
@@ -37,6 +63,19 @@ def create_language_profile(language, text) -> dict[str, str | dict[str, float]]
                             "freq": freq_dict
                             }
         return language_profile
+
+    """
+    Create a language profile.
+
+    Args:
+        language (str): A language
+        text (str): A text
+
+    Returns:
+        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
+
+    In case of corrupt input arguments, None is returned
+    """
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -51,6 +90,19 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
                 summa += sqw_dif
             mse = summa/n
             return mse
+
+    """
+    Calculate mean squared error between predicted and actual values.
+
+    Args:
+        predicted (list): A list of predicted values
+        actual (list): A list of actual values
+
+    Returns:
+        float | None: The score
+
+    In case of corrupt input arguments, None is returned
+    """
 
 
 def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
@@ -83,8 +135,23 @@ def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
             profile_pr = list(compare_freq_new.values())
             profile_act = list(unknown_freq_new.values())
             mse = calculate_mse(profile_pr, profile_act)
-            mse = round(mse, 3)
+            mse = round(mse, 4)
             return mse
+
+    """
+    Compare profiles and calculate the distance using symbols.
+
+    Args:
+        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of an unknown profile
+        profile_to_compare (dict[str, str | dict[str, float]]): A dictionary of a profile
+            to compare the unknown profile to
+
+    Returns:
+        float | None: The distance between the profiles
+
+    In case of corrupt input arguments or lack of keys 'name' and
+    'freq' in arguments, None is returned
+    """
 
 
 def detect_language(
@@ -104,6 +171,21 @@ def detect_language(
             language = sorted(lang_list)[0]
         return language
 
+    """
+    Detect the language of an unknown profile.
+
+    Args:
+        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of a profile
+            to determine the language of
+        profile_1 (dict[str, str | dict[str, float]]): A dictionary of a known profile
+        profile_2 (dict[str, str | dict[str, float]]): A dictionary of a known profile
+
+    Returns:
+        str | None: A language
+
+    In case of corrupt input arguments, None is returned
+    """
+
 
 def load_profile(path_to_file: str) -> dict | None:
     if type(path_to_file) is str:
@@ -113,21 +195,69 @@ def load_profile(path_to_file: str) -> dict | None:
             profile = dict(profile_r)
         return profile
 
+    """
+    Load a language profile.
+
+    Args:
+        path_to_file (str): A path to the language profile
+
+    Returns:
+        dict | None: A dictionary with at least two keys – name, freq
+
+    In case of corrupt input arguments, None is returned
+    """
+
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
-    if type(profile) is dict:
+    if type(profile) is dict and type(profile.get('freq')) is dict:
         new_profile = {}
         name = {"name": profile.get("name")}
         new_profile.update(name)
         frequency = profile.get("freq")
         new_freq = {}
-        for tok in frequency.keys():
-            if len(tok) == 1 and tok.isalpha:
-                freq_index = frequency.get(tok)
+        for tok in list(frequency.keys()):
+            if type(tok) is str:
+                if len(tok) == 1 and tok.isalpha():
+                    num = frequency.get(tok)
+                    if tok.lower() not in list(new_freq.keys()):
+                        correct_tok = {tok.lower(): num}
+                        new_freq.update(correct_tok)
+                    else:
+                        if type(new_freq.get(tok)) is int:
+                            freq = num + frequency.get(tok.lower())
+                            correct_tok = {tok.lower(): freq}
+                            new_freq.update(correct_tok)
+        for elem in list(new_freq.keys()):
+            freq_index = round(new_freq.get(elem)/profile.get('n_words')[0], 4)
+            correct_tok = {elem: freq_index}
+            new_freq.update(correct_tok)
+        frequency_for_profile = {"freq": new_freq}
+        new_profile.update(frequency_for_profile)
+        return new_profile
 
+    """
+    Preprocess profile for a loaded language.
+
+    Args:
+        profile (dict): A loaded profile
+
+    Returns:
+        dict[str, str | dict] | None: A dict with a lower-cased loaded profile
+            with relative frequencies without unnecessary n-grams
+
+    In case of corrupt input arguments or lack of keys 'name', 'n_words' and
+    'freq' in arguments, None is returned
+    """
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
+    if type(paths_to_profiles) is list:
+        list_of_profiles = []
+        for name in paths_to_profiles:
+            profile = load_profile(name)
+            correct_profile = preprocess_profile(profile)
+            list_of_profiles.append(correct_profile)
+        return list_of_profiles
     """
     Collect profiles for a given path.
 

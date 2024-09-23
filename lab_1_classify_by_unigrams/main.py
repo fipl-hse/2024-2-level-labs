@@ -143,8 +143,9 @@ def compare_profiles(
     unknown_sorted = [(unknown_profile['freq'][char] if char in unknown_profile['freq'] else 0.0)
                       for char in all_chars]
 
-    profile_to_compare_sorted = [(profile_to_compare['freq'][char] if char in profile_to_compare['freq']
-                                  else 0.0) for char in all_chars]
+    profile_to_compare_sorted = [(profile_to_compare['freq'][char]
+                                  if char in profile_to_compare['freq'] else 0.0)
+                                 for char in all_chars]
 
     return calculate_mse(unknown_sorted, profile_to_compare_sorted)
 
@@ -239,22 +240,12 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
 
     all_unigrams_count = profile['n_words'][0]
 
-    # for key in profile['freq']:
-    #     key = key.strip().lower()
-    #     if len(key) == 1 and key.isalpha() and key not in profile_preprocessed:
-    #         profile_preprocessed['freq'][key] = profile['freq'][key] / all_unigrams_count
-    #     elif len(key) == 1 and key.isalpha():
-    #         profile_preprocessed['freq'][key] += profile['freq'][key] / all_unigrams_count
-
     for key in profile['freq']:
-        if key.isalpha() and len(key.strip()) == 1:
-            if key.lower() in profile_preprocessed:
-                profile_preprocessed['freq'][key.lower().strip()] += profile['freq'][key]
+        if len(key.strip()) == 1:
+            if key.lower() in profile_preprocessed['freq']:
+                profile_preprocessed['freq'][key.lower()] += profile['freq'][key] / all_unigrams_count
             else:
-                profile_preprocessed['freq'][key.lower().strip()] = profile['freq'][key]
-
-    for key in profile_preprocessed['freq']:
-        profile_preprocessed['freq'][key] = round(profile_preprocessed['freq'][key] / all_unigrams_count, 4)
+                profile_preprocessed['freq'][key.lower()] = profile['freq'][key] / all_unigrams_count
 
     return profile_preprocessed
 

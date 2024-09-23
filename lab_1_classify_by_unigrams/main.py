@@ -15,6 +15,7 @@ def tokenize(text: str) -> list[str] | None:
     Args:
         text (str): A text
 
+
     Returns:
         list[str] | None: A list of lower-cased tokens without punctuation
 

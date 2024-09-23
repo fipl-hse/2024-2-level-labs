@@ -3,11 +3,12 @@ Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+import main as func
+
 
 def main() -> None:
-    pass
     """
-    Launches an implementation
+    Launches an i mplementation
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
@@ -16,10 +17,10 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
-    result = letter_lst
-
+    result = func.create_language_profile("en", en_text)
     assert result, "Detection result is None"
-    print(tokenize(en_text))
+    print(result)
+
 
 
 if __name__ == "__main__":

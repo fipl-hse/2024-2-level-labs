@@ -8,14 +8,14 @@ Language detection
 
 def tokenize(text: str) -> list[str] | None:
 
-    if type(text) == str:
+    if isinstance(text, str):
         text = text.lower()
-        letter_lst = []
+        tokens = []
         for i in text:
-            if i.isalpha():
-                letter_lst.append(i)
+            if i.isalpha() and i != "º":
+                tokens.append(i)
 
-        return letter_lst
+        return tokens
     else:
         return None
 
@@ -35,6 +35,20 @@ def tokenize(text: str) -> list[str] | None:
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+
+    if not isinstance(tokens, list):
+        return None
+    else:
+        for i in tokens:
+            if not isinstance(i, str):
+                return None
+
+    freq_dict = {}
+    for letter in tokens:
+        if letter not in freq_dict:
+            freq_dict[letter] = tokens.count(letter) / len(tokens)
+    return freq_dict
+
     """
     Calculate frequencies of given tokens.
 
@@ -49,6 +63,16 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+
+    if isinstance(language, str) and isinstance(text, str):
+        freq_dict = calculate_frequencies(tokenize(text))
+        new_profile = {"name": language, "freq": freq_dict}
+        return new_profile
+    else:
+        return None
+
+
+
     """
     Create a language profile.
 

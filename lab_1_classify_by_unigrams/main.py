@@ -3,6 +3,9 @@ Lab 1.
 
 Language detection
 """
+
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 def tokenize(text: str) -> list[str] | None:
@@ -45,12 +48,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if isinstance(tokens, list):
         freq = {}
         for i in tokens:
-            if isinstance(i, str):
+            if isinstance(i, str) and len(i) == 1:
                 if i in freq:
                     continue
-                average_freq = tokens.count(i) / len(tokens)
                 if isinstance(i, str):
-                    freq[i] = average_freq
+                    freq[i] = tokens.count(i) / len(tokens)
             else:
                 return None
         return freq
@@ -73,10 +75,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     tokens = tokenize(text)
     freq = calculate_frequencies(tokens)
     if freq is not None and tokens is not None and isinstance(language, str):
-        profile = {'name': language, 'freq': freq}
+        return {'name': language, 'freq': calculate_frequencies(tokens)}
     else:
         return None
-    return profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -167,13 +168,17 @@ def detect_language(
     detect_2 = compare_profiles(unknown_profile, profile_2)
     if isinstance(detect_1, float) and isinstance(detect_2, float):
         if detect_1 < detect_2:
-            return profile_1['name']
+            lang = str(profile_1['name'])
+            return lang
         elif detect_1 == detect_2:
             a = [profile_1['name'], profile_2['name']]
             a.sort()
-            return a[0]
+            lang = str(a[0])
+            return lang
         else:
-            return profile_2['name']
+            lang = str(profile_2['name'])
+
+            return lang
     else:
         return None
 

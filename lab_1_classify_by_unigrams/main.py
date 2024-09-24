@@ -56,7 +56,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 print(calculate_frequencies(a))
 
 
-def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float] | None] | None:
     """
     Create a language profile.
 
@@ -104,30 +104,40 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     mse = 0
     length = len(predicted)
     for index in range(length):
-        mse += (actual[index] - predicted[index] ** 2)
+        mse += (actual[index] - predicted[index]) ** 2
     return mse / float(length)
     #mse = float(sum((actual[i] - predicted[i])**2 for i in range(length)) / length)
 
 
 print(calculate_mse([0.1538, 0.0, 0.0, 0.0769, 0.0769, 0.0769, 0.0, 0.0, 0.0769, 0.0769, 0.0769, 0.1538, 0.2307, 0.0], [0.1666, 0.1666, 0.0333, 0.1333, 0.0, 0.0666, 0.0666, 0.0333, 0.0333, 0.1, 0.0666, 0.0, 0.0666, 0.0666]))
 
-def profiles_bad_input(profile: dict[str, str | dict[str, float]]):
+def profiles_bad_input(profile: dict[str, str | dict[str, float]]) -> dict[str, str | dict[str, float]] | None:
     if not isinstance(profile, dict):
         return None
-    if len(profile.keys()) != 2 and set(profile.keys()) != {"name", "freq"}:
+    if len(profile.keys()) != 2:
         return None
-    for key, value in profile.items(): #example of profile: { "name": "en", "freq": ["g": 0.89, "t": 0.89] }
-        if not isinstance(profile["name"], str):
-            return None
-        if not isinstance(profile["freq"], dict):
-            return None
-        elif isinstance(profile["freq"], dict):
-            for letter, number in profile["freq"].items():
-                if not isinstance(letter, str):
-                    return None
-                if not isinstance(number, float):
-                    return None
+    if "name" not in profile and "freq" not in profile:
+        return None #example of profile: { "name": "en", "freq": {"g": 0.89, "t": 0.89} }
+    if not isinstance(profile["name"], str):
+        return None
+    if not isinstance(profile["freq"], dict):
+        return None
+    if isinstance(profile["freq"], dict):
+        for letter in profile["freq"].keys():
+            if not isinstance(letter, str):
+                return None
+        for number in profile["freq"].values():
+            if not isinstance(number, float):
+                return None
+    return profile
 
+print(profiles_bad_input({
+            'name': 'en',
+            'freq': {
+                'y': 0.0769, 'n': 0.0769, 'e': 0.0769, 'h': 0.1538, 'm': 0.0769, 'i': 0.0769,
+                'a': 0.2307, 's': 0.0769, 'p': 0.1538
+            }
+        }))
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_to_compare: dict[str, str | dict[str, float]],
@@ -146,8 +156,8 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    profiles_bad_input(unknown_profile)
-    profiles_bad_input(profile_to_compare)
+    if profiles_bad_input(unknown_profile) == None or profiles_bad_input(profile_to_compare) == None:
+        return None
     from_profile1 = unknown_profile["freq"] #here we have dictionaries like ["h": 0.056]
     from_profile2 = profile_to_compare["freq"]
     keys_for_1 = {key for key in from_profile1.keys()} #take all keys from these dictionaries
@@ -170,11 +180,12 @@ def compare_profiles(
     list1 = list(sorted1.values())
     list2 = list(sorted2.values())
     conclusion = calculate_mse(list2, list1)
-    if conclusion <= 0:
+    if type(conclusion) is not float and conclusion <= 0:
         return None
     return conclusion
 
 print(compare_profiles({
+            'name': 'en',
             'freq': {
                 'y': 0.0769, 'n': 0.0769, 'e': 0.0769, 'h': 0.1538, 'm': 0.0769, 'i': 0.0769,
                 'a': 0.2307, 's': 0.0769, 'p': 0.1538
@@ -207,18 +218,14 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    profiles_bad_input(unknown_profile)
-    profiles_bad_input(profile_1)
-    profiles_bad_input(profile_2)
+    if profiles_bad_input(unknown_profile) == None or profiles_bad_input(profile_1) == None or profiles_bad_input(profile_2) == None:
+        return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    if mse_1 == mse_2:
-        languages = []
-        languages.append(profile_1["name"])
-        languages.append(profile_2["name"])
-        sort = sorted(languages)
-        return sort[0]
-    return min(mse_1, mse_2)
+    if mse_1 <= mse_2:
+        return profile_1["name"]
+    else:
+        return profile_2["name"]
 
 
 def load_profile(path_to_file: str) -> dict | None:

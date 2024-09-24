@@ -7,7 +7,7 @@ Language detection
 
 
 def tokenize(text):
-    if type(text) is str:
+    if isinstance(text, str):
         text = text.lower()
         tokens = []
         for i in text:
@@ -31,12 +31,12 @@ def tokenize(text):
 
 
 def calculate_frequencies(tokens):
-    if type(tokens) is list:
-        if type(tokens[0]) is str:
+    if isinstance(tokens, list):
+        if isinstance(tokens[0], str):
             frequency = {}
             tokens_number = len(tokens)
             for letter in tokens:
-                if type(letter) is str:
+                if isinstance(letter, str):
                     letter_number = tokens.count(letter)
                     letter_index = letter_number/tokens_number
                     letter_dict = {letter: letter_index}
@@ -57,7 +57,7 @@ def calculate_frequencies(tokens):
 
 
 def create_language_profile(language, text) -> dict[str, str | dict[str, float]] | None:
-    if type(text) is str and type(language) is str:
+    if isinstance(text, str) and isinstance(language, str):
         freq_dict = calculate_frequencies(tokenize(text))
         language_profile = {"name": language,
                             "freq": freq_dict
@@ -79,7 +79,7 @@ def create_language_profile(language, text) -> dict[str, str | dict[str, float]]
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
-    if type(predicted) is list and type(actual) is list:
+    if isinstance(predicted, list) and isinstance(actual, list):
         if len(actual) == len(predicted):
             summa = 0
             n = len(actual)
@@ -107,7 +107,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
                      profile_to_compare: dict[str, str | dict[str, float]],) -> float | None:
-    if type(unknown_profile) is dict and type(profile_to_compare) is dict:
+    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict):
         if len(unknown_profile) == 2 and len(profile_to_compare) == 2:
             unknown_freq = unknown_profile.get("freq")
             compare_freq = profile_to_compare.get("freq")
@@ -159,7 +159,7 @@ def detect_language(
     profile_1: dict[str, str | dict[str, float]],
     profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
-    if type(unknown_profile) is dict and type(profile_1) is dict and type(profile_2) is dict:
+    if isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict):
         mse_1 = compare_profiles(unknown_profile, profile_1)
         mse_2 = compare_profiles(unknown_profile, profile_2)
         if mse_1 < mse_2:
@@ -188,7 +188,7 @@ def detect_language(
 
 
 def load_profile(path_to_file: str) -> dict | None:
-    if type(path_to_file) is str:
+    if isinstance(path_to_file, str):
         import json
         with open(path_to_file, "r", encoding="utf-8") as file_to_read:
             profile_r = json.load(file_to_read)
@@ -209,21 +209,21 @@ def load_profile(path_to_file: str) -> dict | None:
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
-    if type(profile) is dict and type(profile.get('freq')) is dict:
+    if isinstance(profile, dict) and isinstance(profile.get('freq'), dict):
         new_profile = {}
         name = {"name": profile.get("name")}
         new_profile.update(name)
         frequency = profile.get("freq")
         new_freq = {}
         for tok in list(frequency.keys()):
-            if type(tok) is str:
+            if isinstance(tok, str):
                 if len(tok) == 1 and tok.isalpha():
                     num = frequency.get(tok)
                     if tok.lower() not in list(new_freq.keys()):
                         correct_tok = {tok.lower(): num}
                         new_freq.update(correct_tok)
                     else:
-                        if type(new_freq.get(tok)) is int:
+                        if isinstance(new_freq.get(tok), int):
                             freq = num + frequency.get(tok.lower())
                             correct_tok = {tok.lower(): freq}
                             new_freq.update(correct_tok)
@@ -251,7 +251,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
-    if type(paths_to_profiles) is list:
+    if isinstance(paths_to_profiles, list):
         list_of_profiles = []
         for name in paths_to_profiles:
             profile = load_profile(name)

@@ -110,7 +110,21 @@ def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
-    """
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or not len(
+            profile_to_compare) == len(unknown_profile) == 2:
+        return None
+    profile_1 = set(unknown_profile['freq'].keys())
+    profile_2 = set(profile_to_compare['freq'].keys())
+    union_set = profile_1.union(profile_2)
+    act_freq = []
+    pred_freq = []
+    for token in union_set:
+        act_freq.append(unknown_profile['freq'].get(token, 0))
+        pred_freq.append(profile_to_compare['freq'].get(token, 0))
+    return calculate_mse(pred_freq, act_freq)
+
+
+"""
     Compare profiles and calculate the distance using symbols.
 
     Args:

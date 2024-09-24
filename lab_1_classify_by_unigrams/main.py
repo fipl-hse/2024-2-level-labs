@@ -6,7 +6,7 @@ Language detection
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
-def tokenize(text):
+def tokenize(text: str) -> list[str] | None:
     if isinstance(text, str):
         text = text.lower()
         tokens = []
@@ -30,7 +30,7 @@ def tokenize(text):
     """
 
 
-def calculate_frequencies(tokens):
+def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if isinstance(tokens, list):
         if isinstance(tokens[0], str):
             frequency = {}
@@ -56,26 +56,27 @@ def calculate_frequencies(tokens):
     """
 
 
-def create_language_profile(language, text) -> dict[str, str | dict[str, float]] | None:
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     if isinstance(text, str) and isinstance(language, str):
         freq_dict = calculate_frequencies(tokenize(text))
         language_profile = {"name": language,
                             "freq": freq_dict
                             }
+        """
+        Create a language profile.
+
+        Args:
+            language (str): A language
+            text (str): A text
+
+        Returns:
+            dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
+
+        In case of corrupt input arguments, None is returned
+        """
         return language_profile
 
-    """
-    Create a language profile.
 
-    Args:
-        language (str): A language
-        text (str): A text
-
-    Returns:
-        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
-
-    In case of corrupt input arguments, None is returned
-    """
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -159,7 +160,9 @@ def detect_language(
     profile_1: dict[str, str | dict[str, float]],
     profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
-    if isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict):
+    if (isinstance(unknown_profile, dict)
+            and isinstance(profile_1, dict)
+            and isinstance(profile_2, dict)):
         mse_1 = compare_profiles(unknown_profile, profile_1)
         mse_2 = compare_profiles(unknown_profile, profile_2)
         if mse_1 < mse_2:

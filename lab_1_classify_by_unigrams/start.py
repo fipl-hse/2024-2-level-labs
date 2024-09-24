@@ -2,11 +2,13 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
+
+
 def main() -> None:
     """
     Launches an implementation
     """
-    from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
 
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
@@ -35,4 +37,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     print(main())
-

@@ -127,11 +127,11 @@ def reverse_word(sentence: str) -> str:
             new_sent.append(word[::-1])
         else:
             new_sent.append(word)
+    return " ".join(new_sent)
 
 
 
-
-# reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
+print(reverse_word("Hey fellow warriors")) #== "Hey wollef sroirraw"
 #
 # reverse_word("This is a test") == "This is a test"
 #

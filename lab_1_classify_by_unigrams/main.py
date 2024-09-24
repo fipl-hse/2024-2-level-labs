@@ -41,19 +41,18 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
                     letter_index = letter_number/tokens_number
                     letter_dict = {letter: letter_index}
                     frequency.update(letter_dict)
+            """
+            Calculate frequencies of given tokens.
+
+            Args:
+                tokens (list[str] | None): A list of tokens
+
+            Returns:
+                dict[str, float] | None: A dictionary with frequencies
+
+            In case of corrupt input arguments, None is returned
+            """
             return frequency
-
-    """
-    Calculate frequencies of given tokens.
-
-    Args:
-        tokens (list[str] | None): A list of tokens
-
-    Returns:
-        dict[str, float] | None: A dictionary with frequencies
-
-    In case of corrupt input arguments, None is returned
-    """
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -75,8 +74,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         In case of corrupt input arguments, None is returned
         """
         return language_profile
-
-
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

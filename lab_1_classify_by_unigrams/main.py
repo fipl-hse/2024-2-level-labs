@@ -171,9 +171,9 @@ def detect_language(
         mse_1 = compare_profiles(unknown_profile, profile_1)
         mse_2 = compare_profiles(unknown_profile, profile_2)
         if mse_1 < mse_2:
-            return ({profile_1["name"]})
+            return (profile_1["name"])
         else:
-            return ({profile_2["name"]})
+            return (profile_2["name"])
 
 
 def load_profile(path_to_file: str) -> dict | None:

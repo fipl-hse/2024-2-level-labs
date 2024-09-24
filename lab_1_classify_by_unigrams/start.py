@@ -2,6 +2,7 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+from main import collect_profiles, detect_language_advanced, create_language_profile, print_report
 
 
 def main() -> None:
@@ -25,6 +26,11 @@ def main() -> None:
         'assets/profiles/ru.json',
         'assets/profiles/tr.json'
     ]
+
+    profiles = collect_profiles(paths_to_profiles)
+    unknown_profile = create_language_profile('unknown', unknown_text)
+    detections = detect_language_advanced(unknown_profile, profiles)
+    print_report(detections)
 
     result = 'AAAAA'
     assert result, "Detection result is None"

@@ -107,8 +107,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or len(predicted) != len(actual):
         return None
 
-    return round(float(sum((actual[i] - predicted[i]) ** 2
-                           for i in range(len(actual))) / len(actual)), 4)
+    return float(sum((actual[i] - predicted[i]) ** 2
+                           for i in range(len(actual))) / len(actual))
 
 
 def compare_profiles(
@@ -192,7 +192,6 @@ def detect_language(
     return str(profile_1['name'])
 
 
-# здесь и далее -- недоделано и непротестировано
 def load_profile(path_to_file: str) -> dict | None:
     """
     Load a language profile.
@@ -320,6 +319,6 @@ def print_report(detections: list[tuple[str, float]]) -> None:
         return None
 
     for result in detections:
-        print(f'{result[0]}: MSE {result[1]}')
+        print(f'{result[0]}: MSE {result[1]:.5f}')
 
     return None

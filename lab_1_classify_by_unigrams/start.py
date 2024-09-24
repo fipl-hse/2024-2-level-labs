@@ -3,8 +3,8 @@ Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-from lab_1_classify_by_unigrams.main import collect_profiles, \
-    create_language_profile, detect_language_advanced, print_report
+from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
+                                             detect_language_advanced, print_report)
 
 
 def main() -> None:

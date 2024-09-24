@@ -4,7 +4,7 @@ Lab 1.
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-
+import json
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -116,7 +116,7 @@ def profiles_bad_input(profile: dict[str, str | dict[str, float]]) -> dict[str, 
         return None
     if len(profile.keys()) != 2:
         return None
-    if "name" not in profile and "freq" not in profile:
+    if not all(l in profile for l in ('freq', 'name')):
         return None #example of profile: { "name": "en", "freq": {"g": 0.89, "t": 0.89} }
     if not isinstance(profile["name"], str):
         return None
@@ -240,7 +240,9 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
-
+    with open(path_to_file) as file_to_read:
+        dictionary = json.load(file_to_read)
+        return dictionary
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
@@ -256,7 +258,23 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
-
+    if not isinstance(profile, dict) or not all(l in profile for l in ('freq', 'name', 'n_words')):
+        return None
+    processed_profile = {'name': profile['name'], 'freq': {}} #our pattern of the result
+    dicty = {} #make on your own internal dictionary for "freq"
+    for i in profile['freq'].keys(): #letters
+        if isinstance(i, str) and len(i) == 1:
+            dicty.setdefault(i, profile['freq'][i])
+    letters = [i for i in dicty]
+    for letter in letters:
+        if letter.isupper():
+            pass
+        if not letter.isupper():
+            dicty[letter] = dicty.get(letter, 0) + dicty.get(letter.upper(), 0)
+            processed_profile['freq'][letter] = dicty[letter] / profile['n_words'][0]
+            if letter.upper() in dicty:
+                del dicty[letter.upper()]
+    return processed_profile
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
@@ -270,6 +288,17 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
+    list_for_dictionaries = []
+    for profile in paths_to_profiles:
+        dictionary_unprocessed = load_profile(profile)
+        if not isinstance(dictionary_unprocessed, dict):
+            return None
+        processed_profile = preprocess_profile(dictionary_unprocessed)
+        if not isinstance(processed_profile, dict):
+            return None
+        result = profiles_bad_input(processed_profile)
+        list_for_dictionaries.append(result)
+    return list_for_dictionaries
 
 
 def detect_language_advanced(
@@ -288,7 +317,19 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-
+    if profiles_bad_input(unknown_profile) == None and not isinstance(known_profiles, list):
+        return None
+    sorted_list: list[tuple[str, float]] | None
+    sorted_list = []
+    for profile in known_profiles:
+        mse: float | None
+        mse = compare_profiles(unknown_profile, profile)
+        if mse is None:
+            return None
+        names_with_mse = tuple(profile["name"], mse)
+        sorted_list.append(names_with_mse)
+        result_list = sorted(sorted_list, key=lambda profile: profile[1])
+    return result_list
 
 def print_report(detections: list[tuple[str, float]]) -> None:
     """
@@ -299,3 +340,8 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+    result_list = detect_language_advanced(detections)
+    for tuple in result_list:
+        language = tuple[0]
+        score = tuple[1]
+        print(f'{language}: MSE {score:.5f}')

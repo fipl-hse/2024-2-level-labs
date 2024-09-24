@@ -145,7 +145,7 @@ def reverse_word(sentence: str) -> str:
 
 
 # Task 6
-def generate_hashtag(input_string: str) -> str:
+def generate_hashtag(input_string: str) -> str | False:
     """
     The marketing team is spending way too much time typing in hashtags.
     Let's help them with our own Hashtag Generator!

@@ -54,7 +54,7 @@ def multiply_string(input_string: str, how_many: int) -> str:
     """
     # student realisation goes here
     result = input_string * how_many
-    return (result)
+    return result
 
 print(multiply_string("Hi", 3))
 print(multiply_string("Hi", 2))
@@ -145,7 +145,7 @@ def reverse_word(sentence: str) -> str:
 
 
 # Task 6
-def generate_hashtag(input_string: str) -> str | False:
+def generate_hashtag(input_string: str) -> str:
     """
     The marketing team is spending way too much time typing in hashtags.
     Let's help them with our own Hashtag Generator!
@@ -162,27 +162,20 @@ def generate_hashtag(input_string: str) -> str | False:
     ""                                        =>  false
     """
     # student realisation goes here
-    if len(input_string) == 0 or len(input_string) > 140:
-        return False
-    result = input_string.strip()
-    words = [word.capitalize() for word in result.split()]
-    return f"#{''.join(words)}"
-
-print(generate_hashtag(" Hello there thanks for trying my quiz"))
-print(generate_hashtag("       Hello       World    "))
-print(generate_hashtag(""))
 
 
 
 # Task 7:
-def combo_string(first_string: str, second_string: str) -> str:
+def combo_string(first_string: str, second_string: str) -> str | None:
     """
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
+    if len(first_string) == len(second_string):
+        return None
     if len(first_string) > len(second_string):
         return f"{second_string}{first_string}{second_string}"
-    elif len(first_string) < len(second_string):
+    if len(first_string) < len(second_string):
         return f"{first_string}{second_string}{first_string}"
 
 print(combo_string("aaaa", "ff"))

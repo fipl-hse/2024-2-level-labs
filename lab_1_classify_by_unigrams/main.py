@@ -6,6 +6,7 @@ Language detection
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 import json
 
+
 def tokenize(text: str) -> list[str] | None:
     """
 Split a text into tokens.

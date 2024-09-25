@@ -2,9 +2,9 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-from lab_1_classify_by_unigrams.main import (tokenize, create_language_profile,
-                                             detect_language, collect_profiles,
-                                             detect_language_advanced, print_report)
+from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
+                                             detect_language, detect_language_advanced,
+                                             print_report, tokenize)
 
 
 def main() -> None:
@@ -23,17 +23,17 @@ def main() -> None:
                          'assets/profiles/es.json', 'assets/profiles/fr.json',
                          'assets/profiles/it.json', 'assets/profiles/ru.json',
                          'assets/profiles/tr.json']
-    if (isinstance(create_language_profile('unk', unknown_text), dict)
-            and isinstance(create_language_profile('en', en_text), dict)
-            and isinstance(create_language_profile('de', de_text), dict)):
+    unk_profile = create_language_profile('unk', unknown_text)
+    en_profile = create_language_profile('en', en_text)
+    de_profile = create_language_profile('de', de_text)
+    if unk_profile and en_profile and de_profile:
         print(tokenize(en_text))
         print(create_language_profile('en', en_text))
-        print(detect_language(create_language_profile('unk', unknown_text),
-                              create_language_profile('en', en_text),
-                              create_language_profile('de', de_text)))
-        if isinstance(collect_profiles(paths_to_profiles), list):
+        print(detect_language(unk_profile, en_profile, de_profile))
+        profiles_collection = collect_profiles(paths_to_profiles)
+        if profiles_collection:
             detection_result = detect_language_advanced(
-                create_language_profile('unk', unknown_text), collect_profiles(paths_to_profiles))
+                unk_profile, profiles_collection)
             if isinstance(detection_result, list):
                 print_report(detection_result)
     assert result, "Detection result is None"

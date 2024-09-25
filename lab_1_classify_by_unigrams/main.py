@@ -21,7 +21,18 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
 
-
+    punc = [
+        ',', '.', '?', '"', "'", ':', ':', '>', '<', '-', '_',
+        '(', ')', '!', '^', '%', '#', '№', '&', '*', '@', ' '
+    ]
+    list = []
+    for symb in text:
+        symb = symb.lower()
+        if symb in punc:
+            continue
+        else:
+            list += symb
+    return list
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculate frequencies of given tokens.

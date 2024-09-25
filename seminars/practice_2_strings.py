@@ -47,19 +47,19 @@ print(example)
 # TASKS
 
 # Task 1:
-def multiply_string(input_string: str, how_many: int) -> str:
+def multiply_string(text:str, number:int) -> str:
     """
     Given a string and a non-negative number,
     display the given string the number of times given in the `how_many`.
     """
-    # student realisation goes here
+
 
 
 # Function calls with expected result:
-# multiply_string('Hi', 2) → 'HiHi'
-# multiply_string('Hi', 3) → 'HiHiHi'
-# multiply_string('Hi', 1) → 'Hi'
-# multiply_string('Hi', 0) → ''
+# multiply_string('Hi', 2))
+# multiply_string('Hi', 3))
+# multiply_string('Hi', 1))
+# multiply_string('Hi', 0))
 
 
 # Task 2:

@@ -22,11 +22,15 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not (type(text) is str):
+        return None
     ab = 'qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQÄäẞßÜüÖö'
     out = []
     for char in text:
         if char in ab:
             out.append(char.lower())
+    if not out:
+        return None
     return out
 
 
@@ -42,6 +46,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not (type(tokens) is list):
+        return None
     frq = {}
     for sy in tokens:
         frq.update({sy: tokens.count(sy) / len(tokens)})
@@ -61,6 +67,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if not (type(language) is str) or not (type(text) is str):
+        return None
     if len(text) <= 0:
         return None
     out = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
@@ -80,6 +88,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not (type(predicted) is list) or not (type(actual) is list):
+        return None
     sig = 0
     for s in range(len(actual)):
         sig += ((actual[s] - predicted[s]) ** 2)
@@ -108,6 +118,8 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    if not (type(unknown_profile) is dict) or not (type(profile_to_compare) is dict):
+        return None
     if list(unknown_profile.keys())[0] != 'name':
         return None
     if list(profile_to_compare.keys())[0] != 'name':
@@ -118,7 +130,8 @@ def compare_profiles(
         return None
     trg_prof = list(unknown_profile.values())[1]
     src_prof = list(profile_to_compare.values())[1]
-
+    if not (type(trg_prof) is dict) or not (type(src_prof) is dict):
+        return None
     for tv in list(trg_prof.keys()):
         if src_prof.get(tv, 0.0) == 0.0:
             src_prof.update({tv: 0.0})
@@ -150,6 +163,12 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    if not (type(unknown_profile) is dict):
+        return None
+    if not (type(profile_1) is dict):
+        return None
+    if not (type(profile_2) is dict):
+        return None
     check1 = compare_profiles(unknown_profile, profile_1)
     check2 = compare_profiles(unknown_profile, profile_2)
     if check1 < check2:

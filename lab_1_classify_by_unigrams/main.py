@@ -18,7 +18,6 @@ def tokenize(text):
             text_only_letters += symbol
 
     text_only_letters = list(text_only_letters.lower())
-    #print(text_only_letters)
     return text_only_letters
 
 
@@ -36,7 +35,6 @@ def calculate_frequencies(tokens):
             dictionary[letter] = 1/token_number
         else:
             dictionary[letter] = (dictionary[letter]*token_number + 1)/token_number
-    #print(dictionary)
     return dictionary
 
 
@@ -46,7 +44,6 @@ def create_language_profile(language, text):
     dictionary = calculate_frequencies(tokenize(text))
     language_profile = {}
     language_profile = {'name': language, 'freq': dictionary}
-    #print(language_profile)
     return language_profile
 
 
@@ -57,14 +54,12 @@ def calculate_mse(predicted, actual):
         for i in predicted:
             if isinstance(i, (float, int)):
                 continue
-            else:
-                return None
+            return None
         if isinstance(actual, list):
             for i in actual:
                 if isinstance(i, (float, int)):
                     continue
-                else:
-                    return None
+                return None
     if len(predicted) != len(actual):
         return None
     error_score_list = []
@@ -83,13 +78,11 @@ def compare_profiles(unknown_profile, profile_to_compare):
         for i in unknown_profile['freq'].keys():
             if isinstance(i, str):
                 continue
-            else:
-                return None
+            return None
         for i in unknown_profile['freq'].values():
             if isinstance(i, (int, float)):
                 continue
-            else:
-                return None
+            return None
 
     # bad input check for profile_to_compare:
     if not isinstance(profile_to_compare, dict):
@@ -98,13 +91,11 @@ def compare_profiles(unknown_profile, profile_to_compare):
         for i in profile_to_compare['freq'].keys():
             if isinstance(i, str):
                 continue
-            else:
-                return None
+            return None
         for i in profile_to_compare['freq'].values():
             if isinstance(i, (int, float)):
                 continue
-            else:
-                return None
+            return None
     if len(profile_to_compare) == 2 and len(unknown_profile) == 2:
         freq_dict_2 = profile_to_compare['freq']
         freq_dict_1 = unknown_profile['freq']
@@ -120,26 +111,25 @@ def compare_profiles(unknown_profile, profile_to_compare):
                 freq_dict_2[key1] = 0.0
     else:
         return None
-    #print('Словари с нулевыми частотностями:\n', freq_dict_1, '\n', freq_dict_2)
 
-    sorted_keys_of_dict_1_with_zeros = sorted(freq_dict_2.keys()) #getting the list of sorted letters
+    sorted_keys_of_dict_1_with_zeros = sorted(freq_dict_2.keys())
     sorted_keys_of_dict_2_with_zeros = sorted(freq_dict_1.keys())
 
-    dict_2_with_zeros = {} #dictionaries where all letters (even with freq zero) are sorted the same way
+    dict_2_with_zeros = {} #dictionaries where ALL letters are sorted
     dict_1_with_zeros = {}
 
     for element in sorted_keys_of_dict_2_with_zeros:
         dict_2_with_zeros[element] = freq_dict_2[element]
     for element in sorted_keys_of_dict_1_with_zeros:
         dict_1_with_zeros[element] = freq_dict_1[element]
-    #print('Словари с нулевыми частотностями и ОТСОРТИРОВАННЫЕ:\n', dict_1_with_zeros, '\n', dict_2_with_zeros)
 
-    #now the task is to get values from these two dictionaries in the right order (which I've created above)
+    #getting values from two dictionaries in the right order
     values_list_1 = list(dict_1_with_zeros.values())
     values_list_2 = list(dict_2_with_zeros.values())
 
     score = calculate_mse(values_list_1, values_list_2)
     return score
+
 
 def detect_language(unknown_profile, profile_1, profile_2):
     # bad input check for unknown_profile:
@@ -149,13 +139,11 @@ def detect_language(unknown_profile, profile_1, profile_2):
         for i in unknown_profile['freq'].keys():
             if isinstance(i, str):
                 continue
-            else:
-                return None
+            return None
         for i in unknown_profile['freq'].values():
             if isinstance(i, (int, float)):
                 continue
-            else:
-                return None
+            return None
     # bad input check for profile_1:
     if not isinstance(profile_1, dict):
         return None
@@ -163,13 +151,11 @@ def detect_language(unknown_profile, profile_1, profile_2):
         for i in profile_1['freq'].keys():
             if isinstance(i, str):
                 continue
-            else:
-                return None
+            return None
         for i in profile_1['freq'].values():
             if isinstance(i, (int, float)):
                 continue
-            else:
-                return None
+            return None
     # bad input check for profile_2:
     if not isinstance(profile_2, dict):
         return None
@@ -177,13 +163,11 @@ def detect_language(unknown_profile, profile_1, profile_2):
         for i in profile_2['freq'].keys():
             if isinstance(i, str):
                 continue
-            else:
-                return None
+            return None
         for i in profile_2['freq'].values():
             if isinstance(i, (int, float)):
                 continue
-            else:
-                return None
+            return None
 
     mse_1_and_unknown = compare_profiles(unknown_profile, profile_1)
     mse_2_and_unknown = compare_profiles(unknown_profile, profile_2)

@@ -1,4 +1,3 @@
-
 """
 Programming 2024
 Seminar 1
@@ -18,9 +17,10 @@ Running python application and debugging
 # 3. Debugging is the first skill of a programmer.
 #       It helps you to take a step-by-step look at how the program works.
 
+
 # Debugging exercise. Debug the program and fix errors:
-first_num = 4
-second_num = 3
+first_num = 15
+second_num = 0
 
 print(f'Numbers: {first_num} and {second_num}')
 
@@ -28,17 +28,9 @@ print(f'Numbers: {first_num} and {second_num}')
 # third_num = first_num / second_num
 
 # Fix the first exception:
-second_num = 3
+second_num = 6
 third_num = first_num / second_num
 print(f'Numbers: {first_num}, {second_num} and {third_num}')
-print(round(third_num,2))
-
-c = 4
-stroka = str(c)
-d = f'Моё число: {c:.2f}' #f = float
-print(d)
-exit(0)
-
 
 
 # Case 2: the second debugging case:

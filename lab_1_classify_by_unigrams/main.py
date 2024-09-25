@@ -3,6 +3,8 @@ Lab 1.
 
 Language detection
 """
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -20,6 +22,12 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    ab = 'qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQ'
+    out = []
+    for char in text:
+        if char in ab:
+            out.append(char.lower())
+    return out
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -34,6 +42,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    frq = dict()
+    for sy in tokens:
+        frq[sy] = (tokens.count(sy) / len(tokens))
+    return frq
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -49,6 +61,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    out = dict()
+    out['name'] = language
+    out['freq'] = calculate_frequencies(tokenize(text))
+    return out
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -64,11 +80,15 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    sig = 0
+    for s in range(len(actual)):
+        sig += ((actual[s] - predicted[s]) ** 2)
+    return sig / len(actual)
 
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -84,12 +104,25 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    trg_prof = list(unknown_profile.values())[1]
+    src_prof = list(profile_to_compare.values())[1]
+
+    for tv in list(trg_prof.keys()):
+        if src_prof.get(tv, 0.0) == 0.0:
+            src_prof[tv] = 0.0
+    for tv in list(src_prof.keys()):
+        if trg_prof.get(tv, 0.0) == 0.0:
+            trg_prof[tv] = 0.0
+    trg_srt = dict(sorted(trg_prof.items()))
+    src_srt = dict(sorted(src_prof.items()))
+    out = calculate_mse(list(src_srt.values()), list(trg_srt.values()))
+    return out
 
 
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -105,6 +138,16 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    check1 = compare_profiles(unknown_profile, profile_1)
+    check2 = compare_profiles(unknown_profile, profile_2)
+    if check1 < check2:
+        return list(profile_1.values())[0]
+    elif check2 < check1:
+        return list(profile_2.values())[0]
+    else:
+        failsafe = [list(profile_1.values())[0], list(profile_2.values())[0]]
+        failsafe.sort(key=str.lower)
+        return failsafe[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -152,7 +195,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

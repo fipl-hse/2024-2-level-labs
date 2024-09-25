@@ -99,7 +99,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             for i in range(0, n):
                 a = float(actual[i])
                 p = float(predicted[i])
-                sqw_dif = (a - p)**2
+                sqw_dif = float((a - p)**2)
                 summa += sqw_dif
             mse = summa/n
             return mse
@@ -232,17 +232,16 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         frequency = profile.get("freq")
         new_freq = {}
         for tok in list(frequency.keys()):
-            if isinstance(tok, str):
-                if len(tok) == 1 and tok.isalpha():
-                    num = frequency.get(tok)
-                    if tok.lower() not in list(new_freq.keys()):
-                        correct_tok = {tok.lower(): num}
+            if isinstance(tok, str) and len(tok) == 1 and tok.isalpha():
+                num = frequency.get(tok)
+                if tok.lower() not in new_freq:
+                    correct_tok = {tok.lower(): num}
+                    new_freq.update(correct_tok)
+                else:
+                    if isinstance(new_freq.get(tok), int):
+                        freq = num + frequency.get(tok.lower())
+                        correct_tok = {tok.lower(): freq}
                         new_freq.update(correct_tok)
-                    else:
-                        if isinstance(new_freq.get(tok), int):
-                            freq = num + frequency.get(tok.lower())
-                            correct_tok = {tok.lower(): freq}
-                            new_freq.update(correct_tok)
         for elem in list(new_freq.keys()):
             freq_index = round(new_freq.get(elem)/profile.get('n_words')[0], 4)
             correct_tok = {elem: freq_index}

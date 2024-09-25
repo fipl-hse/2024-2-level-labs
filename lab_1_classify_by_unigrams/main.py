@@ -22,7 +22,7 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    ab = 'qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQ'
+    ab = 'qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQÄäẞßÜüÖö'
     out = []
     for char in text:
         if char in ab:
@@ -44,7 +44,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     frq = {}
     for sy in tokens:
-        frq[sy] = (tokens.count(sy) / len(tokens))
+        frq.update({sy: tokens.count(sy) / len(tokens)})
     return frq
 
 
@@ -61,6 +61,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if len(text) <= 0:
+        return None
     out = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
     return out
 
@@ -81,6 +83,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     sig = 0
     for s in range(len(actual)):
         sig += ((actual[s] - predicted[s]) ** 2)
+    if len(actual) == 0:
+        return None
+    if len(actual) != len(predicted):
+        return None
     return sig / len(actual)
 
 
@@ -102,15 +108,23 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    if list(unknown_profile.keys())[0] != 'name':
+        return None
+    if list(profile_to_compare.keys())[0] != 'name':
+        return None
+    if list(unknown_profile.keys())[1] != 'freq':
+        return None
+    if list(profile_to_compare.keys())[1] != 'freq':
+        return None
     trg_prof = list(unknown_profile.values())[1]
     src_prof = list(profile_to_compare.values())[1]
 
     for tv in list(trg_prof.keys()):
         if src_prof.get(tv, 0.0) == 0.0:
-            src_prof[tv] = 0.0
+            src_prof.update({tv: 0.0})
     for tv in list(src_prof.keys()):
         if trg_prof.get(tv, 0.0) == 0.0:
-            trg_prof[tv] = 0.0
+            trg_prof.update({tv: 0.0})
     trg_srt = dict(sorted(trg_prof.items()))
     src_srt = dict(sorted(src_prof.items()))
     out = calculate_mse(list(src_srt.values()), list(trg_srt.values()))

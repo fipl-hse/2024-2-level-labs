@@ -142,10 +142,9 @@ def detect_language(
         return list(profile_1.values())[0]
     if check2 < check1:
         return list(profile_2.values())[0]
-    else:
-        failsafe = [list(profile_1.values())[0], list(profile_2.values())[0]]
-        failsafe.sort(key=str.lower)
-        return failsafe[0]
+    failsafe = [list(profile_1.values())[0], list(profile_2.values())[0]]
+    failsafe.sort(key=str.lower)
+    return failsafe[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:

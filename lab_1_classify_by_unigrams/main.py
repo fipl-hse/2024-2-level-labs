@@ -50,17 +50,15 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
 
     # checking input
-    if not isinstance(tokens, list) or not all(isinstance(item, str) for item in tokens):
+    if not isinstance(tokens, list) or not all(isinstance(item, str) for item in tokens) \
+            or not tokens:
         return None
 
     tokens_total = len(tokens)
 
     freq = {}
     for char in set(tokens):
-        freq[char] = float(tokens.count(char))
-
-    for letter in freq:
-        freq[letter] = freq[letter] / tokens_total
+        freq[char] = float(tokens.count(char)) / tokens_total
 
     return freq
 
@@ -83,9 +81,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
 
-    profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    frequencies = calculate_frequencies(tokenize(text))
+    if frequencies is not None:
+        return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
-    return profile
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -132,7 +132,7 @@ def compare_profiles(
     # checking input
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if 'name' not in unknown_profile.keys() or 'name' not in profile_to_compare.keys():
+    if 'name' not in unknown_profile or 'name' not in profile_to_compare:
         return None
     if not all(isinstance(key, str) for key in unknown_profile) \
             or not all(isinstance(key, str) for key in profile_to_compare):
@@ -210,7 +210,7 @@ def load_profile(path_to_file: str) -> dict | None:
         return None
 
     with open(path_to_file, 'r', encoding='UTF-8') as file:
-        profile = dict(load(file))
+        profile = load(file)
 
     return profile
 
@@ -270,8 +270,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     loaded_profiles = []
     for path in paths_to_profiles:
-        loaded_profiles.append(preprocess_profile(load_profile(path)))
-
+        if preprocess_profile(load_profile(path)) is not None:
+            loaded_profiles.append(preprocess_profile(load_profile(path)))
+        else:
+            return None
     return loaded_profiles
 
 
@@ -299,7 +301,6 @@ def detect_language_advanced(
     for profile in known_profiles:
         distances.append(tuple((profile['name'], compare_profiles(unknown_profile, profile))))
 
-    # distances = sorted(distances, key=itemgetter(1, 0))
     distances = sorted(distances, key=lambda t: t[1])
     return distances
 

@@ -76,8 +76,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
                             "freq": freq_dict
                             }
         return language_profile
-    else:
-        return None
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -104,8 +103,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
                 summa += sqw_dif
             mse = summa/n
             return mse
-    else:
-        return None
+    return None
 
 
 def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
@@ -154,8 +152,7 @@ def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
             mse = calculate_mse(profile_pr, profile_act)
             mse = round(mse, 4)
             return mse
-    else:
-        return None
+    return None
 
 
 def detect_language(
@@ -190,8 +187,7 @@ def detect_language(
             lang_list = [profile_1.get('name'), profile_2.get('name')]
             language = sorted(lang_list)[0]
         return language
-    else:
-        return None
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -212,8 +208,7 @@ def load_profile(path_to_file: str) -> dict | None:
             profile_r = json.load(file_to_read)
             profile = dict(profile_r)
         return profile
-    else:
-        return None
+    return None
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -255,8 +250,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         frequency_for_profile = {"freq": new_freq}
         new_profile.update(frequency_for_profile)
         return new_profile
-    else:
-        return None
+    return None
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -278,8 +272,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
             correct_profile = preprocess_profile(profile)
             list_of_profiles.append(correct_profile)
         return list_of_profiles
-    else:
-        return None
+    return None
 
 
 def detect_language_advanced(

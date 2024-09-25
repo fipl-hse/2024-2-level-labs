@@ -42,7 +42,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    frq = dict()
+    frq = {}
     for sy in tokens:
         frq[sy] = (tokens.count(sy) / len(tokens))
     return frq
@@ -61,9 +61,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    out = dict()
-    out['name'] = language
-    out['freq'] = calculate_frequencies(tokenize(text))
+    out = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
     return out
 
 
@@ -142,7 +140,7 @@ def detect_language(
     check2 = compare_profiles(unknown_profile, profile_2)
     if check1 < check2:
         return list(profile_1.values())[0]
-    elif check2 < check1:
+    if check2 < check1:
         return list(profile_2.values())[0]
     else:
         failsafe = [list(profile_1.values())[0], list(profile_2.values())[0]]

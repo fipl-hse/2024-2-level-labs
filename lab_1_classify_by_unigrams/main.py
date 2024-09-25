@@ -28,8 +28,7 @@ def tokenize(text: str) -> list[str] | None:
             if i.isalpha():
                 tokens.append(i)
         return tokens
-    else:
-        return None
+    return None
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -55,8 +54,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
                     letter_dict = {letter: letter_index}
                     frequency.update(letter_dict)
             return frequency
-    else:
-        return None
+    return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

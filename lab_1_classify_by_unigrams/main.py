@@ -82,10 +82,18 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     frequencies = calculate_frequencies(tokenize(text))
-    if frequencies is not None:
-        return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    if (not isinstance(frequencies, dict)
+            or not all(isinstance(char, str) for char in frequencies)
+            or not all(isinstance(value, float) for value in frequencies.values())):
+        return None
 
-    return None
+    profile = {'name': language, 'freq': frequencies}
+    if (not isinstance(profile, dict)
+            or not all(isinstance(key, str) for key in profile)
+            or not all(isinstance(value, dict) for value in profile.values())):
+        return None
+
+    return profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

@@ -178,9 +178,6 @@ def combo_string(first_string: str, second_string: str) -> str | None:
     if len(first_string) < len(second_string):
         return f"{first_string}{second_string}{first_string}"
 
-print(combo_string("aaaa", "ff"))
-print(combo_string("Hello", "hi"))
-print(combo_string("hi", "Hello"))
 
 # combo_string('Hello', 'hi') → 'hiHellohi'
 # combo_string('hi', 'Hello') → 'hiHellohi'

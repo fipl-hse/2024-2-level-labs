@@ -9,42 +9,43 @@ import json
 
 def tokenize(text: str) -> list[str] | None:
     """
-Split a text into tokens.
-Convert the tokens into lowercase, remove punctuation, digits and other symbols
-Args:
-    text (str): A text
-Returns:
-    list[str] | None: A list of lower-cased tokens without punctuation
-In case of corrupt input arguments, None is returned
-"""
+    Split a text into tokens.
+
+    Convert the tokens into lowercase, remove punctuation, digits and other symbols
+
+    Args:
+        text (str): A text
+
+    Returns:
+        list[str] | None: A list of lower-cased tokens without punctuation
+
+    In case of corrupt input arguments, None is returned
+    """
     if not isinstance(text, str):
         return None
-    low = text.lower()
-    symbols = []
-    for symbol in low:
-        symbols.append(symbol)
-    clear_list = []
+    #symbols = []
+    #clear_list = []
     wrong_cases = list("!?/|&><%\.,';:\"#@()*-+=`~ 1234567890")
-    for i in symbols:
-        if i not in wrong_cases:
-            clear_list.append(i)
-    return clear_list
-
-a = tokenize("Hello, my dear friend! I would like to see you!!! **")
+    #for symbol in text.lower():
+        #symbols.append(symbol)
+    #for i in symbols:
+        #if i not in wrong_cases:
+            #clear_list.append(i)
+    return [symbol for symbol in text.lower() if symbol not in wrong_cases]
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
-        Calculate frequencies of given tokens.
+    Calculate frequencies of given tokens.
 
-        Args:
-            tokens (list[str] | None): A list of tokens
+    Args:
+        tokens (list[str] | None): A list of tokens
 
-        Returns:
-            dict[str, float] | None: A dictionary with frequencies
+    Returns:
+        dict[str, float] | None: A dictionary with frequencies
 
-        In case of corrupt input arguments, None is returned
-        """
+    In case of corrupt input arguments, None is returned
+    """
     if not isinstance(tokens, list) or not all(isinstance(s, str) for s in tokens):
         return None
     frequency = {}
@@ -53,8 +54,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             counter = tokens.count(letter) / len(tokens)
             frequency[letter] = counter
     return frequency
-
-print(calculate_frequencies(a))
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float] | None] | None:
@@ -110,8 +109,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     #mse = float(sum((actual[i] - predicted[i])**2 for i in range(length)) / length)
 
 
-print(calculate_mse([0.1538, 0.0, 0.0, 0.0769, 0.0769, 0.0769, 0.0, 0.0, 0.0769, 0.0769, 0.0769, 0.1538, 0.2307, 0.0], [0.1666, 0.1666, 0.0333, 0.1333, 0.0, 0.0666, 0.0666, 0.0333, 0.0333, 0.1, 0.0666, 0.0, 0.0666, 0.0666]))
-
 def profiles_bad_input(profile: dict[str, str | dict[str, float]]) -> dict[str, str | dict[str, float]] | None:
     if not isinstance(profile, dict):
         return None
@@ -132,13 +129,7 @@ def profiles_bad_input(profile: dict[str, str | dict[str, float]]) -> dict[str, 
                 return None
     return profile
 
-print(profiles_bad_input({
-            'name': 'en',
-            'freq': {
-                'y': 0.0769, 'n': 0.0769, 'e': 0.0769, 'h': 0.1538, 'm': 0.0769, 'i': 0.0769,
-                'a': 0.2307, 's': 0.0769, 'p': 0.1538
-            }
-        }))
+
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_to_compare: dict[str, str | dict[str, float]],
@@ -185,20 +176,6 @@ def compare_profiles(
         return None
     return conclusion
 
-print(compare_profiles({
-            'name': 'en',
-            'freq': {
-                'y': 0.0769, 'n': 0.0769, 'e': 0.0769, 'h': 0.1538, 'm': 0.0769, 'i': 0.0769,
-                'a': 0.2307, 's': 0.0769, 'p': 0.1538
-            }
-        }, {
-            'name': 'de',
-            'freq': {
-                'u': 0.0344, 'e': 0.1724, 'a': 0.0344, 'r': 0.0344, 'i': 0.1034, 'g': 0.0344,
-                'b': 0.0344, 't': 0.0344, 'd': 0.0344, 'm': 0.0344, 's': 0.1034, 'h': 0.0689,
-                'c': 0.0689, 'v': 0.0344, 'l': 0.1034, 'ü': 0.0344, 'n': 0.0344
-            }
-        }))
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -225,8 +202,7 @@ def detect_language(
     mse_2 = compare_profiles(unknown_profile, profile_2)
     if mse_1 <= mse_2:
         return profile_1["name"]
-    else:
-        return profile_2["name"]
+    return profile_2["name"]
 
 
 def load_profile(path_to_file: str) -> dict | None:

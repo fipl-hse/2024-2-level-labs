@@ -12,10 +12,11 @@ def tokenize(text):
     extra = ',.:?!;%$#№"&()[]{}~’º01‘23456789 -\n><*=@'
     text_only_letters = ''
     for symbol in text:
-        if symbol not in extra:
-            text_only_letters += symbol
-        else:
+        if symbol in extra:
             continue
+        else:
+            text_only_letters += symbol
+
     text_only_letters = list(text_only_letters.lower())
     #print(text_only_letters)
     return text_only_letters
@@ -44,8 +45,7 @@ def create_language_profile(language, text):
         return None
     dictionary = calculate_frequencies(tokenize(text))
     language_profile = {}
-    language_profile['name'] = language
-    language_profile['freq'] = dictionary
+    language_profile = {'name': language, 'freq': dictionary}
     #print(language_profile)
     return language_profile
 
@@ -55,16 +55,16 @@ def calculate_mse(predicted, actual):
         return None
     if isinstance(predicted, list):
         for i in predicted:
-            if not isinstance(i, (float, int)):
-                return None
-            else:
+            if isinstance(i, (float, int)):
                 continue
+            else:
+                return None
         if isinstance(actual, list):
             for i in actual:
-                if not isinstance(i, (float, int)):
-                    return None
-                else:
+                if isinstance(i, (float, int)):
                     continue
+                else:
+                    return None
     if len(predicted) != len(actual):
         return None
     error_score_list = []
@@ -81,44 +81,42 @@ def compare_profiles(unknown_profile, profile_to_compare):
         return None
     if isinstance(unknown_profile, dict):
         for i in unknown_profile['freq'].keys():
-            if not isinstance(i, str):
-                return None
-            else:
+            if isinstance(i, str):
                 continue
+            else:
+                return None
         for i in unknown_profile['freq'].values():
-            if not isinstance(i, (int, float)):
-                return None
-            else:
+            if isinstance(i, (int, float)):
                 continue
+            else:
+                return None
 
     # bad input check for profile_to_compare:
     if not isinstance(profile_to_compare, dict):
         return None
     if isinstance(profile_to_compare, dict):
         for i in profile_to_compare['freq'].keys():
-            if not isinstance(i, str):
-                return None
-            else:
+            if isinstance(i, str):
                 continue
+            else:
+                return None
         for i in profile_to_compare['freq'].values():
-            if not isinstance(i, (int, float)):
-                return None
-            else:
+            if isinstance(i, (int, float)):
                 continue
+            else:
+                return None
     if len(profile_to_compare) == 2 and len(unknown_profile) == 2:
         freq_dict_2 = profile_to_compare['freq']
-        keys_of_dict_2 = freq_dict_2.keys()
         freq_dict_1 = unknown_profile['freq']
-        keys_of_dict_1 = freq_dict_1.keys()
-        for key2 in keys_of_dict_2:
-            if key2 in keys_of_dict_1:
+        for key2 in freq_dict_2.keys():
+            if key2 in freq_dict_1.keys():
                 continue
-            if key2 not in keys_of_dict_1:
+            if key2 not in freq_dict_1.keys():
                 freq_dict_1[key2] = 0.0
-        for key1 in keys_of_dict_1:
-            if key1 in keys_of_dict_2:
+        for key1 in freq_dict_1.keys():
+            if key1 in freq_dict_2.keys():
                 continue
-            if key1 not in keys_of_dict_2:
+            if key1 not in freq_dict_2.keys():
                 freq_dict_2[key1] = 0.0
     else:
         return None
@@ -149,43 +147,43 @@ def detect_language(unknown_profile, profile_1, profile_2):
         return None
     if isinstance(unknown_profile, dict):
         for i in unknown_profile['freq'].keys():
-            if not isinstance(i, str):
-                return None
-            else:
+            if isinstance(i, str):
                 continue
+            else:
+                return None
         for i in unknown_profile['freq'].values():
-            if not isinstance(i, (int, float)):
-                return None
-            else:
+            if isinstance(i, (int, float)):
                 continue
+            else:
+                return None
     # bad input check for profile_1:
     if not isinstance(profile_1, dict):
         return None
     if isinstance(profile_1, dict):
         for i in profile_1['freq'].keys():
-            if not isinstance(i, str):
-                return None
-            else:
+            if isinstance(i, str):
                 continue
+            else:
+                return None
         for i in profile_1['freq'].values():
-            if not isinstance(i, (int, float)):
-                return None
-            else:
+            if isinstance(i, (int, float)):
                 continue
+            else:
+                return None
     # bad input check for profile_2:
     if not isinstance(profile_2, dict):
         return None
     if isinstance(profile_2, dict):
         for i in profile_2['freq'].keys():
-            if not isinstance(i, str):
-                return None
-            else:
+            if isinstance(i, str):
                 continue
+            else:
+                return None
         for i in profile_2['freq'].values():
-            if not isinstance(i, (int, float)):
-                return None
-            else:
+            if isinstance(i, (int, float)):
                 continue
+            else:
+                return None
 
     mse_1_and_unknown = compare_profiles(unknown_profile, profile_1)
     mse_2_and_unknown = compare_profiles(unknown_profile, profile_2)

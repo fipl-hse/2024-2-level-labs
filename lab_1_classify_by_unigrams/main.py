@@ -4,7 +4,7 @@ Lab 1.
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-
+print("hello world")
 
 def tokenize(text: str) -> list[str] | None:
     """

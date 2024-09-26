@@ -156,9 +156,7 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
     if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict)
             and isinstance(profile_2, dict)):
         return None
-    if not ('name' in unknown_profile or 'freq' in unknown_profile or
-            'name' in profile_1 or 'freq' in profile_1 or
-            'name' in profile_2 or 'freq' in profile_2):
+    if not (isinstance(profile_1["name"], str) and isinstance(profile_2["name"], str)):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
@@ -171,6 +169,7 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
     if mse_1 == mse_2:
         sorted_profiles = sorted([profile_1['name'], profile_2['name']])
         return str(sorted_profiles[0])
+    return None
 
 
 def load_profile() -> dict | None:

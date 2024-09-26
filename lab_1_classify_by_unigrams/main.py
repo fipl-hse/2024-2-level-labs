@@ -9,6 +9,17 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
+    """
+        Split a text into tokens.
+
+        Convert the tokens into lowercase, remove punctuation, digits and other symbols
+         Args:
+            text (str): A text
+        Returns:
+            list[str] | None: A list of lower-cased tokens without punctuation
+
+        In case of corrupt input arguments, None is returned
+        """
     if not isinstance(text, str):
         return None
     tokens = []
@@ -19,20 +30,18 @@ def tokenize(text: str) -> list[str] | None:
     return tokens
 
 
-"""
-    Split a text into tokens.
-
-    Convert the tokens into lowercase, remove punctuation, digits and other symbols
-     Args:
-        text (str): A text
-    Returns:
-        list[str] | None: A list of lower-cased tokens without punctuation
-
-    In case of corrupt input arguments, None is returned
-    """
-
-
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+    """
+        Calculate frequencies of given tokens.
+
+        Args:
+            tokens (list[str] | None): A list of tokens
+
+        Returns:
+            dict[str, float] | None: A dictionary with frequencies
+
+        In case of corrupt input arguments, None is returned
+        """
     if not (isinstance(tokens, list) and all(isinstance(token, str) for token in tokens)):
         return None
     dict_freq = {}
@@ -46,42 +55,39 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return dict_freq
 
 
-"""
-    Calculate frequencies of given tokens.
-
-    Args:
-        tokens (list[str] | None): A list of tokens
-
-    Returns:
-        dict[str, float] | None: A dictionary with frequencies
-
-    In case of corrupt input arguments, None is returned
-    """
-
-
 def create_language_profile(language: str, text: str) ->\
         dict[str, str | dict[str, float]] | None:
+    """
+        Create a language profile.
+
+        Args:
+            language (str): A language
+            text (str): A text
+
+        Returns:
+            dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
+
+        In case of corrupt input arguments, None is returned
+        """
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
     return {'name': language,
             'freq': calculate_frequencies(tokenize(text))}
 
 
-"""
-    Create a language profile.
-
-    Args:
-        language (str): A language
-        text (str): A text
-
-    Returns:
-        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
-
-    In case of corrupt input arguments, None is returned
-    """
-
-
 def calculate_mse(predicted: list, actual: list) -> float | None:
+    """
+        Calculate mean squared error between predicted and actual values.
+
+        Args:
+            predicted (list): A list of predicted values
+            actual (list): A list of actual values
+
+        Returns:
+            float | None: The score
+
+        In case of corrupt input arguments, None is returned
+        """
     if not (isinstance(predicted, list) and isinstance(actual, list)
             and len(predicted) == len(actual)):
         return None
@@ -94,22 +100,23 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     return summation / all_number
 
 
-"""
-    Calculate mean squared error between predicted and actual values.
-
-    Args:
-        predicted (list): A list of predicted values
-        actual (list): A list of actual values
-
-    Returns:
-        float | None: The score
-
-    In case of corrupt input arguments, None is returned
-    """
-
-
 def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
                      profile_to_compare: dict[str, str | dict[str, float]],) -> float | None:
+    """
+        Compare profiles and calculate the distance using symbols.
+
+        Args:
+            unknown_profile (dict[str, str | dict[str, float]]): A dictionary of an unknown profile
+            profile_to_compare (dict[str, str | dict[str, float]]): A dictionary of a profile
+                to compare the unknown profile to
+
+        Returns:
+            float | None: The distance between the profiles
+
+        In case of corrupt input arguments or lack of keys 'name' and
+        'freq' in arguments, None is returned
+        """
+
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
     if ('name' not in unknown_profile or 'freq' not in unknown_profile or
@@ -126,54 +133,38 @@ def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
     return calculate_mse(pred_freq, act_freq)
 
 
-"""
-    Compare profiles and calculate the distance using symbols.
-
-    Args:
-        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of an unknown profile
-        profile_to_compare (dict[str, str | dict[str, float]]): A dictionary of a profile
-            to compare the unknown profile to
-
-    Returns:
-        float | None: The distance between the profiles
-
-    In case of corrupt input arguments or lack of keys 'name' and
-    'freq' in arguments, None is returned
-    """
-
-
 def detect_language(unknown_profile: dict[str, str | dict[str, float]],
                     profile_1: dict[str, str | dict[str, float]],
                     profile_2: dict[str, str | dict[str, float]],) -> str | None:
+    """
+        Detect the language of an unknown profile.
+
+        Args:
+            unknown_profile (dict[str, str | dict[str, float]]): A dictionary of a profile
+                to determine the language of
+            profile_1 (dict[str, str | dict[str, float]]): A dictionary of a known profile
+            profile_2 (dict[str, str | dict[str, float]]): A dictionary of a known profile
+
+        Returns:
+            str | None: A language
+
+        In case of corrupt input arguments, None is returned
+        """
     if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict)
             and isinstance(profile_2, dict)):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
+    if not isinstance(profile_2['name'], str) and not isinstance(profile_1['name'], str):
+        return None
     if mse_1 is None or mse_2 is None:
         return None
     if mse_1 < mse_2:
-        return profile_1['name']
+        return str(profile_1['name'])
     if mse_1 > mse_2:
-        return profile_2['name']
+        return str(profile_2['name'])
     if mse_1 == mse_2:
-        return sorted([profile_1['name'], profile_2['name']])[0]
-
-
-"""
-    Detect the language of an unknown profile.
-
-    Args:
-        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of a profile
-            to determine the language of
-        profile_1 (dict[str, str | dict[str, float]]): A dictionary of a known profile
-        profile_2 (dict[str, str | dict[str, float]]): A dictionary of a known profile
-
-    Returns:
-        str | None: A language
-
-    In case of corrupt input arguments, None is returned
-    """
+        return str(sorted([profile_1['name'], profile_2['name']])[0])
 
 
 def load_profile() -> dict | None:

@@ -4,9 +4,7 @@ Language detection starter
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-from lab_1_classify_by_unigrams.main import (tokenize, calculate_frequencies,
-                                             create_language_profile,
-                                             compare_profiles, detect_language)
+from main import (create_language_profile, detect_language)
 
 
 def main() -> None:
@@ -24,9 +22,10 @@ def main() -> None:
     de_profile = create_language_profile("de", de_text)
     unknown_profile = create_language_profile('unknown', unknown_text)
 
-    print(tokenize(en_text))
-    print(calculate_frequencies(tokenize(en_text)))
-    print(compare_profiles(unknown_profile, en_profile))
+    if (create_language_profile('unk', unknown_text) is None or
+            create_language_profile('en', en_text) is None or
+            create_language_profile('de', de_text) is None):
+        return None
     result = detect_language(unknown_profile, de_profile, en_profile)
     assert result, "Detection result is None"
 

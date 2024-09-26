@@ -82,7 +82,8 @@ def create_language_profile(language: str, text: str) ->\
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
-    if not (isinstance(predicted, list) and isinstance(actual, list) and len(predicted) == len(actual)):
+    if not (isinstance(predicted, list) and isinstance(actual, list)
+            and len(predicted) == len(actual)):
         return None
     summation = 0
     all_number = len(actual)
@@ -107,12 +108,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
 
 
-def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]],
-) -> float | None:
-    if (not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict)
-            or not len(unknown_profile) == len(profile_to_compare) == 2):
+def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
+                     profile_to_compare: dict[str, str | dict[str, float]],) -> float | None:
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
     if ('name' not in unknown_profile or 'freq' not in unknown_profile or
             'name' not in profile_to_compare or 'freq' not in profile_to_compare):
@@ -144,16 +142,15 @@ def compare_profiles(
     """
 
 
-def detect_language(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]],
-) -> str | None:
-    if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict)):
+def detect_language(unknown_profile: dict[str, str | dict[str, float]],
+                    profile_1: dict[str, str | dict[str, float]],
+                    profile_2: dict[str, str | dict[str, float]],) -> str | None:
+    if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict)
+            and isinstance(profile_2, dict)):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    if mse_1 and mse_2 is None:
+    if mse_1 is None or mse_2 is None:
         return None
     if mse_1 < mse_2:
         return profile_1['name']

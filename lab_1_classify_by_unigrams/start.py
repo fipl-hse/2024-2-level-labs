@@ -30,9 +30,9 @@ def main() -> None:
     print(f'Language profile: {create_language_profile("en", en_text)}')
     print(f'MSE:{calculate_mse}')
     print(f'Compare profiles:{compare_profiles(en_profile, de_profile)}')
-    print(f'Detected Language: {detect_language(unknown_profile, en_profile, de_profile)}')
 
-    result = ""
+    result = f'Detected Language: {detect_language(unknown_profile, en_profile, de_profile)}'
+    print(result)
 
     assert result, "Detection result is None"
 

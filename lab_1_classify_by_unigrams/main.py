@@ -97,8 +97,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for i in range(0, n):
         squared_difference = (actual[i] - predicted[i]) ** 2
         summation = summation + squared_difference
-    mse = summation / n
-    return mse
+    return summation / n
 
 
 def compare_profiles(

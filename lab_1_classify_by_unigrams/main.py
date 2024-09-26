@@ -21,11 +21,10 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
     if isinstance(text, str) and len(text) > 0:
-        clean_text = ""
+        tokens = []
         for symbol in text.lower().strip():
             if symbol.isalpha():
-                clean_text += symbol
-        tokens = list(clean_text)
+                tokens += symbol
         return tokens
 
     return None
@@ -49,17 +48,19 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     freq_dict = {}
     new_tokens = []
 
-    for i in tokens:
-        if isinstance(i, str) and len(i) == 1:
-            new_tokens.append(i)
+    for token in tokens:
+        if isinstance(token, str) and len(token) == 1:
+            new_tokens.append(token)
+        else:
+            return None
 
     all_tokens = len(new_tokens)
     if all_tokens == 0:
         return None
 
-    for i in new_tokens:
-        token_freq = new_tokens.count(i) / all_tokens
-        freq_dict[i] = token_freq
+    for token in new_tokens:
+        token_freq = new_tokens.count(token) / all_tokens
+        freq_dict[token] = token_freq
 
     return freq_dict
 

@@ -22,7 +22,7 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (type(text) is str):
+    if not isinstance(text, str):
         return None
     ab = 'qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQÄäẞßÜüÖö'
     out = []
@@ -46,10 +46,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (type(tokens) is list):
+    if not isinstance(tokens, list):
         return None
     frq = {}
     for sy in tokens:
+        if not isinstance(sy, str):
+            return None
         frq.update({sy: tokens.count(sy) / len(tokens)})
     return frq
 
@@ -67,7 +69,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if not (type(language) is str) or not (type(text) is str):
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
     if len(text) <= 0:
         return None
@@ -88,11 +90,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (type(predicted) is list) or not (type(actual) is list):
+    if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
     sig = 0
-    for s in range(len(actual)):
-        sig += ((actual[s] - predicted[s]) ** 2)
+    for s, (src, trg) in enumerate(zip(predicted, actual)):
+        sig += ((trg - src) ** 2)
     if len(actual) == 0:
         return None
     if len(actual) != len(predicted):
@@ -118,19 +120,15 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not (type(unknown_profile) is dict) or not (type(profile_to_compare) is dict):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if list(unknown_profile.keys())[0] != 'name':
+    if (list(unknown_profile.keys())[0] != 'name') or (list(profile_to_compare.keys())[0] != 'name'):
         return None
-    if list(profile_to_compare.keys())[0] != 'name':
-        return None
-    if list(unknown_profile.keys())[1] != 'freq':
-        return None
-    if list(profile_to_compare.keys())[1] != 'freq':
+    if (list(unknown_profile.keys())[1] != 'freq') or (list(profile_to_compare.keys())[1] != 'freq'):
         return None
     trg_prof = list(unknown_profile.values())[1]
     src_prof = list(profile_to_compare.values())[1]
-    if not (type(trg_prof) is dict) or not (type(src_prof) is dict):
+    if not isinstance(trg_prof, dict) or not isinstance(src_prof, dict):
         return None
     for tv in list(trg_prof.keys()):
         if src_prof.get(tv, 0.0) == 0.0:
@@ -163,11 +161,11 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not (type(unknown_profile) is dict):
+    if not isinstance(unknown_profile, dict):
         return None
-    if not (type(profile_1) is dict):
+    if not isinstance(profile_1, dict):
         return None
-    if not (type(profile_2) is dict):
+    if not isinstance(profile_2, dict):
         return None
     check1 = compare_profiles(unknown_profile, profile_1)
     check2 = compare_profiles(unknown_profile, profile_2)

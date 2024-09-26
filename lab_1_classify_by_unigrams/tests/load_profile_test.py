@@ -29,7 +29,7 @@ class LoadProfileTest(unittest.TestCase):
         with open(path_to_profile, 'r', encoding='utf-8') as file:
             expected = json.load(file)
 
-        actual = load_profile(str(path_to_profile))
+        actual = load_profile()
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_1_classify_by_unigrams
@@ -41,5 +41,5 @@ class LoadProfileTest(unittest.TestCase):
         expected = None
 
         path_to_profile = []
-        actual = load_profile(path_to_profile)
+        actual = load_profile()
         self.assertEqual(expected, actual)

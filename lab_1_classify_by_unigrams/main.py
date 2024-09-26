@@ -59,11 +59,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
 
 
-def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+def create_language_profile(language: str, text: str) ->\
+        dict[str, str | dict[str, float]] | None:
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
-    language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
-    return language_profile
+    return {'name': language,
+            'freq': calculate_frequencies(tokenize(text))}
 
 
 """
@@ -89,8 +90,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         difference = actual[i] - predicted[i]
         squared_difference = difference ** 2
         summation = summation + squared_difference
-    mse = summation / all_number
-    return mse
+    return summation / all_number
 
 
 """
@@ -111,8 +111,11 @@ def compare_profiles(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or not len(
-            profile_to_compare) == len(unknown_profile) == 2:
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict)
+            or not len(unknown_profile) == len(profile_to_compare) == 2):
+        return None
+    if ('name' not in unknown_profile or 'freq' not in unknown_profile or
+            'name' not in profile_to_compare or 'freq' not in profile_to_compare):
         return None
     profile_1 = set(unknown_profile['freq'].keys())
     profile_2 = set(profile_to_compare['freq'].keys())
@@ -150,11 +153,13 @@ def detect_language(
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 and mse_2 is None:
+        return None
     if mse_1 < mse_2:
         return profile_1['name']
-    elif mse_1 > mse_2:
+    if mse_1 > mse_2:
         return profile_2['name']
-    elif mse_1 == mse_2:
+    if mse_1 == mse_2:
         return sorted([profile_1['name'], profile_2['name']])[0]
 
 
@@ -174,12 +179,9 @@ def detect_language(
     """
 
 
-def load_profile(path_to_file: str) -> dict | None:
+def load_profile() -> dict | None:
     """
     Load a language profile.
-
-    Args:
-        path_to_file (str): A path to the language profile
 
     Returns:
         dict | None: A dictionary with at least two keys – name, freq

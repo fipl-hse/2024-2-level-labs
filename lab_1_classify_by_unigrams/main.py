@@ -7,7 +7,6 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-
     """
     Split a text into tokens.
 
@@ -22,17 +21,16 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
 
+    if not isinstance(text, str):
+        return None
     tokens = []
-    if isinstance(text, str):
-        for symb in text:
-            if symb.isalpha():
-                tokens.append(symb.lower())
-        return tokens
-    return None
+    for symb in text:
+        if symb.isalpha():
+            tokens.append(symb.lower())
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-
     """
     Calculate frequencies of given tokens.
 
@@ -44,24 +42,20 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+
     if not isinstance(tokens, list) or len(tokens) == 0 or None in tokens:
         return None
-    if isinstance(tokens, list):
-        freq = {}
-        all_tokens = len(tokens)
-        for token in tokens:
-            if token in freq:
-                freq[token] += 1
-            else:
-                freq[token] = 1
-        for token in freq:
-            freq[token] /= all_tokens
-        return freq
-    return None
+    freq = {}
+    all_tokens = len(tokens)
+    for token in tokens:
+        if token in freq:
+            freq[token] += 1 / all_tokens
+        else:
+            freq[token] = 1 / all_tokens
+    return freq
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-
     """
     Create a language profile.
 
@@ -75,15 +69,14 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
 
-    if isinstance(language, str) and isinstance(text, str):
-        freq_dict = calculate_frequencies(tokenize(text))
-        language_profile = {'name': language, 'freq': freq_dict}
-        return language_profile
-    return None
+    if not (isinstance(language, str) and isinstance(text, str)):
+        return None
+    freq_dict = calculate_frequencies(tokenize(text))
+    language_profile = {'name': language, 'freq': freq_dict}
+    return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
-
     """
     Calculate mean squared error between predicted and actual values.
 
@@ -112,7 +105,6 @@ def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
-
     """
     Compare profiles and calculate the distance using symbols.
 

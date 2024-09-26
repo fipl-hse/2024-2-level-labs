@@ -32,7 +32,7 @@ def main() -> None:
     print(f'Compare profiles:{compare_profiles(en_profile, de_profile)}')
     print(f'Detected Language: {detect_language(unknown_profile, en_profile, de_profile)}')
 
-    result = "a"
+    result = ""
 
     assert result, "Detection result is None"
 

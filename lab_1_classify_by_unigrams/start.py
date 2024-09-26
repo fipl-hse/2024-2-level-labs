@@ -1,8 +1,8 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams.main import tokenize,calculate_frequencies, create_language_profile, compare_profiles
-
+from lab_1_classify_by_unigrams.main import (tokenize,calculate_frequencies,
+                                             create_language_profile, compare_profiles, detect_language)
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
@@ -22,12 +22,10 @@ def main() -> None:
     de_profile = create_language_profile("de", de_text)
     unknown_profile = create_language_profile('unknown', unknown_text)
 
-    result = en_text
     print(tokenize(en_text))
-    print(tokenize(de_text))
-    print(tokenize(unknown_text))
     print(calculate_frequencies(tokenize(en_text)))
-    print(create_language_profile('en', en_text))
+    print(compare_profiles(unknown_profile, en_profile))
+    result = detect_language(unknown_profile, de_profile, en_profile)
     assert result, "Detection result is None"
 
 

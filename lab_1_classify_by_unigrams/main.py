@@ -9,13 +9,14 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-    if isinstance(text, str):
-        tokens = []
-        for symbol in text:
-            if symbol.isalpha():
-                tokens.append(symbol.lower())
-        return tokens
-    return None
+    if not isinstance(text, str):
+        return None
+    tokens = []
+    for symbol in text:
+        if symbol.isalpha():
+            tokens.append(symbol.lower())
+        continue
+    return tokens
 
 
 """
@@ -32,17 +33,17 @@ def tokenize(text: str) -> list[str] | None:
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    if isinstance(tokens, list) and all(isinstance(token, str) for token in tokens):
-        d = {}
-        for token in tokens:
-            if token in d.keys():
-                d[token] = 1 + d[token]
-            else:
-                d[token] = 1
-        for token in d:
-            d[token] /= len(tokens)
-        return d
-    return None
+    if not (isinstance(tokens, list) and all(isinstance(token, str) for token in tokens)):
+        return None
+    dict_freq = {}
+    for token in tokens:
+        if token in dict_freq.keys():
+            dict_freq[token] += 1
+        else:
+            dict_freq[token] = 1
+    for token in dict_freq:
+        dict_freq[token] /= len(tokens)
+    return dict_freq
 
 
 """
@@ -59,10 +60,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    if isinstance(language, str) and isinstance(text, str):
-        language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
-        return language_profile
-    return None
+    if not (isinstance(language, str) and isinstance(text, str)):
+        return None
+    language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    return language_profile
 
 
 """
@@ -80,16 +81,16 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
-    if isinstance(predicted, list) and isinstance(actual, list) and len(predicted) == len(actual):
-        summation = 0
-        n = len(actual)
-        for i in range(0, n):
-            difference = actual[i] - predicted[i]
-            squared_difference = difference ** 2
-            summation = summation + squared_difference
-        mse = summation / n
-        return mse
-    return None
+    if not (isinstance(predicted, list) and isinstance(actual, list) and len(predicted) == len(actual)):
+        return None
+    summation = 0
+    all_number = len(actual)
+    for i in range(0, all_number):
+        difference = actual[i] - predicted[i]
+        squared_difference = difference ** 2
+        summation = summation + squared_difference
+    mse = summation / all_number
+    return mse
 
 
 """
@@ -145,7 +146,19 @@ def detect_language(
         profile_1: dict[str, str | dict[str, float]],
         profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
-    """
+    if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict)):
+        return None
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 < mse_2:
+        return profile_1['name']
+    elif mse_1 > mse_2:
+        return profile_2['name']
+    elif mse_1 == mse_2:
+        return sorted([profile_1['name'], profile_2['name']])[0]
+
+
+"""
     Detect the language of an unknown profile.
 
     Args:

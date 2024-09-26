@@ -71,8 +71,11 @@ def create_language_profile(language: str, text: str) ->\
         """
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
+    freq_dict = calculate_frequencies(tokenize(text))
+    if not isinstance(freq_dict, dict):
+        return None
     return {'name': language,
-            'freq': calculate_frequencies(tokenize(text))}
+            'freq': freq_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -122,8 +125,8 @@ def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
     if ('name' not in unknown_profile or 'freq' not in unknown_profile or
             'name' not in profile_to_compare or 'freq' not in profile_to_compare):
         return None
-    profile_1 = set(unknown_profile['freq'].keys())
-    profile_2 = set(profile_to_compare['freq'].keys())
+    profile_1 = set(unknown_profile['freq'])
+    profile_2 = set(profile_to_compare['freq'])
     union_set = profile_1.union(profile_2)
     act_freq = []
     pred_freq = []
@@ -153,18 +156,19 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
     if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict)
             and isinstance(profile_2, dict)):
         return None
+    if ('name' not in unknown_profile or 'freq' not in unknown_profile or
+            'name' not in profile_1 or 'freq' not in profile_1 or
+            'name' not in profile_2 or 'freq' not in profile_2):
+        return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    if not isinstance(profile_2['name'], str) and not isinstance(profile_1['name'], str):
-        return None
-    if mse_1 is None or mse_2 is None:
-        return None
     if mse_1 < mse_2:
         return str(profile_1['name'])
-    if mse_1 > mse_2:
+    elif mse_1 > mse_2:
         return str(profile_2['name'])
-    if mse_1 == mse_2:
+    else:
         return str(sorted([profile_1['name'], profile_2['name']])[0])
+
 
 
 def load_profile() -> dict | None:

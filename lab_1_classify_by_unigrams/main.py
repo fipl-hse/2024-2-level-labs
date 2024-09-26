@@ -168,7 +168,9 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
         return str(profile_1['name'])
     if mse_1 > mse_2:
         return str(profile_2['name'])
-    return str(sorted([profile_1['name'], profile_2['name']])[0])
+    if mse_1 == mse_2:
+        sorted_profiles = sorted([profile_1['name'], profile_2['name']])
+        return str(sorted_profiles[0])
 
 
 def load_profile() -> dict | None:

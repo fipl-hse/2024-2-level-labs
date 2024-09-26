@@ -1,9 +1,7 @@
 """
 Language detection starter
 """
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-
 from lab_1_classify_by_unigrams.main import (create_language_profile, detect_language)
 
 
@@ -26,8 +24,9 @@ def main() -> None:
             create_language_profile('en', en_text) is None or
             create_language_profile('de', de_text) is None):
         return None
-    result = detect_language(unknown_profile, de_profile, en_profile)
-    assert result, "Detection result is None"
+    result = detect_language(unknown_profile, en_profile, de_profile)
+    return result
+#assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

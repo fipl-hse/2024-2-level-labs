@@ -20,13 +20,10 @@ def main() -> None:
     de_profile = create_language_profile("de", de_text)
     unknown_profile = create_language_profile('unknown', unknown_text)
 
-    if (unknown_profile is None or en_profile is None or
-            de_profile is None):
-        return None
     result = detect_language(unknown_profile, en_profile, de_profile)
     print(result)
     assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
-    print(main())
+    main()

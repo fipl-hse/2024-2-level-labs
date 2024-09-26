@@ -165,10 +165,10 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
     if mse_1 is None or mse_2 is None:
         return None
     if mse_1 < mse_2:
-        return profile_1['name']
+        return str(profile_1['name'])
     if mse_1 > mse_2:
-        return profile_2['name']
-    return sorted([profile_1['name'], profile_2['name']])[0]
+        return str(profile_2['name'])
+    return str(sorted([profile_1['name'], profile_2['name']])[0])
 
 
 def load_profile() -> dict | None:

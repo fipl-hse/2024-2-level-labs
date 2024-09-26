@@ -46,11 +46,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     dict_freq = {}
     for token in tokens:
-        if token in dict_freq.keys():
+        if token in dict_freq:
             dict_freq[token] += 1
         else:
             dict_freq[token] = 1
-    for token in dict_freq:
+    for token, count in dict_freq.items():
         dict_freq[token] /= len(tokens)
     return dict_freq
 
@@ -156,15 +156,17 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
     if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict)
             and isinstance(profile_2, dict)):
         return None
-    if ('name' not in unknown_profile or 'freq' not in unknown_profile or
-            'name' not in profile_1 or 'freq' not in profile_1 or
-            'name' not in profile_2 or 'freq' not in profile_2):
+    if not ('name' in unknown_profile or 'freq' in unknown_profile or
+            'name' in profile_1 or 'freq' in profile_1 or
+            'name' in profile_2 or 'freq' in profile_2):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 is None or mse_2 is None:
+        return None
     if mse_1 < mse_2:
         return str(profile_1['name'])
-    elif mse_1 > mse_2:
+    if mse_1 > mse_2:
         return str(profile_2['name'])
     else:
         return str(sorted([profile_1['name'], profile_2['name']])[0])

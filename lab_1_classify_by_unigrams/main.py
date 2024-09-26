@@ -154,9 +154,8 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
         In case of corrupt input arguments, None is returned
         """
     if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict)
-            and isinstance(profile_2, dict)):
-        return None
-    if not (isinstance(profile_1["name"], str) and isinstance(profile_2["name"], str)):
+            and isinstance(profile_2, dict) and isinstance(profile_1["name"], str)
+            and isinstance(profile_2["name"], str)):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)

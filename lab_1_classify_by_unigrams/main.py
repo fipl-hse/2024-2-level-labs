@@ -24,7 +24,7 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(text) is not str or len(text) == 0:
+    if not isinstance(text, str) or len(text) == 0:
         return None
 
     tokens = []
@@ -46,7 +46,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(tokens) is not list or len(tokens) == 0 or None in tokens:
+    if not isinstance(tokens, list) or len(tokens) == 0 or None in tokens:
         return None
 
     freq_dict = {}
@@ -69,8 +69,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if type(language) is not str or type(text) is not str or len(language) == 0 or len(text) == 0:
+    if not isinstance(language, str) or not isinstance(text, str) or len(language) == 0 or len(text) == 0:
         return None
+
     profile_dict: dict[str, str | dict[str, float]] | None
     profile_dict = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
     return profile_dict
@@ -89,7 +90,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if (type(predicted) is not list or type(actual) is not list or len(predicted) == 0 or len(actual) == 0
+    if (not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) == 0 or len(actual) == 0
             or len(predicted) != len(actual)):
         return None
 
@@ -99,8 +100,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         value += (actual[i] - predicted[i]) ** 2
         i += 1
 
-    mse = value / i
-    return mse
+    return value / i
 
 
 def sort_dict(dictio):
@@ -112,8 +112,8 @@ def sort_dict(dictio):
 
 
 def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -129,7 +129,7 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if ((type(unknown_profile) is not dict or type(profile_to_compare) is not dict or len(unknown_profile) == 0
+    if ((not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or len(unknown_profile) == 0
          or len(profile_to_compare) == 0) or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
         return None
 
@@ -151,9 +151,9 @@ def compare_profiles(
 
 
 def detect_language(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_1: dict[str, str | dict[str, float]],
+    profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -169,7 +169,7 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if (type(unknown_profile) is not dict or type(profile_1) is not dict or type(profile_2) is not dict
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict)
             or len(unknown_profile) == 0 or len(profile_1) == 0 or len(profile_2) == 0):
         return None
 
@@ -196,7 +196,7 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(path_to_file) is not str or len(path_to_file) == 0:
+    if not isinstance(path_to_file, str) or len(path_to_file) == 0:
         return None
 
     with open(path_to_file, 'r', encoding='utf-8') as file:
@@ -218,7 +218,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
-    if (type(profile) is not dict or len(profile) == 0 or 'name' not in profile.keys()
+    if (not isinstance(profile, dict) or len(profile) == 0 or 'name' not in profile.keys()
             or 'n_words' not in profile.keys() or 'freq' not in profile.keys()):
         return None
 
@@ -264,7 +264,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
-    if type(paths_to_profiles) is not list or len(paths_to_profiles) == 0:
+    if not isinstance(paths_to_profiles, list) or len(paths_to_profiles) == 0:
         return None
 
     profiles_list = []
@@ -277,7 +277,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.
@@ -292,7 +292,7 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if (type(unknown_profile) is not dict or type(known_profiles) is not list or len(unknown_profile) == 0
+    if (not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list) or len(unknown_profile) == 0
             or len(known_profiles) == 0):
         return None
 
@@ -300,9 +300,6 @@ def detect_language_advanced(
     for profile in known_profiles:
         result_list.append((profile['name'], compare_profiles(unknown_profile, profile)))
     result_list = sorted(sorted(result_list, key=lambda x: x[0]), key=lambda x: x[1], reverse=False)
-    # for profile in result_list:
-    #     if profile[1] == result_list[result_list.index(profile)+1][1]:
-    #         if
 
     return result_list
 
@@ -316,7 +313,7 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(detections) is not list or len(detections) == 0:
+    if not isinstance(detections, list) or len(detections) == 0:
         return None
 
     for profile in detections:

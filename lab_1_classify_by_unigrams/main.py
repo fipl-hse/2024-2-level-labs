@@ -36,7 +36,7 @@ def tokenize(text: str) -> list[str] | None:
 
 #print(tokenize(text))
 
-#tokens = ['h', 'e', 'y', 'h', 'o', 'w', 'a', 'r', 'e', 'y', 'o', 'u']
+#tokens = ['string', {}, (), None, 9, 9.34, True, [None]]
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -53,13 +53,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not tokens or None:
         return None
 
-    for i in tokens:
-        if len(i) > 1 or not i:
-            return None
-
     token_freq = {}
 
     for token in tokens:
+        if not isinstance(token, str):
+            return None
+        if len(token) > 1:
+            return None
         if token not in token_freq:
             token_freq[token] = 1
         else:

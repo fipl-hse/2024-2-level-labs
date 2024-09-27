@@ -66,13 +66,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
-    
+
     freq_dict = calculate_frequencies(tokenize(text))
-    if not freq_dict:
+    if freq_dict is None:
         return None
-    
-    lang_profile = {"name": language, "freq": freq_dict}
-    return lang_profile
+
+    return {"name": language, "freq": freq_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -90,7 +89,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if not (isinstance(predicted, list) and
             isinstance(actual, list) and
-            len(predicted) == len(actual)):
+            len(predicted) == len(actual) and
+            len(predicted) == 0):
         return None
 
     num_of_diffs = len(predicted)
@@ -124,7 +124,7 @@ def compare_profiles(
             all("name" in a for a in (unknown_profile, profile_to_compare)) and
             all("freq" in b for b in (unknown_profile, profile_to_compare))):
         return None
-
+    
     all_keys = list(set(unknown_profile["freq"]) | set(profile_to_compare["freq"]))
     unknown_profile_with_0s = []
     profile_to_compare_with_0s = []
@@ -167,7 +167,7 @@ def detect_language(
 
     diff_unk_1 = compare_profiles(unknown_profile, profile_1)
     diff_unk_2 = compare_profiles(unknown_profile, profile_2)
-    if diff_unk_1 == None or diff_unk_2 == None:
+    if diff_unk_1 is None or diff_unk_2 is None:
         return None
 
     if diff_unk_1 < diff_unk_2:

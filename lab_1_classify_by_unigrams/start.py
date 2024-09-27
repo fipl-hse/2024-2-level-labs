@@ -8,7 +8,7 @@ import main as func
 
 def main() -> None:
     """
-    Launches an i mplementation
+    Launches an implementation
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()

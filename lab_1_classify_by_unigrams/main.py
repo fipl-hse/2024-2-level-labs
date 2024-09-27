@@ -73,41 +73,37 @@ def compare_profiles(unknown_profile, profile_to_compare):
     # bad input check for unknown_profile:
     if not isinstance(unknown_profile, dict):
         return None
-    else:
-        for i in unknown_profile['freq'].keys():
-            if isinstance(i, str):
-                continue
-            return None
-        for i in unknown_profile['freq'].values():
-            if isinstance(i, (int, float)):
-                continue
-            return None
+    for i in unknown_profile['freq'].keys():
+        if isinstance(i, str):
+            continue
+        return None
+    for i in unknown_profile['freq'].values():
+        if isinstance(i, (int, float)):
+            continue
+        return None
 
     # bad input check for profile_to_compare:
     if not isinstance(profile_to_compare, dict):
         return None
-    else:
-        for i in profile_to_compare['freq'].keys():
-            if isinstance(i, str):
-                continue
-            return None
-        for i in profile_to_compare['freq'].values():
-            if isinstance(i, (int, float)):
-                continue
-            return None
+    for i in profile_to_compare['freq'].keys():
+        if isinstance(i, str):
+            continue
+        return None
+    for i in profile_to_compare['freq'].values():
+        if isinstance(i, (int, float)):
+            continue
+        return None
     if len(profile_to_compare) == 2 and len(unknown_profile) == 2:
         freq_dict_2 = profile_to_compare['freq']
         freq_dict_1 = unknown_profile['freq']
         for key2 in freq_dict_2.keys():
             if key2 in freq_dict_1.keys():
                 continue
-            else:
-                freq_dict_1[key2] = 0.0
+            freq_dict_1[key2] = 0.0
         for key1 in freq_dict_1.keys():
             if key1 in freq_dict_2.keys():
                 continue
-            else:
-                freq_dict_2[key1] = 0.0
+            freq_dict_2[key1] = 0.0
     else:
         return None
 

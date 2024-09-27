@@ -145,7 +145,7 @@ def detect_language(unknown_profile, profile_1, profile_2):
         for i in profile_1['freq'].keys():
             if isinstance(i, str):
                 continue
-            return None
+            #return None
         for i in profile_1['freq'].values():
             if isinstance(i, (int, float)):
                 continue
@@ -157,7 +157,7 @@ def detect_language(unknown_profile, profile_1, profile_2):
         for i in profile_2['freq'].keys():
             if isinstance(i, str):
                 continue
-            return None
+            #return None
         for i in profile_2['freq'].values():
             if isinstance(i, (int, float)):
                 continue

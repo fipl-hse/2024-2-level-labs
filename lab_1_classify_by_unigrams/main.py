@@ -5,7 +5,7 @@ Language detect
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-
+text = "Hey, how are you?"
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -20,7 +20,23 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not text:
+        return None
 
+    text = text.lower()
+    num = '1234567890'
+    symb = ',./?!:;'
+    tokens = []
+
+    for i in text:
+        if i not in num and i not in symb and i != ' ':
+            tokens.append(i)
+
+    return tokens
+
+print(tokenize(text))
+
+tokens = ['h', 'e', 'y', 'h', 'o', 'w', 'a', 'r', 'e', 'y', 'o', 'u']
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -34,6 +50,27 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not tokens or None:
+        return None
+
+    token_freq = {}
+
+    for token in tokens:
+        if token not in token_freq:
+            token_freq[token] = 1
+        else:
+            token_freq[token] += 1
+
+    total_tokens = len(tokens)
+
+    for key, value in token_freq.items():
+        token_freq[key] = value / total_tokens
+
+    return token_freq
+
+print(calculate_frequencies(tokens))
+
+
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -49,7 +86,30 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if not language or not text:
+        return None
 
+    token_freq = {}
+    for token in text.lower().split():
+        if token not in token_freq:
+            token_freq[token] = 1
+        else:
+            token_freq[token] += 1
+
+    total_tokens = len(text.lower().split())
+    for key, value in token_freq.items():
+        token_freq[key] = value / total_tokens
+
+    return {
+        "name": language,
+        "freq": token_freq
+    }
+
+
+text = "Я люблю программировать на Python."
+language = 'Python'
+profile = create_language_profile(language, text)
+print(profile)
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -64,6 +124,17 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if len(predicted) != len(actual):
+        return None
+
+    mse = 0
+
+    for i in range(len(predicted)):
+        mse += (predicted[i] - actual[i]) ** 2
+
+    return mse / len(predicted)
+
+
 
 
 def compare_profiles(

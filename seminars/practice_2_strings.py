@@ -15,24 +15,24 @@ Data Type: String
 # strings are case-sensitive
 
 # Create a string
-example = 'Hello'  # or "Hello"
-print(example)
+#example = 'Hello'  # or "Hello"
+#print(example)
 
 # String concatenation
-greeting = example + ' there!'
-print(greeting)
+#greeting = example + ' there!'
+#print(greeting)
 
 # String multiplication
-several_hellos = example * 5
-print(several_hellos)
+#several_hellos = example * 5
+#print(several_hellos)
 
 # String formatting
 # .format() method
-example = '{} there!'.format(example)  # pylint: disable=consider-using-f-string
-print(example)
+#example = '{} there!'.format(example)  # pylint: disable=consider-using-f-string
+#print(example)
 # f-strings
-example = f'{greeting} - this is the "greeting" variable.'
-print(example)
+#example = f'{greeting} - this is the "greeting" variable.'
+#print(example)
 
 
 # String methods (some of them)
@@ -47,70 +47,79 @@ print(example)
 # TASKS
 
 # Task 1:
-def multiply_string(input_string: str, how_many: int) -> str:
+def multiply_string(s, inter):
     """
     Given a string and a non-negative number,
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
+    if inter >= 0:
+        itog = s * inter
+        return itog
 
 
 # Function calls with expected result:
-# multiply_string('Hi', 2) → 'HiHi'
-# multiply_string('Hi', 3) → 'HiHiHi'
-# multiply_string('Hi', 1) → 'Hi'
-# multiply_string('Hi', 0) → ''
+#print(multiply_string('Hi', 2))
+#print(multiply_string('Hi', 3))
+#print(multiply_string('Hi', 1))
+#print(multiply_string('Hi', 0))
 
 
 # Task 2:
-def front_times(input_string: str, how_many: int) -> str:
+def front_times(s: str, num: int):
     """
     Given the string, take its three leading characters
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
+    itog = s[:3] * num
+    return itog
 
 
 # Function calls with expected result:
-# front_times('Chocolate', 2) → 'ChoCho'
-# front_times('Chocolate', 3) → 'ChoChoCho'
-# front_times('Abc', 3) → 'AbcAbcAbc'
-# front_times('A', 4) → 'AAAA'
-# front_times('', 4) → ''
-# front_times('Abc', 0) → ''
+#print(front_times('Chocolate', 2))
+#print(front_times('Chocolate', 3))
+#print(front_times('Abc', 3))
+#print(front_times('A', 4))
+#print(front_times('', 4))
+#print(front_times('Abc', 0))
 
 
 # Task 3:
-def extra_end(input_string: str) -> str:
+def extra_end(s: str):
     """
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
+    itog = s[-2:] * 3
+    return itog
 
 
 # Function calls with expected result:
-# extra_end('Hello') → 'lololo'
+#print(extra_end('Hello'))
 # extra_end('ab') → 'ababab'
 # extra_end('Hi') → 'HiHiHi'
 # extra_end('Code') → 'dedede'
 
 
 # Task 4:
-def make_abba(first_string: str, second_string: str) -> str:
+def make_abba(s1: str, s2: str):
     """
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
+    itog = s1 + s2 * 2 + s1
+    return itog
 
 
-# make_abba('Hi', 'Bye') → 'HiByeByeHi'
-# make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
-# make_abba('What', 'Up') → 'WhatUpUpWhat'
-# make_abba('', 'y') → 'yy'
+#print(make_abba('Hi', 'Bye'))
+#print(make_abba('Yo', 'Alice'))
+#print(make_abba('What', 'Up'))
+#print(make_abba('', 'y'))
 
 
 # Task 5
-def reverse_word(sentence: str) -> str:
+def reverse_word(s: str):
     """
     Write a function that takes in a string of one or more words,
     and returns the same string, but with all five or more letter words reversed.
@@ -119,17 +128,21 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
+    l = s.split(' ')
+    for i in range(len(l)):
+        if len(l[i]) >= 5:
+            l[i] = l[i][::-1]
+    return ' '.join(l)
 
-
-# reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
+print(reverse_word("Hey fellow warriors")) #== "Hey wollef sroirraw"
 #
-# reverse_word("This is a test") == "This is a test"
+print(reverse_word("This is a test")) #== "This is a test"
 #
-# reverse_word("This is another test") == "This is rehtona test"
+print(reverse_word("This is another test")) #== "This is rehtona test"
 
 
 # Task 6
-def generate_hashtag(input_string: str) -> str:
+def generate_hashtag(s: str):
     """
     The marketing team is spending way too much time typing in hashtags.
     Let's help them with our own Hashtag Generator!
@@ -146,8 +159,14 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
-
-
+    s2 = ''
+    l = s.split(' ')
+    for i in s:
+        if i == ' ':
+            i = ''
+        s2 += i
+    return '#' + s2
+print(generate_hashtag(" Hello there thanks for trying my quiz"))
 # Task 7:
 def combo_string(first_string: str, second_string: str) -> str:
     """

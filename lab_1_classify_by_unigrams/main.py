@@ -170,6 +170,7 @@ def detect_language(
             if mse_prof_1 > mse_prof_2:
                 return profile_2.get('name')
             return min(profile_1.get('name'), profile_2.get('name'))
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:

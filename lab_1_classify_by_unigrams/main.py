@@ -75,7 +75,6 @@ def compare_profiles(unknown_profile, profile_to_compare):
     for i in unknown_profile['freq'].keys():
         if isinstance(i, str):
             continue
-        return None
     for i in unknown_profile['freq'].values():
         if isinstance(i, (int, float)):
             continue
@@ -87,7 +86,6 @@ def compare_profiles(unknown_profile, profile_to_compare):
     for i in profile_to_compare['freq'].keys():
         if isinstance(i, str):
             continue
-        return None
     for i in profile_to_compare['freq'].values():
         if isinstance(i, (int, float)):
             continue
@@ -133,7 +131,6 @@ def detect_language(unknown_profile, profile_1, profile_2):
         for i in unknown_profile['freq'].keys():
             if isinstance(i, str):
                 continue
-            #return None
         for i in unknown_profile['freq'].values():
             if isinstance(i, (int, float)):
                 continue
@@ -145,7 +142,6 @@ def detect_language(unknown_profile, profile_1, profile_2):
         for i in profile_1['freq'].keys():
             if isinstance(i, str):
                 continue
-            #return None
             for ii in profile_1['freq'].values():
                 if isinstance(ii, (int, float)):
                     continue

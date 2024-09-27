@@ -80,6 +80,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
                     for key, value in freq_dict.items())):
         return None
     language_profile = {'name': language, 'freq': freq_dict}
+    for key in freq_dict:
+        if not isinstance(key, str) or not isinstance(freq_dict[key], float):
+            return None
     return language_profile
 
 

@@ -53,8 +53,11 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
+    print(input_string * how_many)
 
-
+input_string = 'привет'
+how_many = 1
+multiply_string(input_string, how_many)
 # Function calls with expected result:
 # multiply_string('Hi', 2) → 'HiHi'
 # multiply_string('Hi', 3) → 'HiHiHi'
@@ -69,6 +72,11 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
+    return (input_string[:3] * how_many)
+
+input_string = 'Abc'
+how_many = 2
+print(front_times(input_string, how_many))
 
 
 # Function calls with expected result:
@@ -86,6 +94,9 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
+    return (input_string[-2:]*3)
+input_string = 'Code'
+print(extra_end(input_string))
 
 
 # Function calls with expected result:
@@ -101,9 +112,11 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
+    #return first_string + second_string + second_string + first_string
+    #return {}{}{}.format(first_string, second_string*2, first_string)
+    return f'{first_string}{second_string*2}{first_string}'
 
-
-# make_abba('Hi', 'Bye') → 'HiByeByeHi'
+print(make_abba('Hi', 'Bye'))
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
 # make_abba('', 'y') → 'yy'
@@ -119,10 +132,14 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
-
-
-# reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
-#
+    sp = []
+    for word in sentence.split(' '):
+        if len(word) >= 5:
+            sp.append(word[::-1])
+        else:
+            sp.append(word)
+    return ' '.join(sp)
+print(reverse_word("Hey fellow warriors"))
 # reverse_word("This is a test") == "This is a test"
 #
 # reverse_word("This is another test") == "This is rehtona test"
@@ -146,6 +163,9 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
+    result = []
+    for word in input_string.split():
+        result.append = ''.join(result)
 
 
 # Task 7:

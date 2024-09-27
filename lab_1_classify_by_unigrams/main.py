@@ -20,6 +20,9 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if type(text) != str:
+        return None
+
     en_text_list = []
     en_text_list = text.split()
     words_list = []

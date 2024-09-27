@@ -178,7 +178,9 @@ def detect_language(
             or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None
-    for k, v in unknown_profile['freq'].items() and profile_1['freq'].items() and profile_2['freq'].items():
+    for k, v in (unknown_profile['freq'].items()
+                 and profile_1['freq'].items()
+                 and profile_2['freq'].items()):
         if not isinstance(k, str) or not isinstance(v, (int, float)):
             return None
 
@@ -188,9 +190,10 @@ def detect_language(
             or not isinstance(mse_2_and_unknown, (int, float))):
         return None
     if mse_1_and_unknown < mse_2_and_unknown:
-        return profile_1['name']
+        result = profile_1['name']
     if mse_2_and_unknown < mse_1_and_unknown:
-        return profile_2['name']
+        result = profile_2['name']
+    return result
 
 
 def load_profile(path_to_file: str) -> dict | None:

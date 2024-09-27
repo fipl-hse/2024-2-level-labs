@@ -6,7 +6,16 @@ Language detection
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
-def tokenize(text):
+def tokenize(text: str) -> list[str] | None:
+    """
+    Split a text into tokens.
+    Convert the tokens into lowercase, remove punctuation, digits and other symbols
+    Args:
+        text (str): A text
+    Returns:
+        list[str] | None: A list of lower-cased tokens without punctuation
+    In case of corrupt input arguments, None is returned
+    """
     if not isinstance(text, str):
         return None
     extra = ',.:?!;%$#№"&()[]{}~’º01‘23456789 -\n><*=@'
@@ -20,7 +29,15 @@ def tokenize(text):
     return text_only_letters
 
 
-def calculate_frequencies(tokens):
+def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+    """
+    Calculate frequencies of given tokens.
+    Args:
+        tokens (list[str] | None): A list of tokens
+    Returns:
+        dict[str, float] | None: A dictionary with frequencies
+    In case of corrupt input arguments, None is returned
+    """
     if not isinstance(tokens, list):
         return None
     if isinstance(tokens, list):
@@ -37,7 +54,16 @@ def calculate_frequencies(tokens):
     return dictionary
 
 
-def create_language_profile(language, text):
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+    """
+    Create a language profile.
+    Args:
+        language (str): A language
+        text (str): A text
+    Returns:
+        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
+    In case of corrupt input arguments, None is returned
+    """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     dictionary = calculate_frequencies(tokenize(text))
@@ -45,7 +71,16 @@ def create_language_profile(language, text):
     return language_profile
 
 
-def calculate_mse(predicted, actual):
+def calculate_mse(predicted: list, actual: list) -> float | None:
+    """
+    Calculate mean squared error between predicted and actual values.
+    Args:
+        predicted (list): A list of predicted values
+        actual (list): A list of actual values
+    Returns:
+        float | None: The score
+    In case of corrupt input arguments, None is returned
+    """
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
     if isinstance(predicted, list):
@@ -68,7 +103,21 @@ def calculate_mse(predicted, actual):
     return mse
 
 
-def compare_profiles(unknown_profile, profile_to_compare):
+def compare_profiles(
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
+) -> float | None:
+    """
+    Compare profiles and calculate the distance using symbols.
+    Args:
+        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of an unknown profile
+        profile_to_compare (dict[str, str | dict[str, float]]): A dictionary of a profile
+            to compare the unknown profile to
+    Returns:
+        float | None: The distance between the profiles
+    In case of corrupt input arguments or lack of keys 'name' and
+    'freq' in arguments, None is returned
+    """
     # bad input check for unknown_profile:
     if not isinstance(unknown_profile, dict):
         return None
@@ -123,7 +172,22 @@ def compare_profiles(unknown_profile, profile_to_compare):
     return score
 
 
-def detect_language(unknown_profile, profile_1, profile_2):
+def detect_language(
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_1: dict[str, str | dict[str, float]],
+    profile_2: dict[str, str | dict[str, float]],
+) -> str | None:
+    """
+    Detect the language of an unknown profile.
+    Args:
+        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of a profile
+            to determine the language of
+        profile_1 (dict[str, str | dict[str, float]]): A dictionary of a known profile
+        profile_2 (dict[str, str | dict[str, float]]): A dictionary of a known profile
+    Returns:
+        str | None: A language
+    In case of corrupt input arguments, None is returned
+    """
     # bad input check for unknown_profile:
     if not isinstance(unknown_profile, dict):
         return None
@@ -153,7 +217,6 @@ def detect_language(unknown_profile, profile_1, profile_2):
         for i in profile_2['freq'].keys():
             if isinstance(i, str):
                 continue
-            #return None
             for ii in profile_2['freq'].values():
                 if isinstance(ii, (int, float)):
                     continue

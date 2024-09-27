@@ -53,13 +53,7 @@ def multiply_string(input_string: str, how_many: int) -> str:
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
-    result = input_string * how_many
-    return result
 
-print(multiply_string("Hi", 3))
-print(multiply_string("Hi", 2))
-print(multiply_string("Hi", 1))
-print(multiply_string("Hi", 0))
 # Function calls with expected result:
 # multiply_string('Hi', 2) → 'HiHi'
 # multiply_string('Hi', 3) → 'HiHiHi'
@@ -74,12 +68,7 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
-    result = input_string[:3] * how_many
-    return result
 
-print(front_times("Chocolate", 3))
-print(front_times("A", 4))
-print(front_times(" ", 4))
 
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'
@@ -96,12 +85,7 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
-    result = input_string[-2:] * 3
-    return result
 
-print(extra_end("Hello"))
-print(extra_end("ab"))
-print(extra_end("Hi"))
 # Function calls with expected result:
 # extra_end('Hello') → 'lololo'
 # extra_end('ab') → 'ababab'
@@ -115,15 +99,13 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
-    return first_string + second_string + second_string + first_string
 
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
 # make_abba('', 'y') → 'yy'
 
-print(make_abba("Hi", "Bye"))
-print(make_abba("Hi", "Bye"))
+
 
 # Task 5
 def reverse_word(sentence: str) -> str:
@@ -171,12 +153,7 @@ def combo_string(first_string: str, second_string: str) -> str | None:
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
-    if len(first_string) == len(second_string):
-        return None
-    if len(first_string) > len(second_string):
-        return f"{second_string}{first_string}{second_string}"
-    if len(first_string) < len(second_string):
-        return f"{first_string}{second_string}{first_string}"
+
 
 
 # combo_string('Hello', 'hi') → 'hiHellohi'
@@ -193,13 +170,7 @@ def string_splosion(input_string: str) -> str:
     Given the string, format it like in the example.
     """
     # student realisation goes here
-    length = len(input_string)
-    return ''.join(input_string[:i+1] for i in range(length))
 
-print(string_splosion('Code'))
-print(string_splosion('abc'))
-print(string_splosion('ab'))
-print(string_splosion('Kitten'))
 
 # Function calls with expected result:
 # string_splosion('Code') → 'CCoCodCode'

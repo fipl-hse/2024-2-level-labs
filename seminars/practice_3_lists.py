@@ -48,7 +48,7 @@ first_test = [1, 2, 3, [1, 2, 3]]
 # .pop() or .pop(index) – removes the item from the given index
 # (or the last item) and returns that item
 # .index(item) – returns the index of the first occurrence
-# .sort() – sorts the list in place i.e. modifies the original list
+# .sort() – sorts the list in place i.e modifies the original list
 # .reverse() – reverses the list in place
 # .copy() – returns a shallow copy of the list
 
@@ -61,7 +61,6 @@ def count_evens(nums: list) -> int:
     Return the number of even ints in the given array.
     """
     # student realization goes here
-
 
 
 # Function calls with expected result:

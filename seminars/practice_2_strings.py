@@ -155,6 +155,7 @@ def combo_string(first_string: str, second_string: str) -> str:
     """
     # student realisation goes here
 
+
 # combo_string('Hello', 'hi') → 'hiHellohi'
 # combo_string('hi', 'Hello') → 'hiHellohi'
 # combo_string('aaa', 'b') → 'baaab'
@@ -186,8 +187,6 @@ def string_match(first_string: str, second_string: str) -> int:
     is found at the same position in both strings.
     """
     # student realisation goes here
-
-
 
 # Function calls with expected result:
 # string_match('xxcaazz', 'xxbaaz') → 3

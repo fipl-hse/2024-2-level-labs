@@ -32,6 +32,7 @@ second_num = 6
 third_num = first_num / second_num
 print(f'Numbers: {first_num}, {second_num} and {third_num}')
 
+
 # Case 2: the second debugging case:
 if first_num * second_num == third_num:
     print('First number * second equals third number')

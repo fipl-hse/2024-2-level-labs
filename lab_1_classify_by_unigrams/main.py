@@ -20,6 +20,11 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    text = text.lower()
+    lst = []
+    for letter in text:
+        lst.append(letter)
+    return lst
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:

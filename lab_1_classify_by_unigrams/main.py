@@ -20,10 +20,8 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    file = open(text)
-    en_text = file.read()
     en_text_list = []
-    en_text_list = en_text.split()
+    en_text_list = text.split()
     words_list = []
 
     for i in range(len(en_text_list)):
@@ -35,25 +33,19 @@ def tokenize(text: str) -> list[str] | None:
 
     for j in range(len(words_list)):
         for i in range(len(words_list[j])):
-            letters_list.append(words_list[j][i])
+            if words_list[j][i].isalpha():
+                letters_list.append(words_list[j][i])
             i += 1
         j += 1
 
-    punct = ''.join(letters_list)
-    res = []
 
-    for k in range(len(punct)):
-        if punct[k].isalpha():
-            res.append(punct[k])
-
-    res = str(res).lower()
+    letters_list = str(letters_list).lower()
 
 
-    return res
+    return letters_list
 
 
-print(tokenize('assets\\texts\\de.txt'))
-
+print(tokenize('assets\en.txt'))
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """

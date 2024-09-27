@@ -14,8 +14,7 @@ def tokenize(text):
     for symbol in text:
         if symbol in extra:
             continue
-        else:
-            text_only_letters += symbol
+        text_only_letters += symbol
 
     text_only_letters = list(text_only_letters.lower())
     return text_only_letters
@@ -134,7 +133,7 @@ def detect_language(unknown_profile, profile_1, profile_2):
         for i in unknown_profile['freq'].keys():
             if isinstance(i, str):
                 continue
-            return None
+            #return None
         for i in unknown_profile['freq'].values():
             if isinstance(i, (int, float)):
                 continue

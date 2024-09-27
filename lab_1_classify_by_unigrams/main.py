@@ -66,8 +66,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
-
-    lang_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
+    
+    freq_dict = calculate_frequencies(tokenize(text))
+    if not freq_dict:
+        return None
+    
+    lang_profile = {"name": language, "freq": freq_dict}
     return lang_profile
 
 
@@ -122,16 +126,19 @@ def compare_profiles(
         return None
 
     all_keys = list(set(unknown_profile["freq"]) | set(profile_to_compare["freq"]))
-    corresp_input = [unknown_profile["freq"], profile_to_compare["freq"]]
-    corresp_output = [[], []]
+    unknown_profile_with_0s = []
+    profile_to_compare_with_0s = []
     for i in all_keys:
-        for j in range(2):
-            if not i in corresp_input[j]:
-                corresp_output[j].append(0)
-            else:
-                corresp_output[j].append(corresp_input[j][i])
+        if not i in unknown_profile["freq"]:
+            unknown_profile_with_0s.append(0)
+        else:
+            unknown_profile_with_0s.append(unknown_profile["freq"][i])
+        if not i in profile_to_compare["freq"]:
+            profile_to_compare_with_0s.append(0)
+        else:
+            profile_to_compare_with_0s.append(profile_to_compare["freq"][i])
 
-    return calculate_mse(corresp_output[1], corresp_output[0])
+    return calculate_mse(unknown_profile_with_0s, profile_to_compare_with_0s)
 
 
 def detect_language(
@@ -160,6 +167,8 @@ def detect_language(
 
     diff_unk_1 = compare_profiles(unknown_profile, profile_1)
     diff_unk_2 = compare_profiles(unknown_profile, profile_2)
+    if diff_unk_1 == None or diff_unk_2 == None:
+        return None
 
     if diff_unk_1 < diff_unk_2:
         res = str(profile_1["name"])

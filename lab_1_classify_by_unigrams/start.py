@@ -1,11 +1,8 @@
-import lab_1_classify_by_unigrams.main as m
-
 """
 Language detection starter
 """
-
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+import lab_1_classify_by_unigrams.main as m
 
 
 def main() -> None:
@@ -21,8 +18,10 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
 
     result = m.detect_language_advanced(m.create_language_profile('unknown', unknown_text),
-                                        m.collect_profiles(['assets/profiles/es.json', 'assets/profiles/fr.json',
-                                                            'assets/profiles/it.json', 'assets/profiles/ru.json',
+                                        m.collect_profiles(['assets/profiles/es.json',
+                                                            'assets/profiles/fr.json',
+                                                            'assets/profiles/it.json',
+                                                            'assets/profiles/ru.json',
                                                             'assets/profiles/tr.json']))
     print(result)
     m.print_report(result)

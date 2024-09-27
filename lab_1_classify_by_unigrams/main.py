@@ -1,13 +1,10 @@
-import json
-
 """
 Lab 1.
 
 Language detection
 """
-
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+import json
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -69,7 +66,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(language, str) or not isinstance(text, str) or len(language) == 0 or len(text) == 0:
+    if (not isinstance(language, str) or not isinstance(text, str)
+            or len(language) == 0 or len(text) == 0):
         return None
 
     profile_dict: dict[str, str | dict[str, float]] | None
@@ -90,7 +88,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if (not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) == 0 or len(actual) == 0
+    if (not isinstance(predicted, list) or not isinstance(actual, list)
+            or len(predicted) == 0 or len(actual) == 0
             or len(predicted) != len(actual)):
         return None
 
@@ -104,6 +103,16 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 
 def sort_dict(dictio):
+    """
+    Alphabetically sort the dictionary
+
+    Args:
+        dictio: A dictionary to be sorted
+
+    Returns:
+        sorted_dict: A sorted dictionary in alphabetical order
+
+    """
     sorted_list = sorted(dictio.items())
     sorted_dict = {}
     for key, value in sorted_list:
@@ -129,8 +138,9 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if ((not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or len(unknown_profile) == 0
-         or len(profile_to_compare) == 0) or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
+    if ((not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict)
+         or len(unknown_profile) == 0 or len(profile_to_compare) == 0)
+            or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
         return None
 
     profile_to_compare_freq = dict(profile_to_compare['freq'])
@@ -144,8 +154,10 @@ def compare_profiles(
         if profile_to_compare_freq.get(key) is None:
             profile_to_compare_freq.update({key: 0})
 
-    sorted_profile_to_compare = list(dict(sorted(profile_to_compare_freq.items(), key=lambda x: x[0])).values())
-    sorted_unknown_profile = list(dict(sorted(unknown_profile_freq.items(), key=lambda x: x[0])).values())
+    sorted_profile_to_compare = list(dict(sorted(profile_to_compare_freq.items(),
+                                                 key=lambda x: x[0])).values())
+    sorted_unknown_profile = list(dict(sorted(unknown_profile_freq.items(),
+                                              key=lambda x: x[0])).values())
 
     return calculate_mse(sorted_profile_to_compare, sorted_unknown_profile)
 
@@ -169,8 +181,9 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict)
-            or len(unknown_profile) == 0 or len(profile_1) == 0 or len(profile_2) == 0):
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict) or len(unknown_profile) == 0
+            or len(profile_1) == 0 or len(profile_2) == 0):
         return None
 
     mse_profile_1 = compare_profiles(unknown_profile, profile_1)
@@ -179,7 +192,7 @@ def detect_language(
 
     if mse_profile_1 == mse_profile_2:
         return sorted(lang_list)[0]
-    elif mse_profile_1 > mse_profile_2:
+    if mse_profile_1 > mse_profile_2:
         return profile_2['name']
     return profile_1['name']
 
@@ -292,8 +305,8 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if (not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list) or len(unknown_profile) == 0
-            or len(known_profiles) == 0):
+    if (not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list)
+            or len(unknown_profile) == 0 or len(known_profiles) == 0):
         return None
 
     result_list = []

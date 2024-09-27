@@ -189,6 +189,7 @@ def detect_language(
     if (not isinstance(mse_1_and_unknown, (int, float))
             or not isinstance(mse_2_and_unknown, (int, float))):
         return None
+    result = None
     if mse_1_and_unknown < mse_2_and_unknown:
         result = profile_1['name']
     if mse_2_and_unknown < mse_1_and_unknown:

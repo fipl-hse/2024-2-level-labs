@@ -4,7 +4,6 @@ Lab 1.
 Language detection
 """
 
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -13,10 +12,8 @@ def tokenize(text: str) -> list[str] | None:
         Split a text into tokens.
 
         Convert the tokens into lowercase, remove punctuation, digits and other symbols
-
         Args:
             text (str): A text
-
         Returns:
             list[str] | None: A list of lower-cased tokens without punctuation
 

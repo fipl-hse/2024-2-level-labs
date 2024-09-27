@@ -42,6 +42,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+
     eng_dict = {}
     for i in tokens:
         if i not in eng_dict.keys():

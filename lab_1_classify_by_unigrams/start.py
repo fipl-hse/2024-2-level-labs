@@ -20,8 +20,6 @@ def main():
         unknown_text = file_to_read_unk.read()
         unknown_profile = create_language_profile('unknown', unknown_text)
 
-    the_distance_between_en_and_unknown = compare_profiles(unknown_profile, profile_to_compare_en)
-    the_distance_between_de_and_unknown = compare_profiles(unknown_profile, profile_to_compare_de)
     answer = detect_language(unknown_profile, profile_to_compare_en, profile_to_compare_de)
 
     result = answer

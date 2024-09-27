@@ -4,7 +4,9 @@ Language detection starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
-from lab_1_classify_by_unigrams.main import create_language_profile, compare_profiles, detect_language
+from lab_1_classify_by_unigrams.main import (create_language_profile,
+                                             compare_profiles, detect_language)
+
 
 def main():
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:

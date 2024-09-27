@@ -167,15 +167,13 @@ def detect_language(
     if isinstance(detect_1, float) and isinstance(detect_2, float):
         if detect_1 < detect_2:
             lang = str(profile_1['name'])
-            return lang
         elif detect_1 == detect_2:
             a = [profile_1['name'], profile_2['name']]
             a.sort()
             lang = str(a[0])
-            return lang
         else:
             lang = str(profile_2['name'])
-            return lang
+        return lang
     return None
 
 

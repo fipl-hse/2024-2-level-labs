@@ -1,10 +1,3 @@
-a = 0
-b = a
-c = 0
-print(b, id(b), id(c))
-
-
-
 """
 Programming 2024
 Seminar 1

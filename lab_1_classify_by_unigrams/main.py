@@ -173,31 +173,25 @@ def detect_language(
         str | None: A language
     In case of corrupt input arguments, None is returned
     """
-    # bad input check for unknown_profile:
+    # bad input check:
     if (not isinstance(unknown_profile, dict)
             or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None
-    for k, v in unknown_profile['freq'].items():
+    for k, v in unknown_profile['freq'].items() and profile_1['freq'].items() and profile_2['freq'].items():
         if not isinstance(k, str) or not isinstance(v, (int, float)):
-            return None
-    # bad input check for profile_1:
-    for k1, v1 in profile_1['freq'].items():
-        if not isinstance(k1, str) or not isinstance(v1, (int, float)):
-            return None
-    # bad input check for profile_2:
-    for k2, v2 in profile_1['freq'].items():
-        if not isinstance(k2, str) or not isinstance(v2, (int, float)):
             return None
 
     mse_1_and_unknown = compare_profiles(unknown_profile, profile_1)
     mse_2_and_unknown = compare_profiles(unknown_profile, profile_2)
-    if not isinstance(mse_1_and_unknown, (int, float)) or not isinstance(mse_2_and_unknown, (int, float)):
+    if (not isinstance(mse_1_and_unknown, (int, float))
+            or not isinstance(mse_2_and_unknown, (int, float))):
         return None
     if mse_1_and_unknown < mse_2_and_unknown:
         return profile_1['name']
     if mse_2_and_unknown < mse_1_and_unknown:
         return profile_2['name']
+
 
 def load_profile(path_to_file: str) -> dict | None:
     """

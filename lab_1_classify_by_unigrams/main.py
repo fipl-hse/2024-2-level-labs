@@ -190,9 +190,9 @@ def load_profile(path_to_file: str) -> dict | None:
         return None
     with open(path_to_file, 'r', encoding='utf-8') as file_to_profile:
         profile = json.load(file_to_profile)
-    if isinstance(profile, dict):
-        return profile
-    return None
+    if not isinstance(profile, dict):
+        return None
+    return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:

@@ -25,8 +25,8 @@ def tokenize(text: str) -> list[str] | None:
             continue
         text_only_letters += symbol
 
-    text_only_letters = list(text_only_letters.lower())
-    return text_only_letters
+    text_only_letters_list = list(text_only_letters.lower())
+    return text_only_letters_list
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -174,7 +174,9 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
     # bad input check for unknown_profile:
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if (not isinstance(unknown_profile, dict)
+            or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
     for k, v in unknown_profile['freq'].items():
         if not isinstance(k, str) or not isinstance(v, (int, float)):

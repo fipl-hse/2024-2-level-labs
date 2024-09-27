@@ -33,21 +33,17 @@ def main() -> None:
     unknown_profile = create_language_profile('unknown', unknown_text)
 
     if (not isinstance(profiles, list)
-            or not isinstance(unknown_profile, dict)
-            or not all(isinstance(unknown_profile[key], str) for key in unknown_profile)
-            or not isinstance(unknown_profile['name'], str)
-            or not isinstance(unknown_profile['freq'], float)):
+            or not isinstance(unknown_profile, dict)):
         result = None
     else:
         detections = detect_language_advanced(unknown_profile, profiles)
+        if (not isinstance(detections, list)
+                or not all(isinstance(t, tuple) for t in detections)):
+            result = None
+        else:
+            print_report(detections)
+            result = 'AAAAA'
 
-    if (not isinstance(detections, list)
-            or not all(isinstance(t, tuple) for t in detections)):
-        result = None
-    else:
-         print_report(detections)
-
-    result = 'AAAAA'
     assert result, "Detection result is None"
 
 

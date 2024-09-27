@@ -87,13 +87,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
             or not all(isinstance(value, float) for value in frequencies.values())):
         return None
 
-    profile = {'name': language, 'freq': frequencies}
-    if (not isinstance(profile, dict)
-            or not all(isinstance(key, str) for key in profile)
-            or not all(isinstance(value, dict) for value in profile.values())):
-        return None
-
-    return profile
+    if frequencies is not None:
+        return {'name': language, 'freq': frequencies}
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -116,7 +112,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
 
     return float(sum((actual[i] - predicted[i]) ** 2
-                           for i in range(len(actual))) / len(actual))
+                     for i in range(len(actual))) / len(actual))
 
 
 def compare_profiles(
@@ -186,8 +182,10 @@ def detect_language(
             or not all(isinstance(key, str) for key in profile_2):
         return None
 
-    mse_1 = float(compare_profiles(unknown_profile, profile_1))
-    mse_2 = float(compare_profiles(unknown_profile, profile_2))
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if not isinstance(mse_1, float) or not isinstance(mse_2, float):
+        return None
 
     # if mse values differ
     if mse_1 > mse_2:
@@ -219,6 +217,9 @@ def load_profile(path_to_file: str) -> dict | None:
 
     with open(path_to_file, 'r', encoding='UTF-8') as file:
         profile = load(file)
+
+    if not isinstance(profile, dict):
+        return None
 
     return profile
 
@@ -278,10 +279,14 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     loaded_profiles = []
     for path in paths_to_profiles:
-        if preprocess_profile(load_profile(path)) is not None:
-            loaded_profiles.append(preprocess_profile(load_profile(path)))
+        profile_loaded = load_profile(path)
+        if isinstance(profile_loaded, dict):
+            profile_preprocessed = preprocess_profile(profile_loaded)
+            if isinstance(profile_preprocessed, dict):
+                loaded_profiles.append(profile_preprocessed)
         else:
             return None
+
     return loaded_profiles
 
 
@@ -309,8 +314,7 @@ def detect_language_advanced(
     for profile in known_profiles:
         distances.append(tuple((profile['name'], compare_profiles(unknown_profile, profile))))
 
-    distances = sorted(distances, key=lambda t: t[1])
-    return distances
+    return sorted(distances, key=lambda t: t[1])
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

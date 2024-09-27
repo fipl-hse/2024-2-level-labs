@@ -118,26 +118,28 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict):
-        if 'name' in unknown_profile and profile_to_compare:
-            for elem in unknown_profile['freq'].keys():
-                if elem not in profile_to_compare['freq']:
-                    profile_to_compare['freq'][elem] = 0.0
-            for elem in profile_to_compare['freq'].keys():
-                if elem not in unknown_profile['freq']:
-                    unknown_profile['freq'][elem] = 0.0
-            profile_to_compare['freq'] = dict(sorted(profile_to_compare['freq'].items()))
-            unknown_profile['freq'] = dict(sorted(unknown_profile['freq'].items()))
-            predicted = []
-            for elem in unknown_profile['freq'].values():
-                predicted.append(elem)
-            actual = []
-            for elem in profile_to_compare['freq'].values():
-                actual.append(elem)
-        else:
-            return None
-    else:
-        return None
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return  None
+    if 'name' not in unknown_profile or 'name' not in profile_to_compare:
+        return  None
+    for elem in unknown_profile['freq'].keys():
+        if elem not in profile_to_compare['freq']:
+            if not isinstance(profile_to_compare['freq'], dict):
+                return None
+            profile_to_compare['freq'][elem] = 0.0
+    for elem in profile_to_compare['freq'].keys():
+        if elem not in unknown_profile['freq']:
+            if not isinstance(unknown_profile['freq'], dict):
+                return None
+            unknown_profile['freq'][elem] = 0.0
+    profile_to_compare['freq'] = dict(sorted(profile_to_compare['freq'].items()))
+    unknown_profile['freq'] = dict(sorted(unknown_profile['freq'].items()))
+    predicted = []
+    for elem in unknown_profile['freq'].values():
+        predicted.append(elem)
+    actual = []
+    for elem in profile_to_compare['freq'].values():
+        actual.append(elem)
     profile_mse = calculate_mse(predicted, actual)
     return profile_mse
 

@@ -3,9 +3,9 @@ Lab 1.
 
 Language detection
 """
+import copy
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 import json
-import copy
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -131,11 +131,11 @@ def compare_profiles(
     sort_unk = dict(sorted(copy_unk_profile['freq'].items()))
     sort_comp = dict(sorted(profile_to_compare['freq'].items()))
     comp_values_lst = []
-    for i in sort_comp.values():
-        comp_values_lst.append(i)
+    for k in sort_comp.values():
+        comp_values_lst.append(k)
     unk_values_lst = []
-    for i in sort_unk.values():
-        unk_values_lst.append(i)
+    for k in sort_unk.values():
+        unk_values_lst.append(k)
     return calculate_mse(comp_values_lst, unk_values_lst)
 
 
@@ -299,3 +299,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
         return None
     for i in detections:
         print(f'{i[0]}: MSE {i[-1]:.5f}')
+    return None

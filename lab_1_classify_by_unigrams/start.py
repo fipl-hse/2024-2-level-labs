@@ -24,7 +24,7 @@ def main() -> None:
     unknown_profile = create_language_profile('unknown', unknown_text)
 
     if en_profile is None or de_profile is None or unknown_profile is None:
-        return None
+        return
 
     print(f'Tokens: {tokens}')
     print(f'Frequencies: {calculate_frequencies(tokens)}')
@@ -34,7 +34,7 @@ def main() -> None:
 
     result = f'Detected Language: {detect_language(unknown_profile, en_profile, de_profile)}'
     if result is None:
-        return None
+        return
     print(f'Detected Language: {result}')
 
     assert result, "Detection result is None"

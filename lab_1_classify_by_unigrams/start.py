@@ -34,7 +34,7 @@ def main() -> None:
 
     result = f'Detected Language: {detect_language(unknown_profile, en_profile, de_profile)}'
     if result is None:
-        return
+        return None
     print(f'Detected Language: {result}')
 
     assert result, "Detection result is None"

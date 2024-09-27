@@ -47,7 +47,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     dictionary = {}
     token_number = len(tokens)
     for letter in tokens:
-        if letter not in dictionary.keys():
+        if letter not in dictionary:
             dictionary[letter] = 1/token_number
         else:
             dictionary[letter] = (dictionary[letter]*token_number + 1)/token_number
@@ -96,8 +96,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
     error_score_list = []
-    for i in range(len(predicted)):
-        error_score = (predicted[i] - actual[i])**2
+    for i, el in enumerate(predicted):
+        error_score = (el - actual[i])**2
         error_score_list.append(error_score)
     mse = sum(error_score_list)/len(actual)
     return mse

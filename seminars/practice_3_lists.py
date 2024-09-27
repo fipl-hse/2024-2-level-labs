@@ -61,7 +61,7 @@ def count_evens(nums: list) -> int:
     Return the number of even ints in the given array.
     """
     # student realization goes here
-    return [num for num ]
+
 
 
 # Function calls with expected result:

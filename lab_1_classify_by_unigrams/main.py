@@ -23,12 +23,11 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     text = text.lower()
-    cleaned_text = ''
+    cleaned_text = []
     for i in text:
         if i.isalpha():
-            cleaned_text += i
-    result = list(cleaned_text)
-    return result
+            cleaned_text.append(i)
+    return cleaned_text
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:

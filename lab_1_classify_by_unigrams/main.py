@@ -34,9 +34,9 @@ def tokenize(text: str) -> list[str] | None:
 
     return tokens
 
-print(tokenize(text))
+#print(tokenize(text))
 
-tokens = ['h', 'e', 'y', 'h', 'o', 'w', 'a', 'r', 'e', 'y', 'o', 'u']
+#tokens = ['h', 'e', 'y', 'h', 'o', 'w', 'a', 'r', 'e', 'y', 'o', 'u']
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -53,6 +53,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not tokens or None:
         return None
 
+    for i in tokens:
+        if len(i) > 1 or not i:
+            return None
+
     token_freq = {}
 
     for token in tokens:
@@ -68,7 +72,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     return token_freq
 
-print(calculate_frequencies(tokens))
+#print(calculate_frequencies(tokens))
 
 
 
@@ -89,16 +93,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not language or not text:
         return None
 
-    token_freq = {}
-    for token in text.lower().split():
-        if token not in token_freq:
-            token_freq[token] = 1
-        else:
-            token_freq[token] += 1
+    tokens = tokenize(text)
 
-    total_tokens = len(text.lower().split())
-    for key, value in token_freq.items():
-        token_freq[key] = value / total_tokens
+    token_freq = calculate_frequencies(tokens)
+
 
     return {
         "name": language,
@@ -106,10 +104,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     }
 
 
-text = "Я люблю программировать на Python."
-language = 'Python'
-profile = create_language_profile(language, text)
-print(profile)
+#text = "Я люблю программировать."
+#language = 'Python'
+#profile = create_language_profile(language, text)
+#print(profile)
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

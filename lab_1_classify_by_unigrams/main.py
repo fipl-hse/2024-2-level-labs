@@ -52,7 +52,7 @@ def tokenize(text: str) -> list[str] | None:
     return res
 
 
-print(tokenize('assets\\texts\\en.txt'))
+print(tokenize('assets\\texts\\de.txt'))
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -67,6 +67,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    # tokens_summ = len(list)
+    #
+    # freq = {}
+    #
+    # for i in range(tokens_summ):
+
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

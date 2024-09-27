@@ -22,7 +22,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    tokens_list = [i.lower() for i in text if i.isalpha()]
+    tokens_list = [symbol.lower() for symbol in text if symbol.isalpha()]
     return tokens_list
 
 
@@ -46,7 +46,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         freq_dict.setdefault(i, 0)
         freq_dict[i] += 1
     for n in freq_dict:
-        freq_dict[n] = freq_dict[n] / len(tokens)
+        freq_dict[n] /= len(tokens)
 
     return freq_dict
 
@@ -68,7 +68,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     lang_profile = {"name": language, "freq": calculate_frequencies(tokenize(text))}
-
     return lang_profile
 
 
@@ -90,11 +89,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             len(predicted) == len(actual)):
         return None
 
-    n = len(predicted)
-    s = 0
-    for i in range(n):
-        s += (actual[i] - predicted[i]) ** 2
-    mse = s / n
+    num_of_diffs = len(predicted)
+    sum_of_diffs = 0
+    for i in range(num_of_diffs):
+        sum_of_diffs += (actual[i] - predicted[i]) ** 2
+    mse = sum_of_diffs / num_of_diffs
 
     return mse
 
@@ -132,8 +131,7 @@ def compare_profiles(
             else:
                 corresp_output[j].append(corresp_input[j][i])
 
-    mse = calculate_mse(corresp_output[1], corresp_output[0])
-    return mse
+    return calculate_mse(corresp_output[1], corresp_output[0])
 
 
 def detect_language(
@@ -160,10 +158,10 @@ def detect_language(
             isinstance(profile_2, dict)):
         return None
 
-    a = compare_profiles(unknown_profile, profile_1)
-    b = compare_profiles(unknown_profile, profile_2)
+    diff_unk_1 = compare_profiles(unknown_profile, profile_1)
+    diff_unk_2 = compare_profiles(unknown_profile, profile_2)
 
-    if a < b:
+    if diff_unk_1 < diff_unk_2:
         res = str(profile_1["name"])
         return res
     res = str(profile_2["name"])

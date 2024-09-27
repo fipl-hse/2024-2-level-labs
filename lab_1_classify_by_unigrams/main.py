@@ -121,24 +121,16 @@ def compare_profiles(
     # bad input check for unknown_profile:
     if not isinstance(unknown_profile, dict):
         return None
-    for i in unknown_profile['freq'].keys():
-        if isinstance(i, str):
-            continue
-    for i in unknown_profile['freq'].values():
-        if isinstance(i, (int, float)):
-            continue
-        return None
+    for k, v in unknown_profile['freq'].items():
+        if not isinstance(k, str) or not isinstance(v, (int, float)):
+            return None
 
     # bad input check for profile_to_compare:
     if not isinstance(profile_to_compare, dict):
         return None
-    for i in profile_to_compare['freq'].keys():
-        if isinstance(i, str):
-            continue
-    for i in profile_to_compare['freq'].values():
-        if isinstance(i, (int, float)):
-            continue
-        return None
+    for k, v in profile_to_compare['freq'].items():
+        if not isinstance(k, str) or not isinstance(v, (int, float)):
+            return None
     if len(profile_to_compare) == 2 and len(unknown_profile) == 2:
         freq_dict_2 = profile_to_compare['freq']
         freq_dict_1 = unknown_profile['freq']

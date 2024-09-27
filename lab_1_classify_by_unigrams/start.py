@@ -1,3 +1,4 @@
+from main import create_language_profile, detect_language
 """
 Language detection starter
 """
@@ -5,7 +6,6 @@ Language detection starter
 
 
 def main() -> None:
-    from main import create_language_profile
     """
     Launches an implementation
     """
@@ -16,12 +16,14 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
-    result = create_language_profile("en", en_text)
-    print(result)
+    english = create_language_profile("en", en_text)
+    german = create_language_profile("en", de_text)
+    unknown = create_language_profile("en", unknown_text)
+    print(detect_language(unknown,english,german))
+
+    result = 1
     assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
     main()
-
-

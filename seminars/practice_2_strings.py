@@ -75,7 +75,7 @@ def front_times(input_string: str, how_many: int) -> str:
 # front_times('Chocolate', 2) → 'ChoCho'
 # front_times('Chocolate', 3) → 'ChoChoCho'
 # front_times('Abc', 3) → 'AbcAbcAbc'
-print(front_times('A', 4))
+# front_times('A', 4) → 'AAAA'
 # front_times('', 4) → ''
 # front_times('Abc', 0) → ''
 
@@ -85,11 +85,14 @@ def extra_end(input_string: str) -> str:
     """
     Given the string, take its two last characters and display them three times.
     """
+    # student realisation goes here
+
 
 # Function calls with expected result:
 # extra_end('Hello') → 'lololo'
 # extra_end('ab') → 'ababab'
 # extra_end('Hi') → 'HiHiHi'
+# extra_end('Code') → 'dedede'
 
 
 # Task 4:
@@ -100,8 +103,10 @@ def make_abba(first_string: str, second_string: str) -> str:
     # student realisation goes here
 
 
+# make_abba('Hi', 'Bye') → 'HiByeByeHi'
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
+# make_abba('', 'y') → 'yy'
 
 
 # Task 5
@@ -116,6 +121,8 @@ def reverse_word(sentence: str) -> str:
     # student realisation goes here
 
 
+# reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
+#
 # reverse_word("This is a test") == "This is a test"
 #
 # reverse_word("This is another test") == "This is rehtona test"
@@ -147,7 +154,7 @@ def combo_string(first_string: str, second_string: str) -> str:
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
-    
+
 
 # combo_string('Hello', 'hi') → 'hiHellohi'
 # combo_string('hi', 'Hello') → 'hiHellohi'

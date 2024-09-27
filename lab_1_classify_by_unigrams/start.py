@@ -21,7 +21,7 @@ def main() -> None:
     de_profile = create_language_profile("de", de_text)
     unknown_profile = create_language_profile('unknown', unknown_text)
     if unknown_profile is None or en_profile is None or de_profile is None:
-        return None
+        return
     print(detect_language(unknown_profile, en_profile, de_profile))
     result = tokens
     assert result, "Detection result is None"

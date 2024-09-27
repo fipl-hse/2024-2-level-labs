@@ -72,6 +72,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
     freq_dict = calculate_frequencies(tokenize(text))
+    if freq_dict is None:
+        return None
     language_profile = {'name': language, 'freq': freq_dict}
     return language_profile
 
@@ -165,11 +167,14 @@ def detect_language(
         mse_prof_1 = compare_profiles(unknown_profile, profile_1)
         mse_prof_2 = compare_profiles(unknown_profile, profile_2)
         if mse_prof_1 is not None and mse_prof_2 is not None:
-            if mse_prof_1 < mse_prof_2:
-                return profile_1.get('name')
-            if mse_prof_1 > mse_prof_2:
-                return profile_2.get('name')
-            return min(profile_1.get('name'), profile_2.get('name'))
+            prof_1_name = profile_1.get('name')
+            prof_2_name = profile_2.get('name')
+            if isinstance(prof_1_name, str) and isinstance(prof_2_name, str):
+                if mse_prof_1 < mse_prof_2:
+                    return prof_1_name
+                if mse_prof_1 > mse_prof_2:
+                    return prof_2_name
+                return min(prof_1_name, prof_2_name)
     return None
 
 

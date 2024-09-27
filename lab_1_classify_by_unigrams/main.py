@@ -24,15 +24,14 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(text, str):
-        return
-    else:
-        text = text.lower().split()
-        split2 = []
-        for word in text:
-            for token in word:
-                if token.isalpha():
-                    split2 += token
-        return split2
+        return None
+    text = text.lower().split()
+    split2 = []
+    for word in text:
+        for token in word:
+            if token.isalpha():
+                split2 += token
+    return split2
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -167,13 +166,14 @@ def detect_language(
     if not (isinstance(unknown_profile, dict)) or not (isinstance(profile_1, dict)) or not (isinstance(profile_2,dict)) or not (
                 len(unknown_profile) == 2) or not (len(profile_1) == 2)  or not (len(profile_2) == 2):
         return None
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 is None or mse_2 is None:
+        return None
+    if mse_1 < mse_2:
+        return (profile_1["name"])
     else:
-        mse_1 = compare_profiles(unknown_profile, profile_1)
-        mse_2 = compare_profiles(unknown_profile, profile_2)
-        if mse_1 < mse_2:
-            return (profile_1["name"])
-        else:
-            return (profile_2["name"])
+        return (profile_2["name"])
 
 
 def load_profile(path_to_file: str) -> dict | None:

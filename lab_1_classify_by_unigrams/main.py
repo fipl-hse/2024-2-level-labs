@@ -179,14 +179,16 @@ def detect_language(
             and isinstance(profile_2, dict)):
         mse_1 = compare_profiles(unknown_profile, profile_1)
         mse_2 = compare_profiles(unknown_profile, profile_2)
-        if mse_1 < mse_2:
-            language = profile_1.get('name')
-        elif mse_2 < mse_1:
-            language = profile_2.get('name')
-        else:
-            lang_list = [profile_1.get('name'), profile_2.get('name')]
-            language = sorted(lang_list)[0]
-        return language
+        if isinstance(mse_1, float) and isinstance(mse_2, float):
+            if mse_1 < mse_2:
+                language = profile_1.get('name')
+            elif mse_2 < mse_1:
+                language = profile_2.get('name')
+            else:
+                lang_list = [profile_1.get('name'), profile_2.get('name')]
+                lang = sorted(lang_list)
+                language = lang[0]
+            return language
     return None
 
 
@@ -226,28 +228,29 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     'freq' in arguments, None is returned
     """
     if isinstance(profile, dict) and isinstance(profile.get('freq'), dict):
+        frequency = profile.get("freq")
         new_profile = {}
         name = {"name": profile.get("name")}
         new_profile.update(name)
-        frequency = profile.get("freq")
-        new_freq = {}
-        for tok in list(frequency.keys()):
-            if isinstance(tok, str) and len(tok) == 1 and tok.isalpha():
-                num = frequency.get(tok)
-                if tok.lower() not in new_freq:
-                    correct_tok = {tok.lower(): num}
-                    new_freq.update(correct_tok)
+        tokens = list(frequency.keys())
+        letters = {}
+        n_words = profile.get("n_words")[0]
+        for elem in tokens:
+            if isinstance(elem, str) and len(elem) == 1:
+                number = frequency.get(elem)
+                let = elem.lower()
+                if let not in letters.keys():
+                    new_token = {let: number}
+                    letters.update(new_token)
                 else:
-                    if isinstance(new_freq.get(tok), int):
-                        freq = num + frequency.get(tok.lower())
-                        correct_tok = {tok.lower(): freq}
-                        new_freq.update(correct_tok)
-        for elem in list(new_freq.keys()):
-            freq_index = round(new_freq.get(elem)/profile.get('n_words')[0], 4)
-            correct_tok = {elem: freq_index}
-            new_freq.update(correct_tok)
-        frequency_for_profile = {"freq": new_freq}
-        new_profile.update(frequency_for_profile)
+                    freq_add = letters.get(let)
+                    sum_freq = number + freq_add
+                    new_token = {let: sum_freq}
+                    letters.update(new_token)
+        for tok in letters:
+            freq_index = float(letters.get(tok))/n_words
+            letters[tok] = freq_index
+        new_profile["freq"] = letters
         return new_profile
     return None
 
@@ -290,6 +293,16 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
+    if isinstance(unknown_profile, dict) and isinstance(known_profiles, list):
+        compared_languages = {}
+        for profile in known_profiles:
+            if isinstance(profile, dict):
+                mse = compare_profiles(unknown_profile, profile)
+                lang_mse = {profile.get('name'): mse}
+                compared_languages.update(lang_mse)
+        data_to_return = list(compared_languages.items())
+        return data_to_return
+    return None
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

@@ -30,8 +30,7 @@ def tokenize(text: str) -> list[str] | None:
             if i not in needless:
                 tokens += i
         return tokens
-    else:
-        return None
+    return None
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -56,8 +55,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             else:
                 return None
         return freq
-    else:
-        return None
+    return None
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -76,8 +74,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     freq = calculate_frequencies(tokens)
     if freq is not None and tokens is not None and isinstance(language, str):
         return {'name': language, 'freq': calculate_frequencies(tokens)}
-    else:
-        return None
+    return None
+
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -177,10 +175,8 @@ def detect_language(
             return lang
         else:
             lang = str(profile_2['name'])
-
             return lang
-    else:
-        return None
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:

@@ -3,7 +3,11 @@ Lab 1.
 
 Language detection
 """
+from string import punctuation
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -20,6 +24,23 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(text, str):
+        return None
+
+
+    extra_symb = ',.:?!;%$#№"&()[]{}~0123456789‘’º -\n><*=@'
+    clean_text = ''
+    for symb in text:
+        if symb in extra_symb:
+            continue
+        else:
+            clean_text += symb
+
+    clean_text = list(clean_text.lower())
+    # print(clean_text)
+    return clean_text
+
+
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -34,6 +55,17 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    common_numb = len(tokens)
+    print(common_numb)
+
+    from collections import Counter
+
+    symbols = (tokens.lower()).split('')
+    print(symbols)
+
+    frequency_dict = Counter(symbols)
+
+    return frequency_dict
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -49,6 +81,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

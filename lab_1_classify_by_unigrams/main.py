@@ -5,6 +5,8 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+punct = '''!@#$%^&*()_-=+|/{}[]'"?.>,<~:;'''
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -20,6 +22,12 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    lowered_text = text.lower()
+    tokens = []
+    for elem in lowered_text:
+        if elem.isalpha():
+            tokens += elem
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -34,6 +42,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    eng_dict = {}
+    for i in tokens:
+        if i not in eng_dict.keys():
+            eng_dict.update({i: 1})
+        else:
+            eng_dict[i] += 1
+    return eng_dict
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

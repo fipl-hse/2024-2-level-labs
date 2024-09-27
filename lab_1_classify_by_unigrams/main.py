@@ -119,15 +119,11 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
     # bad input check for unknown_profile:
-    if not isinstance(unknown_profile, dict):
-        return None
     for k, v in unknown_profile['freq'].items():
         if not isinstance(k, str) or not isinstance(v, (int, float)):
             return None
 
     # bad input check for profile_to_compare:
-    if not isinstance(profile_to_compare, dict):
-        return None
     for k, v in profile_to_compare['freq'].items():
         if not isinstance(k, str) or not isinstance(v, (int, float)):
             return None

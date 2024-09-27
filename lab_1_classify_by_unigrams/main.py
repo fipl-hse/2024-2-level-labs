@@ -116,9 +116,13 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
     if (not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict)
-            or not any([isinstance(keys, str) for keys in unknown_profile])):
+            or not all(key in unknown_profile for key in ('name', 'freq'))
+            or not all(key in profile_to_compare for key in ('name', 'freq'))):
         return None
-    
+    tokens_union = set(profile_to_compare['freq'].keys()).union(unknown_profile['freq'].keys())
+    unknown_freq = [unknown_profile['freq'].get(token, 0) for token in tokens_union]
+    freq_to_compare = [profile_to_compare['freq'].get(token, 0) for token in tokens_union]
+    return round(calculate_mse(freq_to_compare, unknown_freq), 3)
 
 
 def detect_language(
@@ -140,6 +144,20 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    if ((not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)
+            or not all(key in unknown_profile for key in ('name', 'freq'))
+            or not all(key in profile_1 for key in ('name', 'freq')))
+            or not all(key in profile_2 for key in ('name', 'freq'))):
+        return None
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if mse_1 < mse_2:
+        return profile_1['name']
+    if mse_1 > mse_2:
+        return profile_2['name']
+    if mse_1 == mse_2:
+        return sorted([profile_1['name'], profile_2['name']])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:

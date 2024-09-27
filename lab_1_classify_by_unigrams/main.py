@@ -146,10 +146,10 @@ def detect_language(unknown_profile, profile_1, profile_2):
             if isinstance(i, str):
                 continue
             #return None
-        for i in profile_1['freq'].values():
-            if isinstance(i, (int, float)):
-                continue
-            return None
+            for ii in profile_1['freq'].values():
+                if isinstance(ii, (int, float)):
+                    continue
+                return None
     # bad input check for profile_2:
     if not isinstance(profile_2, dict):
         return None
@@ -158,10 +158,10 @@ def detect_language(unknown_profile, profile_1, profile_2):
             if isinstance(i, str):
                 continue
             #return None
-        for i in profile_2['freq'].values():
-            if isinstance(i, (int, float)):
-                continue
-            return None
+            for ii in profile_2['freq'].values():
+                if isinstance(ii, (int, float)):
+                    continue
+                return None
 
     mse_1_and_unknown = compare_profiles(unknown_profile, profile_1)
     mse_2_and_unknown = compare_profiles(unknown_profile, profile_2)

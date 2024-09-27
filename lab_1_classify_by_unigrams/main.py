@@ -192,34 +192,22 @@ def detect_language(
     if not isinstance(unknown_profile, dict):
         return None
     if isinstance(unknown_profile, dict):
-        for i in unknown_profile['freq'].keys():
-            if isinstance(i, str):
-                continue
-        for i in unknown_profile['freq'].values():
-            if isinstance(i, (int, float)):
-                continue
-            return None
+        for k, v in unknown_profile['freq'].items():
+            if not isinstance(k, str) or not isinstance(v, (int, float)):
+                return None
     # bad input check for profile_1:
     if not isinstance(profile_1, dict):
         return None
     if isinstance(profile_1, dict):
-        for i in profile_1['freq'].keys():
-            if isinstance(i, str):
-                continue
-            for ii in profile_1['freq'].values():
-                if isinstance(ii, (int, float)):
-                    continue
+        for k1, v1 in profile_1['freq'].items():
+            if not isinstance(k1, str) or not isinstance(v1, (int, float)):
                 return None
     # bad input check for profile_2:
     if not isinstance(profile_2, dict):
         return None
     if isinstance(profile_2, dict):
-        for i in profile_2['freq'].keys():
-            if isinstance(i, str):
-                continue
-            for ii in profile_2['freq'].values():
-                if isinstance(ii, (int, float)):
-                    continue
+        for k2, v2 in profile_1['freq'].items():
+            if not isinstance(k2, str) or not isinstance(v2, (int, float)):
                 return None
 
     mse_1_and_unknown = compare_profiles(unknown_profile, profile_1)

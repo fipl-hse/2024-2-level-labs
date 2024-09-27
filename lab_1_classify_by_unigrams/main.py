@@ -5,6 +5,7 @@ Language detection
 """
 import json
 
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -45,9 +46,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
-    freq = dict.fromkeys(tokens)
-    for letter in freq:
-        freq[letter] = tokens.count(letter) / len(tokens)
+    freq = {}
+    for letter in tokens:
+        freq[letter] = float(tokens.count(letter) / len(tokens))
     return freq
 
 
@@ -66,8 +67,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
-
+    tokens = tokenize(text)
+    freq = calculate_frequencies(tokens)
+    if not freq:
+        return None
+    return {'name': language, 'freq': freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -113,8 +117,9 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
     if (not isinstance(unknown_profile, dict) or
-            'name' not in unknown_profile or 'freq' not in unknown_profile or
-            not isinstance(profile_to_compare, dict) or
+            not isinstance(profile_to_compare, dict)):
+        return None
+    if ('name' not in unknown_profile or 'freq' not in unknown_profile or
             'name' not in profile_to_compare or 'freq' not in profile_to_compare):
         return None
     unknown_letters_list = list(unknown_profile['freq'].keys())
@@ -157,13 +162,24 @@ def detect_language(
     if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None
-    comparison_results = {
-        profile_1['name']: compare_profiles(unknown_profile, profile_1),
-        profile_2['name']: compare_profiles(unknown_profile, profile_2)
-    }
+    comparison_results: dict[str, float] = {}
+
+    comp_1 = compare_profiles(unknown_profile, profile_1)
+    if comp_1 is None or not isinstance(profile_1['name'], str):
+        return None
+    comparison_results[profile_1['name']] = comp_1
+    comp_2 = compare_profiles(unknown_profile, profile_1)
+    if comp_2 is None or not isinstance(profile_2['name'], str):
+        return None
+    comparison_results[profile_2['name']] = comp_2
+    # comparison_results: dict[str, float] = {
+    #     profile_1['name']: compare_profiles(unknown_profile, profile_1),
+    #     profile_2['name']: compare_profiles(unknown_profile, profile_2)
+    # }
     potential_languages = []
+    min_value = min(comparison_results.values())  # check Nones
     for name in comparison_results.keys():
-        if comparison_results[name] == min(comparison_results.values()):
+        if comparison_results[name] == min_value:
             potential_languages.append(name)
     return str(sorted(potential_languages)[0])
 

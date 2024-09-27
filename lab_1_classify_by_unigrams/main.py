@@ -118,15 +118,9 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    # bad input check for unknown_profile:
-    if isinstance(unknown_profile, dict):
+    # bad input check:
+    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict):
         for k, v in unknown_profile['freq'].items():
-            if not isinstance(k, str) or not isinstance(v, (int, float)):
-                return None
-
-    # bad input check for profile_to_compare:
-    if isinstance(profile_to_compare, dict):
-        for k, v in profile_to_compare['freq'].items():
             if not isinstance(k, str) or not isinstance(v, (int, float)):
                 return None
 
@@ -180,20 +174,16 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
     # bad input check for unknown_profile:
-    if not isinstance(unknown_profile, dict):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
     for k, v in unknown_profile['freq'].items():
         if not isinstance(k, str) or not isinstance(v, (int, float)):
             return None
     # bad input check for profile_1:
-    if not isinstance(profile_1, dict):
-        return None
     for k1, v1 in profile_1['freq'].items():
         if not isinstance(k1, str) or not isinstance(v1, (int, float)):
             return None
     # bad input check for profile_2:
-    if not isinstance(profile_2, dict):
-        return None
     for k2, v2 in profile_1['freq'].items():
         if not isinstance(k2, str) or not isinstance(v2, (int, float)):
             return None

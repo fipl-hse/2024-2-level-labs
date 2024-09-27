@@ -23,14 +23,11 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-
-    if isinstance(text, str):
-        text = text.lower()
-        tokens = []
-        for token in text:
-            if token.isalpha():
-                tokens.append(token)
-        return tokens
+    tokens = []
+    for token in text.lower():
+        if token.isalpha():
+            tokens.append(token)
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -45,21 +42,17 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(tokens, list):
+    if (not isinstance(tokens, list) or
+            not any([isinstance(token, str) for token in tokens])):
         return None
-
-    if isinstance(tokens, list):
-        freq_list = []
-        token_list = []
-        freq_dic = {}
-        for token in tokens:
-            if not isinstance(token, str):
-                return None
-            if isinstance(token, str):
-                freq_list.append(tokens.count(f"{token}") / len(tokens))
-                token_list.append(token)
-                freq_dic = dict(zip(token_list, freq_list))
-        return freq_dic
+    freq_list = []
+    token_list = []
+    freq_dic = {}
+    for token in tokens:
+        freq_list.append(tokens.count(token) / len(tokens))
+        token_list.append(token)
+        freq_dic = dict(zip(token_list, freq_list))
+    return freq_dic
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -75,21 +68,14 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(language, str) or not isinstance(text, str):
+    if (not isinstance(language, str) or not isinstance(text, str)
+            or not isinstance(tokenize(text), list)):
         return None
-    if isinstance(language, str) and isinstance(text, str):
-        tokens = tokenize(text)
+    calced_freq = calculate_frequencies(tokenize(text))
 
-        if not isinstance(tokens, list):
-            return None
-        if isinstance(tokens, list):
-            calced_freq = calculate_frequencies(tokens)
-
-            if not isinstance(calced_freq, dict):
-                return None
-            if isinstance(calced_freq, dict):
-                return dict(zip(['name', 'freq'],
-                                [f'{language}', calced_freq]))
+    if not isinstance(calced_freq, dict):
+        return None
+    return dict(zip(['name', 'freq'], [language, calced_freq]))
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -108,10 +94,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if (not isinstance(predicted, list) or not isinstance(actual, list)
             or len(predicted) != len(actual)):
         return None
-
-    if isinstance(predicted, list) and isinstance(actual, list) and len(predicted) == len(actual):
-        mse = sum((p - a) ** 2 for p, a in zip(predicted, actual)) / len(predicted)
-        return mse
+    return sum((p - a) ** 2 for p, a in zip(predicted, actual)) / len(predicted)
 
 
 def compare_profiles(
@@ -132,6 +115,10 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict)
+            or not any([isinstance(keys, str) for keys in unknown_profile])):
+        return None
+    
 
 
 def detect_language(

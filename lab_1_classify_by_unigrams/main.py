@@ -99,7 +99,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for i, el in enumerate(predicted):
         error_score = (el - actual[i])**2
         error_score_list.append(error_score)
-    mse = sum(error_score_list)/len(actual)
+    mse: float = sum(error_score_list) / len(actual)
     return mse
 
 

@@ -169,7 +169,7 @@ def compare_profiles(
     list1 = list(sorted1.values())
     list2 = list(sorted2.values())
     conclusion = calculate_mse(list2, list1)
-    if type(conclusion) is not float and conclusion <= 0:
+    if not isinstance(conclusion, float) or conclusion <= 0.0:
         return None
     return conclusion
 
@@ -271,13 +271,13 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         dictionary_unprocessed: dict | None = load_profile(profile)
         if not isinstance(dictionary_unprocessed, dict):
             return None
-        if preprocess_profile(dictionary_unprocessed) == None:
+        if preprocess_profile(dictionary_unprocessed) is None:
             return None
         processed_profile = preprocess_profile(dictionary_unprocessed)
         if not isinstance(processed_profile, dict):
             return None
         result: dict[str, str | dict[str, float]] | None = profiles_bad_input(processed_profile)
-        if result == None:
+        if result is None:
             return None
         list_for_dictionaries.append(result)
     return list_for_dictionaries
@@ -328,10 +328,7 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     """
     if not isinstance(detections, list):
         return None
-    if detect_language_advanced(detections) == None:
-        return None
-    result_list = detect_language_advanced(detections)
-    for tuple in result_list:
+    for tuple in detections:
         language = tuple[0]
         score = tuple[1]
         print(f'{language}: MSE {score:.5f}')

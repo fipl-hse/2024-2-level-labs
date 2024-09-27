@@ -25,7 +25,6 @@ def main() -> None:
     print(detect_language(unknown_profile, en_profile, de_profile))
     result = tokens
     assert result, "Detection result is None"
-    return result
 
 
 if __name__ == "__main__":

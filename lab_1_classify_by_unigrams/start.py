@@ -4,7 +4,6 @@ from main import calculate_frequencies, create_language_profile, detect_language
 Language detection starter
 """
 
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 def main() -> None:

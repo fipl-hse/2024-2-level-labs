@@ -5,7 +5,6 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-
 def tokenize(text: str) -> list[str] | None:
     """
        Split a text into tokens.
@@ -20,10 +19,14 @@ def tokenize(text: str) -> list[str] | None:
 
        In case of corrupt input arguments, None is returned
     """
+    if (type(text)) != str:
+        return None
     letters = []
     for letter in text:
         if letter.isalpha():
             letters.append(letter.lower())
+    if len(letters) == 0:
+        return None
     return letters
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -38,6 +41,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
         In case of corrupt input arguments, None is returned
     """
+    if (type(tokens)) != list:
+        return None
+    else:
+        for i in tokens:
+            if (type(i)) != str:
+                return None
     vocabulary = {}
     lenght = len(tokens)
     tokens_set = list(set(tokens))
@@ -60,15 +69,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
         In case of corrupt input arguments, None is returned
     """
+    if (type(language)) != str or (type(text)) != str:
+        return None
     profile = {}
     frequency = calculate_frequencies(tokenize(text))
-    if not frequency:
-        return None
-    else:
-        profile['name'] = language
-        profile['freq'] = frequency
-        return profile
-
+    profile['name'] = language
+    profile['freq'] = frequency
+    return profile
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -83,15 +90,16 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if len(predicted) != len(actual):
+    if (type(predicted)) != list or (type(actual)) != list or len(predicted) != len(actual):
         return None
     else:
         n = len(predicted)
     summa = 0
-    for i in range(n-1):
-        summa += predicted[i]-actual[i]
-    mse = (summa**2)/n
+    for i in range(n):
+        summa += (actual[i]-predicted[i])**2
+    mse = summa/n
     return mse
+
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -111,17 +119,27 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    unknown_profile_freq = list(unknown_profile["freq"].values())
-    profile_to_compare_freq = list(profile_to_compare["freq"].values())
-    letters = sorted(list(set(unknown_profile["freq"].keys() | set(profile_to_compare["freq"].keys()))))
-    while len(unknown_profile_freq) != len(letters):
-        unknown_profile_freq.append(0)
-    while len(profile_to_compare_freq) != len(letters):
-        profile_to_compare_freq.append(0)
-    mse = calculate_mse(predicted=unknown_profile_freq, actual=profile_to_compare_freq)
-    return round(mse, 3)
+    try:
+        if type(unknown_profile["name"]) == str and type(profile_to_compare["name"]) == str:
+            pass
+    except:
+        return None
+    if not (type(unknown_profile)) == dict or not (type(profile_to_compare)) == dict:
+        return None
+    else:
+        if not (type(unknown_profile["freq"])) == dict or not (type(profile_to_compare["freq"])) == dict:
+            return None
+    vocabulary = set(unknown_profile['freq'].keys()) | set(profile_to_compare['freq'].keys())
+    actual = []
+    predicted = []
+    for letter in vocabulary:
+        actual.append(unknown_profile['freq'].get(letter, 0))
+    for letter in vocabulary:
+        predicted.append(profile_to_compare['freq'].get(letter,0))
 
-print(compare_profiles(unknown_profile=create_language_profile(language="en", text="ab"), profile_to_compare=create_language_profile(language="en", text="bc")))
+    mse = calculate_mse(predicted=predicted, actual=actual)
+
+    return round(mse, 3)
 
 
 def detect_language(
@@ -143,6 +161,32 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    try:
+        if type(unknown_profile["name"]) == str and type(profile_1["name"]) == str and type(profile_2["name"]) == str:
+            pass
+    except:
+        return None
+    if not (type(unknown_profile)) == dict or not (type(profile_1)) == dict or not (type(profile_2)) == dict:
+        return None
+    else:
+        if not (type(unknown_profile["freq"])) == dict or not (type(profile_1["freq"])) == dict or not (type(profile_2["freq"])) == dict:
+            return None
+    voc_language = {}
+    voc_language[f"{profile_1['name']}"] = compare_profiles(unknown_profile, profile_1)
+    voc_language[f"{profile_2['name']}"] = compare_profiles(unknown_profile, profile_2)
+    min_value = 1
+    min_key = ''
+    for key, value in voc_language.items():
+        if value < min_value:
+            min_value = value
+            min_key = key
+        elif value == min_value:
+            sorted_languages = sorted(list(voc_language.keys()))
+            min_key = sorted_languages[0]
+    return min_key
+
+
+
 
 
 def load_profile(path_to_file: str) -> dict | None:

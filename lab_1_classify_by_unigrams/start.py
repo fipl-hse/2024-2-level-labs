@@ -16,6 +16,10 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
     result = detect_language
+    if not isinstance(create_language_profile('unknown', unknown_text), dict)\
+                      or not isinstance(create_language_profile('english', en_text), dict)\
+                      or not isinstance(create_language_profile('deutsch', de_text), dict):
+        return None
     print(detect_language(create_language_profile('unknown', unknown_text),
                           create_language_profile('english', en_text),
                           create_language_profile('deutsch', de_text)))

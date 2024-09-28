@@ -31,5 +31,29 @@ def main() -> None:
     # assert result, "Detection result is None"
 
 
+unknown_profile = {
+            'name': 'unk',
+            'freq': {
+                'm': 0.0909, 'e': 0.0909, 'h': 0.1818, 'p': 0.1818,
+                'y': 0.0909, 's': 0.0909, 'n': 0.0909, 'a': 0.1818
+            }
+        }
+
+en_profile = {
+    'name': 'en',
+    'freq': {
+        'p': 0.2, 'y': 0.1, 'e': 0.1, 'h': 0.2,
+        'a': 0.2, 'm': 0.1, 'n': 0.1
+    }
+}
+
+de_profile = {'name': 'de',
+              'freq': {
+                  'n': 0.0666, 's': 0.0333, 'a': 0.0666, 'm': 0.0666,
+                  't': 0.0666, 'i': 0.1333, 'w': 0.0666, 'ß': 0.0333,
+                  'ö': 0.0333, 'e': 0.1, 'h': 0.1666, 'c': 0.1666}}
+
+detect_language(unknown_profile, de_profile,en_profile)
+
 if __name__ == "__main__":
     main()

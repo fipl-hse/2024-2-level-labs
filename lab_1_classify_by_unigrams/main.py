@@ -5,7 +5,6 @@ Language detection
 """
 import json
 
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -26,9 +25,9 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     list_of_letters = []
-    for character in text:
+    for character in text.lower():
         if character.isalpha():
-            list_of_letters.append(character.lower())
+            list_of_letters.append(character)
     return list_of_letters
 
 
@@ -90,17 +89,17 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if (not isinstance(predicted, list) or not isinstance(actual, list) or
             not len(actual) == len(predicted)):
         return None
-    n = len(actual)
+    values_count = len(actual)
     mse = 0.0
-    for i in range(n):
+    for i in range(values_count):
         mse += ((actual[i] - predicted[i]) ** 2)
-    mse /= n
+    mse /= values_count
     return mse
 
 
 def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -168,14 +167,11 @@ def detect_language(
     if comp_1 is None or not isinstance(profile_1['name'], str):
         return None
     comparison_results[profile_1['name']] = comp_1
-    comp_2 = compare_profiles(unknown_profile, profile_1)
+    comp_2 = compare_profiles(unknown_profile, profile_2)
     if comp_2 is None or not isinstance(profile_2['name'], str):
         return None
     comparison_results[profile_2['name']] = comp_2
-    # comparison_results: dict[str, float] = {
-    #     profile_1['name']: compare_profiles(unknown_profile, profile_1),
-    #     profile_2['name']: compare_profiles(unknown_profile, profile_2)
-    # }
+
     potential_languages = []
     min_value = min(comparison_results.values())  # check Nones
     for name in comparison_results.keys():
@@ -199,7 +195,10 @@ def load_profile(path_to_file: str) -> dict | None:
     if not isinstance(path_to_file, str):
         return None
     with open(path_to_file, 'r', encoding="utf8") as profile_file:
-        return json.load(profile_file)
+        dictionary = json.load(profile_file)
+    if not isinstance(dictionary, dict):
+        return None
+    return dictionary
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -233,7 +232,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

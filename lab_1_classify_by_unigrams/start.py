@@ -1,4 +1,4 @@
-from lab_1_classify_by_unigrams.main import calculate_frequencies, create_language_profile, detect_language, tokenize
+from main import calculate_frequencies, create_language_profile, detect_language, tokenize
 
 """
 Language detection starter
@@ -21,8 +21,11 @@ def main() -> None:
     print(result)
     print(calculate_frequencies(result))
     print(create_language_profile('en', en_text))
-    print(detect_language(create_language_profile('un', unknown_text), create_language_profile('en', en_text),
-                          create_language_profile('de', de_text)))
+    profile_en = create_language_profile('en', en_text)
+    profile_de = create_language_profile('de', de_text)
+    profile_un = create_language_profile('un', unknown_text)
+    if profile_un and profile_en and profile_de:
+        print(detect_language(profile_unk, profile_en, profile_de))
     assert result, "Detection result is None"
 
 

@@ -147,14 +147,14 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(
-            profile_1, dict) or not isinstance(profile_2, dict):
-        return None
-    if 'freq' not in profile_1 or 'freq' not in profile_2 or 'freq' not in unknown_profile:
+    if not all(
+            isinstance(profile, dict) and 'freq' in profile and 'name' in profile
+            for profile in (unknown_profile, profile_1, profile_2)
+    ):
         return None
     distance_1 = compare_profiles(unknown_profile, profile_1)
     distance_2 = compare_profiles(unknown_profile, profile_2)
-    if not isinstance(profile_2['name'], str) or not isinstance(profile_1['name'], str):
+    if not all(isinstance(profile['name'], str) for profile in (profile_1, profile_2)):
         return None
     if distance_1 is None:
         return profile_2['name'] if distance_2 is not None else None

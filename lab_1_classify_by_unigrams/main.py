@@ -25,7 +25,8 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text = text.lower().split()
+    text = text.lower()
+    text = text.split()
     split2 = []
     for word in text:
         for token in word:
@@ -80,9 +81,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
+    tokenized_text = tokenize(text)
     return {
         'name': language,
-        'freq': calculate_frequencies(tokenize(text))
+        'freq': calculate_frequencies(tokenized_text)
     }
 
 
@@ -127,12 +129,14 @@ def compare_profiles(
     """
     if not (isinstance(unknown_profile, dict)) or not (isinstance(profile_to_compare, dict)) or not (len(unknown_profile) ==2) or not (len(profile_to_compare) == 2):
         return None
-    for i in unknown_profile['freq']:
-        if i not in profile_to_compare['freq']:
-            profile_to_compare['freq'][i] = 0
-    for i in profile_to_compare['freq']:
-        if i not in unknown_profile['freq']:
-            unknown_profile['freq'][i] = 0
+    unknown_frequency = unknown_profile['freq']
+    comparing_frequency = profile_to_compare['freq']
+    for i in unknown_frequency:
+        if i not in comparing_frequency:
+            comparing_frequency[i] = 0
+    for i in comparing_frequency:
+        if i not in unknown_frequency:
+            unknown_frequency[i] = 0
     sorted_unknown = dict(sorted(unknown_profile['freq'].items()))
     sorted_compare = dict(sorted(profile_to_compare['freq'].items()))
     sort_comp_list = []
@@ -168,12 +172,14 @@ def detect_language(
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
+    name1 = profile_1['name']
+    name2 = profile_2['name']
     if mse_1 is None or mse_2 is None:
         return None
     if mse_1 < mse_2:
-        return (profile_1["name"])
+        return name1
     else:
-        return (profile_2["name"])
+        return name2
 
 
 def load_profile(path_to_file: str) -> dict | None:

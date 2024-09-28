@@ -16,9 +16,12 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
     result = 1
+    unknown_language_profile = create_language_profile('unknown',unknown_text)
+    en_language_profile = create_language_profile('en',en_text)
+    de_language_profile = create_language_profile('de',de_text)
     print(tokenize(en_text))
     print(create_language_profile('en',en_text))
-    print(detect_language(create_language_profile('unknown',unknown_text),create_language_profile('en',en_text),create_language_profile('de',de_text)))
+    print(detect_language(unknown_language_profile,en_language_profile,de_language_profile))
 
     assert result, "Detection result is None"
 

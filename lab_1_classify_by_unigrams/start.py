@@ -1,8 +1,9 @@
-from main import calculate_frequencies, create_language_profile, detect_language, tokenize
+from lab_1_classify_by_unigrams.main import calculate_frequencies, create_language_profile, detect_language, tokenize
 
 """
 Language detection starter
 """
+
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 

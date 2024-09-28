@@ -90,7 +90,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not (isinstance(predicted, list) and
             isinstance(actual, list) and
             len(predicted) == len(actual) and
-            len(predicted) == 0):
+            len(predicted) != 0):
         return None
 
     num_of_diffs = len(predicted)
@@ -124,7 +124,7 @@ def compare_profiles(
             all("name" in a for a in (unknown_profile, profile_to_compare)) and
             all("freq" in b for b in (unknown_profile, profile_to_compare))):
         return None
-    
+
     all_keys = list(set(unknown_profile["freq"]) | set(profile_to_compare["freq"]))
     unknown_profile_with_0s = []
     profile_to_compare_with_0s = []
@@ -167,7 +167,7 @@ def detect_language(
 
     diff_unk_1 = compare_profiles(unknown_profile, profile_1)
     diff_unk_2 = compare_profiles(unknown_profile, profile_2)
-    if diff_unk_1 is None or diff_unk_2 is None:
+    if not (isinstance(diff_unk_1, float) and isinstance(diff_unk_2, float)):
         return None
 
     if diff_unk_1 < diff_unk_2:

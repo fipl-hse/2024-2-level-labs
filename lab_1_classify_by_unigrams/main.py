@@ -61,14 +61,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     tokens = tokenize(text)
+    frequency = calculate_frequencies(tokens)
 
-    if tokens is None or not isinstance(text, str) or any(
-            not isinstance(token, str) for token in tokens):
-        return None
-    if calculate_frequencies(tokens) is None:
+    if tokens is None or not isinstance(text, str) or any(not isinstance(
+            token, str) for token in tokens) or frequency is None:
         return None
 
-    return {'name': language, 'freq': calculate_frequencies(tokens)}
+    return {'name': language, 'freq': frequency}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -112,14 +111,12 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
-        return None
-    if 'name' not in unknown_profile or 'freq' not in unknown_profile or 'name' not \
-            in profile_to_compare or 'freq' not in profile_to_compare:
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or 'name' not in \
+            unknown_profile or 'freq' not in unknown_profile or 'name' not in profile_to_compare or 'freq' \
+            not in profile_to_compare:
         return None
     unknown_freq = unknown_profile['freq']
     compare_freq = profile_to_compare['freq']
-
     if not isinstance(unknown_freq, dict) or not isinstance(compare_freq, dict):
         return None
     tokens = list(set(unknown_freq.keys()) | set(compare_freq.keys()))
@@ -161,10 +158,8 @@ def detect_language(
         return None
     if distance_1 is None and distance_2 is None:
         return None
-    if distance_1 is None or distance_2 < distance_1:
+    if distance_1 is None or (distance_2 is not None and distance_2 < distance_1):
         return profile_2['name']
-    if distance_2 is None or distance_2 > distance_1:
-        return profile_1['name']
     return min(profile_1['name'], profile_2['name'])
 
 

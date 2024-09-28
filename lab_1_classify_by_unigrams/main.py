@@ -147,7 +147,8 @@ def compare_profiles(
     unknown_profile_freq = unknown_profile['freq']
     if not isinstance(unknown_profile_freq, dict):
         return None
-    unknown_sorted = [(unknown_profile_freq[char] if char in unknown_profile_freq else 0.0) for char in all_chars]
+    unknown_sorted = [(unknown_profile_freq[char] if char in unknown_profile_freq else 0.0)
+                      for char in all_chars]
 
     profile_to_compare_freq = profile_to_compare['freq']
     if not isinstance(profile_to_compare_freq, dict):
@@ -180,9 +181,8 @@ def detect_language(
 
     # checking input
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
-            or not isinstance(profile_2, dict):
-        return None
-    if not all(isinstance(key, str) for key in unknown_profile) \
+            or not isinstance(profile_2, dict) \
+            or not all(isinstance(key, str) for key in unknown_profile) \
             or not all(isinstance(key, str) for key in profile_1) \
             or not all(isinstance(key, str) for key in profile_2):
         return None

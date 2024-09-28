@@ -162,10 +162,8 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)\
-            or not isinstance(profile_2, dict):
-        return None
-    if not all(isinstance(key,str) for key in unknown_profile) or \
+    if not all(isinstance(profile, dict) for profile in [unknown_profile, profile_1, profile_2]) or\
+            not all(isinstance(key,str) for key in unknown_profile) or \
             not all(isinstance(key, str) for key in profile_1) or\
             not all(isinstance(key,str) for key in profile_2):
         return None
@@ -174,13 +172,13 @@ def detect_language(
     if not isinstance(mse_unk_p1, float) or not isinstance(mse_unk_p2, float):
         return None
     if mse_unk_p1 > mse_unk_p2:
-        return profile_2.get('name')
+        return str(profile_2.get('name'))
     if mse_unk_p1 < mse_unk_p2:
-        return profile_1.get('name')
+        return str(profile_1.get('name'))
     if mse_unk_p1 == mse_unk_p2:
         sort_lang = [profile_1['name'], profile_2['name']]
         sort_lang.sort()
-        return sort_lang[0]
+        return str(sort_lang[0])
     return None
 
 

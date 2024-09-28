@@ -21,14 +21,14 @@ def main() -> None:
     profile_1 = funcs.create_language_profile("en", en_text)
     profile_2 = funcs.create_language_profile("de", de_text)
 
-    if all(isinstance(prof, dict) for prof in (
-        unknown_profile, profile_1, profile_2
-    )):
+    if (isinstance(unknown_profile, dict) and
+        isinstance(profile_1, dict) and
+        isinstance(profile_2, dict)):
         result = funcs.detect_language(unknown_profile, profile_1, profile_2)
     else:
         result = None
-    assert result, "Detection result is None"
     print(result)
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

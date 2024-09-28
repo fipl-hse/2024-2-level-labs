@@ -27,6 +27,10 @@ def main() -> None:
     result = None
     if isinstance(unknown_profile, dict) and isinstance(profiles, list):
         result = funcs.detect_language_advanced(unknown_profile, profiles)
+    if (isinstance(result, list) and
+        all(isinstance(pair, tuple) for pair in result) and
+        all(isinstance(pair[0], str) for pair in result) and
+        all(isinstance(pair[1], float) for pair in result)):
         funcs.print_report(result)
     assert result, "Detection result is None"
 

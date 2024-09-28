@@ -26,7 +26,6 @@ def tokenize(text: str) -> list[str] | None:
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
        Calculate frequencies of given tokens.
-
        Args:
            tokens (list[str] | None): A list of tokens
 

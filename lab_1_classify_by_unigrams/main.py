@@ -180,8 +180,7 @@ def detect_language(
     """
 
     # checking input
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
-            or not isinstance(profile_2, dict) \
+    if not all(isinstance(profile, dict) for profile in [unknown_profile, profile_1, profile_2]) \
             or not all(isinstance(key, str) for key in unknown_profile) \
             or not all(isinstance(key, str) for key in profile_1) \
             or not all(isinstance(key, str) for key in profile_2):

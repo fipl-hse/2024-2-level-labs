@@ -1,7 +1,7 @@
 """
 Language detection starter
 """
-from lab_1_classify_by_unigrams import main
+from lab_1_classify_by_unigrams import main as func
 
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable
@@ -16,13 +16,13 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result = main.tokenize(en_text)
+    result = func.tokenize(en_text)
     print(result)
-    print(main.calculate_frequencies(result))
-    print(main.create_language_profile('en', en_text))
-    print(main.detect_language(main.create_language_profile(
-        'un', unknown_text), main.create_language_profile('de', de_text), main.create_language_profile(
-        'en', en_text)))
+    print(func.calculate_frequencies(result))
+    print(func.create_language_profile('en', en_text))
+    print(func.detect_language(func.create_language_profile(
+        'un', unknown_text), func.create_language_profile(
+        'de', de_text), func.create_language_profile('en', en_text)))
     assert result, "Detection result is None"
 
 

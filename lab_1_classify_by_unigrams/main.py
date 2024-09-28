@@ -4,6 +4,7 @@ Lab 1.
 Language detection
 """
 
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -19,7 +20,6 @@ def tokenize(text: str) -> list[str] | None:
 
         In case of corrupt input arguments, None is returned
         """
-
     if not isinstance(text, str):
         return None
     return [symbol.lower() for symbol in text if symbol.isalpha()]
@@ -92,7 +92,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    return None
+    if len(actual) == 0 or len(actual) != len(predicted):
+        return None
+    if not all(isinstance(predicted_values, (int, float)) for predicted_values in predicted) or not all(
+            isinstance(actual_values, (int, float)) for actual_values in actual):
+        return None
+    return sum([(actual[i] - predicted[i]) ** 2 for i in range(len(actual))]) / len(actual)
 
 
 def compare_profiles(
@@ -113,8 +118,27 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    return None
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+    if 'name' not in unknown_profile or 'freq' not in unknown_profile:
+        return None
+    if 'name' not in profile_to_compare or 'freq' not in profile_to_compare:
+        return None
+    tokens = []
+    for token in unknown_profile['freq']:
+        if token not in tokens:
+            tokens.append(token)
 
+    for token in profile_to_compare['freq']:
+        if token not in tokens:
+            tokens.append(token)
+    actual_values = []
+    predicted_values = []
+    for token in tokens:
+        actual_values.append(unknown_profile['freq'][token] if token in unknown_profile['freq'] else 0)
+        predicted_values.append(profile_to_compare['freq'][token] if token in profile_to_compare['freq'] else 0)
+
+    return calculate_mse(predicted_values, actual_values)
 
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
@@ -135,8 +159,22 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    return None
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+        return None
+    if 'freq' not in profile_1 or 'freq' not in profile_2:
+        return None
+    if compare_profiles(unknown_profile, profile_1) is None and compare_profiles(unknown_profile, profile_2) is None:
+        return None
+    elif compare_profiles(unknown_profile, profile_1) is None:
+        return profile_2['name']
+    elif compare_profiles(unknown_profile, profile_2) is None:
+        return profile_1['name']
 
+    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+        return profile_1['name']
+    if compare_profiles(unknown_profile, profile_2) < compare_profiles(unknown_profile, profile_1):
+        return profile_2['name']
+    return min(profile_1['name'], profile_2['name'])
 
 def load_profile(path_to_file: str) -> dict | None:
     """

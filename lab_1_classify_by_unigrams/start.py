@@ -1,4 +1,4 @@
-from main import calculate_frequencies, create_language_profile, tokenize
+from main import calculate_frequencies, create_language_profile, detect_language, tokenize
 
 """
 Language detection starter
@@ -21,6 +21,8 @@ def main() -> None:
     print(result)
     print(calculate_frequencies(result))
     print(create_language_profile('en', en_text))
+    print(detect_language(create_language_profile('un', unknown_text), create_language_profile('en', en_text),
+                          create_language_profile('de', de_text)))
     assert result, "Detection result is None"
 
 

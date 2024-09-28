@@ -23,9 +23,9 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
         unknown_profile = create_language_profile('unknown', unknown_text)
 
-    if ( isinstance(unknown_profile, dict)
-            or isinstance(profile_to_compare_en, dict)
-            or isinstance(profile_to_compare_de, dict)):
+    if (isinstance(unknown_profile, dict)
+            and isinstance(profile_to_compare_en, dict)
+            and isinstance(profile_to_compare_de, dict)):
 
         answer = detect_language(unknown_profile, profile_to_compare_en, profile_to_compare_de)
 

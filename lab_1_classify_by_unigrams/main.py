@@ -215,6 +215,23 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
+    if (not isinstance(profile,dict) or 'name' not in profile or
+            'n_words' not in profile or 'freq' not in profile):
+        return None
+    unigram_count = profile['n_words'][0]
+    del profile['n_words']
+    profile_processed ={}
+    for token, freq in profile['freq'].items():
+        if len(token) == 1:
+            token = token.lower()
+            if token in profile_processed:
+                profile_processed[token] += freq
+            else:
+                profile_processed[token] = freq
+    for token, freq in profile_processed.items():
+        profile_processed[token] /= unigram_count
+    profile['freq'] = profile_processed
+    return profile
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -229,6 +246,19 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(paths_to_profiles, list):
+        return None
+    loaded_profiles =[]
+    for path in paths_to_profiles:
+        profile = load_profile(path)
+        if not isinstance(profile,dict):
+            return None
+        profile = preprocess_profile(profile)
+        if not isinstance(profile, dict):
+            return None
+        loaded_profiles.append(profile)
+    return loaded_profiles
+
 
 
 def detect_language_advanced(
@@ -247,6 +277,16 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
+    # if not isinstance(unknown_profile, dict) or not isinstance(known_profiles,list):
+    #     return None
+    # score_list =[]
+    # for known_profile in known_profiles:
+    #     score_tuple = (known_profile['name'],compare_profiles(unknown_profile,known_profile))
+    #     score_list.append(score_tuple)
+    # return score_list.sort(reverse=True)
+
+
+
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

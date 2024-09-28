@@ -23,14 +23,14 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
         unknown_profile = create_language_profile('unknown', unknown_text)
 
-    if (not isinstance(unknown_profile, dict)
-            or not isinstance(profile_to_compare_en, dict)
-            or not isinstance(profile_to_compare_de, dict)):
-        return None
-    answer = detect_language(unknown_profile, profile_to_compare_en, profile_to_compare_de)
+    if ( isinstance(unknown_profile, dict)
+            or isinstance(profile_to_compare_en, dict)
+            or isinstance(profile_to_compare_de, dict)):
 
-    result = answer
-    assert result, "Detection result is None"
+        answer = detect_language(unknown_profile, profile_to_compare_en, profile_to_compare_de)
+
+        result = answer
+        assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

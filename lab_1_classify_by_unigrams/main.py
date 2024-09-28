@@ -5,6 +5,9 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+import json
+
+
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -38,15 +41,16 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(tokens, list) and all(isinstance(x, str) for x in tokens)):
+    if not (isinstance(tokens, list) and
+            all(isinstance(token, str) for token in tokens)):
         return None
 
     freq_dict = {}
-    for i in tokens:
-        freq_dict.setdefault(i, 0)
-        freq_dict[i] += 1
-    for n in freq_dict:
-        freq_dict[n] /= len(tokens)
+    for token in tokens:
+        freq_dict.setdefault(token, 0)
+        freq_dict[token] += 1
+    for dict_token in freq_dict:
+        freq_dict[dict_token] /= len(tokens)
 
     return freq_dict
 
@@ -120,23 +124,26 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not (isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and
-            all("name" in a for a in (unknown_profile, profile_to_compare)) and
-            all("freq" in b for b in (unknown_profile, profile_to_compare))):
+    if not (isinstance(unknown_profile, dict) and
+            isinstance(profile_to_compare, dict) and
+            "name" in unknown_profile and 
+            "name" in profile_to_compare and
+            "freq" in unknown_profile and
+            "freq" in profile_to_compare):
         return None
 
     all_keys = list(set(unknown_profile["freq"]) | set(profile_to_compare["freq"]))
     unknown_profile_with_0s = []
     profile_to_compare_with_0s = []
-    for i in all_keys:
-        if not i in unknown_profile["freq"]:
+    for key in all_keys:
+        if not key in unknown_profile["freq"]:
             unknown_profile_with_0s.append(0)
         else:
-            unknown_profile_with_0s.append(unknown_profile["freq"][i])
-        if not i in profile_to_compare["freq"]:
+            unknown_profile_with_0s.append(unknown_profile["freq"][key])
+        if not key in profile_to_compare["freq"]:
             profile_to_compare_with_0s.append(0)
         else:
-            profile_to_compare_with_0s.append(profile_to_compare["freq"][i])
+            profile_to_compare_with_0s.append(profile_to_compare["freq"][key])
 
     return calculate_mse(unknown_profile_with_0s, profile_to_compare_with_0s)
 
@@ -167,7 +174,8 @@ def detect_language(
 
     diff_unk_1 = compare_profiles(unknown_profile, profile_1)
     diff_unk_2 = compare_profiles(unknown_profile, profile_2)
-    if not (isinstance(diff_unk_1, float) and isinstance(diff_unk_2, float)):
+    if not (isinstance(diff_unk_1, float) and
+            isinstance(diff_unk_2, float)):
         return None
 
     if diff_unk_1 < diff_unk_2:
@@ -189,6 +197,16 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(path_to_file, str):
+        return None
+
+    profile = json.load(
+        open(path_to_file, "r", encoding="utf-8")
+        )
+    if not (isinstance(profile, dict) and "name" in profile and "freq" in profile):
+        return None
+
+    return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -205,6 +223,21 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
+    if not (isinstance(profile, dict) and
+            "name" in profile and
+            "freq" in profile and
+            "n_words" in profile):
+        return None
+
+    result_freq_dict = {}
+    for token in profile["freq"]:
+        if isinstance(token, str) and len(token) == 1:
+            result_freq_dict.setdefault(token.lower(), 0)
+            result_freq_dict[token.lower()] += profile["freq"][token]
+    for dict_token in result_freq_dict:
+        result_freq_dict[dict_token] /= profile["n_words"][0]
+
+    return {"name": profile["name"], "freq": result_freq_dict}
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -219,6 +252,21 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
+    if not (isinstance(paths_to_profiles, list) and
+            all(isinstance(path, str) for path in paths_to_profiles)):
+        return None
+
+    result_profiles = []
+    for path in paths_to_profiles:
+        profile = load_profile(path)
+        if not isinstance(profile, dict):
+            return None
+        profile = preprocess_profile(profile)
+        if not isinstance(profile, dict):
+            return None
+        result_profiles.append(profile)
+
+    return result_profiles
 
 
 def detect_language_advanced(
@@ -237,6 +285,20 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
+    if not (isinstance(unknown_profile, dict) and
+            isinstance(known_profiles, list) and
+            all(isinstance(prof, dict) for prof in known_profiles)):
+        return None
+
+    dist_list = []
+    for known_profile in known_profiles:
+        diff_unk_known = compare_profiles(unknown_profile, known_profile)
+        if not isinstance(diff_unk_known, float):
+            return None
+        dist_list.append((known_profile["name"], diff_unk_known))
+
+    dist_list.sort(key=lambda a: a[1])
+    return dist_list
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -248,3 +310,9 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not (isinstance(detections, list) and
+            all(isinstance(detection, tuple) for detection in detections)):
+        return None
+
+    for detection in detections:
+        print(f"{detection[0]}: MSE {detection[1]:.5f}")

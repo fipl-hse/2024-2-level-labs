@@ -66,8 +66,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(text, str) or not isinstance(language, str):
         return None
+    frequencies = calculate_frequencies(tokenize(text))
+    if not isinstance(frequencies, dict):
+        return None
     return {'name': language,
-            'freq': calculate_frequencies(tokenize(text))}
+            'freq': frequencies}
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -152,11 +155,13 @@ def detect_language(
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)\
             or not isinstance(profile_2, dict):
         return None
-    if compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
+    mse_unk_p1 = compare_profiles(unknown_profile, profile_1)
+    mse_unk_p2 = compare_profiles(unknown_profile, profile_2)
+    if mse_unk_p1 > mse_unk_p2:
         return profile_2.get('name')
-    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+    if mse_unk_p1 < mse_unk_p2:
         return profile_1.get('name')
-    if compare_profiles(unknown_profile, profile_1) == compare_profiles(unknown_profile, profile_2):
+    if mse_unk_p1 == mse_unk_p2:
         sort_lang = [profile_1['name'], profile_2['name']]
         sort_lang.sort()
         return sort_lang[0]

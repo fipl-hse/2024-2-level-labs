@@ -1,7 +1,9 @@
 from main import calculate_frequencies, create_language_profile, detect_language, tokenize
 
 """
+
 Language detection starter
+
 """
 
 
@@ -9,7 +11,9 @@ Language detection starter
 
 def main() -> None:
     """
+
     Launches an implementation
+
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
@@ -21,11 +25,10 @@ def main() -> None:
     print(result)
     print(calculate_frequencies(result))
     print(create_language_profile('en', en_text))
-    profile_en = create_language_profile('en', en_text)
-    profile_de = create_language_profile('de', de_text)
-    profile_un = create_language_profile('un', unknown_text)
-    if profile_un and profile_en and profile_de:
-        print(detect_language(profile_unk, profile_en, profile_de))
+    if create_language_profile('un', unknown_text) and create_language_profile('de', de_text)\
+            and create_language_profile('en', en_text):
+        print(detect_language(create_language_profile('un', unknown_text), create_language_profile(
+            'de', de_text), create_language_profile('en', en_text)))
     assert result, "Detection result is None"
 
 

@@ -61,9 +61,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     tokens = tokenize(text)
-    if tokens is None:
-        return None
-    if not isinstance(text, str) or any(not isinstance(token, str) for token in tokens):
+
+    if tokens is None or not isinstance(text, str) or any(
+            not isinstance(token, str) for token in tokens):
         return None
     if calculate_frequencies(tokens) is None:
         return None

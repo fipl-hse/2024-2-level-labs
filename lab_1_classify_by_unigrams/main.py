@@ -94,8 +94,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if (not isinstance(predicted, list) or not isinstance(actual, list)
             or len(predicted) != len(actual)):
         return None
-    squared_error = [(p - a) ** 2 for p, a in zip(predicted, actual)]
-    return sum(squared_error) / len(squared_error)
+    squared_error_sum = sum([(p - a) ** 2 for p, a in zip(predicted, actual)])
+    if not isinstance(squared_error_sum, float):
+        return None
+    return squared_error_sum / len(predicted)
 
 
 def compare_profiles(
@@ -124,6 +126,8 @@ def compare_profiles(
     unknown_freq = [unknown_profile['freq'].get(token, 0) for token in tokens_union]
     freq_to_compare = [profile_to_compare['freq'].get(token, 0) for token in tokens_union]
     mse = calculate_mse(freq_to_compare, unknown_freq)
+    if not isinstance(mse, float):
+        return None
     return round(mse, 3)
 
 
@@ -158,15 +162,17 @@ def detect_language(
     if (not isinstance(mse_1, float) or not isinstance(mse_2, float)
             or mse_1 is None or mse_2 is None):
         return None
+    if (not isinstance(unknown_profile['name'], str)
+            or not isinstance(profile_1['name'], str) or not isinstance(profile_2['name'], str)):
+        return None
     if mse_1 < mse_2:
-        profile_1_name = profile_1.get('name')
-        return profile_1_name
+        return profile_1['name']
     if mse_1 > mse_2:
-        profile_2_name = profile_2['name']
-        return profile_2_name
+        return profile_2['name']
     if mse_1 == mse_2:
         profiles_list = sorted([profile_1['name'], profile_2['name']])
         return profiles_list[0]
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:

@@ -128,11 +128,11 @@ def compare_profiles(
         freq_dict_2 = profile_to_compare['freq']
         freq_dict_1 = unknown_profile['freq']
         for key2 in freq_dict_2.keys():
-            if key2 in freq_dict_1.keys() and isinstance(freq_dict_1, dict):
+            if key2 in freq_dict_1.keys() and isinstance(freq_dict_1, dict) and isinstance(key2, str):
                 continue
             freq_dict_1[key2] = 0.0
         for key1 in freq_dict_1.keys():
-            if key1 in freq_dict_2.keys() and isinstance(freq_dict_2, dict):
+            if key1 in freq_dict_2.keys() and isinstance(freq_dict_2, dict) and isinstance(key1, str):
                 continue
             freq_dict_2[key1] = 0.0
     else:

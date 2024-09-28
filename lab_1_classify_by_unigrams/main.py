@@ -67,13 +67,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     dictionary = calculate_frequencies(tokenize(text))
-
-    if dictionary and language:
-        language_profile = {'name': language, 'freq': dictionary}
-        if (isinstance(language_profile, dict) and
-            isinstance(language_profile['freq'], dict) and
-                isinstance(language_profile['name'], str)):
-            return language_profile
+    language_profile = {'name': language, 'freq': dictionary}
+    if not dictionary and not language:
+        return None
+    if isinstance(language_profile, dict):
+        return language_profile
     return None
 
 

@@ -200,9 +200,8 @@ def load_profile(path_to_file: str) -> dict | None:
     if not isinstance(path_to_file, str):
         return None
 
-    profile = json.load(
-        open(path_to_file, "r", encoding="utf-8")
-        )
+    with open(path_to_file, "r", encoding="utf-8") as f:
+        profile = json.load(f)
     if not (isinstance(profile, dict) and "name" in profile and "freq" in profile):
         return None
 
@@ -316,3 +315,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     for detection in detections:
         print(f"{detection[0]}: MSE {detection[1]:.5f}")
+    return None

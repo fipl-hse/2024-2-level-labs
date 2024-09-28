@@ -3,32 +3,12 @@ Lab 1.
 
 Language detection
 """
+from idlelib.iomenu import encoding
 from os.path import split
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-
-
-with open("assets/texts/de.txt", "r") as file:
-    text = file.read()
-    text = text.lower()
-    clean_text = "".join(letter for letter in text if letter.isalpha())
-    result =  list(clean_text)
-
-with open("assets/texts/en.txt", "r") as file:
-    text1 = file.read()
-    text1 = text1.lower()
-    clean_text1= "".join(letter for letter in text1 if letter.isalpha())
-    result1 = list(clean_text1)
-
-with open("assets/texts/unknown.txt", "r") as file:
-    text2 = file.read()
-    text2 = text2.lower()
-    clean_text2 = "".join(letter for letter in text2 if letter.isalpha())
-    result2 = list(clean_text2)
-print(result)
-print(result1)
-print(result2)
-
+from collections import Counter
+from tarfile import LENGTH_LINK
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -46,6 +26,9 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    text = ''.join(letter for letter in text if letter.isalpha()).lower()
+    return list(text)
+
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:

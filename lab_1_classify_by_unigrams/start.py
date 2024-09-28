@@ -24,8 +24,10 @@ def main() -> None:
                      'assets/profiles/tr.json',]
     profiles = funcs.collect_profiles(profile_paths)
 
-    result = funcs.detect_language_advanced(unknown_profile, profiles)
-    funcs.print_report(result)
+    result = None
+    if isinstance(unknown_profile, dict) and isinstance(profiles, list):
+        result = funcs.detect_language_advanced(unknown_profile, profiles)
+        funcs.print_report(result)
     assert result, "Detection result is None"
 
 

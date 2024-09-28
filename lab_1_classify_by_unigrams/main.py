@@ -116,6 +116,9 @@ def compare_profiles(
         return None
     unknown_lst = []
     compared_lst = []
+    if not isinstance(unknown_profile['freq'], dict) \
+            or not isinstance(profile_to_compare['freq'], dict):
+        return None
     for letter in unknown_profile['freq']:
         if letter not in profile_to_compare['freq']:
             profile_to_compare['freq'][letter] = 0
@@ -157,6 +160,8 @@ def detect_language(
         return None
     mse_unk_p1 = compare_profiles(unknown_profile, profile_1)
     mse_unk_p2 = compare_profiles(unknown_profile, profile_2)
+    if not isinstance(mse_unk_p1, float) or not isinstance(mse_unk_p2, float):
+        return None
     if mse_unk_p1 > mse_unk_p2:
         return profile_2.get('name')
     if mse_unk_p1 < mse_unk_p2:

@@ -67,9 +67,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     dictionary = calculate_frequencies(tokenize(text))
-    language_profile = {'name': language, 'freq': dictionary}
-    if not dictionary and not language:
+    if not dictionary:
         return None
+    language_profile = {'name': language, 'freq': dictionary}
     return language_profile
 
 
@@ -122,7 +122,7 @@ def compare_profiles(
     """
     # bad input check:
     if (isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and
-        len(profile_to_compare) == 2 and len(unknown_profile) == 2):
+            len(profile_to_compare) == 2 and len(unknown_profile) == 2):
         for k, v in unknown_profile['freq'].items():
             if not isinstance(k, str) or not isinstance(v, (int, float)):
                 return None

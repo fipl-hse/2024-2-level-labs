@@ -70,7 +70,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     if dictionary and language:
         language_profile = {'name': language, 'freq': dictionary}
-        return language_profile
+        if (isinstance(language_profile, dict) and
+            isinstance(language_profile['freq'], (int, float)) and
+            isinstance(language_profile['name'], str)):
+            return language_profile
     return None
 
 

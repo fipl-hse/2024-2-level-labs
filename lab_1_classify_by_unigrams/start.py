@@ -17,11 +17,10 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
-    unknown_profile: dict = funcs.create_language_profile("unk", unknown_text)
-    profile_1: dict = funcs.create_language_profile("en", en_text)
-    profile_2: dict = funcs.create_language_profile("de", de_text)
-
-    result = funcs.detect_language(unknown_profile, profile_1, profile_2)
+    result = funcs.detect_language(
+        funcs.create_language_profile("unk", unknown_text),
+        funcs.create_language_profile("en", en_text),
+        funcs.create_language_profile("de", de_text))
     assert result, "Detection result is None"
     print(result)
 

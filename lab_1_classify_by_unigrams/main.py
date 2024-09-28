@@ -43,7 +43,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(tokens, list) or None in tokens:
+    if not isinstance(tokens, list) or None in tokens\
+            or not all(isinstance(token,str) for token in tokens):
         return None
     frequency_dictionary = {}
     for token in tokens:
@@ -67,7 +68,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(text, str) or not isinstance(language, str):
         return None
     frequencies = calculate_frequencies(tokenize(text))
-    if not isinstance(frequencies, dict):
+    if not isinstance(frequencies, dict) or not all(isinstance(key, str) for key in frequencies)\
+            or not all(isinstance(freq, float) for freq in frequencies.values()):
         return None
     return {'name': language,
             'freq': frequencies}
@@ -91,7 +93,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     diff = 0
     for m, n in enumerate(actual):
         diff += (n - predicted[m])**2
-    return diff / len(actual)
+    return float(diff / len(actual))
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -113,6 +115,9 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or \
             len(profile_to_compare) != len(unknown_profile) != 2:
+        return None
+    if not all(isinstance(key, str) for key in unknown_profile) or \
+            not all(isinstance(key, str) for key in profile_to_compare):
         return None
     unknown_lst = []
     compared_lst = []
@@ -158,9 +163,11 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)\
-            or not isinstance(profile_2, dict) or not isinstance(profile_1['name'], str)\
-            or not isinstance(profile_2['name'], str)\
-            or not isinstance(unknown_profile['name'], str):
+            or not isinstance(profile_2, dict):
+        return None
+    if not all(isinstance(key,str) for key in unknown_profile) or \
+            not all(isinstance(key, str) for key in profile_1) or\
+            not all(isinstance(key,str) for key in profile_2):
         return None
     mse_unk_p1 = compare_profiles(unknown_profile, profile_1)
     mse_unk_p2 = compare_profiles(unknown_profile, profile_2)

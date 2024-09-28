@@ -98,8 +98,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -140,9 +140,9 @@ def compare_profiles(
 
 
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -215,12 +215,12 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
-    if (not isinstance(profile,dict) or 'name' not in profile or
+    if (not isinstance(profile, dict) or 'name' not in profile or
             'n_words' not in profile or 'freq' not in profile):
         return None
     unigram_count = profile['n_words'][0]
     del profile['n_words']
-    profile_processed ={}
+    profile_processed = {}
     for token, freq in profile['freq'].items():
         if len(token) == 1:
             token = token.lower()
@@ -248,10 +248,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     """
     if not isinstance(paths_to_profiles, list):
         return None
-    loaded_profiles =[]
+    loaded_profiles = []
     for path in paths_to_profiles:
         profile = load_profile(path)
-        if not isinstance(profile,dict):
+        if not isinstance(profile, dict):
             return None
         profile = preprocess_profile(profile)
         if not isinstance(profile, dict):
@@ -260,9 +260,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     return loaded_profiles
 
 
-
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.
@@ -277,16 +276,12 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    # if not isinstance(unknown_profile, dict) or not isinstance(known_profiles,list):
-    #     return None
-    # score_list =[]
-    # for known_profile in known_profiles:
-    #     score_tuple = (known_profile['name'],compare_profiles(unknown_profile,known_profile))
-    #     score_list.append(score_tuple)
-    # return score_list.sort(reverse=True)
-
-
-
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
+        return None
+    distances = []
+    for known_profile in known_profiles:
+        distances.append((known_profile['name'], compare_profiles(unknown_profile, known_profile)))
+    return sorted(distances, key=lambda x: (x[1], x[0]))
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -298,3 +293,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+    for detection in detections:
+        print(f'{detection[0]}: MSE {detection[1]:.5f}')

@@ -70,9 +70,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     language_profile = {'name': language, 'freq': dictionary}
     if not dictionary and not language:
         return None
-    if isinstance(language_profile, dict):
-        return language_profile
-    return None
+    return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

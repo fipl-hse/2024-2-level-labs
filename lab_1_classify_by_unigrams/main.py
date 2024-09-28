@@ -152,18 +152,15 @@ def detect_language(
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)\
             or not isinstance(profile_2, dict):
         return None
-    if compare_profiles(unknown_profile, profile_1) > \
-            compare_profiles(unknown_profile, profile_2):
-        return profile_2['name']
-    if compare_profiles(unknown_profile, profile_1) < \
-            compare_profiles(unknown_profile, profile_2):
-        return profile_1['name']
-    if compare_profiles(unknown_profile, profile_1) == \
-            compare_profiles(unknown_profile, profile_2):
+    if compare_profiles(unknown_profile, profile_1) > compare_profiles(unknown_profile, profile_2):
+        return profile_2.get('name')
+    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+        return profile_1.get('name')
+    if compare_profiles(unknown_profile, profile_1) == compare_profiles(unknown_profile, profile_2):
         sort_lang = [profile_1['name'], profile_2['name']]
         sort_lang.sort()
         return sort_lang[0]
-
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:

@@ -144,11 +144,16 @@ def compare_profiles(
 
     all_chars = set(unknown_profile['freq']).union(set(profile_to_compare['freq']))
     # creating lists to pass into calculate_mse function
-    unknown_sorted = [(unknown_profile['freq'][char] if char in unknown_profile['freq'] else 0.0)
-                      for char in all_chars]
+    unknown_profile_freq = unknown_profile['freq']
+    if not isinstance(unknown_profile_freq, dict):
+        return None
+    unknown_sorted = [(unknown_profile_freq[char] if char in unknown_profile_freq else 0.0) for char in all_chars]
 
-    profile_to_compare_sorted = [(profile_to_compare['freq'][char]
-                                  if char in profile_to_compare['freq'] else 0.0)
+    profile_to_compare_freq = profile_to_compare['freq']
+    if not isinstance(profile_to_compare_freq, dict):
+        return None
+    profile_to_compare_sorted = [(profile_to_compare_freq[char]
+                                  if char in profile_to_compare_freq else 0.0)
                                  for char in all_chars]
 
     return calculate_mse(unknown_sorted, profile_to_compare_sorted)
@@ -312,9 +317,13 @@ def detect_language_advanced(
 
     distances = []
     for profile in known_profiles:
-        distances.append(tuple((profile['name'], compare_profiles(unknown_profile, profile))))
-
-    return sorted(distances, key=lambda t: t[1])
+        profile_name: str = profile['name']
+        distance = compare_profiles(unknown_profile, profile)
+        if distance is None:
+            return None
+        distances.append((profile_name, distance))
+    distances_sorted: list[tuple['str', float]] = sorted(distances, key=lambda t: t[1])
+    return distances_sorted
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

@@ -42,7 +42,7 @@ def main() -> None:
             result = None
         else:
             print_report(detections)
-            result = 'AAAAA'
+            result = detections
 
     assert result, "Detection result is None"
 

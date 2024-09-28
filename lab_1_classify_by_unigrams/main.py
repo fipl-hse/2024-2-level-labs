@@ -137,7 +137,6 @@ def compare_profiles(
         actual_values.append(unknown_profile['freq'][token] if token in unknown_profile['freq'] else 0)
         predicted_values.append(profile_to_compare['freq'][token] if token in profile_to_compare['freq'] else 0)
     return calculate_mse(predicted_values, actual_values)
-
 def detect_language(
         unknown_profile: dict[str, str | dict[str, float]],
         profile_1: dict[str, str | dict[str, float]],

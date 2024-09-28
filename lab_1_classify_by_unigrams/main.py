@@ -128,7 +128,6 @@ def compare_profiles(
     for token in unknown_profile['freq']:
         if token not in tokens:
             tokens.append(token)
-
     for token in profile_to_compare['freq']:
         if token not in tokens:
             tokens.append(token)

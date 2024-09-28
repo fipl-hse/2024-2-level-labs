@@ -173,9 +173,9 @@ def detect_language(
     comparison_results[profile_2['name']] = comp_2
 
     potential_languages = []
-    min_value = min(comparison_results.values())  # check Nones
-    for name in comparison_results.keys():
-        if comparison_results[name] == min_value:
+    min_value = min(comparison_results.values())
+    for name, profile in comparison_results.items():
+        if profile == min_value:
             potential_languages.append(name)
     return str(sorted(potential_languages)[0])
 

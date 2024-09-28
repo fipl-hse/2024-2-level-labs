@@ -94,7 +94,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if (not isinstance(predicted, list) or not isinstance(actual, list)
             or len(predicted) != len(actual)):
         return None
-    squared_error_sum = sum([(p - a) ** 2 for p, a in zip(predicted, actual)])
+    squared_error_sum = sum((p - a) ** 2 for p, a in zip(predicted, actual))
     if not isinstance(squared_error_sum, float):
         return None
     return squared_error_sum / len(predicted)
@@ -150,20 +150,16 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
-            or not isinstance(profile_2, dict)):
-        return None
-    if (not all(key in unknown_profile for key in ('name', 'freq'))
+    if (any(not isinstance(profile, dict) for profile in (unknown_profile, profile_1, profile_2))
+        or not all(key in unknown_profile for key in ('name', 'freq'))
             or not all(key in profile_1 for key in ('name', 'freq'))
             or not all(key in profile_2 for key in ('name', 'freq'))):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    if (not isinstance(mse_1, float) or not isinstance(mse_2, float)
+    if (not isinstance(profile_1['name'], str) or not isinstance(profile_2['name'], str)
+            or not isinstance(mse_1, float) or not isinstance(mse_2, float)
             or mse_1 is None or mse_2 is None):
-        return None
-    if (not isinstance(unknown_profile['name'], str)
-            or not isinstance(profile_1['name'], str) or not isinstance(profile_2['name'], str)):
         return None
     if mse_1 < mse_2:
         return profile_1['name']

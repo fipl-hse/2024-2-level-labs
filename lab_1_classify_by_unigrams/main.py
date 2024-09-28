@@ -23,7 +23,6 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     return [symbol.lower() for symbol in text if symbol.isalpha()]
-
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
        Calculate frequencies of given tokens.

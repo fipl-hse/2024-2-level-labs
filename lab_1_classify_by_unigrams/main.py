@@ -65,8 +65,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(text, str) or not isinstance(language, str):
-        return {'name': language,
-                'freq': calculate_frequencies(tokenize(text))}
+        return None
+    return {'name': language,
+            'freq': calculate_frequencies(tokenize(text))}
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -85,9 +86,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             not len(predicted) == len(actual):
         return None
     diff = 0
-    for i in range(len(actual)):
-        diff += (actual[i] - predicted[i])**2
-    return diff/len(actual)
+    for m, n in enumerate(actual):
+        diff += (n - predicted[m])**2
+    return diff / len(actual)
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -160,7 +161,8 @@ def detect_language(
     if compare_profiles(unknown_profile, profile_1) == \
             compare_profiles(unknown_profile, profile_2):
         sort_lang = [profile_1['name'], profile_2['name']]
-        return sort_lang.sort()
+        sort_lang.sort()
+        return sort_lang[0]
 
 
 

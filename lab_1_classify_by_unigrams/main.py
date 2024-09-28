@@ -73,6 +73,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(text, str) or any(not isinstance(token, str) for token in tokens):
         return None
     language_profile = {'name': language, 'freq': calculate_frequencies(tokens)}
+    if language_profile['freq'] is None:
+        return None
+
     return language_profile
 
 
@@ -94,7 +97,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not all(isinstance(predicted_values, (int, float)) for predicted_values in predicted) or not all(
             isinstance(actual_values, (int, float)) for actual_values in actual):
         return None
-    return sum([(actual[i] - predicted[i]) ** 2 for i in range(len(actual))]) / len(actual)
+    return float(sum([(actual[i] - predicted[i]) ** 2 for i in range(len(actual))]) / len(actual))
 
 
 def compare_profiles(
@@ -117,17 +120,16 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if 'name' not in unknown_profile or 'freq' not in unknown_profile:
+    if not all(key in unknown_profile for key in ['name', 'freq']) or not all(
+            key in profile_to_compare for key in ['name', 'freq']):
         return None
-    if 'name' not in profile_to_compare or 'freq' not in profile_to_compare:
+    unknown_freq = unknown_profile['freq']
+    compare_freq = profile_to_compare['freq']
+
+    if not isinstance(unknown_freq, dict) or not isinstance(compare_freq, dict):
         return None
+    tokens = list(set(unknown_freq.keys()) | set(compare_freq.keys()))
     tokens = []
-    for token in unknown_profile['freq']:
-        if token not in tokens:
-            tokens.append(token)
-    for token in profile_to_compare['freq']:
-        if token not in tokens:
-            tokens.append(token)
     actual_values = []
     predicted_values = []
     for token in tokens:
@@ -155,18 +157,20 @@ def detect_language(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
-    if 'freq' not in profile_1 or 'freq' not in profile_2:
+    if 'freq' not in profile_1 or 'freq' not in profile_2 or 'freq' not in unknown_profile:
         return None
-    if compare_profiles(unknown_profile, profile_1) is None and compare_profiles(unknown_profile, profile_2) is None:
+    distance_1 = compare_profiles(unknown_profile, profile_1)
+    distance_2 = compare_profiles(unknown_profile, profile_2)
+    if distance_1 is None and distance_2 is None:
         return None
-    elif compare_profiles(unknown_profile, profile_1) is None:
+    elif distance_1 is None:
         return profile_2['name']
-    elif compare_profiles(unknown_profile, profile_2) is None:
+    elif distance_2 is None:
         return profile_1['name']
 
-    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+    if distance_1 < distance_2:
         return profile_1['name']
-    if compare_profiles(unknown_profile, profile_2) < compare_profiles(unknown_profile, profile_1):
+    if distance_2 < distance_1:
         return profile_2['name']
     return min(profile_1['name'], profile_2['name'])
 

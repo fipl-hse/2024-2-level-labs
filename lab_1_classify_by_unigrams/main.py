@@ -71,8 +71,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if (isinstance(language_profile['name'], str) and
             isinstance(language_profile['freq'], dict)):
         return language_profile
-    else:
-        return None
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -123,12 +122,12 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
     # bad input check:
-    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict):
+    if (isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and
+        len(profile_to_compare) == 2 and len(unknown_profile) == 2):
         for k, v in unknown_profile['freq'].items():
             if not isinstance(k, str) or not isinstance(v, (int, float)):
                 return None
 
-    if len(profile_to_compare) == 2 and len(unknown_profile) == 2:
         freq_dict_2 = profile_to_compare['freq']
         freq_dict_1 = unknown_profile['freq']
         for key2 in freq_dict_2.keys():

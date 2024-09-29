@@ -21,7 +21,14 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-
+    if not isinstance(text, str):
+        return None
+    tokens = list()
+    text = text.lower()
+    for elem in text.lower():
+        if elem.isalpha():
+            tokens += elem
+    return tokens
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -35,7 +42,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
+        return None
+    freq_dictionary = {}
+    total_amount_of_tokens = len(tokens)
+    for elem in set(tokens):
+        freq_dictionary[elem] = float(tokens.count(elem) / total_amount_of_tokens)
+    return freq_dictionary
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -50,6 +63,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

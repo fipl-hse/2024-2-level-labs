@@ -97,6 +97,17 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if type(predicted) is not list or type(actual) is not list:
+        return None
+    if len(predicted) != len(actual):
+        return None
+
+    mse = 0
+    for i in range(len(predicted)):
+        mse += (predicted[i] - actual[i])**2
+    mse = mse/len(predicted)
+
+    return mse
 
 
 def compare_profiles(

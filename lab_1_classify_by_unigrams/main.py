@@ -103,8 +103,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 
 def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -122,8 +122,8 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    elif (len(unknown_profile) == 0 or len(profile_to_compare) == 0
-          or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
+    if (len(unknown_profile) == 0 or len(profile_to_compare) == 0
+            or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
         return None
 
     profile_to_compare_freq = dict(profile_to_compare['freq'])
@@ -146,9 +146,9 @@ def compare_profiles(
 
 
 def detect_language(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_1: dict[str, str | dict[str, float]],
+    profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -166,8 +166,8 @@ def detect_language(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict):
         return None
-    elif (not isinstance(profile_2, dict) or len(unknown_profile) == 0
-          or len(profile_1) == 0 or len(profile_2) == 0):
+    if (not isinstance(profile_2, dict) or len(unknown_profile) == 0
+            or len(profile_1) == 0 or len(profile_2) == 0):
         return None
 
     mse_profile_1 = compare_profiles(unknown_profile, profile_1)
@@ -274,7 +274,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

@@ -50,7 +50,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     frequency = {}
     tokens_number = len(tokens)
     for letter in tokens:
-        if isinstance(letter, str):
+        if not isinstance(letter, str):
             return None
         letter_number = tokens.count(letter)
         letter_index = letter_number/tokens_number
@@ -98,12 +98,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(actual) != len(predicted):
         return None
     summa = 0.0
-    for ind in range(0, len(actual)):
+    n = len(actual)
+    for ind in range(0, n):
         a = float(actual[ind])
         p = float(predicted[ind])
         sqw_dif = float((a - p)**2)
         summa = float(summa + sqw_dif)
-    mse = summa/len(actual)
+    mse = summa/n
     return mse
 
 
@@ -125,7 +126,7 @@ def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
         """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if len(unknown_profile) != 2 and len(profile_to_compare) != 2:
+    if len(unknown_profile) != 2 or len(profile_to_compare) != 2:
         return None
     unknown_freq = unknown_profile.get("freq").copy()
     compare_freq = profile_to_compare.get("freq").copy()
@@ -259,20 +260,19 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         return None
     n_words = n_words_list[0]
     for elem in tokens:
-        if not isinstance(elem, str) or len(elem) != 1:
-            return None
-        number = frequency.get(elem)
-        let = elem.lower()
-        if isinstance(let, str) and let not in letters:
-            new_token = {let: number}
-            letters.update(new_token)
-        else:
-            freq_add = letters.get(let)
-            sum_freq = number + freq_add
-            new_token = {let: sum_freq}
-            letters.update(new_token)
+        if isinstance(elem, str) and len(elem) == 1:
+            number = frequency.get(elem)
+            let = elem.lower()
+            if isinstance(let, str) and let not in letters:
+                new_token = {let: number}
+                letters.update(new_token)
+            else:
+                freq_add = letters.get(let)
+                sum_freq = number + freq_add
+                new_token = {let: sum_freq}
+                letters.update(new_token)
     for tok in letters:
-        freq_index = float(letters.get(tok)/n_words)
+        freq_index = float(letters.get(tok) / n_words)
         letters[tok] = freq_index
     return {"name": name, "freq": letters}
 
@@ -294,11 +294,12 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     list_of_profiles = []
     for name in paths_to_profiles:
         profile = load_profile(name)
-        if isinstance(profile, dict):
-            correct_profile = preprocess_profile(profile)
-            if not correct_profile:
-                return None
-            list_of_profiles.append(correct_profile)
+        if not isinstance(profile, dict):
+            return None
+        correct_profile = preprocess_profile(profile)
+        if not isinstance(correct_profile, dict):
+            return None
+        list_of_profiles.append(correct_profile)
         if isinstance(list_of_profiles, list):
             return list_of_profiles
     return None

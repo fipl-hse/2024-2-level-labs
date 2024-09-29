@@ -75,9 +75,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     freq_dict = calculate_frequencies(tokenize(text))
     if freq_dict is None:
         return None
-    language_profile = {"name": language,
-                        "freq": freq_dict}
-    return language_profile
+    return {"name": language, "freq": freq_dict}
 
 
 
@@ -250,7 +248,6 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     name = {"name": profile.get("name")}
     if not isinstance(name, dict):
         return None
-    new_profile.update(name)
     tokens = list(frequency.keys())
     if not isinstance(tokens, list):
         return None
@@ -274,8 +271,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     for tok in letters:
         freq_index = float(letters.get(tok)/n_words)
         letters[tok] = freq_index
-        new_profile["freq"] = letters
-    return new_profile
+    return {"name": name, "freq": letters}
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:

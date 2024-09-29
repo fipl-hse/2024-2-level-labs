@@ -17,7 +17,8 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
     paths = ['assets/profiles/de.json', 'assets/profiles/en.json', 'assets/profiles/es.json', 'assets/profiles/fr.json',
              'assets/profiles/it.json', 'assets/profiles/ru.json', 'assets/profiles/tr.json']
-    result = print_report(detect_language_advanced(create_language_profile('un', unknown_text), collect_profiles(paths)))
+    print_report(detect_language_advanced(create_language_profile('un', unknown_text), collect_profiles(paths)))
+    result = None
     assert result, "Detection result is None"
 
 

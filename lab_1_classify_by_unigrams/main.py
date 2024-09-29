@@ -23,32 +23,38 @@ def tokenize(text: str) -> list[str] | None:
     if type(text) != str:
         return None
 
-    en_text_list = []
-    en_text_list = text.split()
-    words_list = []
+    text = text.lower()
 
-    for i in range(len(en_text_list)):
-        letters = list(en_text_list[i])
-        words_list.append(letters)
-        i += 1
+    # en_text_list = []
+    # en_text_list = text.split()
+    # words_list = []
+    #
+    # for i in range(len(en_text_list)):
+    #     letters = list(en_text_list[i])
+    #     words_list.append(letters)
+    #     i += 1
+    #
+    # letters_list = []
+    #
+    # for j in range(len(words_list)):
+    #     for i in range(len(words_list[j])):
+    #         if words_list[j][i].isalpha():
+    #             letters_list.append(words_list[j][i])
+    #         i += 1
+    #     j += 1
+    #
+    #
+    # letters_list = str(letters_list).lower()
 
     letters_list = []
 
-    for j in range(len(words_list)):
-        for i in range(len(words_list[j])):
-            if words_list[j][i].isalpha():
-                letters_list.append(words_list[j][i])
-            i += 1
-        j += 1
-
-
-    letters_list = str(letters_list).lower()
+    for i in range(len(text)):
+        if text[i].isalpha():
+            letters_list.append(text[i])
 
 
     return letters_list
 
-
-print(tokenize('assets\en.txt'))
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -62,11 +68,14 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    # tokens_summ = len(list)
-    #
-    # freq = {}
-    #
-    # for i in range(tokens_summ):
+    tokens_summ = len(tokens)
+
+    freq = {}
+
+    for i in range(tokens_summ):
+        freq[tokens[i]] = tokens.count(tokens[i]) / tokens_summ
+
+    return freq
 
 
 
@@ -83,6 +92,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+
+    return language_profile
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

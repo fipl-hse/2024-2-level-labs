@@ -122,9 +122,11 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if (list(unknown_profile.keys())[0] != 'name') or (list(profile_to_compare.keys())[0] != 'name'):
+    if (list(unknown_profile.keys())[0] != 'name') or (list(unknown_profile.keys())[1] != 'freq'):
         return None
-    if (list(unknown_profile.keys())[1] != 'freq') or (list(profile_to_compare.keys())[1] != 'freq'):
+    if list(profile_to_compare.keys())[0] != 'name':
+        return None
+    if list(profile_to_compare.keys())[1] != 'freq':
         return None
     trg_prof = list(unknown_profile.values())[1]
     src_prof = list(profile_to_compare.values())[1]
@@ -177,10 +179,9 @@ def detect_language(
     failsafe.sort(key=str.lower)
     return failsafe[0]
 
-    # def load_profile(path_to_file: str) -> dict | None:
 
-
-"""
+def load_profile(path_to_file: str) -> dict | None:
+    """
     Load a language profile.
 
     Args:
@@ -192,8 +193,9 @@ def detect_language(
     In case of corrupt input arguments, None is returned
 """
 
-# def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
-"""
+
+def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
+    """
     Preprocess profile for a loaded language.
 
     Args:
@@ -207,8 +209,9 @@ def detect_language(
     'freq' in arguments, None is returned
 """
 
-# def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
-"""
+
+def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
+    """
     Collect profiles for a given path.
 
     Args:
@@ -220,9 +223,10 @@ def detect_language(
     In case of corrupt input arguments, None is returned
 """
 
-# def detect_language_advanced( unknown_profile:
-# dict[str, str | dict[str, float]], known_profiles: list) -> list | None:
-"""
+
+def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
+                             known_profiles: list) -> list | None:
+    """
     Detect the language of an unknown profile.
 
     Args:
@@ -236,8 +240,9 @@ def detect_language(
     In case of corrupt input arguments, None is returned
 """
 
-# def print_report(detections: list[tuple[str, float]]) -> None:
-"""
+
+def print_report(detections: list[tuple[str, float]]) -> None:
+    """
     Print report for detection of language.
 
     Args:

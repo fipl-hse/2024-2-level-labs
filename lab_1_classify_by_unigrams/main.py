@@ -20,12 +20,12 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not text:
+    if not text or not isinstance(text, str):
         return None
 
     text = text.lower()
     num = '1234567890'
-    symb = ',./?!:;'
+    symb = ',./?!:;#@*-&<>%'
     tokens = []
 
     for i in text:
@@ -36,7 +36,6 @@ def tokenize(text: str) -> list[str] | None:
 
 #print(tokenize(text))
 
-#tokens = ['string', {}, (), None, 9, 9.34, True, [None]]
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -51,6 +50,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     In case of corrupt input arguments, None is returned
     """
     if not tokens or None:
+        return None
+
+    if not isinstance(tokens, list):
         return None
 
     token_freq = {}
@@ -68,11 +70,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     total_tokens = len(tokens)
 
     for key, value in token_freq.items():
-        token_freq[key] = value / total_tokens
+        token_freq[key] = round(value / total_tokens, 4)
 
     return token_freq
 
-#print(calculate_frequencies(tokens))
 
 
 
@@ -90,7 +91,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if not language or not text:
+    if not language or not text or not isinstance(language, str):
         return None
 
     tokens = tokenize(text)
@@ -104,10 +105,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     }
 
 
-#text = "Я люблю программировать."
-#language = 'Python'
-#profile = create_language_profile(language, text)
-#print(profile)
+language_name = 'en'
+text = 'he is a happy man'
+profile = create_language_profile(language_name, text)
+print(profile)
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

@@ -77,15 +77,20 @@ def sum13(nums: list) -> int:
     so it does not count and numbers that come after a 13
     also do not count.
     """
-    # student realization goes here
+    a = 0
+    for i in nums:
+        if i == 13:
+            return a
+        a += i
+    print(a)
 
 # Function calls with expected result:
-# sum13([1, 2, 2, 1]) → 6
-# sum13([1, 1]) → 2
-# sum13([1, 2, 2, 1, 13]) → 6
-# sum13([1, 2, 2, 1, 13, 5, 6]) → 6
+sum13([1, 2, 2, 1])
+sum13([1, 1])
+sum13([1, 2, 2, 1, 13])
+sum13([1, 2, 2, 1, 13, 5, 6])
 
-
+import copy
 # Task 3
 # easy level
 def sum67(nums: list) -> int:
@@ -95,13 +100,20 @@ def sum67(nums: list) -> int:
     (every 6 will be followed by at least one 7).
     Return 0 for no numbers.
     """
-    # student realization goes here
+    nums = copy.deepcopy(nums)
+    a = 0
+    for i in nums:
+        if 6 in nums:
+            del nums[nums.index(6):nums.index(7)+1]
+        a += i
+    print(a)
+
 
 # Function calls with expected result:
-# sum67([1, 2, 2]) → 5
-# sum67([1, 2, 2, 6, 99, 99, 7]) → 5
-# sum67([1, 1, 6, 7, 2]) → 4
-
+sum67([1, 2, 2])
+sum67([1, 6, 99, 99, 7, 1, 6, 7])
+sum67([1, 1, 6, 7, 2])
+import random
 
 # Task 4
 # easy level
@@ -110,7 +122,8 @@ def create_phone_number(nums: list) -> str:
     Write a function that accepts an array of 10 integers (between 0 and 9),
     that returns a string of those numbers in the form of a phone number.
     """
-    # student realization goes here
+    random_nums = nums.rand
+    a = random_nums
 
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])

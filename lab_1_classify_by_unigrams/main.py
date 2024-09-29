@@ -3,9 +3,9 @@ Lab 1.
 
 Language detection
 """
-# pylint:disable=too-many-locals, unused-argument, unused-variable
+from typing import Tuple, Dict, Any
 
-punct = '''!@#$%^&*()_-=+|/{}[]'"?.>,<~:;'''
+# pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -30,7 +30,7 @@ def tokenize(text: str) -> list[str] | None:
     return tokens
 
 
-def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+def calculate_frequencies(tokens: list[str] | None) -> (dict[str, float] | None):
     """
     Calculate frequencies of given tokens.
 
@@ -42,11 +42,23 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if type(tokens) is not list:
+        return None
+
+    for elem in tokens:
+        if type(elem) is not str:
+            return None
+
     token_dict = {}
     for i in tokens:
         if i not in token_dict.keys():
-            token_dict.update({i: 1})
+            token_dict.update({i: 0})
         token_dict[i] += 1
+
+    sum_token_dict_values = sum(token_dict.values())
+    for i in token_dict:
+        new_elem = token_dict[i] / sum_token_dict_values
+        token_dict[i] = new_elem
     return token_dict
 
 

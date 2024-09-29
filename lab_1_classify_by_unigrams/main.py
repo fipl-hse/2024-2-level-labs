@@ -160,7 +160,7 @@ def detect_language(
         return str(profile_1['name'])
     if distance_2 < distance_1:
         return str(profile_2['name'])
-    return min(profile_1['name'], profile_2['name'], key=str)
+    return min(str(profile_1['name']), str(profile_2['name']))
 
 
 def load_profile(path_to_file: str) -> dict | None:

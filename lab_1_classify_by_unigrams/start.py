@@ -37,7 +37,8 @@ def main() -> None:
                                            'assets/profiles/it.json', 'assets/profiles/ru.json',
                                            'assets/profiles/tr.json'])
 
-    if detect_language_advanced is not None and print_report is not None and collected_profiles is not None:
+    if (detect_language_advanced is not None and print_report is not None
+            and collected_profiles is not None and unk_profile is not None):
         print_report(detect_language_advanced(unk_profile, collected_profiles))
 
     result = 1

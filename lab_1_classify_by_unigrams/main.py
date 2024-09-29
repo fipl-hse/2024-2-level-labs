@@ -8,6 +8,7 @@ Language detection
 
 import json
 
+
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -86,7 +87,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if len(predicted) != len(actual):
         return None
-    if not (all(isinstance(p, (float, int)) for p in predicted) and all(isinstance(a, (float, int)) for a in actual)):
+    if not (all(isinstance(p, (float, int)) for p in predicted) and all(isinstance(a, (float, int))
+                                                                        for a in actual)):
         return None
     mse = 0
     for i in range(0, len(actual)):
@@ -111,8 +113,8 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not ("name" in unknown_profile and "freq" in unknown_profile and "name" in profile_to_compare and
-            "freq" in profile_to_compare):
+    if not ("name" in unknown_profile and "freq" in unknown_profile and "name" in profile_to_compare
+            and "freq" in profile_to_compare):
         return None
     unknown_freq = []
     profile_freq = []
@@ -236,7 +238,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(paths_to_profiles,list) and all(isinstance(p, str) for p in paths_to_profiles)):
+    if not (isinstance(paths_to_profiles,list) and all(isinstance(p, str)
+                                                       for p in paths_to_profiles)):
         return None
     all_profiles = []
     for path in paths_to_profiles:
@@ -261,8 +264,8 @@ def detect_language_advanced(
     In case of corrupt input arguments, None is returned
     """
     distance = []
-    if not (isinstance(unknown_profile, dict) and isinstance(known_profiles,list) and all(isinstance(elem, dict)
-                                                                                          for elem in known_profiles)):
+    if not (isinstance(unknown_profile, dict) and isinstance(known_profiles, list) and
+            all(isinstance(elem, dict) for elem in known_profiles)):
         return None
     for profile in known_profiles:
         distance.append((profile['name'], compare_profiles(unknown_profile, profile)))

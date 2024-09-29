@@ -177,9 +177,10 @@ def detect_language(
     failsafe.sort(key=str.lower)
     return failsafe[0]
 
+    # def load_profile(path_to_file: str) -> dict | None:
 
-def load_profile(path_to_file: str) -> dict | None:
-    """
+
+"""
     Load a language profile.
 
     Args:
@@ -189,11 +190,10 @@ def load_profile(path_to_file: str) -> dict | None:
         dict | None: A dictionary with at least two keys – name, freq
 
     In case of corrupt input arguments, None is returned
-    """
+"""
 
-
-def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
-    """
+# def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
+"""
     Preprocess profile for a loaded language.
 
     Args:
@@ -205,11 +205,10 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
 
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
-    """
+"""
 
-
-def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
-    """
+# def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
+"""
     Collect profiles for a given path.
 
     Args:
@@ -219,13 +218,11 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         list[dict[str, str | dict[str, float]]] | None: A list of loaded profiles
 
     In case of corrupt input arguments, None is returned
-    """
+"""
 
-
-def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
-) -> list | None:
-    """
+# def detect_language_advanced( unknown_profile:
+# dict[str, str | dict[str, float]], known_profiles: list) -> list | None:
+"""
     Detect the language of an unknown profile.
 
     Args:
@@ -237,15 +234,14 @@ def detect_language_advanced(
         list | None: A sorted list of tuples containing a language and a distance
 
     In case of corrupt input arguments, None is returned
-    """
+"""
 
-
-def print_report(detections: list[tuple[str, float]]) -> None:
-    """
+# def print_report(detections: list[tuple[str, float]]) -> None:
+"""
     Print report for detection of language.
 
     Args:
         detections (list[tuple[str, float]]): A list with distances for each available language
 
     In case of corrupt input arguments, None is returned
-    """
+"""

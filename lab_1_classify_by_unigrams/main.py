@@ -6,7 +6,7 @@ Language detection
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-
+import json
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -175,6 +175,13 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(path_to_file,str):
+        return None
+    with open(path_to_file, 'r', encoding="utf-8") as file_to_read:
+        profile = json.load(file_to_read)
+    if not isinstance(profile, dict) or profile is None:
+        return None
+    return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -191,6 +198,28 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
+    profile_processed = {}
+    quantity = 0
+    if not ("name" in profile and "freq" in profile and "n_words" in profile):
+        return None
+    for k, v in profile.items():
+        if k == 'name':
+            profile_processed[k] = v.lower()
+            continue
+        if k == 'n_words':
+            quantity += v[0]
+            continue
+        if k == 'freq':
+            profile_processed[k] = {}
+            for k_2, v_2 in v.items():
+                if len(k_2) == 1:
+                    if k_2.lower() not in profile_processed[k] and k_2.isalpha():
+                        profile_processed[k][k_2.lower()] = v_2
+                    elif k_2.lower() in profile_processed[k] and k_2.isalpha():
+                        profile_processed[k][k_2.lower()] += v_2
+    for k, v in profile_processed['freq'].items():
+        profile_processed['freq'][k] = v / quantity
+    return profile_processed
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -205,6 +234,12 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
+    if not (isinstance(paths_to_profiles,list) and all(isinstance(p, str) for p in paths_to_profiles)):
+        return None
+    all_profiles = []
+    for path in paths_to_profiles:
+        all_profiles.append(preprocess_profile(load_profile(path)))
+    return all_profiles
 
 
 def detect_language_advanced(
@@ -223,6 +258,12 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
+    distance = []
+    if not (isinstance(unknown_profile, dict) and isinstance(known_profiles,list) and all(isinstance(elem, dict) for elem in known_profiles)):
+        return None
+    for profile in known_profiles:
+        distance.append((profile['name'], compare_profiles(unknown_profile, profile)))
+    return sorted(distance, key=lambda i:i[1])
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -234,3 +275,8 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not all(isinstance(elem, tuple) for elem in detections):
+        return None
+    for elem in detections:
+        print(f'{elem[0]}: MSE {elem[1]:.5f}')
+    return None

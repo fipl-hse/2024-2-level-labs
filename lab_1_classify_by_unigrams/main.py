@@ -105,10 +105,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     }
 
 
-language_name = 'en'
-text = 'he is a happy man'
-profile = create_language_profile(language_name, text)
-print(profile)
+#language_name = 'en'
+#text = 'he is a happy man'
+#profile = create_language_profile(language_name, text)
+#print(profile)
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -156,6 +156,8 @@ def compare_profiles(
     """
 
 
+
+
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_1: dict[str, str | dict[str, float]],
@@ -175,6 +177,7 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+
 
 
 def load_profile(path_to_file: str) -> dict | None:

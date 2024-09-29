@@ -161,7 +161,9 @@ def detect_language(
     if distance_2 < distance_1:
         return str(profile_2['name'])
     return min(str(profile_1['name']), str(profile_2['name']))
-
+# I don't know why str() is necessary in 158-163 if I've checked the type in 153
+# but without it MyPy was arguing about error in return value type
+# so it was the only solution I could find
 
 def load_profile(path_to_file: str) -> dict | None:
     """

@@ -19,9 +19,13 @@ def main() -> None:
     print(result)
     print(func.calculate_frequencies(result))
     print(func.create_language_profile('en', en_text))
-    print(func.detect_language(func.create_language_profile(
-        'un', unknown_text), func.create_language_profile(
-        'de', de_text), func.create_language_profile('en', en_text)))
+    en_profile = func.create_language_profile('en', en_text)
+    du_profile = func.create_language_profile('de', de_text)
+    un_profile = func.create_language_profile('un', unknown_text)
+    if not isinstance(en_profile, dict) or not isinstance(
+            du_profile, dict) or not isinstance(en_profile, dict):
+        return None
+    print(func.detect_language(un_profile, du_profile, en_profile))
     assert result, "Detection result is None"
 
 

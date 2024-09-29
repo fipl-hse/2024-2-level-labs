@@ -17,14 +17,7 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
-    result = m.detect_language_advanced(m.create_language_profile('unknown', unknown_text),
-                                        m.collect_profiles(['assets/profiles/es.json',
-                                                            'assets/profiles/fr.json',
-                                                            'assets/profiles/it.json',
-                                                            'assets/profiles/ru.json',
-                                                            'assets/profiles/tr.json']))
-    print(result)
-    m.print_report(result)
+    result = m.tokenize(en_text)
 
     assert result, "Detection result is None"
 

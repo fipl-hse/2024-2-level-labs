@@ -152,17 +152,14 @@ def detect_language(
         return None
     if not all(isinstance(profile['name'], str) for profile in (profile_1, profile_2)):
         return None
-
     distance_1 = compare_profiles(unknown_profile, profile_1)
     distance_2 = compare_profiles(unknown_profile, profile_2)
-
     if distance_1 is None:
-        return profile_2['name'] if distance_2 is not None else None
+        return (str(profile_2['name'])) if distance_2 is not None else None
     if distance_2 is None or distance_1 < distance_2:
-        return profile_1['name']
+        return str(profile_1['name'])
     if distance_2 < distance_1:
-        return profile_2['name']
-
+        return str(profile_2['name'])
     return min(profile_1['name'], profile_2['name'], key=str)
 
 

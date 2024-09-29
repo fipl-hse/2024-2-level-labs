@@ -111,8 +111,8 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or\
-            'name' not in unknown_profile or 'freq' not in unknown_profile or 'name' not\
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or \
+            'name' not in unknown_profile or 'freq' not in unknown_profile or 'name' not \
             in profile_to_compare or 'freq' not in profile_to_compare:
         return None
     unknown_freq = unknown_profile['freq']
@@ -147,22 +147,23 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not all(
-            isinstance(profile, dict) and 'freq' in profile and 'name' in profile
-            for profile in (unknown_profile, profile_1, profile_2)
-    ):
+    if not all(isinstance(profile, dict) and 'freq' in profile and
+               'name' in profile for profile in (unknown_profile, profile_1, profile_2)):
         return None
     if not all(isinstance(profile['name'], str) for profile in (profile_1, profile_2)):
         return None
+
     distance_1 = compare_profiles(unknown_profile, profile_1)
     distance_2 = compare_profiles(unknown_profile, profile_2)
+
     if distance_1 is None:
         return profile_2['name'] if distance_2 is not None else None
     if distance_2 is None or distance_1 < distance_2:
         return profile_1['name']
     if distance_2 < distance_1:
         return profile_2['name']
-    return min(profile_1['name'], profile_2['name'])
+
+    return min(profile_1['name'], profile_2['name'], key=str)
 
 
 def load_profile(path_to_file: str) -> dict | None:

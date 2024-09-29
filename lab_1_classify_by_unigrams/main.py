@@ -118,7 +118,8 @@ def compare_profiles(
         return None
     if not 'name' in profile_to_compare or not 'name' in unknown_profile:
         return None
-    if not isinstance(profile_to_compare['name'], str) or not isinstance(profile_to_compare['freq'], dict):
+    if (not isinstance(profile_to_compare['name'], str) or
+            not isinstance(profile_to_compare['freq'], dict)):
         return None
     for prof in [unknown_profile['freq'], profile_to_compare['freq']]:
         for elem, freq in prof.items():
@@ -127,7 +128,7 @@ def compare_profiles(
     first_language_prof = unknown_profile['freq']
     second_language_prof = profile_to_compare['freq']
     for letter in first_language_prof.keys():
-        if not (letter in second_language_prof.keys()):
+        if not letter in second_language_prof.keys():
             second_language_prof[
                 letter] = 0
     for letter in second_language_prof.keys():
@@ -135,7 +136,8 @@ def compare_profiles(
             first_language_prof[letter] = 0
     profile_to_compare_sort, unknown_profile_sort = dict(sorted(first_language_prof.items())), dict(
         sorted(second_language_prof.items()))
-    compare_result = calculate_mse(list(profile_to_compare_sort.values()), list(unknown_profile_sort.values()))
+    compare_result = calculate_mse(list(profile_to_compare_sort.values()),
+                                   list(unknown_profile_sort.values()))
     return compare_result
 
 
@@ -158,7 +160,8 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
     first_metric = compare_profiles(unknown_profile, profile_1)
     second_metric = compare_profiles(unknown_profile, profile_2)

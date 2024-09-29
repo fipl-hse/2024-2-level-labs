@@ -102,27 +102,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     return value / i
 
 
-def sort_dict(dictio):
-    """
-    Alphabetically sort the dictionary
-
-    Args:
-        dictio: A dictionary to be sorted
-
-    Returns:
-        sorted_dict: A sorted dictionary in alphabetical order
-
-    """
-    sorted_list = sorted(dictio.items())
-    sorted_dict = {}
-    for key, value in sorted_list:
-        sorted_dict[key] = value
-    return sorted_dict
-
-
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -163,9 +145,9 @@ def compare_profiles(
 
 
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -290,7 +272,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.
@@ -331,3 +313,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     for profile in detections:
         print(f'{profile[0]}: MSE {profile[1]:.5f}')
+
+    return None

@@ -69,9 +69,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if (not isinstance(language, str) or not isinstance(text, str)
             or len(language) == 0 or len(text) == 0):
         return None
+    freq_text = calculate_frequencies(tokenize(text))
+    if not freq_text:
+        return None
 
     profile_dict: dict[str, str | dict[str, float]] | None
-    profile_dict = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    profile_dict = {'name': language, 'freq': freq_text}
     return profile_dict
 
 
@@ -142,7 +145,10 @@ def compare_profiles(
     sorted_unknown_profile = list(dict(sorted(unknown_profile_freq.items(),
                                               key=lambda x: x[0])).values())
 
-    return calculate_mse(sorted_profile_to_compare, sorted_unknown_profile)
+    result = calculate_mse(sorted_profile_to_compare, sorted_unknown_profile)
+    if not result:
+        return None
+    return result
 
 
 def detect_language(
@@ -172,6 +178,10 @@ def detect_language(
 
     mse_profile_1 = compare_profiles(unknown_profile, profile_1)
     mse_profile_2 = compare_profiles(unknown_profile, profile_2)
+
+    if not mse_profile_1 or not mse_profile_2:
+        return None
+
     lang_list = [profile_1['name'], profile_2['name']]
 
     if mse_profile_1 == mse_profile_2:
@@ -267,8 +277,9 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     profiles_list = []
     for path in paths_to_profiles:
         preprocessed_profile = preprocess_profile(load_profile(path))
-        if preprocessed_profile is not None:
-            profiles_list.append(preprocessed_profile)
+        if not preprocessed_profile:
+            return None
+        profiles_list.append(preprocessed_profile)
 
     return profiles_list
 
@@ -295,7 +306,10 @@ def detect_language_advanced(
 
     result_list = []
     for profile in known_profiles:
-        result_list.append((profile['name'], compare_profiles(unknown_profile, profile)))
+        compared_profiles = compare_profiles(unknown_profile, profile)
+        if not compared_profiles:
+            return None
+        result_list.append((profile['name'], compared_profiles))
     result_list = sorted(sorted(result_list, key=lambda x: x[0]), key=lambda x: x[1], reverse=False)
 
     return result_list

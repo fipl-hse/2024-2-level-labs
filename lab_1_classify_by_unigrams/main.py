@@ -53,11 +53,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for token in tokens:
         if not isinstance(token, str):
             return None
+        if token in abs_freq:
+            abs_freq[token] += 1
         else:
-            if token in abs_freq:
-                abs_freq[token] += 1
-            else:
-                abs_freq[token] = 1
+            abs_freq[token] = 1
     rel_freq = {element: freq / total_elements for element, freq in abs_freq.items()}
     return rel_freq
 
@@ -96,12 +95,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if not isinstance(predicted, list) or not isinstance(actual, list) \
+            or len(predicted) != len(actual):
         return None
-    mse = 0
-    for i in range(len(actual)):
-        mse += (actual[i] - predicted[i])**2
-    return mse / len(actual)
+    mse = sum((actual[i] - predicted[i])**2 for i in range(len(actual))) / len(actual)
+    return mse
 
 
 def compare_profiles(
@@ -161,19 +159,17 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
+            or not isinstance(profile_2, dict):
         return None
     mse1 = compare_profiles(unknown_profile, profile_1)
     mse2 = compare_profiles(unknown_profile, profile_2)
     if mse1 > mse2:
         return profile_2['name']
-    elif mse2 > mse1:
+    return profile_1['name']
+    if profile_1['name'] < profile_2['name']:
         return profile_1['name']
-    else:
-        if profile_1['name'] < profile_2['name']:
-            return profile_1['name']
-        else:
-            return profile_2['name']
+    return profile_2['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:

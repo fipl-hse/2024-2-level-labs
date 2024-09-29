@@ -91,7 +91,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
                                                                         for a in actual)):
         return None
     mse = 0
-    for i in range(0, len(actual)):
+    for i, l in enumerate(predicted):
         mse += (actual[i] - predicted[i]) ** 2
     return round((mse / len(actual)), 4)
 
@@ -160,7 +160,7 @@ def detect_language(
         return None
     if mse_1 < mse_2:
         return profile_1['name']
-    elif mse_1 > mse_2:
+    if mse_1 > mse_2:
         return profile_2['name']
     languages = [profile_1['name'], profile_2['name']]
     languages.sort()

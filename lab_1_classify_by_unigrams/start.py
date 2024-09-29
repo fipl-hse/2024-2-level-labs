@@ -4,7 +4,7 @@ Language detection starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
-                                             detect_language_advanced, detect_language,
+                                             detect_language, detect_language_advanced,
                                              load_profile, preprocess_profile,
                                              print_report, tokenize)
 
@@ -41,7 +41,7 @@ def main() -> None:
             and collected_profiles is not None and unk_profile is not None):
         print_report(detect_language_advanced(unk_profile, collected_profiles))
 
-    result = 1
+    result = tokens
 
     assert result, "Detection result is None"
 

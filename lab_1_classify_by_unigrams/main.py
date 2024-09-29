@@ -279,7 +279,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     collected_profiles = []
 
     for path in paths_to_profiles:
-        if load_profile(path) is not None:
+        if load_profile is not None and preprocess_profile is not None:
             new_profile = preprocess_profile(load_profile(path))
             if new_profile is None:
                 return None

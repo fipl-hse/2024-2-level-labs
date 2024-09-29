@@ -19,9 +19,10 @@ def main() -> None:
     unknown_language_profile = create_language_profile('unknown',unknown_text)
     en_language_profile = create_language_profile('en',en_text)
     de_language_profile = create_language_profile('de',de_text)
-    print(tokenize(en_text))
-    print(create_language_profile('en',en_text))
-    print(detect_language(unknown_language_profile,en_language_profile,de_language_profile))
+    if unknown_language_profile and en_language_profile and de_language_profile:
+        print(tokenize(en_text))
+        print(create_language_profile('en', en_text))
+        print(detect_language(unknown_language_profile, en_language_profile, de_language_profile))
 
     assert result, "Detection result is None"
 

@@ -26,6 +26,10 @@ def main() -> None:
         print(result)
     else:
         result = None
+    paths_to_profiles = ["assets/profiles/de.json", "assets/profiles/en.json",
+                         "assets/profiles/es.json", "assets/profiles/fr.json",
+                         "assets/profiles/it.json", "assets/profiles/ru.json",
+                         "assets/profiles/tr.json"]
     assert result, "Detection result is None"
 
 

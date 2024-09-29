@@ -5,7 +5,7 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 import json
-
+import copy
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -157,7 +157,8 @@ def compare_profiles(
     if (profiles_bad_input(unknown_profile) is None or
             profiles_bad_input(profile_to_compare) is None):
         return None
-    from_profile1 = unknown_profile["freq"]
+    unk_profile = copy.deepcopy(unknown_profile)
+    from_profile1 = unk_profile["freq"]
     from_profile2 = profile_to_compare["freq"]
     keys_for_1 = set(from_profile1.keys())
     keys_for_2 = set(from_profile2.keys())
@@ -165,20 +166,16 @@ def compare_profiles(
         return None
     letters_need1 = keys_for_1.difference(keys_for_2)
     letters_need2 = keys_for_2.difference(keys_for_1)
-
     for i in letters_need1:
         from_profile2.setdefault(i, 0.0)
     for x in letters_need2:
         from_profile1.setdefault(x, 0.0)
-
     sorted1 = dict(sorted(from_profile1.items()))
     sorted2 = {}
-
     for key in sorted1:
         sorted2[key] = from_profile2.get(key, from_profile1[key])
     list1 = list(sorted1.values())
     list2 = list(sorted2.values())
-
     conclusion = calculate_mse(list2, list1)
     if not isinstance(conclusion, float):
         return None

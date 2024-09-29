@@ -38,7 +38,7 @@ def main() -> None:
         return None
     mainlab.print_report(result)
     assert result, "Detection result is None"
-
+    return None
 
 if __name__ == "__main__":
     main()

@@ -5,8 +5,8 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-
 def tokenize(text: str) -> list[str] | None:
+    from lab_1_classify_by_unigrams.main import tokenize
     """
     Split a text into tokens.
 
@@ -21,8 +21,27 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
 
+def tokenize(text: str) -> list[str] | None:
+    if not isinstance(text, str):
+        return None
+    tokens = []
+    for token in text:
+        if token.isalpha():
+           tokens.append(token.lower())
+    return tokens
+
+
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+    frequency_dict = {}
+    for letter in tokens:
+        if letter.isalpha():
+           if letter in frequency_dict:
+            frequency_dict[letter] += 1
+           else:
+            frequency_dict[letter] = 1
+    return frequency_dict
+
     """
     Calculate frequencies of given tokens.
 
@@ -49,6 +68,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if not (isinstance(language, str) and isinstance(text, str)):
+        return None
+    frequency_dict = calculate_frequencies(tokenize(text))
+    return {'name': language,
+            'freq': frequency_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

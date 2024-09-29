@@ -66,10 +66,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     if not isinstance(text, str):
         return None
-    if tokenize(text) == None:
+    if tokenize(text) is None:
         return None
     freq = tokenize(text)
-    if calculate_frequencies(freq) == None:
+    if calculate_frequencies(freq) is None:
         return None
     dictionary = calculate_frequencies(freq)
     profile = {
@@ -103,7 +103,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for index in range(length):
         mse += (actual[index] - predicted[index]) ** 2
     return mse / float(length)
-
 
 
 def profiles_bad_input(profile: dict[str, str | dict[str, float]]) -> dict[str, str | dict[str, float]] | None:
@@ -145,7 +144,7 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if profiles_bad_input(unknown_profile) == None or profiles_bad_input(profile_to_compare) == None:
+    if profiles_bad_input(unknown_profile) is None or profiles_bad_input(profile_to_compare) is None:
         return None
     from_profile1 = unknown_profile["freq"]
     from_profile2 = profile_to_compare["freq"]
@@ -164,12 +163,14 @@ def compare_profiles(
     sorted1 = dict(sorted(from_profile1.items()))
     sorted2 = {}
 
+    #common_keys = keys_for_1.intersection(keys_for_2)
     for key in sorted1:
         sorted2[key] = from_profile2.get(key, from_profile1[key])
     list1 = list(sorted1.values())
     list2 = list(sorted2.values())
+
     conclusion = calculate_mse(list2, list1)
-    if not isinstance(conclusion, float) or conclusion <= 0.0:
+    if not isinstance(conclusion, float):
         return None
     return conclusion
 
@@ -193,7 +194,7 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if profiles_bad_input(unknown_profile) == None or profiles_bad_input(profile_1) == None or profiles_bad_input(profile_2) == None:
+    if profiles_bad_input(unknown_profile) is None or profiles_bad_input(profile_1) is None or profiles_bad_input(profile_2) is None:
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
@@ -216,9 +217,12 @@ def load_profile(path_to_file: str) -> dict | None:
     """
     if not isinstance(path_to_file, str):
         return None
-    with open(path_to_file, encoding='utf-8') as file_to_read:
+    with open(path_to_file, 'r', encoding='utf-8') as file_to_read:
         dictionary = json.load(file_to_read)
+        if not isinstance(dictionary, dict):
+            return None
         return dictionary
+
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
@@ -234,23 +238,37 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(profile, dict) or not all(l in profile for l in ('freq', 'name', 'n_words')):
+    if not isinstance(profile, dict):
+        return None
+    if len(profile.keys()) != 3:
+        return None
+    if not all(x in profile for x in ['freq', 'name', 'n_words']):
+        return None
+    if not isinstance(profile['n_words'], list) or len(profile['n_words']) == 0:
+        return None
+    if not all(isinstance(key, str) for key in profile['freq'].keys()):
+        return None
+    if not all(isinstance(value, (int, float)) for value in profile['freq'].values()):
         return None
     processed_profile = {'name': profile['name'], 'freq': {}}
     dicty = {}
     for unigram in profile['freq'].keys():
-        if isinstance(unigram, str) and len(unigram) == 1:
-            dicty.setdefault(unigram, profile['freq'][unigram])
-    letters = [i for i in dicty]
-    for letter in letters:
-        if letter.isupper():
+        if unigram.isalpha():
             pass
-        if letter.islower():
+        if len(unigram) == 1:
+            dicty.setdefault(unigram, profile['freq'][unigram])
+    letters = list(dicty)
+    for letter in letters:
+        if not letter.isupper():
             dicty[letter] = dicty.get(letter, 0) + dicty.get(letter.upper(), 0)
-            processed_profile['freq'][letter] = dicty[letter] / profile['n_words'][0]
+            processed_profile['freq'][letter.lower()] = dicty[letter] / profile['n_words'][0]
             if letter.upper() in dicty:
                 del dicty[letter.upper()]
+    for i in dicty.items():
+        if i[0].isupper():
+            processed_profile['freq'][i[0].lower()] = i[1] / profile['n_words'][0]
     return processed_profile
+
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
@@ -264,22 +282,25 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(paths_to_profiles, list):
+        return None
+    if not all(isinstance(letter, str) for letter in paths_to_profiles):
+        return None
     list_for_dictionaries = []
-    for profile in paths_to_profiles:
-        if load_profile(profile) is None:
+    for name_of_profile in paths_to_profiles:
+        if load_profile(name_of_profile) is None:
             return None
-        dictionary_unprocessed: dict | None = load_profile(profile)
+        dictionary_unprocessed = load_profile(name_of_profile)
         if not isinstance(dictionary_unprocessed, dict):
             return None
-        if preprocess_profile(dictionary_unprocessed) is None:
-            return None
         processed_profile = preprocess_profile(dictionary_unprocessed)
+        if processed_profile is None:
+            return None
         if not isinstance(processed_profile, dict):
             return None
-        result: dict[str, str | dict[str, float]] | None = profiles_bad_input(processed_profile)
-        if result is None:
+        if profiles_bad_input(processed_profile) is None:
             return None
-        list_for_dictionaries.append(result)
+        list_for_dictionaries.append(processed_profile)
     return list_for_dictionaries
 
 
@@ -299,23 +320,22 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if profiles_bad_input(unknown_profile) == None:
+    if profiles_bad_input(unknown_profile) is None:
         return None
     if not isinstance(unknown_profile, dict):
         return None
     if not isinstance(known_profiles, list):
         return None
-    sorted_list: list[tuple[str, float]] | None = []
+    sorted_list = []
     for profile in known_profiles:
         mse: float | None = compare_profiles(unknown_profile, profile)
         if mse is None:
             return None
-        names_with_mse: tuple[str, float] = (profile["name"], mse)
-        sorted_list.append(names_with_mse)
-    result_list: list[tuple[str, float]] | None
+        sorted_list.append((profile["name"], mse))
     if sorted_list:
-        result_list = sorted(sorted_list, key=lambda profile: profile[1])
-    return result_list
+        return sorted(sorted_list, key=lambda block: (block[1], block[0]))
+    return None
+
 
 def print_report(detections: list[tuple[str, float]]) -> None:
     """
@@ -328,7 +348,11 @@ def print_report(detections: list[tuple[str, float]]) -> None:
     """
     if not isinstance(detections, list):
         return None
-    for tuple in detections:
-        language = tuple[0]
-        score = tuple[1]
-        print(f'{language}: MSE {score:.5f}')
+    for i in detections:
+        if not isinstance(i, tuple):
+            return None
+        if not isinstance(i[0], str) and isinstance(i[1], float):
+            return None
+    for block in detections:
+        print(f'{block[0]}: MSE {block[1]:.5f}')
+    return None

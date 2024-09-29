@@ -31,15 +31,12 @@ def main() -> None:
                           'assets/profiles/it.json', 'assets/profiles/ru.json',
                           'assets/profiles/tr.json']
     collection = mainlab.collect_profiles(paths_to_profiles)
-    if collection is None:
-        return None
-
-    result = mainlab.detect_language_advanced(unknown_profile, collection)
-    if result is None:
-        return None
-
-    mainlab.print_report(result)
-    assert result, "Detection result is None"
+    if collection:
+        result = mainlab.detect_language_advanced(unknown_profile, collection)
+        if not isinstance(result, list):
+            return None
+        mainlab.print_report(result)
+        assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

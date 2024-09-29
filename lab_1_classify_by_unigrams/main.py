@@ -5,15 +5,7 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-def tokenize(text):
-    token_list = []
-    if not(isinstance(text, str)):
-        return None
-    for letter in text.lower():
-        if letter.isalpha() and letter != 'º':
-            token_list.append(letter)
-    return token_list
-
+def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
 
@@ -27,7 +19,13 @@ def tokenize(text):
 
     In case of corrupt input arguments, None is returned
     """
-
+    token_list = []
+    if not isinstance(text, str):
+        return None
+    for letter in text.lower():
+        if letter.isalpha() and letter != 'º':
+            token_list.append(letter)
+    return token_list
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -42,10 +40,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     In case of corrupt input arguments, None is returned
     """
     freq_dict = {}
-    if not(isinstance(tokens, list)):
+    if not isinstance(tokens, list):
         return None
     for letter in tokens:
-        if not(isinstance(letter, str)):
+        if not isinstance(letter, str):
             return None
         freq_dict[letter] = tokens.count(letter) / len(tokens)
     return freq_dict
@@ -66,7 +64,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
     language_profile = {}
-    if not(isinstance(language, str)) or not(isinstance(text, str)):
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
     language_profile['name'] = language
     language_profile['freq'] = calculate_frequencies(tokenize(text))
@@ -85,7 +83,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not(isinstance(predicted, list)) or not(isinstance(actual, list)):
+    if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
     if len(predicted) != len(actual):
         return None
@@ -116,15 +114,15 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if not('freq' in profile_to_compare) or not('freq' in unknown_profile):
+    if not 'freq' in profile_to_compare or not 'freq' in unknown_profile:
         return None
-    if not('name' in profile_to_compare) or not('name' in unknown_profile):
+    if not 'name' in profile_to_compare or not 'name' in unknown_profile:
         return None
-    if not(isinstance(profile_to_compare['name'], str)) or not(isinstance(profile_to_compare['freq'], dict)):
+    if not isinstance(profile_to_compare['name'], str) or not isinstance(profile_to_compare['freq'], dict):
         return None
     for prof in [unknown_profile['freq'], profile_to_compare['freq']]:
         for elem, freq in prof.items():
-            if not(isinstance(elem, str)) or not(isinstance(freq, float) or isinstance(freq, int)):
+            if not isinstance(elem, str) or not isinstance(freq, (float, int)):
                 return None
     first_language_prof = unknown_profile['freq']
     second_language_prof = profile_to_compare['freq']
@@ -133,7 +131,7 @@ def compare_profiles(
             second_language_prof[
                 letter] = 0  # приводим словари к одному и тому же количеству букв (на случай, если буква встречается в одном словаре, а в другом её нет)
     for letter in second_language_prof.keys():
-        if not (letter in first_language_prof.keys()):
+        if not letter in first_language_prof.keys():
             first_language_prof[letter] = 0
     profile_to_compare_sort, unknown_profile_sort = dict(sorted(first_language_prof.items())), dict(
         sorted(second_language_prof.items()))
@@ -160,17 +158,16 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not(isinstance(unknown_profile, dict)) or not(isinstance(profile_1, dict)) or not(isinstance(profile_2, dict)):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
     first_metric = compare_profiles(unknown_profile, profile_1)
     second_metric = compare_profiles(unknown_profile, profile_2)
     if first_metric == second_metric:
         languages = [profile_1['name'], profile_2['name']]
         return sorted(languages)[0]
-    elif first_metric < second_metric:
+    if first_metric < second_metric:
         return profile_1['name']
-    else:
-        return profile_2['name']
+    return profile_2['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:

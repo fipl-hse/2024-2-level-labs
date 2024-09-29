@@ -22,7 +22,7 @@ def main() -> None:
     unknown_profile = create_language_profile('unknown', unknown_text)
     result = detect_language(unknown_profile, en_profile, de_profile)
     assert result, "Detection result is None"
-    print(result_for_4)
+    print(result_for_4, result)
 
 
 if __name__ == "__main__":

@@ -70,14 +70,14 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
             In case of corrupt input arguments, None is returned
             """
-    if not isinstance(text, str) or not isinstance(language, dict):
+    if not isinstance(text, str) or not isinstance(language, str):
         return None
     freq_dict = calculate_frequencies(tokenize(text))
-    if not freq_dict:
-        return None
-    language_profile = {"name": language,
-                        "freq": freq_dict}
-    return language_profile
+    if freq_dict is not None:
+        language_profile = {"name": language,
+                            "freq": freq_dict}
+        return language_profile
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -247,7 +247,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         return None
     new_profile = {}
     name = {"name": profile.get("name")}
-    if not isinstance(name, dict) or not isinstance(name.get, str):
+    if not isinstance(name, dict):
         return None
     new_profile.update(name)
     tokens = list(frequency.keys())
@@ -262,7 +262,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         if isinstance(elem, str) and len(elem) == 1:
             number = frequency.get(elem)
             let = elem.lower()
-            if isinstance(let, str) and let not in letters.keys():
+            if isinstance(let, str) and let not in letters:
                 new_token = {let: number}
                 letters.update(new_token)
             else:
@@ -270,14 +270,11 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
                 sum_freq = number + freq_add
                 new_token = {let: sum_freq}
                 letters.update(new_token)
-    if isinstance(letters, dict):
-        for tok in letters:
-            freq_index = float(letters.get(tok)/n_words)
-            letters[tok] = freq_index
-            new_profile["freq"] = letters
-    if isinstance(new_profile, dict):
-        return new_profile
-    return None
+    for tok in letters:
+        freq_index = float(letters.get(tok)/n_words)
+        letters[tok] = freq_index
+        new_profile["freq"] = letters
+    return new_profile
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -294,7 +291,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     """
     if not isinstance(paths_to_profiles, list):
         return None
-    list_of_profiles = list()
+    list_of_profiles = []
     for name in paths_to_profiles:
         profile = load_profile(name)
         if isinstance(profile, dict):
@@ -353,4 +350,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
             score = elem[1]
             text = f"{elem[0]}: MSE {score:.5f}"
             print(text)
-    return None

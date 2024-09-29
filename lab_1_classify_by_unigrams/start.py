@@ -1,10 +1,14 @@
-from lab_1_classify_by_unigrams.main import (tokenize, create_language_profile, detect_language,
-                                             collect_profiles, detect_language_advanced,
-                                             print_report)
 """
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+
+from lab_1_classify_by_unigrams.main import tokenize
+from lab_1_classify_by_unigrams.main import detect_language
+from lab_1_classify_by_unigrams.main import create_language_profile
+from lab_1_classify_by_unigrams.main import collect_profiles
+from lab_1_classify_by_unigrams.main import print_report
+from lab_1_classify_by_unigrams.main import detect_language_advanced
 
 
 def main() -> None:
@@ -27,7 +31,7 @@ def main() -> None:
 
     if (isinstance(en_prof, dict) and isinstance(de_prof, dict)
             and isinstance(unknown_prof, dict)):
-        detect_language(en_prof, create_language_profile("de", de_text), unknown_prof)
+        detect_language(en_prof, de_prof, unknown_prof)
     extra_profiles = ["assets/profiles/de.json",
                       "assets/profiles/en.json",
                       "assets/profiles/es.json",
@@ -41,7 +45,9 @@ def main() -> None:
     if isinstance(unknown_prof, dict) and isinstance(all_profiles, list):
         if not detect_language_advanced(unknown_prof, all_profiles):
             return None
-        print_report(detect_language_advanced(unknown_prof, all_profiles))
+        finish = detect_language_advanced(unknown_prof, all_profiles)
+        if isinstance(finish, list):
+            print_report(finish)
 
     return None
     #assert result, "Detection result is None"

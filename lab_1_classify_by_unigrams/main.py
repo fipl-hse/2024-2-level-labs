@@ -42,14 +42,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-
-    eng_dict = {}
+    token_dict = {}
     for i in tokens:
-        if i not in eng_dict.keys():
-            eng_dict.update({i: 1})
-        else:
-            eng_dict[i] += 1
-    return eng_dict
+        if i not in token_dict.keys():
+            token_dict.update({i: 1})
+        token_dict[i] += 1
+    return token_dict
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

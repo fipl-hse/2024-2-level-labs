@@ -127,8 +127,8 @@ def compare_profiles(
             or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
         return None
 
-    profile_to_compare_freq = profile_to_compare['freq']
-    unknown_profile_freq = unknown_profile['freq']
+    profile_to_compare_freq = dict(profile_to_compare['freq'])
+    unknown_profile_freq = dict(unknown_profile['freq'])
 
     for key in profile_to_compare_freq.keys():
         if unknown_profile_freq.get(key) is None:
@@ -177,11 +177,13 @@ def detect_language(
     if not mse_profile_1 or not mse_profile_2:
         return None
 
-    if mse_profile_1 < mse_profile_2:
-        return profile_1['name']
+    lang_list = [profile_1['name'], profile_2['name']]
+
+    if mse_profile_1 == mse_profile_2:
+        return sorted(lang_list)[0]
     if mse_profile_1 > mse_profile_2:
         return profile_2['name']
-    return sorted([profile_1['name'], profile_2['name']])[0]
+    return profile_1['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -304,7 +306,7 @@ def detect_language_advanced(
             return None
         result_list.append((profile['name'], compared_profiles))
 
-    return sorted(sorted(result_list, key=lambda x: x[0]), key=lambda x: x[1])
+    return sorted(sorted(result_list, key=lambda x: x[0]), key=lambda x: x[1], reverse=False)
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

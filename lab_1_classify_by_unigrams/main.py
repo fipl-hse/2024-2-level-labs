@@ -20,18 +20,13 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if type(text) is not str:
+        return None
 
-    punc = [
-        ',', '.', '?', '"', "'", ':', ':', '>', '<', '-', '_',
-        '(', ')', '!', '^', '%', '#', '№', '&', '*', '@', ' '
-    ]
     list = []
     for symb in text:
-        symb = symb.lower()
-        if symb in punc:
-            continue
-        else:
-            list += symb
+        if symb.isalpha():
+            list += symb.lower()
     return list
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -45,7 +40,19 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not tokens or type(tokens) is not list:
+        return None
+    for el in tokens:
+        if type(el) is not str:
+            return None
 
+    dict = {}
+    for token in tokens:
+        if token not in dict:
+            dict[token] = 1/len(tokens)
+        else:
+            dict[token] += 1/len(tokens)
+    return dict
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -61,6 +68,16 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
 
+    if type(language) is not str or type(text) is not str:
+        return None
+
+    tokens = tokenize(text)
+    freq = calculate_frequencies(tokens)
+    dict = {
+        'name': language,
+        'freq': freq
+    }
+    return dict
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

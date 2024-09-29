@@ -245,8 +245,8 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     if not frequency:
         return None
     new_profile = {}
-    name = {"name": profile.get("name")}
-    if not isinstance(name, dict):
+    name = profile.get("name")
+    if not isinstance(name, str):
         return None
     tokens = list(frequency.keys())
     if not isinstance(tokens, list):

@@ -213,9 +213,9 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             profile_processed[k] = {}
             for k_2, v_2 in v.items():
                 if len(k_2) == 1:
-                    if k_2.lower() not in profile_processed[k] and k_2.isalpha():
+                    if k_2.lower() not in profile_processed[k]:
                         profile_processed[k][k_2.lower()] = v_2
-                    elif k_2.lower() in profile_processed[k] and k_2.isalpha():
+                    elif k_2.lower() in profile_processed[k]:
                         profile_processed[k][k_2.lower()] += v_2
     for k, v in profile_processed['freq'].items():
         profile_processed['freq'][k] = v / quantity

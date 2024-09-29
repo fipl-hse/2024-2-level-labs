@@ -338,5 +338,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
             if isinstance(element, tuple):
                 value = element[1]
                 print(f'{element[0]}: MSE {value:.5f}')
-
-    return None

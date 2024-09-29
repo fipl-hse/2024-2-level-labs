@@ -25,10 +25,9 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text = text.lower()
-    text = text.split()
+    split_text = text.lower().split()
     split2 = []
-    for word in text:
+    for word in split_text:
         for token in word:
             if token.isalpha():
                 split2 += token
@@ -81,10 +80,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    tokenized_text = tokenize(text)
+    frequency = calculate_frequencies(tokenize(text))
     return {
         'name': language,
-        'freq': calculate_frequencies(tokenized_text)
+        'freq': frequency
     }
 
 
@@ -131,6 +130,8 @@ def compare_profiles(
         return None
     unknown_frequency = unknown_profile['freq']
     comparing_frequency = profile_to_compare['freq']
+    if (not isinstance(unknown_frequency, dict) or not isinstance(comparing_frequency, dict)):
+        return None
     for i in unknown_frequency:
         if i not in comparing_frequency:
             comparing_frequency[i] = 0
@@ -172,8 +173,8 @@ def detect_language(
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    name1 = profile_1['name']
-    name2 = profile_2['name']
+    name1 = str(profile_1['name'])
+    name2 = str(profile_2['name'])
     if mse_1 is None or mse_2 is None:
         return None
     if mse_1 < mse_2:

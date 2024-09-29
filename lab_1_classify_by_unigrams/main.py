@@ -209,11 +209,11 @@ def detect_language(
     if (unknown_profile is None or profile_1 is None
             or profile_2 is None):
         return None
-    if (not isinstance(unknown_profile, dict) or
-            not isinstance(profile_1, dict) or not isinstance(profile_2, dict)):
-        return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
+    if (not isinstance(mse_1, (int, float))
+            or not isinstance(mse_2, (int, float))):
+        return None
     if mse_1 < mse_2:
         return str(profile_1["name"])
     if mse_1 > mse_2:
@@ -337,8 +337,9 @@ def detect_language_advanced(
             or unknown_profile is None):
         return None
     if (not isinstance(unknown_profile, dict)
-            or not isinstance(known_profiles, list) or
-            unknown_profile is None or known_profiles is None):
+            or not isinstance(known_profiles, list)):
+        return None
+    if unknown_profile is None or known_profiles is None:
         return None
     sorted_list = []
     for profile in known_profiles:

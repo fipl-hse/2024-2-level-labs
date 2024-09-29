@@ -203,8 +203,11 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if (not profiles_bad_input(unknown_profile) and profiles_bad_input(profile_2)
-            and profiles_bad_input(profile_1)):
+    if (not isinstance(unknown_profile, dict) or isinstance(profile_1, dict)
+            or isinstance(profile_2, dict)):
+        return None
+    if (not profiles_bad_input(unknown_profile) or profiles_bad_input(profile_2)
+            or profiles_bad_input(profile_1)):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
@@ -326,8 +329,7 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if (profiles_bad_input(unknown_profile) is None
-            or isinstance(known_profiles, list)):
+    if (profiles_bad_input(unknown_profile) is None) or (not isinstance(known_profiles, list)):
         return None
     if unknown_profile is None or known_profiles is None:
         return None

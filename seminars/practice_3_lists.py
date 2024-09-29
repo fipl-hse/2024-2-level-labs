@@ -62,11 +62,19 @@ def count_evens(nums: list) -> int:
     """
     # student realization goes here
 
+    counter = 0
+    for num in nums:
+        if num % 2 == 0 and num != 0:
+            counter += 1
+    return counter
+
 
 # Function calls with expected result:
-# count_evens([2, 1, 2, 3, 4]) → 3
-# count_evens([2, 2, 0]) → 3
-# count_evens([1, 3, 5]) → 0
+print(count_evens([2, 1, 2, 3, 4]))
+print(count_evens([2, 2, 0]))
+print(count_evens([1, 3, 5]))
+
+print('\n')
 
 # Task 2:
 # easy level
@@ -79,12 +87,20 @@ def sum13(nums: list) -> int:
     """
     # student realization goes here
 
-# Function calls with expected result:
-# sum13([1, 2, 2, 1]) → 6
-# sum13([1, 1]) → 2
-# sum13([1, 2, 2, 1, 13]) → 6
-# sum13([1, 2, 2, 1, 13, 5, 6]) → 6
+    num_sum = 0
+    for num in nums:
+        if num == 13:
+            return num_sum
+        num_sum += num
+    return num_sum
 
+# Function calls with expected result:
+print(sum13([1, 2, 2, 1]), 6)
+print(sum13([1, 1]), 2)
+print(sum13([1, 2, 2, 1, 13]), 6)
+print(sum13([1, 2, 2, 1, 13, 5, 6]), 6)
+
+print('\n')
 
 # Task 3
 # easy level
@@ -97,10 +113,27 @@ def sum67(nums: list) -> int:
     """
     # student realization goes here
 
+    nums_new = []
+    result = 0
+    flag = True
+    for elem in nums:
+        if elem == 6:
+            flag =  False
+            continue
+        if flag:
+            result += elem
+        if elem == 7:
+            flag = True
+            continue
+
+        return result
+
+print('sum67')
+
 # Function calls with expected result:
-# sum67([1, 2, 2]) → 5
-# sum67([1, 2, 2, 6, 99, 99, 7]) → 5
-# sum67([1, 1, 6, 7, 2]) → 4
+print(sum67([1, 2, 2]), 5)
+print(sum67([1, 2, 2, 6, 99, 99, 7]), 5)
+print(sum67([1, 1, 6, 7, 2]), 4)
 
 
 # Task 4
@@ -111,6 +144,7 @@ def create_phone_number(nums: list) -> str:
     that returns a string of those numbers in the form of a phone number.
     """
     # student realization goes here
+
 
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])

@@ -25,18 +25,16 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     tozenized_text = []
-    punctiation = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '.', '-', '/', ':', ';', '<', '=', '>',
+    bad_symbols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '.', '-', '/', ':', ';', '<', '=', '>',
                         '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ']
-    numbers = '0123456789'
 
     for symb in text:
-        if symb in punctiation or symb in numbers:
+        if symb in bad_symbols:
             continue
-        else:
-            low_symb = symb.lower()
-            tozenized_text.append(low_symb)
+        low_symb = symb.lower()
+        tozenized_text.append(low_symb)
 
-    if tozenized_text == []:
+    if not tozenized_text:
         return None
     else:
         return tozenized_text
@@ -54,16 +52,15 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     In case of corrupt input arguments, None is returned
     """
 
-    if tokens is None or type(tokens) is not list:
+    if tokens is None or not isinstance(tokens, list):
         return  None
     frequencies = {}
     for token in tokens:
-        if type(token) is not str:
+        if not isinstance(token, str):
             return None
-        elif token in frequencies:
-            frequencies[token] += 1
-        else:
-            frequencies[token] = 1
+        if token not in frequencies:
+            frequencies[token] = 0
+        frequencies[token] += 1
 
     for token in frequencies:
         frequencies[token] = frequencies[token] / len(tokens)
@@ -86,12 +83,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
     profile = {}
-    if type(language) is not str or language not in ['en', 'de'] or type(text) is not str:
+    if not isinstance(language, str) or language not in ['en', 'de'] or not isinstance(text, str):
         return None
-    else:
-        profile['name'] = language
-        profile['freq'] = calculate_frequencies(tokenize(text))
-        return profile
+    profile['name'] = language
+    profile['freq'] = calculate_frequencies(tokenize(text))
+    return profile
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -107,6 +103,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     In case of corrupt input arguments, None is returned
     """
 
+    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+        return None
+    n = len(predicted)
+    mse = 0
+    for i in range(n):
+        mse += (predicted[i] - actual[i]) ** 2
+    return mse / n
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -126,6 +129,29 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or unknown_profile.get('name') is None or profile_to_compare.get('name') is None or profile_to_compare.get('freq') is None or unknown_profile.get('freq') is None:
+        return None
+
+    lang_1 = unknown_profile['freq']
+    lang_2 = profile_to_compare['freq']
+
+    for element in lang_1:
+        if element not in lang_2:
+            lang_2[element] = 0
+
+    for element in lang_2:
+        if element not in lang_1:
+            lang_1[element] = 0
+
+    sorted_lang_1 = []
+    sorted_lang_2 = []
+
+    sorted_lang_1 = list(lang_1.values())
+
+    for letter in lang_1:
+        sorted_lang_2.append(lang_2[letter])
+
+    return calculate_mse(sorted_lang_1, sorted_lang_2)
 
 
 def detect_language(
@@ -147,6 +173,19 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+        return None
+
+    score_1 = compare_profiles(unknown_profile, profile_1)
+    score_2 = compare_profiles(unknown_profile, profile_2)
+
+    if score_1 < score_2:
+        return profile_1['name']
+    elif score_1 == score_2:
+        print('de')
+    else:
+        return profile_2['name']
+
 
 
 def load_profile(path_to_file: str) -> dict | None:

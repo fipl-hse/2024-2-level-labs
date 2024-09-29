@@ -15,14 +15,14 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result = detect_language
+    result = None
     en_text_1 = create_language_profile('english', en_text)
     de_text_1 = create_language_profile('deutsch', de_text)
     unknown_text_1 = create_language_profile('unknown', unknown_text)
-    if not en_text_1 or not de_text_1 or not unknown_text_1:
-        return None
-    if all(isinstance(text, dict) for text in [unknown_text_1, en_text_1, de_text_1]):
-        print(detect_language(unknown_text_1, en_text_1, de_text_1))
+    if en_text_1 and de_text_1 and unknown_text_1:
+        if all(isinstance(text, dict) for text in [unknown_text_1, en_text_1, de_text_1]):
+            result = detect_language(unknown_text_1, en_text_1, de_text_1)
+            print(result)
     assert result, "Detection result is None"
 
 

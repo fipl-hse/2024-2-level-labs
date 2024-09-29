@@ -39,7 +39,9 @@ def main() -> None:
 
     if (detect_language_advanced is not None and print_report is not None
             and collected_profiles is not None and unk_profile is not None):
-        print_report(detect_language_advanced(unk_profile, collected_profiles))
+        if (isinstance(detect_language_advanced, list) and isinstance(unk_profile, dict)
+                and isinstance(collected_profiles, list)):
+            print_report(detect_language_advanced(unk_profile, collected_profiles))
 
     result = tokens
 

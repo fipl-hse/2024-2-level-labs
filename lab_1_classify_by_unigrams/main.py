@@ -129,7 +129,7 @@ def compare_profiles(
     for letter in first_language_prof.keys():
         if not (letter in second_language_prof.keys()):
             second_language_prof[
-                letter] = 0  # приводим словари к одному и тому же количеству букв (на случай, если буква встречается в одном словаре, а в другом её нет)
+                letter] = 0
     for letter in second_language_prof.keys():
         if not letter in first_language_prof.keys():
             first_language_prof[letter] = 0

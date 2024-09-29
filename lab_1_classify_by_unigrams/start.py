@@ -6,6 +6,7 @@ from main import tokenize
 from main import create_language_profile
 from main import detect_language
 
+
 def main() -> None:
     """
     Launches an implementation

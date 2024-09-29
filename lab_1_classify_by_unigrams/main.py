@@ -3,6 +3,9 @@ Lab 1.
 
 Language detection
 """
+import json
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -211,6 +214,13 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if isinstance(path_to_file, str):
+        with open(path_to_file, 'r', encoding='UTF-8') as file:
+            profile = json.load(file)
+        if isinstance(profile, dict):
+            return profile
+
+    return None
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -228,6 +238,28 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     'freq' in arguments, None is returned
     """
 
+    if not (isinstance(profile, dict)
+            and all(key in profile for key in ['name', 'freq', 'n_words'])
+            and isinstance(profile['name'], str) and isinstance('freq', dict)
+            and isinstance('n_words', list)):
+        return None
+
+    name: str = profile['name']
+    freq: dict = profile['freq']
+    n_words: list = profile['n_words']
+
+    total_number: int = n_words[0]
+    if total_number < 1:
+        return None
+
+    freq_dict = {}
+    for k, v in freq.items():
+        if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
+            freq_dict[k.lower()] = v / total_number
+
+    processed_profile = {'name': name, 'freq': freq_dict}
+    return processed_profile
+
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
@@ -241,6 +273,18 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(paths_to_profiles, list):
+        return None
+
+    collected_profiles = []
+
+    for path in paths_to_profiles:
+        new_profile = preprocess_profile(load_profile(path))
+        if new_profile is None:
+            return None
+        collected_profiles.append(new_profile)
+
+    return collected_profiles
 
 
 def detect_language_advanced(
@@ -259,6 +303,25 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
+    if (unknown_profile is None or not isinstance(unknown_profile, dict)
+            or known_profiles is None or not isinstance(known_profiles, list)):
+        return None
+
+    for profile in known_profiles:
+        if not isinstance(profile, dict) or not all(key in profile for key in ['name', 'freq']):
+            return None
+
+    results_not_sorted = {}
+    for profile in known_profiles:
+        mse = compare_profiles(unknown_profile, profile)
+        if mse is not None:
+            result = {profile.get('name'): mse}
+            results_not_sorted.update(result)
+
+    results_lst = list(results_not_sorted.items())
+    results_sorted = sorted(results_lst, key=lambda x: (x[1], x[0]))
+
+    return results_sorted
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -270,3 +333,9 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(detections, list):
+        return None
+    for element in detections:
+        if not isinstance(element, tuple):
+            value = round(element[1], 5)
+            print(f'{element[0]}: MSE {value}')

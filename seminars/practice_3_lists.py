@@ -60,13 +60,17 @@ def count_evens(nums: list) -> int:
     """
     Return the number of even ints in the given array.
     """
-    # student realization goes here
+    how_many_evens = 0
+    for number in nums:
+        if number%2 == 0:
+            how_many_evens += 1
+    print(how_many_evens)
 
 
 # Function calls with expected result:
-# count_evens([2, 1, 2, 3, 4]) → 3
-# count_evens([2, 2, 0]) → 3
-# count_evens([1, 3, 5]) → 0
+count_evens([2, 1, 2, 3, 4])
+count_evens([2, 2, 0])
+count_evens([1, 3, 5])
 
 # Task 2:
 # easy level
@@ -77,13 +81,21 @@ def sum13(nums: list) -> int:
     so it does not count and numbers that come after a 13
     also do not count.
     """
-    # student realization goes here
+    a = 0
+    for i in nums:
+        if i == 13:
+            return a
+        a += i
+    return a
+
+
+
 
 # Function calls with expected result:
-# sum13([1, 2, 2, 1]) → 6
-# sum13([1, 1]) → 2
-# sum13([1, 2, 2, 1, 13]) → 6
-# sum13([1, 2, 2, 1, 13, 5, 6]) → 6
+print(sum13([1, 2, 2, 1]))
+print(sum13([1, 1]))
+print(sum13([1, 2, 2, 1, 13]))
+print(sum13([1, 2, 2, 1, 13, 5, 6]))
 
 
 # Task 3
@@ -95,12 +107,35 @@ def sum67(nums: list) -> int:
     (every 6 will be followed by at least one 7).
     Return 0 for no numbers.
     """
-    # student realization goes here
+    nums_copy = nums[:]
+    if 6 in nums_copy:
+        del nums_copy[nums_copy.index(6):nums_copy.index(7)+1]
+    nums_sum = sum(nums_copy)
+    print(nums_sum)
+    return nums_sum
+
+    nums_new = []
+    result = 0
+    flag = True
+    for elem in nums:
+        if elem == 6:
+            flag = False
+        if flag:
+            result += elem
+        if elem == 7:
+            flag = True
+            continue
+        if flag:
+            result += elem
+
+print(result)
+return(result)
+
 
 # Function calls with expected result:
-# sum67([1, 2, 2]) → 5
-# sum67([1, 2, 2, 6, 99, 99, 7]) → 5
-# sum67([1, 1, 6, 7, 2]) → 4
+sum67([1, 2, 2])
+sum67([1, 2, 2, 6, 99, 99, 7])
+sum67([1, 1, 6, 7, 2])
 
 
 # Task 4
@@ -110,7 +145,7 @@ def create_phone_number(nums: list) -> str:
     Write a function that accepts an array of 10 integers (between 0 and 9),
     that returns a string of those numbers in the form of a phone number.
     """
-    # student realization goes here
+    freturn '({nums[0:3]}) '
 
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])

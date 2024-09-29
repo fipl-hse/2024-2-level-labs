@@ -48,21 +48,20 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
-    else:
-        for token in tokens:
-            if not isinstance(token, str):
-                return None
-        freq = {}
-        prop = {}
-        total_tokens = len(tokens)
-        for token in tokens:
-            if token in freq:
-                freq[token] += 1
-            else:
-                freq[token] = 1
-        for key, value in freq.items():
-            prop[key] = value / total_tokens
-        return prop
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+    freq = {}
+    prop = {}
+    total_tokens = len(tokens)
+    for token in tokens:
+        if token in freq:
+            freq[token] += 1
+        else:
+            freq[token] = 1
+    for key, value in freq.items():
+        prop[key] = value / total_tokens
+    return prop
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -102,7 +101,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(predicted, list) or not isinstance(actual,list) or (len(predicted) != len(actual)):
+    if not isinstance(predicted, list) or not isinstance(actual,list) or\
+            (len(predicted) != len(actual)):
         return None
     sum_diff = 0
     for pair_num, actual_num in enumerate(actual):
@@ -128,7 +128,8 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not (isinstance(unknown_profile, dict)) or not (isinstance(profile_to_compare, dict)) or not (len(unknown_profile) ==2) or not (len(profile_to_compare) == 2):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or not\
+            len(unknown_profile) ==2 or not len(profile_to_compare) == 2:
         return None
     unknown_frequency = unknown_profile['freq']
     comparing_frequency = profile_to_compare['freq']
@@ -170,8 +171,8 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(unknown_profile, dict)) or not (isinstance(profile_1, dict)) or not (isinstance(profile_2,dict)) or not (
-                len(unknown_profile) == 2) or not (len(profile_1) == 2)  or not (len(profile_2) == 2):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not\
+            isinstance(profile_2,dict):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
@@ -181,8 +182,7 @@ def detect_language(
         return None
     if mse_1 < mse_2:
         return name1
-    else:
-        return name2
+    return name2
 
 
 def load_profile(path_to_file: str) -> dict | None:

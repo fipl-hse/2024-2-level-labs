@@ -22,6 +22,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     text = text.lower()
+    text = text.replace("º", "")
     cleaned_text = ""
     for symbol in text:
         if symbol.isalpha():
@@ -95,10 +96,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(actual) == 0 or (len(predicted) != len(actual)):
+    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
         return None
-    mse = sum((actual[i] - predicted[i])**2 for i in range(len(actual))) / len(actual)
-    return mse
+    mse = 0
+    for i in range(len(actual)):
+        mse += (actual[i] - predicted[i])**2
+    return mse / len(actual)
 
 
 def compare_profiles(
@@ -125,9 +128,17 @@ def compare_profiles(
         return None
 
     all_freq_keys = set(unknown_profile['freq']).union(set(profile_to_compare['freq']))
+    new_unknown_profile = []
+    new_profile_to_compare = []
     for key in all_freq_keys:
-        new_unknown_profile = [unknown_profile['freq'][key] if key in unknown_profile['freq'] else 0]
-        new_profile_to_compare = [profile_to_compare['freq'][key] if key in profile_to_compare['freq'] else 0]
+        if key in unknown_profile["freq"]:
+            new_unknown_profile.append(unknown_profile['freq'][key])
+        else:
+            new_unknown_profile.append(0)
+        if key in profile_to_compare["freq"]:
+            new_profile_to_compare.append(profile_to_compare['freq'][key])
+        else:
+            new_profile_to_compare.append(0)
     return calculate_mse(new_unknown_profile, new_profile_to_compare)
 
 
@@ -154,12 +165,12 @@ def detect_language(
         return None
     mse1 = compare_profiles(unknown_profile, profile_1)
     mse2 = compare_profiles(unknown_profile, profile_2)
-    if mse1>mse2:
+    if mse1 > mse2:
         return profile_2['name']
-    elif mse2>mse1:
+    elif mse2 > mse1:
         return profile_1['name']
     else:
-        if profile_1['name']<profile_2['name']:
+        if profile_1['name'] < profile_2['name']:
             return profile_1['name']
         else:
             return profile_2['name']

@@ -73,9 +73,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not freq_text:
         return None
 
-    profile_dict: dict[str, str | dict[str, float]] | None
-    profile_dict = {'name': language, 'freq': freq_text}
-    return profile_dict
+    return {'name': language, 'freq': freq_text}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -145,10 +143,7 @@ def compare_profiles(
     sorted_unknown_profile = list(dict(sorted(unknown_profile_freq.items(),
                                               key=lambda x: x[0])).values())
 
-    result = calculate_mse(sorted_profile_to_compare, sorted_unknown_profile)
-    if not result:
-        return None
-    return result
+    return calculate_mse(sorted_profile_to_compare, sorted_unknown_profile)
 
 
 def detect_language(
@@ -310,9 +305,8 @@ def detect_language_advanced(
         if not compared_profiles:
             return None
         result_list.append((profile['name'], compared_profiles))
-    result_list = sorted(sorted(result_list, key=lambda x: x[0]), key=lambda x: x[1], reverse=False)
 
-    return result_list
+    return sorted(sorted(result_list, key=lambda x: x[0]), key=lambda x: x[1], reverse=False)
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

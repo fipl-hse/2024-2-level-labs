@@ -7,6 +7,7 @@ Language detection
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 import json
+
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -110,7 +111,8 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not ("name" in unknown_profile and "freq" in unknown_profile and "name" in profile_to_compare and "freq" in profile_to_compare):
+    if not ("name" in unknown_profile and "freq" in unknown_profile and "name" in profile_to_compare and
+            "freq" in profile_to_compare):
         return None
     unknown_freq = []
     profile_freq = []
@@ -259,7 +261,8 @@ def detect_language_advanced(
     In case of corrupt input arguments, None is returned
     """
     distance = []
-    if not (isinstance(unknown_profile, dict) and isinstance(known_profiles,list) and all(isinstance(elem, dict) for elem in known_profiles)):
+    if not (isinstance(unknown_profile, dict) and isinstance(known_profiles,list) and all(isinstance(elem, dict)
+                                                                                          for elem in known_profiles)):
         return None
     for profile in known_profiles:
         distance.append((profile['name'], compare_profiles(unknown_profile, profile)))

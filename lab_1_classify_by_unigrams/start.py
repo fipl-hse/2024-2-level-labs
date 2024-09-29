@@ -2,6 +2,7 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+
 from main import collect_profiles, create_language_profile, detect_language_advanced, print_report
 
 

@@ -25,7 +25,7 @@ def tokenize(text: str) -> list[str] | None:
     lowered_text = text.lower()
     tokens = []
     for elem in lowered_text:
-        if elem.isalpha():
+        if elem.isalpha() and elem != "º":
             tokens += elem
     return tokens
 
@@ -75,6 +75,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if (type(language) is not str) or (type(text) is not str):
+        return None
+
+    language_prof = {"name": language,
+                     "freq": calculate_frequencies(tokenize(text))
+                     }
+    return language_prof
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

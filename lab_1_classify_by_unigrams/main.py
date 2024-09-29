@@ -37,7 +37,7 @@ def tokenize(text: str) -> list[str] | None:
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
-    if not (isinstance(tokens, list) and all([type(symbol) is str for symbol in tokens])):
+    if not (isinstance(tokens, list) and all([isinstance(symbol, str) for symbol in tokens])):
         return None
 
     freq_dict = {}
@@ -86,6 +86,22 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
+
+    if len(actual) != len(predicted):
+        return None
+
+    num_sum = 0
+
+    for actual_num, predicted_num in zip(actual, predicted):
+        num_sum += (actual_num - predicted_num) ** 2
+
+    mse = num_sum / len(actual)
+
+    return mse
+
+
+
+
     """
     Calculate mean squared error between predicted and actual values.
 
@@ -104,7 +120,35 @@ def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
-    """
+
+    if len(unknown_profile) != len(profile_to_compare):
+        return None
+
+    unknown_lst = []
+    compare_lst = []
+
+    for el_1 in unknown_profile['freq']:
+        if el_1 not in profile_to_compare['freq']:
+            unknown_lst.append(0)
+        else:
+            unknown_lst.append(unknown_profile['freq'][el_1])
+
+    for el_2 in profile_to_compare['freq']:
+        if el_2 not in unknown_profile['freq']:
+            compare_lst.append(0)
+        else:
+            compare_lst.append(profile_to_compare['freq'][el_2])
+
+    comparison = calculate_mse(unknown_lst, compare_lst)
+
+    return round(comparison, 3)
+
+
+
+
+
+
+"""
     Compare profiles and calculate the distance using symbols.
 
     Args:

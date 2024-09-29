@@ -2,7 +2,8 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
+from lab_1_classify_by_unigrams.main import (create_language_profile,
+                                             collect_profiles, detect_language_advanced, print_report)
 
 
 def main() -> None:
@@ -22,18 +23,19 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
         unknown_prof = create_language_profile('unknown', unknown_text)
 
-    extra_profiles = ["lab_1_classify_by_unigrams\\assets\\profiles\\de.json",
-                      "lab_1_classify_by_unigrams\\assets\\profiles\\en.json",
-                      "lab_1_classify_by_unigrams\\assets\\profiles\\es.json",
-                      "lab_1_classify_by_unigrams\\assets\\profiles\\fr.json",
-                      "lab_1_classify_by_unigrams\\assets\\profiles\\it.json",
-                      "lab_1_classify_by_unigrams\\assets\\profiles\\ru.json"
-                      "lab_1_classify_by_unigrams\\assets\\profiles\\tr.json"]
+    extra_profiles = ["assets/profiles/de.json",
+                      "assets/profiles/en.json",
+                      "assets/profiles/es.json",
+                      "assets/profiles/fr.json",
+                      "assets/profiles/it.json",
+                      "assets/profiles/ru.json",
+                      "assets/profiles/tr.json"]
+    all_profiles = collect_profiles(extra_profiles)
+    print_report(detect_language_advanced(unknown_prof, all_profiles))
 
-    result = detect_language(unknown_prof, en_prof, de_prof)
-    return result
-    #assert result, "Detection result is None"
+    return None
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":
-    print(main())
+    main()

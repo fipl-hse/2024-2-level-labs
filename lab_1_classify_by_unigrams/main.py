@@ -222,10 +222,10 @@ def detect_language(
         return None
 
     if mse_profile_1_and_unknown < mse_profile_2_and_unknown:
-        return profile_1['name']
+        result = str(profile_1['name'])
     if mse_profile_2_and_unknown < mse_profile_1_and_unknown:
-        return profile_2['name']
-    return None
+        result = str(profile_2['name'])
+    return result
 
 
 def load_profile(path_to_file: str) -> dict | None:

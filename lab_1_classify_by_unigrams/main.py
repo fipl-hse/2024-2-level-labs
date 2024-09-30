@@ -21,7 +21,7 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
 
-    if type(text) is not str:
+    if not isinstance(text, str):
         return None
 
     text = text.lower()
@@ -44,7 +44,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     In case of corrupt input arguments, None is returned
     """
 
-    if type(tokens) is not list[str]:
+    if not isinstance(tokens, list):
         return None
 
     freq_dic = {}
@@ -66,14 +66,14 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
 
-    if type(text) is not str:
+    if not isinstance(text, str):
         return None
-    if type(language) is not str:
+    if not isinstance(language, str):
         return None
 
     freq = calculate_frequencies(tokenize(text))
 
-    language_profile = {"name":language,"freq":freq}
+    language_profile = {"name": language, "freq": freq}
     return language_profile
 
 
@@ -166,13 +166,13 @@ def detect_language(
 #             if key == key_:
 #                 all_profile_to_compare[key_] = value
 #
-#     return calculate_mse(list(all_unknown_profile.values()), list(all_profile_to_compare.values()))
+#     return calculate_mse(list(all_unknown_profile.values()),list(all_profile_to_compare.values()))
 
 # def detect_language(unknown_profile,profile_1,profile_2,):
 #
-#     if compare_profiles(unknown_profile,profile_1) < compare_profiles(unknown_profile,profile_2):
+#     if compare_profiles(unknown_profile,profile_1)<compare_profiles(unknown_profile,profile_2):
 #         return profile_1["name"]
-#     elif compare_profiles(unknown_profile,profile_2) < compare_profiles(unknown_profile,profile_1):
+#     elif compare_profiles(unknown_profile,profile_2)<compare_profiles(unknown_profile,profile_1):
 #         return profile_2["name"]
 #     else:
 #         alpha_sort = [profile_1["name"], profile_2["name"]].sort()
@@ -249,4 +249,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-

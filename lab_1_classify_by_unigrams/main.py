@@ -173,6 +173,14 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+
+    def sort_by_alpha(lang1, lang2):
+        alphabet = 'abcdefghijklmnopqrstuvwxyz'
+        if alphabet.index(lang1[0]) < alphabet.index(lang2[0]) or (alphabet.index(lang1[0]) == alphabet.index(lang2[0]) and alphabet.index(lang1[1]) < alphabet.index(lang2[1])):
+            return lang1
+        else:
+            return lang2
+
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
 
@@ -182,7 +190,7 @@ def detect_language(
     if score_1 < score_2:
         return profile_1['name']
     elif score_1 == score_2:
-        print('de')
+        return sort_by_alpha(profile_1['name'], profile_2['name'])
     else:
         return profile_2['name']
 

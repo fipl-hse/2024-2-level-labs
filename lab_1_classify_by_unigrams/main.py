@@ -51,17 +51,21 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     In case of corrupt input arguments, None is returned.
     """
 
-    if tokens is None:
+
+    if not isinstance(tokens, list) or not all(isinstance(i, str) for i in tokens):
         return None
 
-    if not isinstance(tokens, list):
-        return None
-
+    total_count = len(tokens)
     frequency_dict = {}
 
-    for letter in tokens:
-        if isinstance(letter, str) and letter.isalpha():
-            frequency_dict[letter] = frequency_dict.get(letter, 0) + 1
+    for token in tokens:
+        if token in frequency_dict:
+            frequency_dict[token] += 1
+        else:
+            frequency_dict[token] = 1
+
+    for token in frequency_dict:
+        frequency_dict[token] /= total_count
 
     return frequency_dict
 
@@ -72,21 +76,17 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     Create a language profile.
 
     Args:
-
-
         language (str): A language.
         text (str): A text.
 
     Returns:
-
         dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq.
-
 
     In case of corrupt input arguments, None is returned.
     """
 
     if not (isinstance(language, str) and isinstance(text, str)):
-        return {}
+        return None
 
     frequency_dict = calculate_frequencies(tokenize(text))
 

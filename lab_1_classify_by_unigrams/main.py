@@ -156,9 +156,6 @@ def compare_profiles(
     frequency_unknown_profile = unknown_profile.get('freq')
     frequency_profile_to_compare = profile_to_compare.get('freq')
 
-    #if frequency_unknown_profile is None or frequency_profile_to_compare is None:
-        #return None
-
     # создание множества ключей без повторений, сортировка
     tokens = set()
     for key in frequency_unknown_profile:

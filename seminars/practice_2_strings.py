@@ -151,7 +151,7 @@ def generate_hashtag(input_string: str) -> str:
     for word in input_string.split():
         result.append(word.capitalize())
     result_joined = ''.join(result)
-    if len(result_joined) >+ 14 or len(''.join(result))
+    if len(result_joined) >+ 14 or len(''.join(result)):
         return False
     return'#'+''.join(result)
 

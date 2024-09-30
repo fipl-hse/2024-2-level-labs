@@ -47,6 +47,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens, list):
         return None
 
+    for check in tokens:
+        if not isinstance(check, str):
+            return None
+
     freq_dic = {}
     for letter in tokens:
         freq_dic[letter] = tokens.count(letter) / len(tokens)

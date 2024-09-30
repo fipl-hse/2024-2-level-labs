@@ -203,6 +203,9 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    unknown_profile: dict[str, str | dict[str, float]]
+    profile_1: dict[str, str | dict[str, float]]
+    profile_2: dict[str, str | dict[str, float]]
     if (not isinstance(unknown_profile, dict)
             or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
@@ -257,6 +260,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
+    profile: dict
     if not isinstance(profile, dict):
         return None
     if (len(profile.keys()) != 3
@@ -330,6 +334,7 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
+    unknown_profile: dict[str, str | dict[str, float]]
     if profiles_bad_input(unknown_profile) is None:
         return None
     if (not isinstance(known_profiles, list) and

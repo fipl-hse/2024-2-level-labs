@@ -162,7 +162,8 @@ def compare_profiles(
             tokens.add(key)
     sorted_tokens = sorted(tokens)
 
-    # создаем два списка со встречаемостью токенов (если значение частоты в словаре отсутсвует, то 0)
+    '''создаем два списка со встречаемостью токенов 
+    (если значение частоты в словаре отсутсвует, то 0)'''
     new_list_unknown = [
         frequency_unknown_profile.get(element, 0) for element in sorted_tokens
     ]

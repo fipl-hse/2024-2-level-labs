@@ -7,10 +7,12 @@ Language detection
 
 def tokenize(text):
 
+    if type(text) != str:
+        return None
+
     text = text.lower()
-    split_text = ''.join(text)
     token_list = []
-    for symbol in split_text:
+    for symbol in text:
         if symbol.isalpha():
             token_list.append(symbol)
     return token_list

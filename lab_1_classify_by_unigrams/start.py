@@ -5,6 +5,7 @@ Language detection starter
 
 from main import create_language_profile
 
+
 def main() -> None:
 
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:

@@ -51,17 +51,17 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     In case of corrupt input arguments, None is returned.
     """
 
+    if tokens is None:
+        return None
+
     if not isinstance(tokens, list):
-        return {}
+        return None
 
     frequency_dict = {}
 
     for letter in tokens:
-        if letter.isalpha():
-            if letter in frequency_dict:
-                frequency_dict[letter] += 1
-            else:
-                frequency_dict[letter] = 0
+        if isinstance(letter, str) and letter.isalpha():
+            frequency_dict[letter] = frequency_dict.get(letter, 0) + 1
 
     return frequency_dict
 

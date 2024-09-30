@@ -133,21 +133,21 @@ def compare_profiles(
         return None
 
     all_keys = list(set(unknown_profile["freq"]) | set(profile_to_compare["freq"]))
-    unknown_profile_with_0s = []
-    profile_to_compare_with_0s = []
+    unknown_freq_list = []
+    freq_list_to_compare = []
     for key in all_keys:
         if not key in unknown_profile["freq"]:
-            unknown_profile_with_0s.append(0)
+            unknown_freq_list.append(0)
         else:
             freq_of_key = unknown_profile["freq"][key]
-            unknown_profile_with_0s.append(freq_of_key)
+            unknown_freq_list.append(freq_of_key)
         if not key in profile_to_compare["freq"]:
-            profile_to_compare_with_0s.append(0)
+            freq_list_to_compare.append(0)
         else:
             freq_of_key = profile_to_compare["freq"][key]
-            profile_to_compare_with_0s.append(freq_of_key)
+            freq_list_to_compare.append(freq_of_key)
 
-    return calculate_mse(unknown_profile_with_0s, profile_to_compare_with_0s)
+    return calculate_mse(unknown_freq_list, freq_list_to_compare)
 
 
 def detect_language(

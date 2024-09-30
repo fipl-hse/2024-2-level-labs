@@ -20,6 +20,11 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    tokens = []
+    for char in text:
+        if char.isalpha():
+            tokens.append(char.lower())
+    return tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -34,6 +39,20 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    token_frequencies = {}
+
+    for token in tokens:
+        if token in token_frequencies:
+            token_frequencies[token] += 1
+        else:
+            token_frequencies[token] = 1
+
+    total_tokens = len(tokens)
+    for token in token_frequencies:
+        token_frequencies[token] /= total_tokens
+
+    return token_frequencies
+
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

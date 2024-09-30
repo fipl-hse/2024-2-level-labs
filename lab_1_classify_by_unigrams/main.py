@@ -1,11 +1,13 @@
 """
 Lab 1.
 
-Language detect
+Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-text = "Hey, how are you?"
+def bestround(n, decimals=0):
+    multiplier = 10**decimals
+    return int(n * multiplier) / multiplier
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -24,17 +26,15 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     text = text.lower()
-    num = '1234567890'
-    symb = ',./?!:;#@*-&<>%'
+    symb = ',./?!:;#@*-&<>%1234567890 '
     tokens = []
 
     for i in text:
-        if i not in num and i not in symb and i != ' ':
+        if i not in symb:
             tokens.append(i)
 
     return tokens
 
-#print(tokenize(text))
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -49,8 +49,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not tokens or None:
-        return None
 
     if not isinstance(tokens, list):
         return None
@@ -70,7 +68,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     total_tokens = len(tokens)
 
     for key, value in token_freq.items():
-        token_freq[key] = round(value / total_tokens, 4)
+        token_freq[key] = bestround(value / total_tokens, 4)
 
     return token_freq
 
@@ -95,9 +93,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
 
     tokens = tokenize(text)
-
     token_freq = calculate_frequencies(tokens)
-
 
     return {
         "name": language,
@@ -105,10 +101,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     }
 
 
-#language_name = 'en'
-#text = 'he is a happy man'
-#profile = create_language_profile(language_name, text)
-#print(profile)
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

@@ -5,7 +5,9 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+
 def tokenize(text: str) -> list[str] | None:
+
     """
     Split a text into tokens.
 
@@ -19,8 +21,9 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+
     if not isinstance(text, str):
-        return []
+        return None
 
     tokens = []
 
@@ -32,17 +35,22 @@ def tokenize(text: str) -> list[str] | None:
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+
     """
     Calculate frequencies of given tokens.
 
     Args:
+
         tokens (list[str] | None): A list of tokens.
 
     Returns:
+
         dict[str, float] | None: A dictionary with frequencies.
+
 
     In case of corrupt input arguments, None is returned.
     """
+
     if not isinstance(tokens, list):
         return {}
 
@@ -53,24 +61,30 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             if letter in frequency_dict:
                 frequency_dict[letter] += 1
             else:
-                frequency_dict[letter] = 1
+                frequency_dict[letter] = 0
 
     return frequency_dict
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+
     """
     Create a language profile.
 
     Args:
+
+
         language (str): A language.
         text (str): A text.
 
     Returns:
+
         dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq.
+
 
     In case of corrupt input arguments, None is returned.
     """
+
     if not (isinstance(language, str) and isinstance(text, str)):
         return {}
 

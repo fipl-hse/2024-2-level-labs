@@ -24,10 +24,9 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    ab = 'qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQÄäẞßÜüÖö'
     out = []
     for char in text:
-        if char in ab:
+        if char.isalpha():
             out.append(char.lower())
     if not out:
         return None
@@ -73,8 +72,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     if len(text) <= 0:
         return None
-    out = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
-    return out
+    return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -140,8 +138,7 @@ def compare_profiles(
             trg_prof.update({tv: 0.0})
     trg_srt = dict(sorted(trg_prof.items()))
     src_srt = dict(sorted(src_prof.items()))
-    out = calculate_mse(list(src_srt.values()), list(trg_srt.values()))
-    return out
+    return calculate_mse(list(src_srt.values()), list(trg_srt.values()))
 
 
 def detect_language(
@@ -191,7 +188,7 @@ def load_profile(path_to_file: str) -> dict | None:
         dict | None: A dictionary with at least two keys – name, freq
 
     In case of corrupt input arguments, None is returned
-"""
+    """
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -207,7 +204,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
 
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
-"""
+    """
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -221,11 +218,12 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         list[dict[str, str | dict[str, float]]] | None: A list of loaded profiles
 
     In case of corrupt input arguments, None is returned
-"""
+    """
 
 
-def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
-                             known_profiles: list) -> list | None:
+def detect_language_advanced(
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+) -> list | None:
     """
     Detect the language of an unknown profile.
 
@@ -238,7 +236,7 @@ def detect_language_advanced(unknown_profile: dict[str, str | dict[str, float]],
         list | None: A sorted list of tuples containing a language and a distance
 
     In case of corrupt input arguments, None is returned
-"""
+    """
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -249,4 +247,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
         detections (list[tuple[str, float]]): A list with distances for each available language
 
     In case of corrupt input arguments, None is returned
-"""
+    """

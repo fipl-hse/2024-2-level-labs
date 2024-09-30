@@ -2,11 +2,7 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-from lab_1_classify_by_unigrams.main import calculate_frequencies
-from lab_1_classify_by_unigrams.main import compare_profiles
-from lab_1_classify_by_unigrams.main import create_language_profile
-from lab_1_classify_by_unigrams.main import detect_language
-from lab_1_classify_by_unigrams.main import tokenize
+import lab_1_classify_by_unigrams.main as fnc
 
 
 def main() -> None:
@@ -19,20 +15,18 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    res1 = tokenize(en_text)
+    #assert result, "Detection result is None"
+    res1 = fnc.tokenize(en_text)
     print(res1)
-    res2 = calculate_frequencies(res1)
+    res2 = fnc.calculate_frequencies(res1)
     print(res2)
-    en_prof = create_language_profile('en', en_text)
+    en_prof = fnc.create_language_profile('en', en_text)
     print(en_prof)
-    de_prof = create_language_profile('de', de_text)
-    trg_prof = create_language_profile('Unknown', unknown_text)
-    print(compare_profiles(trg_prof, en_prof))
-    print(compare_profiles(trg_prof, de_prof))
-    print(detect_language(trg_prof, en_prof, de_prof))
-
-    # result = None
-    # assert result, "Detection result is None"
+    de_prof = fnc.create_language_profile('de', de_text)
+    trg_prof = fnc.create_language_profile('Unknown', unknown_text)
+    print(fnc.compare_profiles(trg_prof, en_prof))
+    print(fnc.compare_profiles(trg_prof, de_prof))
+    print(fnc.detect_language(trg_prof, en_prof, de_prof))
 
 
 if __name__ == "__main__":

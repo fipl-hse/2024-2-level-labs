@@ -23,6 +23,9 @@ def main() -> None:
     mainlab.create_language_profile('en', en_text) is None or
     mainlab.create_language_profile('de', de_text) is None):
         return None
+    if (not isinstance(unknown_profile, dict) or
+            not isinstance(profile_de, dict) or not isinstance(profile_en, dict)):
+        return None
     print(profile_en)
     detection = mainlab.detect_language(unknown_profile, profile_en, profile_de)
     print(detection)

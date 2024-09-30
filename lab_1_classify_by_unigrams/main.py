@@ -203,13 +203,19 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if (profiles_bad_input(unknown_profile) is None or profiles_bad_input(profile_2) is None
-            or profiles_bad_input(profile_1) is None):
+    if (not isinstance(unknown_profile, dict)
+            or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
-    mse_1 = compare_profiles(unknown_profile, profile_1)
-    mse_2 = compare_profiles(unknown_profile, profile_2)
-    if (not isinstance(mse_1, (int, float))
-            or not isinstance(mse_2, (int, float))):
+    for f, s in (unknown_profile['freq'].items()
+                 and profile_1['freq'].items()
+                 and profile_2['freq'].items()):
+        if not isinstance(f, str) or not isinstance(s, (int, float)):
+            return None
+    mse_1: float = compare_profiles(unknown_profile, profile_1)
+    mse_2: float = compare_profiles(unknown_profile, profile_2)
+    if (not isinstance(mse_1, float)
+            or not isinstance(mse_2,  float)):
         return None
     if mse_1 < mse_2:
         return str(profile_1["name"])
@@ -253,17 +259,13 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
-    if profile is None:
-        return None
     if not isinstance(profile, dict):
         return None
     if (len(profile.keys()) != 3
             or not all(x in profile for x in ['freq', 'name', 'n_words'])):
         return None
-    if not isinstance(profile['n_words'], list) or len(profile['n_words']) == 0:
-        return None
-    processed_profile = {'name': profile['name'], 'freq': {}}
-    dicty = {}
+    processed_profile: dict[str, str | dict] = {'name': profile['name'], 'freq': {}}
+    dicty: dict = {}
     for unigram in profile['freq'].keys():
         if unigram.isalpha():
             pass
@@ -332,7 +334,8 @@ def detect_language_advanced(
     """
     if profiles_bad_input(unknown_profile) is None:
         return None
-    if not isinstance(known_profiles, list) and not all(isinstance(path, dict) for path in known_profiles):
+    if (not isinstance(known_profiles, list) and
+            not all(isinstance(path, dict) for path in known_profiles)):
         return None
     sorted_list = []
     for profile in known_profiles:

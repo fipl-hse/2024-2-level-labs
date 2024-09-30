@@ -23,7 +23,7 @@ def tokenize(text: str) -> list[str] | None:
 
     if text is None or type(text) is not str:
         return None
-
+    text = text.lower()
     tozenized_text = []
     bad_symbols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '.', '-', '/', ':', ';', '<', '=', '>',
                         '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ']
@@ -31,13 +31,12 @@ def tokenize(text: str) -> list[str] | None:
     for symb in text:
         if symb in bad_symbols:
             continue
-        low_symb = symb.lower()
-        tozenized_text.append(low_symb)
+        tozenized_text.append(symb)
 
     if not tozenized_text:
         return None
-    else:
-        return tozenized_text
+
+    return tozenized_text
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -82,12 +81,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    profile = {}
     if not isinstance(language, str) or language not in ['en', 'de'] or not isinstance(text, str):
         return None
-    profile['name'] = language
-    profile['freq'] = calculate_frequencies(tokenize(text))
-    return profile
+    return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -105,11 +101,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
         return None
-    n = len(predicted)
     mse = 0
-    for i in range(n):
-        mse += (predicted[i] - actual[i]) ** 2
-    return mse / n
+    for i, pred_val in enumerate(predicted):
+        mse += (pred_val - actual[i]) ** 2
+    return mse / len(predicted)
+
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -174,13 +170,6 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
 
-    def sort_by_alpha(lang1, lang2):
-        alphabet = 'abcdefghijklmnopqrstuvwxyz'
-        if alphabet.index(lang1[0]) < alphabet.index(lang2[0]) or (alphabet.index(lang1[0]) == alphabet.index(lang2[0]) and alphabet.index(lang1[1]) < alphabet.index(lang2[1])):
-            return lang1
-        else:
-            return lang2
-
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
 
@@ -190,9 +179,13 @@ def detect_language(
     if score_1 < score_2:
         return profile_1['name']
     elif score_1 == score_2:
-        return sort_by_alpha(profile_1['name'], profile_2['name'])
-    else:
-        return profile_2['name']
+        alphabet = 'abcdefghijklmnopqrstuvwxyz'
+        lang1 = profile_1['name']
+        lang2 = profile_2['name']
+        if alphabet.index(lang1[0]) < alphabet.index(lang2[0]) or (alphabet.index(lang1[0]) == alphabet.index(lang2[0]) and alphabet.index(lang1[1]) < alphabet.index(lang2[1])):
+            return lang1
+        return lang2
+    return profile_2['name']
 
 
 

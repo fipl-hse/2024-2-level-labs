@@ -25,27 +25,6 @@ def tokenize(text: str) -> list[str] | None:
 
     text = text.lower()
 
-    # en_text_list = []
-    # en_text_list = text.split()
-    # words_list = []
-    #
-    # for i in range(len(en_text_list)):
-    #     letters = list(en_text_list[i])
-    #     words_list.append(letters)
-    #     i += 1
-    #
-    # letters_list = []
-    #
-    # for j in range(len(words_list)):
-    #     for i in range(len(words_list[j])):
-    #         if words_list[j][i].isalpha():
-    #             letters_list.append(words_list[j][i])
-    #         i += 1
-    #     j += 1
-    #
-    #
-    # letters_list = str(letters_list).lower()
-
     letters_list = []
 
     for i in range(len(text)):
@@ -70,6 +49,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if type(tokens) != list:
         return None
+
+    for i in tokens:
+        if type(i) != str:
+            return None
 
     tokens_summ = len(tokens)
 

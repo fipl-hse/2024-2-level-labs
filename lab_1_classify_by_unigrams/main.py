@@ -129,7 +129,9 @@ def compare_profiles(
             "name" in unknown_profile and 
             "name" in profile_to_compare and
             "freq" in unknown_profile and
-            "freq" in profile_to_compare):
+            "freq" in profile_to_compare and
+            isinstance(unknown_profile["freq"], dict) and
+            isinstance(profile_to_compare["freq"], dict)):
         return None
 
     all_keys = list(set(unknown_profile["freq"]) | set(profile_to_compare["freq"]))

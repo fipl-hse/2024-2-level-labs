@@ -222,4 +222,4 @@ def scramble() -> bool:
 # Function calls with expected result:
 # scramble(['rkqodlw', 'world']) ==> True
 # scramble(['cedewaraaossoqqyt', 'codewars']) ==> True
-# scramble(['katas', 'steak']) ==> False
+# scramble(['katas', 'steak']) ==> Falsegit add

@@ -19,7 +19,7 @@ Running python application and debugging
 
 
 # Debugging exercise. Debug the program and fix errors:
-first_num = 4
+first_num = 15
 second_num = 0
 
 print(f'Numbers: {first_num} and {second_num}')
@@ -28,18 +28,9 @@ print(f'Numbers: {first_num} and {second_num}')
 # third_num = first_num / second_num
 
 # Fix the first exception:
-second_num = 3
+second_num = 6
 third_num = first_num / second_num
-
-# print(f'Numbers: {first_num}, {second_num} and {third_num}')
-# print(round (third_num, 2))
-# print(4/3)
-
-c = 1.333333333333
-stroka = str(c)
-a = f"моё число: {c:.2f}"
-print(a)
-exit(0)
+print(f'Numbers: {first_num}, {second_num} and {third_num}')
 
 
 # Case 2: the second debugging case:

@@ -23,8 +23,9 @@ def main() -> None:
     mainlab.create_language_profile('en', en_text) is None or
     mainlab.create_language_profile('de', de_text) is None):
         return None
+    result = None
     if (not isinstance(unknown_profile, dict) or
-            not isinstance(profile_de, dict) or not isinstance(profile_en, dict)):
+            (not isinstance(profile_de, dict) or (not isinstance(profile_en, dict)))):
         return None
     print(profile_en)
     detection = mainlab.detect_language(unknown_profile, profile_en, profile_de)
@@ -34,12 +35,10 @@ def main() -> None:
                           'assets/profiles/it.json', 'assets/profiles/ru.json',
                           'assets/profiles/tr.json']
     collection = mainlab.collect_profiles(paths_to_profiles)
-    if not collection:
-        return None
-    result = mainlab.detect_language_advanced(unknown_profile, collection)
-    if not isinstance(result, list):
-        return None
-    mainlab.print_report(result)
+    if isinstance(unknown_profile, dict) and isinstance(collection, list):
+        result = mainlab.detect_language_advanced(unknown_profile, collection)
+        if isinstance(result, list):
+            mainlab.print_report(result)
     assert result, "Detection result is None"
     return None
 

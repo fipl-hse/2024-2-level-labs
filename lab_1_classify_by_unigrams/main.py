@@ -29,7 +29,7 @@ def tokenize(text: str) -> list[str] | None:
             cleaned_text += symbol
     tokens = []
     for token in cleaned_text:
-        tokens += token
+        tokens.append(token)
     return tokens
 
 
@@ -78,8 +78,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     preprocessed_text = tokenize(text)
     relative_frequency = calculate_frequencies(preprocessed_text)
-    language_profile = {"name": language, "freq": relative_frequency}
-    return language_profile
+    return {"name": language, "freq": relative_frequency}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -99,7 +98,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or len(predicted) != len(actual):
         return None
     mse = sum((actual[i] - predicted[i])**2 for i in range(len(actual))) / len(actual)
-    return mse
+    return float(mse)
 
 
 def compare_profiles(
@@ -160,10 +159,14 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
-            or not isinstance(profile_2, dict):
+            or not isinstance(profile_2, dict) or not all(isinstance(key, str) for key in unknown_profile) \
+            or not all(isinstance(key, str) for key in profile_1) \
+            or not all(isinstance(key, str) for key in profile_2):
         return None
     mse1 = compare_profiles(unknown_profile, profile_1)
     mse2 = compare_profiles(unknown_profile, profile_2)
+    if not isinstance(mse1,float) or not isinstance(mse2,float):
+        return None
     if mse1 > mse2:
         return profile_2['name']
     if mse1 < mse2:

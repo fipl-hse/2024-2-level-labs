@@ -171,6 +171,9 @@ def detect_language(
         return profile_1['name']
     if mse_1 > mse_2:
         return profile_2['name']
+    if mse_1 == mse_2:
+        profiles_names = [profile_1['name'], profile_2['name']]
+        return sorted(profiles_names)[0]
     return None
 
 
@@ -213,18 +216,18 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         return None
     processed_profile = {'name': profile['name'],
                          'freq': {}}
-    d = {}
+    freq_dict = {}
     for i in profile['freq']:
         if isinstance(i, str) and len(i) == 1:
-            d[i] = profile['freq'][i]
-    letters_list = list(d)
-    for j in letters_list:
-        if not j.isupper():
-            d[j] = d.get(j, 0) + d.get(j.upper(), 0)
-            processed_profile['freq'][j] = d[j] / profile['n_words'][0]
-            if j.upper() in d:
-                del d[j.upper()]
-    for i in d.items():
+            freq_dict[i] = profile['freq'][i]
+    letters_list = list(freq_dict)
+    for letter in letters_list:
+        if not letter.isupper():
+            freq_dict[letter] = freq_dict.get(letter, 0) + freq_dict.get(letter.upper(), 0)
+            processed_profile['freq'][letter] = freq_dict[letter] / profile['n_words'][0]
+            if letter.upper() in freq_dict:
+                del freq_dict[letter.upper()]
+    for i in freq_dict.items():
         if i[0].isupper():
             processed_profile['freq'][i[0].lower()] = i[1] / profile['n_words'][0]
     return processed_profile
@@ -295,8 +298,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(detections, tuple):
-        return None
     for i in detections:
         print(f'{i[0]}: MSE {i[-1]:.5f}')
-    return None

@@ -79,15 +79,15 @@ def sum13(nums: list) -> int:
     so it does not count and numbers that come after a 13
     also do not count.
     """
-    if len(nums) == 0:
-        return None
-    sum = 0
-    for i in nums:
-        if i != 13:
-            sum += i
-        else:
-            return sum
-    return sum
+    # if len(nums) == 0:
+    #     return None
+    # sum = 0
+    # for i in nums:
+    #     if i != 13:
+    #         sum += i
+    #     else:
+    #         return sum
+    # return sum
 
 # Function calls with expected result:
 #sum13([1, 2, 2, 1])

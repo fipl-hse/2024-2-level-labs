@@ -47,7 +47,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     frequencies = {}
     for l in tokens:
-        if l in frequencies.keys():
+        if l in frequencies:
             continue
         frequencies[l] = tokens.count(l)/len(tokens)
     return frequencies
@@ -142,9 +142,10 @@ def compare_profiles(
 
 
 def detect_language(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]]) -> str | None:
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_1: dict[str, str | dict[str, float]],
+    profile_2: dict[str, str | dict[str, float]],
+) -> str | None:
     """
     Detect the language of an unknown profile.
 
@@ -253,7 +254,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.
@@ -290,4 +291,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
         return None
     for elem in detections:
         print(f'{elem[0]}: MSE {elem[1]:.5f}')
-    return None

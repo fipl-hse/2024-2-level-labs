@@ -43,7 +43,19 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(tokens, list):
+        return None
+    frequences = {}
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+        if token not in frequences:
+            frequences[token] = 0
+        frequences[token] += 1
 
+    for token in frequences:
+        frequences[token] = frequences[token] / len(tokens)
+    return frequences
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """

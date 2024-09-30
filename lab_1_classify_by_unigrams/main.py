@@ -70,9 +70,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     In case of corrupt input arguments, None is returned
     """
 
-    if not isinstance(text, str):
-        return None
-    if not isinstance(language, str):
+    if not isinstance(text, str) or not isinstance(language, str):
         return None
 
     freq = calculate_frequencies(tokenize(text))
@@ -95,6 +93,14 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     In case of corrupt input arguments, None is returned
     """
 
+    if not isinstance(predicted, list) or not isinstance(actual, list):
+        return None
+
+    result = 0
+    for index in range(len(actual)):
+        step = ((predicted[index] - actual[index]) ** 2)
+        result += step
+    return result/len(actual)
 
 
 
@@ -117,6 +123,22 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
 
+    unknown_freq, compare_freq = unknown_profile["freq"], profile_to_compare["freq"]
+    unknown_keys, compare_keys = list(unknown_freq.keys()), list(compare_freq.keys())
+    all_keys = (unknown_keys + list(set(compare_keys) - set(unknown_keys)))
+    all_unknown_profile = dict.fromkeys(all_keys, 0)
+    all_profile_to_compare = dict.fromkeys(all_keys, 0)
+    for (key, value) in unknown_freq.items():
+        for (key_, value_) in all_unknown_profile.items():
+            if key == key_:
+                all_unknown_profile[key_] = value
+    for (key, value) in compare_freq.items():
+        for (key_, value_) in all_profile_to_compare.items():
+            if key == key_:
+                all_profile_to_compare[key_] = value
+
+    return calculate_mse(list(all_unknown_profile.values()),list(all_profile_to_compare.values()))
+
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -138,49 +160,17 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
 
+    compare_to1 = compare_profiles(unknown_profile, profile_1)
+    compare_to2 = compare_profiles(unknown_profile, profile_2)
 
-
-
-
-
-
-
-
-# def calculate_mse(predicted, actual):
-#
-#     result = 0
-#     for index in range(len(actual)):
-#         step = (((predicted[index] - actual[index]) ** 2))
-#         result += step
-#     return result/len(actual)
-
-# def compare_profiles(unknown_profile,profile_to_compare):
-#
-#     unknown_freq, compare_freq = unknown_profile["freq"], profile_to_compare["freq"]
-#     unknown_keys, compare_keys = list(unknown_freq.keys()), list(compare_freq.keys())
-#     all_keys = (unknown_keys + list(set(compare_keys) - set(unknown_keys)))
-#     all_unknown_profile = dict.fromkeys(all_keys, 0)
-#     all_profile_to_compare = dict.fromkeys(all_keys, 0)
-#     for (key, value) in unknown_freq.items():
-#         for (key_, value_) in all_unknown_profile.items():
-#             if key == key_:
-#                 all_unknown_profile[key_] = value
-#     for (key, value) in compare_freq.items():
-#         for (key_, value_) in all_profile_to_compare.items():
-#             if key == key_:
-#                 all_profile_to_compare[key_] = value
-#
-#     return calculate_mse(list(all_unknown_profile.values()),list(all_profile_to_compare.values()))
-
-# def detect_language(unknown_profile,profile_1,profile_2,):
-#
-#     if compare_profiles(unknown_profile,profile_1)<compare_profiles(unknown_profile,profile_2):
-#         return profile_1["name"]
-#     elif compare_profiles(unknown_profile,profile_2)<compare_profiles(unknown_profile,profile_1):
-#         return profile_2["name"]
-#     else:
-#         alpha_sort = [profile_1["name"], profile_2["name"]].sort()
-#         return alpha_sort[0]
+    if compare_to1 < compare_to2:
+        return profile_1["name"]
+    elif compare_to2 < compare_to1:
+        return profile_2["name"]
+    else:
+        asort = [profile_1["name"], profile_2["name"]]
+        asort.sort()
+        return asort[0]
 
 def load_profile(path_to_file: str) -> dict | None:
     """

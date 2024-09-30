@@ -142,12 +142,10 @@ def compare_profiles(
         return None
 
     # проверка что значение ключа freq - число с плавающей точкой
-    for key, value in unknown_profile['freq'].items():
-        if not isinstance(key, str) or not isinstance(value, float):
-            return None
-    for key, value in profile_to_compare['freq'].items():
-        if not isinstance(key, str) or not isinstance(value, float,):
-            return None
+    for profile in (unknown_profile, profile_to_compare):
+        for key, value in profile['freq'].items():
+            if not isinstance(key, str) or not isinstance(value, float):
+                return None
 
     # вытаскиваем из словаря словарь с частотами
     frequency_unknown_profile = unknown_profile.get('freq')

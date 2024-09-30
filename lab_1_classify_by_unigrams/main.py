@@ -98,6 +98,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if type(language) != str or type(text) != str:
         return None
 
+    if calculate_frequencies(tokenize(text)) != float:
+        return None
+
     language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
     return language_profile

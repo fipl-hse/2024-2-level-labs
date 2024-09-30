@@ -132,13 +132,17 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
+
     # проверка что ключи вообще есть
     required_keys = ['name', 'freq']
     if not all(key in unknown_profile and key in profile_to_compare for key in required_keys):
         return None
+
     # проверка что значение ключа name - строка
-    if (not isinstance(unknown_profile['name'], str)
-            or not isinstance(profile_to_compare['name'], str)):
+    if not (
+            isinstance(unknown_profile['name'], str) and
+            isinstance(profile_to_compare['name'], str)
+    ):
         return None
 
     # проверка что значение ключа freq - число с плавающей точкой
@@ -152,10 +156,10 @@ def compare_profiles(
     frequency_profile_to_compare = profile_to_compare.get('freq')
 
     tokens = set()
-    for key in frequency_unknown_profile:
-        tokens.add(key)
-    for key in frequency_profile_to_compare:
-        tokens.add(key)
+    for profile1 in (frequency_unknown_profile, frequency_profile_to_compare):
+        for key in profile1:
+            tokens.add(key)
+
     sorted_tokens = sorted(tokens)
 
     # создаем два списка со встречаемостью токенов

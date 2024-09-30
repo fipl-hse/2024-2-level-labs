@@ -139,11 +139,13 @@ def compare_profiles(
         if not key in unknown_profile["freq"]:
             unknown_profile_with_0s.append(0)
         else:
-            unknown_profile_with_0s.append(unknown_profile["freq"][key])
+            freq_of_key = unknown_profile["freq"][key]
+            unknown_profile_with_0s.append(freq_of_key)
         if not key in profile_to_compare["freq"]:
             profile_to_compare_with_0s.append(0)
         else:
-            profile_to_compare_with_0s.append(profile_to_compare["freq"][key])
+            freq_of_key = profile_to_compare["freq"][key]
+            profile_to_compare_with_0s.append(freq_of_key)
 
     return calculate_mse(unknown_profile_with_0s, profile_to_compare_with_0s)
 

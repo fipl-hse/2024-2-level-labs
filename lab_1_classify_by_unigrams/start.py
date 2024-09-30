@@ -22,9 +22,13 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
         unk_language_profile = create_language_profile('un', unknown_text)
 
-    final_result = detect_language(unk_language_profile, en_language_profile, de_language_profile)
-    result = final_result
-    assert result, "Detection result is None"
+    if (isinstance(unk_language_profile, dict) and
+        isinstance(en_language_profile, dict) and
+        isinstance(de_language_profile, dict)):
+
+        final_result = detect_language(unk_language_profile, en_language_profile, de_language_profile)
+        result = final_result
+        assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

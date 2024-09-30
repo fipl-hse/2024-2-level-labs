@@ -60,11 +60,11 @@ def count_evens(nums: list) -> int:
     """
     Return the number of even ints in the given array.
     """
-    counter_even = 0
-    for i in nums:
-        if i % 2 == 0:
-            counter_even += 1
-    print(counter_even)
+    # counter_even = 0
+    # for i in nums:
+    #     if i % 2 == 0:
+    #         counter_even += 1
+    # print(counter_even)
 
 
 # Function calls with expected result:

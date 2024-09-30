@@ -123,6 +123,9 @@ def compare_profiles(
         return None
     if 'name' not in unknown_profile or 'name' not in profile_to_compare:
         return None
+    if not all(isinstance(key, str) for key in unknown_profile) \
+            or not all(isinstance(key, str) for key in profile_to_compare):
+        return None
 
     all_freq_keys = set(unknown_profile['freq']).union(set(profile_to_compare['freq']))
     new_unknown_profile = []
@@ -159,21 +162,22 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
-            or not isinstance(profile_2, dict) or not all(isinstance(key, str) for key in unknown_profile) \
+            or not isinstance(profile_2, dict) \
+            or not all(isinstance(key, str) for key in unknown_profile) \
             or not all(isinstance(key, str) for key in profile_1) \
             or not all(isinstance(key, str) for key in profile_2):
         return None
     mse1 = compare_profiles(unknown_profile, profile_1)
     mse2 = compare_profiles(unknown_profile, profile_2)
-    if not isinstance(mse1,float) or not isinstance(mse2,float):
+    if not isinstance(mse1, float) or not isinstance(mse2, float):
         return None
     if mse1 > mse2:
-        return profile_2['name']
+        return str(profile_2['name'])
     if mse1 < mse2:
-        return profile_1['name']
+        return str(profile_1['name'])
     if profile_1['name'] < profile_2['name']:
-        return profile_1['name']
-    return profile_2['name']
+        return str(profile_1['name'])
+    return str(profile_2['name'])
 
 
 def load_profile(path_to_file: str) -> dict | None:

@@ -134,9 +134,8 @@ def compare_profiles(
         return None
     # проверка что ключи вообще есть
     required_keys = ['name', 'freq']
-    for key in required_keys:
-        if key not in unknown_profile or key not in profile_to_compare:
-            return None
+    if not all(key in unknown_profile and key in profile_to_compare for key in required_keys):
+        return None
     # проверка что значение ключа name - строка
     if (not isinstance(unknown_profile['name'], str)
             or not isinstance(profile_to_compare['name'], str)):

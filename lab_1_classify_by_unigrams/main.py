@@ -138,10 +138,10 @@ def compare_profiles(
         if key not in unknown_profile or key not in profile_to_compare:
             return None
     # проверка что значение ключа name - строка
-    if not isinstance(unknown_profile['name'], str):
+    if (not isinstance(unknown_profile['name'], str)
+            or not isinstance(profile_to_compare['name'], str)):
         return None
-    if not isinstance(profile_to_compare['name'], str):
-        return None
+
     # проверка что значение ключа freq - число с плавающей точкой
     for key, value in unknown_profile['freq'].items():
         if not isinstance(key, str) or not isinstance(value, float):

@@ -4,7 +4,6 @@ Lab 1.
 Language detection
 """
 
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -25,9 +24,9 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     out = []
-    for char in text:
+    for char in text.lower():
         if char.isalpha():
-            out.append(char.lower())
+            out.append(char)
     if not out:
         return None
     return out
@@ -101,8 +100,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 
 def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.

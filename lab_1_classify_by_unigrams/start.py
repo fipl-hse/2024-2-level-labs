@@ -1,8 +1,8 @@
+#Laboratory Work #1
 """
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-
 
 def main() -> None:
     """

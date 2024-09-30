@@ -3,7 +3,6 @@ Lab 1.
 
 Language detection
 """
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 import json
@@ -48,6 +47,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     frequencies = {}
     for l in tokens:
+        if l in frequencies.keys():
+            continue
         frequencies[l] = tokens.count(l)/len(tokens)
     return frequencies
 
@@ -68,8 +69,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     frequencies = calculate_frequencies(tokenize(text))
     if not (isinstance(language, str) and isinstance(frequencies, dict)):
         return None
-    return {'name': language,
-            'freq': frequencies}
+    return {
+        'name': language,
+        'freq': frequencies
+    }
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -98,8 +101,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 
 def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]], ) -> float | None:
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
+) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
 

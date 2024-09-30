@@ -7,7 +7,7 @@ Language detection
 
 def tokenize(text):
 
-    if type(text) != str:
+    if type(text) is not str:
         return None
 
     text = text.lower()

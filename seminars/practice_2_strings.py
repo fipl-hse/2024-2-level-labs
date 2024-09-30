@@ -47,13 +47,14 @@ print(example)
 # TASKS
 
 # Task 1:
-def multiply_string(text:str, number:int) -> str:
+def multiply_string(text: str, number: int) -> str:
     """
     Given a string and a non-negative number,
     display the given string the number of times given in the `how_many`.
     """
     print(str(number))
     return text*number
+
 
 multiply_string('Hi', 3)
 
@@ -71,7 +72,9 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
 
-#lice = input_string[:3]
+# lice = input_string[:3]
+
+
 front_times('Chocolate', 2)
 front_times('Chocolate', 3)
 front_times('Abc', 3)
@@ -96,6 +99,8 @@ def extra_end(input_string: str) -> str:
     """
     end = input_string[-2:]
     return end*3
+
+
 print(extra_end('Lo'))
 
 
@@ -115,7 +120,6 @@ def make_abba(first_string: str, second_string: str) -> str:
     return result.join(l_strings)
 
 
-
 print(make_abba('Hi', 'Bye'))
 print(make_abba('Yo', 'Alice'))
 print(make_abba('What', 'Up'))
@@ -124,13 +128,9 @@ print(make_abba('', 'y'))
 
 # Task 5
 def reverse_word(sentence: str) -> str:
-
     """
     Write a function that takes in a string of one or more words,
     and returns the same string, but with all five or more letter words reversed.
-
-    Strings passed in will consist of only letters and spaces.
-    Spaces will be included only when more than one word is present.
     """
     sp = []
     for word in sentence.split(' '):
@@ -138,25 +138,43 @@ def reverse_word(sentence: str) -> str:
             sp.append(word[::-1])
         else:
             sp.append(word)
-        print(''.join(sp))
+    return ' '.join(sp)  # Возвращаем строку, соединенную пробелами
 
-print(reverse_word("Hey fellow warriors"))
 
+print(reverse_word("Hey fellow warriors"))  # Например, "Hey wollef sroirraw"
 print(reverse_word("This is another test"))
 
+# Test cases
+
+
+print(reverse_word("Hey fellow warriors"))
+print(reverse_word("This is another test"))
 
 # Task 6
+
+
 def generate_hashtag(input_string: str) -> str:
     result = []
+
+    # Убираем лишние пробелы и разбиваем на слова
     for word in input_string.split():
         result.append(word.capitalize())
-    result_joined = ''.join(result)
-    if len(result_joined) >+ 14 or len(''.join(result)):
-        return False
-    return'#'+''.join(result)
+
+    result_joined = ''.join(result)  # Соединяем слова без пробелов
+
+    # Проверяем условия
+    if not result_joined or len(result_joined) > 140:
+        return "False"
+
+    return '#' + result_joined  # Возвращаем строку с хэштегом
+
 
 print(generate_hashtag("Hello there thanks for trying my quiz"))
-    """
+
+print(generate_hashtag("    Hello     World   "))  # "#HelloWorld"
+print(generate_hashtag(""))
+
+"""
     The marketing team is spending way too much time typing in hashtags.
     Let's help them with our own Hashtag Generator!
 
@@ -171,11 +189,12 @@ print(generate_hashtag("Hello there thanks for trying my quiz"))
     "    Hello     World   "                  =>  "#HelloWorld"
     ""                                        =>  false
     """
-    # student realisation goes here
-
+# student realisation goes here
 
 # Task 7:
-def combo_string(first_string: str, second_string: str) -> str:
+
+
+def combo_string() -> str:
     """
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
@@ -207,7 +226,7 @@ def string_splosion(input_string: str) -> str:
 
 
 # Task 2: advanced
-def string_match(first_string: str, second_string: str) -> int:
+def string_match() -> int:
     """
     Given two strings, find the number of times an arbitrary substring (with length of 2)
     is found at the same position in both strings.

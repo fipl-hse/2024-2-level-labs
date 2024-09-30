@@ -221,6 +221,7 @@ def detect_language(
     if mse_profile_1_and_unknown is None or mse_profile_2_and_unknown is None:
         return None
 
+    result = None
     if mse_profile_1_and_unknown < mse_profile_2_and_unknown:
         result = str(profile_1['name'])
     if mse_profile_2_and_unknown < mse_profile_1_and_unknown:

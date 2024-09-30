@@ -44,6 +44,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
+    if isinstance(tokens, list):
+        for element in tokens:
+            if not isinstance(element, str):
+                return None
 
     length = len(tokens)
     freq_dictionary = {}
@@ -56,7 +60,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         freq_dictionary[letter] += 1
 
     for letter in freq_dictionary:
-        freq_dictionary[letter] = float(freq_dictionary[letter]) / length
+        freq_dictionary[letter] = freq_dictionary[letter] / length
     return freq_dictionary
 
 

@@ -46,7 +46,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
 
     length = len(tokens)
-    freq_dictionary = dict()
+    freq_dictionary = {}
 
     for letter in tokens:
         if not isinstance(letter, str):
@@ -75,7 +75,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not isinstance(language, str) or not isinstance(text, str):
         return None
-    language_profile_dictionary = dict()
+    language_profile_dictionary = {}
     language_profile_dictionary['name'] = language
     language_profile_dictionary['freq'] = calculate_frequencies(tokenize(text))
     return language_profile_dictionary
@@ -96,18 +96,18 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
-    elif isinstance(predicted, list):
+    if isinstance(predicted, list):
         for element in predicted:
             if not isinstance(element, float) and not isinstance(element, int):
                 return None
-    elif isinstance(actual, list):
+    if isinstance(actual, list):
         for element in actual:
             if not isinstance(element, float) and not isinstance(element, int):
                 return None
     if len(predicted) != len(actual):
         return None
     sum_mse = 0
-    for i in range(len(predicted)):
+    for i, elem in enumerate(predicted):
         sum_mse += (predicted[i] - actual[i]) ** 2
     return sum_mse / len(predicted)
 
@@ -197,7 +197,11 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if not (
+            isinstance(unknown_profile, dict) and
+            isinstance(profile_1, dict) and
+            isinstance(profile_2, dict)
+    ):
         return None
     if not isinstance(unknown_profile['name'], str):
         return None

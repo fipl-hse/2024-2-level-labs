@@ -155,25 +155,21 @@ def compare_profiles(
     frequency_unknown_profile = unknown_profile.get('freq')
     frequency_profile_to_compare = profile_to_compare.get('freq')
 
+    # создание множества ключей без повторений, сортировка
     tokens = set()
-    for profile1 in (frequency_unknown_profile, frequency_profile_to_compare):
-        for key in profile1:
+    for profile in (frequency_unknown_profile, frequency_profile_to_compare):
+        for key in profile:
             tokens.add(key)
-
     sorted_tokens = sorted(tokens)
 
-    # создаем два списка со встречаемостью токенов
-    new_list_unknown = []
-    new_list_to_compare = []
-    for element in sorted_tokens:
-        if element in frequency_unknown_profile:
-            new_list_unknown.append(frequency_unknown_profile.get(element))
-        else:
-            new_list_unknown.append(0)
-        if element in frequency_profile_to_compare:
-            new_list_to_compare.append(frequency_profile_to_compare.get(element))
-        else:
-            new_list_to_compare.append(0)
+    # создаем два списка со встречаемостью токенов (если значение частоты в словаре отсутсвует, то 0)
+    new_list_unknown = [
+        frequency_unknown_profile.get(element, 0) for element in sorted_tokens
+    ]
+
+    new_list_to_compare = [
+        frequency_profile_to_compare.get(element, 0) for element in sorted_tokens
+    ]
 
     some_mse = calculate_mse(new_list_unknown, new_list_to_compare)
     return some_mse
@@ -204,22 +200,15 @@ def detect_language(
             isinstance(profile_2, dict)
     ):
         return None
-    if not isinstance(unknown_profile['name'], str):
+    if not all(isinstance(profile['name'], str) for profile in
+               (unknown_profile, profile_1, profile_2)):
         return None
-    if not isinstance(profile_1['name'], str):
-        return None
-    if not isinstance(profile_2['name'], str):
-        return None
+
     # проверка что значение ключа freq - число с плавающей точкой
-    for key, value in unknown_profile['freq'].items():
-        if not isinstance(key, str) or not isinstance(value, float):
-            return None
-    for key, value in profile_1['freq'].items():
-        if not isinstance(key, str) or not isinstance(value, float,):
-            return None
-    for key, value in profile_2['freq'].items():
-        if not isinstance(key, str) or not isinstance(value, float,):
-            return None
+    for profile in (unknown_profile, profile_1, profile_2):
+        for key, value in profile['freq'].items():
+            if not isinstance(key, str) or not isinstance(value, float):
+                return None
 
     mse_profile_1_and_unknown = compare_profiles(unknown_profile, profile_1)
     mse_profile_2_and_unknown = compare_profiles(unknown_profile, profile_2)
@@ -228,6 +217,7 @@ def detect_language(
         return profile_1['name']
     if mse_profile_2_and_unknown < mse_profile_1_and_unknown:
         return profile_2['name']
+    return None
 
 
 def load_profile(path_to_file: str) -> dict | None:

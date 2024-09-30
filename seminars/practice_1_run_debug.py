@@ -4,8 +4,6 @@ Seminar 1
 Running python application and debugging
 """
 
-
-
 # pylint: disable=invalid-name
 
 
@@ -32,9 +30,11 @@ print(f'Numbers: {first_num} and {second_num}')
 # Fix the first exception:
 second_num = 3
 third_num = first_num / second_num
-#print(f'Numbers: {first_num}, {second_num} and {third_num}')
-#print(round (third_num, 2))
-#print(4/3)
+
+# print(f'Numbers: {first_num}, {second_num} and {third_num}')
+# print(round (third_num, 2))
+# print(4/3)
+
 c = 1.333333333333
 stroka = str(c)
 a = f"моё число: {c:.2f}"

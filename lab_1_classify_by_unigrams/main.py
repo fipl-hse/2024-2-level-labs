@@ -207,13 +207,11 @@ def detect_language(
             or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None
-    for f, s in (unknown_profile['freq'].items()
-                 and profile_1['freq'].items()
-                 and profile_2['freq'].items()):
-        if not isinstance(f, str) or not isinstance(s, (int, float)):
-            return None
-    mse_1: float = compare_profiles(unknown_profile, profile_1)
-    mse_2: float = compare_profiles(unknown_profile, profile_2)
+    if (unknown_profile is None and profile_1 is None
+            and profile_2 is None):
+        return None
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
     if (not isinstance(mse_1, float)
             or not isinstance(mse_2,  float)):
         return None
@@ -264,8 +262,8 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     if (len(profile.keys()) != 3
             or not all(x in profile for x in ['freq', 'name', 'n_words'])):
         return None
-    processed_profile: dict[str, str | dict] = {'name': profile['name'], 'freq': {}}
-    dicty: dict = {}
+    processed_profile = {'name': profile['name'], 'freq': {}}
+    dicty = {}
     for unigram in profile['freq'].keys():
         if unigram.isalpha():
             pass

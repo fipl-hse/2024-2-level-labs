@@ -120,10 +120,9 @@ def create_phone_number(nums: list) -> str:
     Write a function that accepts an array of 10 integers (between 0 and 9),
     that returns a string of those numbers in the form of a phone number.
     """
-    return f'({str(nums[0]) + str(nums[1]) + str(nums[2])}) {str(nums[3]) + str(nums[4]) + str(nums[5])}-{str(nums[6]) + str(nums[7]) + str(nums[8]) + str(nums[9])}'
 
 # Function calls with expected result:
-print(create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]))
+#print(create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]))
 # => returns "(123) 456-7890"
 
 
@@ -142,26 +141,26 @@ def check_exam(correct_answers: list, student_answers: list) -> int:
     If the score < 0, return 0.
     """
     # student realization goes here
-    score = 0
-    for i in student_answers:
-        if i == correct_answers[student_answers.index(i)]:
-            score += 4
-        if i != correct_answers[student_answers.index(i)] and i != '':
-            score -= 1
-        if i == "":
-            score += 0
-    if score < 0:
-        return 0
-    return score
+    # score = 0
+    # for i in student_answers:
+    #     if i == correct_answers[student_answers.index(i)]:
+    #         score += 4
+    #     if i != correct_answers[student_answers.index(i)] and i != '':
+    #         score -= 1
+    #     if i == "":
+    #         score += 0
+    # if score < 0:
+    #     return 0
+    # return score
 
 # Function calls with expected result:#
 # print(check_exam(["a", "a", "b", "b"], ["a", "c", "b", "d"]))
 #print(check_exam(["a", "a", "c", "b"], ["a", "a", "b",  ""]))
 # → 7
-print(check_exam(["a", "a", "b", "c"], ["a", "a", "b", "c"]))
-#→ 16
-print(check_exam(["b", "c", "b", "a"], ["",  "a", "a", "c"]))
-# → 0
+# print(check_exam(["a", "a", "b", "c"], ["a", "a", "b", "c"]))
+# #→ 16
+# print(check_exam(["b", "c", "b", "a"], ["",  "a", "a", "c"]))
+# # → 0
 
 
 # Task 6

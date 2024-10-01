@@ -5,6 +5,7 @@ Language detection starter
 
 import lab_1_classify_by_unigrams.main as func
 
+
 def main() -> None:
     """
     Launches an implementation

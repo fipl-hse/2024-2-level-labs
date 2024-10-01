@@ -28,8 +28,7 @@ def tokenize(text: str) -> list[str] | None:
     for symbol in text:
         if not symbol.isalpha():
             continue
-        else:
-            tokens.append(symbol.lower())
+        tokens.append(symbol.lower())
     return tokens
 
 

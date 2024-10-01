@@ -22,13 +22,14 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
         unknown_profile = create_language_profile("unknown", unknown_text)
     result = en_text
-    english: dict = profile_en
-    deutch: dict = profile_de
-    unknown: dict = unknown_profile
     print(tokenize(en_text))
     print(profile_en)
 
-    if english and deutch and unknown:
+    if profile_de and profile_en and unknown_profile:
+
+        english: dict = profile_en
+        deutch: dict = profile_de
+        unknown: dict = unknown_profile
         detection = detect_language(unknown, english, deutch)
         print(detection)
 
@@ -39,7 +40,7 @@ def main() -> None:
 
     collection = collect_profiles(paths_to_profiles)
     if collection:
-        profiles = detect_language_advanced(unknown, collection)
+        profiles = detect_language_advanced(unknown_profile, collection)
         if profiles:
             print_report(profiles)
     assert result, "Detection result is None"

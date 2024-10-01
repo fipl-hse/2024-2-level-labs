@@ -25,9 +25,9 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     tokenized_list = []
-    for i in text.lower():
-        if i.isalpha():
-            tokenized_list += i
+    for token in text.lower():
+        if token.isalpha():
+            tokenized_list.append(token)
     return tokenized_list
 
 
@@ -43,11 +43,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(tokens, list) or not all(isinstance(i, str) for i in tokens):
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
     frequency_dict = {}
-    for i in tokens:
-        frequency_dict[i] = tokens.count(i) / len(tokens)
+    for token in tokens:
+        frequency_dict[token] = tokens.count(token) / len(tokens)
     return frequency_dict
 
 
@@ -90,8 +90,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             or not len(predicted) == len(actual)):
         return None
     sum_diff = 0
-    for i, k in enumerate(actual):
-        difference_between_values = (k - predicted[i]) ** 2
+    for i, value in enumerate(actual):
+        difference_between_values = (value - predicted[i]) ** 2
         sum_diff += difference_between_values
     mse = sum_diff / len(predicted)
     return round(mse, 4)
@@ -122,20 +122,20 @@ def compare_profiles(
     if (not isinstance(copy_unk_profile['freq'], dict)
             or not isinstance(profile_to_compare['freq'], dict)):
         return None
-    for i in copy_unk_profile['freq']:
-        if i not in profile_to_compare['freq']:
-            profile_to_compare['freq'][i] = 0
-    for i in profile_to_compare['freq']:
-        if i not in copy_unk_profile['freq']:
-            copy_unk_profile['freq'][i] = 0
+    for letter in copy_unk_profile['freq']:
+        if letter not in profile_to_compare['freq']:
+            profile_to_compare['freq'][letter] = 0
+    for letter in profile_to_compare['freq']:
+        if letter not in copy_unk_profile['freq']:
+            copy_unk_profile['freq'][letter] = 0
     sort_unk = dict(sorted(copy_unk_profile['freq'].items()))
     sort_comp = dict(sorted(profile_to_compare['freq'].items()))
     comp_values_lst = []
-    for k in sort_comp.values():
-        comp_values_lst.append(k)
+    for freq in sort_comp.values():
+        comp_values_lst.append(freq)
     unk_values_lst = []
-    for k in sort_unk.values():
-        unk_values_lst.append(k)
+    for freq in sort_unk.values():
+        unk_values_lst.append(freq)
     return calculate_mse(comp_values_lst, unk_values_lst)
 
 
@@ -214,9 +214,9 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     processed_profile = {'name': profile['name'],
                          'freq': {}}
     freq_dict = {}
-    for i in profile['freq']:
-        if isinstance(i, str) and len(i) == 1:
-            freq_dict[i] = profile['freq'][i]
+    for token in profile['freq']:
+        if isinstance(token, str) and len(token) == 1:
+            freq_dict[token] = profile['freq'][token]
     letters_list = list(freq_dict)
     for letter in letters_list:
         if not letter.isupper():
@@ -246,8 +246,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
             and all(isinstance(i, str) for i in paths_to_profiles)):
         return None
     profiles_collection = []
-    for i in paths_to_profiles:
-        profile = load_profile(i)
+    for path in paths_to_profiles:
+        profile = load_profile(path)
 
         if not profile:
             return None
@@ -278,8 +278,8 @@ def detect_language_advanced(
     if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
         return None
     profiles_list = []
-    for i in known_profiles:
-        profiles_list.append((i['name'], compare_profiles(unknown_profile, i)))
+    for profile in known_profiles:
+        profiles_list.append((profile['name'], compare_profiles(unknown_profile, profile)))
     if profiles_list:
         profiles_list.sort(key=lambda x: (x[-1], x[0]))
         return profiles_list
@@ -295,5 +295,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-    for i in detections:
-        print(f'{i[0]}: MSE {i[-1]:.5f}')
+    for detection in detections:
+        print(f'{detection[0]}: MSE {detection[-1]:.5f}')

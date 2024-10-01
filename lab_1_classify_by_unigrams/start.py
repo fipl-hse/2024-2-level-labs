@@ -2,6 +2,8 @@
 Language detection starter
 """
 from lab_1_classify_by_unigrams import main as func
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 def main() -> None:
     """

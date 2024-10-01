@@ -20,7 +20,8 @@ def main() -> None:
     paths = ['assets/profiles/de.json', 'assets/profiles/en.json', 'assets/profiles/es.json',
              'assets/profiles/fr.json', 'assets/profiles/it.json', 'assets/profiles/ru.json',
              'assets/profiles/tr.json']
-    result = print_report(detect_language_advanced(create_language_profile(
+    result = None
+    print_report(detect_language_advanced(create_language_profile(
         'un', unknown_text), collect_profiles(paths)))
     assert result, "Detection result is None"
 

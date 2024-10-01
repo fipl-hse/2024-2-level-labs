@@ -126,7 +126,7 @@ def compare_profiles(
     for k, v in unknown_profile['freq'].items():
         if k not in profile_to_compare['freq'].keys():
             unknown_freq.append(v)
-            profile_freq.append(0)
+            profile_freq.append(0.0)
         else:
             for k_2, v_2 in profile_to_compare['freq'].items():
                 if k_2 == k:
@@ -135,7 +135,7 @@ def compare_profiles(
 
     for k, v in profile_to_compare['freq'].items():
         if k not in unknown_profile['freq'].keys():
-            unknown_freq.append(0)
+            unknown_freq.append(0.0)
             profile_freq.append(v)
     mse = calculate_mse(unknown_freq, profile_freq)
     return mse
@@ -244,7 +244,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(paths_to_profiles,list) and all(isinstance(p, str)
+    if not (isinstance(paths_to_profiles, list) and all(isinstance(p, str)
                                                        for p in paths_to_profiles)):
         return None
     all_profiles = []
@@ -291,3 +291,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
         return None
     for elem in detections:
         print(f'{elem[0]}: MSE {elem[1]:.5f}')
+    return None

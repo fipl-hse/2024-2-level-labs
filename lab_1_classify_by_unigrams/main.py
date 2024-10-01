@@ -3,9 +3,6 @@ Lab 1.
 
 Language detection
 """
-
-
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 def tokenize(text: str) -> list[str] | None:
@@ -22,15 +19,16 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(text, str):
-        needless = "\n1234567890,.:; -!?'*º’‘@~#№$%^&<>|+-"
-        text = text.lower()
-        tokens = []
-        for i in text:
-            if i not in needless:
-                tokens += i
-        return tokens
-    return None
+    if not isinstance(text, str):
+        return None
+    needless = "\n1234567890,.:; -!?'*º’‘@~#№$%^&<>|+-"
+    text = text.lower()
+    tokens = []
+    for i in text:
+        if i not in needless:
+            tokens += i
+    return tokens
+
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -44,18 +42,17 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(tokens, list):
-        freq = {}
-        for i in tokens:
-            if isinstance(i, str) and len(i) == 1:
-                if i in freq:
-                    continue
-                if isinstance(i, str):
-                    freq[i] = tokens.count(i) / len(tokens)
-            else:
-                return None
-        return freq
-    return None
+    if not isinstance(tokens, list):
+        return None
+    freq = {}
+    for i in tokens:
+        if not isinstance(i, str) and len(i) != 1:
+            return None
+        if i in freq:
+            continue
+        freq[i] = tokens.count(i) / len(tokens)
+    return freq
+
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -77,7 +74,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     return None
 
 
-
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculate mean squared error between predicted and actual values.
@@ -91,14 +87,14 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    squa_diff = 0
-    if len(actual) == len(predicted):
-        for i, x in enumerate(actual):
-            squa_diff += (x - predicted[i]) ** 2
-    else:
+    if len(actual) != len(predicted):
         return None
+    squa_diff = 0
+    for i, x in enumerate(actual):
+        squa_diff += (x - predicted[i]) ** 2
     mse = round((squa_diff/len(actual)), 4)
     return mse
+
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -144,7 +140,6 @@ def compare_profiles(
     return profile_mse
 
 
-
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_1: dict[str, str | dict[str, float]],
@@ -166,17 +161,19 @@ def detect_language(
     """
     detect_1 = compare_profiles(unknown_profile, profile_1)
     detect_2 = compare_profiles(unknown_profile, profile_2)
-    if isinstance(detect_1, float) and isinstance(detect_2, float):
-        if detect_1 < detect_2:
-            lang = str(profile_1['name'])
-        elif detect_1 == detect_2:
-            a = [profile_1['name'], profile_2['name']]
-            a.sort()
-            lang = str(a[0])
-        else:
-            lang = str(profile_2['name'])
-        return lang
-    return None
+    if not isinstance(detect_1, float):
+        return None
+    if not isinstance(detect_2, float):
+        return None
+    if detect_1 < detect_2:
+        lang = str(profile_1['name'])
+    elif detect_1 == detect_2:
+        a = [profile_1['name'], profile_2['name']]
+        a.sort()
+        lang = str(a[0])
+    else:
+        lang = str(profile_2['name'])
+    return lang
 
 
 def load_profile(path_to_file: str) -> dict | None:

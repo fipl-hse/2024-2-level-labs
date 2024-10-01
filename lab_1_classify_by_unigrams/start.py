@@ -22,7 +22,6 @@ def main() -> None:
     en_profile = func.create_language_profile('en', en_text)
     du_profile = func.create_language_profile('de', de_text)
     un_profile = func.create_language_profile('un', unknown_text)
-    print(func.detect_language(un_profile, du_profile, en_profile))
     if en_profile is None or du_profile is None or un_profile is None:
         return
     detection_result = func.detect_language(un_profile, du_profile, en_profile)

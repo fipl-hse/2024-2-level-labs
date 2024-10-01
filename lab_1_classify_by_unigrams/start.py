@@ -9,6 +9,7 @@ def main() -> None:
     """
     Launches an implementation
     """
+    tr = False
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
@@ -20,9 +21,12 @@ def main() -> None:
     de_profile = create_language_profile('de', de_text)
     unknown_profile = create_language_profile('unknown', unknown_text)
     for profile in [en_profile, de_profile, unknown_profile]:
-        if not isinstance(profile, dict):
-            return None
-    result = detect_language(unknown_profile, en_profile, de_profile)
+        if profile is None:
+            tr = True
+    if tr:
+        result = None
+    else:
+        result = detect_language(unknown_profile, en_profile, de_profile)
     assert result, "Detection result is None"
     print(result_for_4, result)
 

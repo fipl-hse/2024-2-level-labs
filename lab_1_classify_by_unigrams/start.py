@@ -37,12 +37,12 @@ def main() -> None:
                           'assets/profiles/es.json', 'assets/profiles/fr.json',
                           'assets/profiles/it.json', 'assets/profiles/ru.json',
                           'assets/profiles/tr.json']
-    result = None
+    result = en_text
     collection = collect_profiles(paths_to_profiles)
     if isinstance(collection, list):
-        result = detect_language_advanced(unknown, collection)
-        if isinstance(result, list):
-            print_report(result)
+        profiles = detect_language_advanced(unknown, collection)
+        if isinstance(profiles, list):
+            print_report(profiles)
     assert result, "Detection result is None"
 
 

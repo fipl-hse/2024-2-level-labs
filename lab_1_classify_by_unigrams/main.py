@@ -3,6 +3,7 @@ Lab 1.
 Language detection
 """
 
+
 def tokenize(text: str) -> list[str] | None:
     """
         Split a text into tokens.
@@ -142,7 +143,7 @@ def detect_language(
         str(profile_1['name']), str(profile_2['name']))
 
 
-def load_profile(path_to_file: str) -> dict | None:
+def load_profile() -> dict | None:
     """
     Load a language profile.
 
@@ -157,7 +158,7 @@ def load_profile(path_to_file: str) -> dict | None:
     return None
 
 
-def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
+def preprocess_profile() -> dict[str, str | dict] | None:
     """
     Preprocess profile for a loaded language.
 
@@ -174,7 +175,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     return None
 
 
-def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
+def collect_profiles() -> list[dict[str, str | dict[str, float]]] | None:
     """
     Collect profiles for a given path.
 
@@ -189,9 +190,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     return None
 
 
-def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
-) -> list | None:
+def detect_language_advanced() -> list | None:
     """
     Detect the language of an unknown profile.
 
@@ -208,7 +207,7 @@ def detect_language_advanced(
     return None
 
 
-def print_report(detections: list[tuple[str, float]]) -> None:
+def print_report() -> None:
     """
     Print report for detection of language.
 

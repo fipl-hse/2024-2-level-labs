@@ -164,11 +164,13 @@ def detect_language(
         return None
     first_metric = compare_profiles(unknown_profile, profile_1)
     second_metric = compare_profiles(unknown_profile, profile_2)
+    if first_metric is None or second_metric is None:
+        return None
     if first_metric == second_metric:
         languages = [profile_1['name'], profile_2['name']]
         if not isinstance(languages, list):
             return None
-        result = sorted(languages)[0]
+        result = list(languages.sort())[0]
     if first_metric < second_metric:
         result = profile_1['name']
     else:

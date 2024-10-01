@@ -176,11 +176,9 @@ def detect_language(
 
     if mse_1 > mse_2:
         language = profile_2['name']
-
-    elif mse_1 < mse_2:
+    if mse_1 < mse_2:
         language = profile_1['name']
-
-    elif mse_1 == mse_2:
+    if mse_1 == mse_2:
         language = equal_lst[0]
 
     return language

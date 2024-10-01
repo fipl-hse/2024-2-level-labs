@@ -239,31 +239,32 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
     if profile is not None:
         if (isinstance(profile, dict)
-                and all(key in profile for key in ['name', 'freq', 'n_words'])
                 and isinstance(profile['name'], str)
                 and isinstance(profile['freq'], dict)
                 and isinstance(profile['n_words'], list)):
+            if all(key in profile for key in ['name', 'freq', 'n_words']):
 
-            name = profile['name']
-            freq = profile['freq']
-            n_words = profile['n_words']
+                name = profile['name']
+                freq = profile['freq']
+                n_words = profile['n_words']
 
-            total_number = n_words[0]
-            if isinstance(total_number, int) and total_number >= 1:
+                total_number = n_words[0]
+                if isinstance(total_number, int) and total_number >= 1:
 
-                freq_dict = {}
-                for k, v in freq.items():
-                    if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
-                        unigram = k.lower()
-                        if unigram.isalpha() or k == '²':
-                            if freq_dict.get(unigram) is not None:
-                                freq_dict[unigram] += v / total_number
-                            else:
-                                freq_dict[unigram] = v / total_number
+                    freq_dict = {}
+                    for k, v in freq.items():
+                        if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
+                            unigram = k.lower()
+                            if unigram.isalpha() or k == '²':
+                                if freq_dict.get(unigram) is not None:
+                                    freq_dict[unigram] += v / total_number
+                                else:
+                                    freq_dict[unigram] = v / total_number
 
-                processed_profile = {'name': name, 'freq': freq_dict}
-                return processed_profile
+                    processed_profile = {'name': name, 'freq': freq_dict}
+                    return processed_profile
 
+                return None
             return None
         return None
     return None
@@ -314,24 +315,26 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if (unknown_profile is not None and isinstance(unknown_profile, dict)
-            and known_profiles is not None and isinstance(known_profiles, list)):
-        for profile in known_profiles:
-            if isinstance(profile, dict) and all(key in profile for key in ['name', 'freq']):
+    if unknown_profile is not None and known_profiles is not None:
+        if isinstance(unknown_profile, dict) and isinstance(known_profiles, list):
 
-                results_not_sorted = {}
-                for profile in known_profiles:
-                    mse = compare_profiles(unknown_profile, profile)
-                    if mse is not None:
-                        lang = profile.get('name')
-                        if lang is not None:
-                            result = {lang: mse}
-                            results_not_sorted.update(result)
+            for profile in known_profiles:
+                if isinstance(profile, dict) and all(key in profile for key in ['name', 'freq']):
 
-                results_lst = list(results_not_sorted.items())
-                results_sorted = sorted(results_lst, key=lambda x: (x[1], x[0]))
-                return results_sorted
+                    results_not_sorted = {}
+                    for profile in known_profiles:
+                        mse = compare_profiles(unknown_profile, profile)
+                        if mse is not None:
+                            lang = profile.get('name')
+                            if lang is not None:
+                                result = {lang: mse}
+                                results_not_sorted.update(result)
 
+                    results_lst = list(results_not_sorted.items())
+                    results_sorted = sorted(results_lst, key=lambda x: (x[1], x[0]))
+                    return results_sorted
+
+                return None
             return None
     return None
 

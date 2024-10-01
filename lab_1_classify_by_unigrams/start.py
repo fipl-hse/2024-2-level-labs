@@ -39,7 +39,7 @@ def main() -> None:
                           'assets/profiles/tr.json']
 
     collection = collect_profiles(paths_to_profiles)
-    if collection and unknown_profile:
+    if collection and isinstance(unknown_profile, dict):
         profiles = detect_language_advanced(unknown_profile, collection)
         if profiles:
             print_report(profiles)

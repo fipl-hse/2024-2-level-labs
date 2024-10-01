@@ -20,6 +20,7 @@ def main() -> None:
     en_profile = func.create_language_profile('en', en_text)
     de_profile = func.create_language_profile('de', de_text)
     unknown_profile = func.create_language_profile('unknown', unknown_text)
+
     result = func.detect_language(unknown_profile, de_profile, en_profile)
 
     assert result, "Detection result is None"

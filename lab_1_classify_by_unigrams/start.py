@@ -4,8 +4,6 @@ Language detection starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
-from main import tokenize
-from main import calculate_frequencies
 from main import create_language_profile
 
 

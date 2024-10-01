@@ -170,16 +170,18 @@ def detect_language(
 
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
+
+    if (mse_1 or mse_2) is None:
+        return None
+
     equal_lst = [profile_1['name'], profile_2['name']]
     equal_lst.sort()
     language = equal_lst[0]
 
     if mse_1 > mse_2:
         return profile_2['name']
-
     if mse_1 < mse_2:
         return profile_1['name']
-
     if mse_1 == mse_2:
         return language
 

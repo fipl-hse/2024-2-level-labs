@@ -1,10 +1,8 @@
+from main import create_language_profile
 """
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-
-
-from main import create_language_profile
 
 
 def main() -> None:

@@ -180,8 +180,10 @@ def detect_language(
 
     if mse_1 > mse_2:
         return profile_2['name']
+
     if mse_1 < mse_2:
         return profile_1['name']
+
     if mse_1 == mse_2:
         return language
 

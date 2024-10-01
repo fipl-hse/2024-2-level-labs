@@ -48,7 +48,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     freq_dict = {}
     for character in tokens:
-        if character in freq_dict.keys():
+        if character in freq_dict:
             continue
         freq_dict[character] = (tokens.count(character) / len(tokens))
 

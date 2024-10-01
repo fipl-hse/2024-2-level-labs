@@ -111,9 +111,11 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or \
-            'name' not in unknown_profile or 'freq' not in unknown_profile or 'name' not \
-            in profile_to_compare or 'freq' not in profile_to_compare:
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+    if 'name' not in unknown_profile or 'freq' not in unknown_profile:
+        return None
+    if 'name' not in profile_to_compare or 'freq' not in profile_to_compare:
         return None
     unknown_freq = unknown_profile['freq']
     compare_freq = profile_to_compare['freq']
@@ -158,11 +160,10 @@ def detect_language(
         return (str(profile_2['name'])) if distance_2 is not None else None
     if distance_2 is None or distance_1 < distance_2:
         return str(profile_1['name'])
-    if distance_2 < distance_1:
-        return str(profile_2['name'])
     if profile_2 is None or profile_1 is None:
         return None
-    return min(str(profile_1['name']), str(profile_2['name']))
+    return str(profile_2['name']) if distance_2 < distance_1 else min(
+        str(profile_1['name']), str(profile_2['name']))
 
 def load_profile(path_to_file: str) -> dict | None:
     """

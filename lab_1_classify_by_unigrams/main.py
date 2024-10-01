@@ -301,7 +301,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(detections, list):
-        return None
     for lang, score in detections:
         print(f'{lang}: MSE {score:.5f}')

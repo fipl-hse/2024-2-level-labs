@@ -41,7 +41,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(tokens, list) or not all(isinstance(stroka, str) for stroka in tokens) or not tokens:
+    if (not isinstance(tokens, list) or
+            not all(isinstance(stroka, str) for stroka in tokens) or not tokens):
         return None
     quantity = len(tokens)
     relative_freq = {}
@@ -84,9 +85,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if (not isinstance(predicted, list) or not isinstance(actual, list)
+            or len(predicted) != len(actual)):
         return None
-    return sum((actual[i] - predicted[i]) ** 2 for i in range(len(actual))) / len(actual)
+    return float(sum((actual[i] - predicted[i]) ** 2 for i in range(len(actual))) / len(actual))
 
 
 
@@ -112,7 +114,8 @@ def compare_profiles(
         return None
     if 'name' not in unknown_profile.keys() or 'name' not in profile_to_compare.keys():
         return None
-    if not all(isinstance(key, str) for key in unknown_profile) or not all(isinstance(key, str) for key in profile_to_compare):
+    if (not all(isinstance(key, str) for key in unknown_profile)
+            or not all(isinstance(key, str) for key in profile_to_compare)):
         return None
     both_profiles_symbols = set(unknown_profile['freq']).union(set(profile_to_compare['freq']))
     unk_freq = unknown_profile['freq']
@@ -141,9 +144,12 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
-    if not all(isinstance(key, str) for key in unknown_profile) or not all(isinstance(key, str) for key in profile_1) or not all(isinstance(key, str) for key in profile_2):
+    if (not all(isinstance(key, str) for key in unknown_profile)
+            or not all(isinstance(key, str) for key in profile_1)
+            or not all(isinstance(key, str) for key in profile_2)):
         return None
     first_comp = compare_profiles(unknown_profile, profile_1)
     second_comp = compare_profiles(unknown_profile, profile_2)

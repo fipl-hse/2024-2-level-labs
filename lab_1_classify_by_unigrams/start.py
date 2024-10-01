@@ -19,7 +19,11 @@ def main() -> None:
     english = create_language_profile("en", en_text)
     german = create_language_profile("en", de_text)
     unknown = create_language_profile("en", unknown_text)
-    result = detect_language(unknown, english, german)
+    if not isinstance(unknown, dict) or not isinstance(english, dict) \
+            or not isinstance(german, dict):
+        result = None
+    else:
+        result = detect_language(unknown, english, german)
     print(result)
     assert result, "Detection result is None"
 

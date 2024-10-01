@@ -119,7 +119,7 @@ def compare_profiles(
     compare_freq = profile_to_compare['freq']
     if not isinstance(unknown_freq, dict) or not isinstance(compare_freq, dict):
         return None
-    tokens = list(set(unknown_freq.keys()) | set(compare_freq.keys()))
+    tokens = set(unknown_freq.keys()).union(set(compare_freq.keys()))
     actual_values = []
     predicted_values = []
     for token in tokens:

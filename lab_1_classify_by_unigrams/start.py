@@ -2,20 +2,24 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-from main import tokenize, calculate_frequencies, create_language_profile, calculate_mse, compare_profiles, detect_language
-
+from lab_1_classify_by_unigrams.main import calculate_frequencies, calculate_mse, compare_profiles, create_language_profile, detect_language, tokenize
 def main() -> None:
     """
     Launches an implementation
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
+        engl_prof = create_language_profile('en', en_text)
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
+        deu_prof = create_language_profile('de', de_text)
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result  = None
-    assert "Detection result is None"
+        unk_prof = create_language_profile('unk', unknown_text)
+    if isinstance(unk_prof, dict) and isinstance(deu_prof, dict) and isinstance(engl_prof, dict):
+        answer = detect_language(unk_prof, engl_prof, deu_prof)
+        result = answer
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

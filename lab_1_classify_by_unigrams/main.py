@@ -178,7 +178,7 @@ def detect_language(
     if not mse_profile_1 or not mse_profile_2:
         return None
 
-    lang_list = [profile_1['name'], profile_2['name']]
+    lang_list: list[str] = [profile_1['name'], profile_2['name']]
 
     if mse_profile_1 == mse_profile_2:
         return str(sorted(lang_list)[0])
@@ -303,13 +303,13 @@ def detect_language_advanced(
             or len(unknown_profile) == 0 or len(known_profiles) == 0):
         return None
 
-    result_list: list = []
+    result_list = []
     for profile in known_profiles:
         compared_profiles = compare_profiles(unknown_profile, profile)
         if not compared_profiles:
             return None
         result_list.append((profile['name'], compared_profiles))
-    return list(sorted(sorted(result_list, key=lambda x: x[0]), key=lambda x: x[1], reverse=False))
+    return sorted(result_list, key=lambda x: (x[1], x[0]))
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

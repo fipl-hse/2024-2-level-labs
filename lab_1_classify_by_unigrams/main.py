@@ -128,6 +128,19 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
+    if (type(unknown_profile) is not dict) or (type(profile_to_compare) is not dict):
+        return None
+    if ("name" not in unknown_profile) or ("name" not in profile_to_compare):
+        return None
+    if len(unknown_profile["freq"]) != len(profile_to_compare["freq"]):
+        for i in unknown_profile["freq"]:
+            if i not in profile_to_compare["freq"]:
+                unknown_profile["freq"].update({i: 0})
+            unknown_profile["freq"][i] += 1
+        for i in profile_to_compare["freq"]:
+            if i not in unknown_profile["freq"]:
+                profile_to_compare["freq"].update({i: 0})
+            profile_to_compare["freq"][i] += 1
 
 
 def detect_language(

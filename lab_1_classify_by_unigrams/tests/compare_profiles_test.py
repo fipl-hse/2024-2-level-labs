@@ -104,10 +104,10 @@ class CompareProfilesTest(unittest.TestCase):
         unknown_profile = []
 
         profile_to_compare = {'name': 'de',
-                      'freq': {
-                          'n': 0.0666, 's': 0.0333, 'a': 0.0666, 'm': 0.0666,
-                          't': 0.0666, 'i': 0.1333, 'w': 0.0666, 'ß': 0.0333,
-                          'ö': 0.0333, 'e': 0.1, 'h': 0.1666, 'c': 0.1666}}
+                              'freq': {
+                                  'n': 0.0666, 's': 0.0333, 'a': 0.0666, 'm': 0.0666,
+                                  't': 0.0666, 'i': 0.1333, 'w': 0.0666, 'ß': 0.0333,
+                                  'ö': 0.0333, 'e': 0.1, 'h': 0.1666, 'c': 0.1666}}
 
         expected = None
         actual = compare_profiles(unknown_profile, profile_to_compare)

@@ -2,9 +2,6 @@
 Lab 1.
 Language detection
 """
-
-
-# pylint:disable=too-many-locals, unused-argument, unused-variable
 def tokenize(text: str) -> list[str] | None:
     """
         Split a text into tokens.
@@ -156,7 +153,6 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
-    return None
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -173,7 +169,6 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
-    return None
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -188,7 +183,6 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
-    return None
 
 
 def detect_language_advanced(
@@ -207,7 +201,6 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    return None
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -219,4 +212,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-    return None

@@ -132,7 +132,6 @@ def compare_profiles(
             unknown_lst.append(0.0)
         else:
             unknown_lst.append(unknown_profile['freq'][elements])
-
         if elements not in profile_to_compare['freq']:
             compare_lst.append(0.0)
         else:

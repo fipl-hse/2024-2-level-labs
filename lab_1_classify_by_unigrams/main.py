@@ -200,8 +200,6 @@ def detect_language(
         lang_list = [name_1, name_2]
         lang = sorted(lang_list)
         language = lang[0]
-        if not isinstance(language, str):
-            return None
     return language
 
 

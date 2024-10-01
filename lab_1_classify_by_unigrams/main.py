@@ -330,12 +330,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(detections, list):
-        return None
-    for i in detections:
-        if not isinstance(i, tuple):
-            return None
-        if not isinstance(i[0], str) and isinstance(i[1], float):
-            return None
     for block in detections:
         print(f'{block[0]}: MSE {block[1]:.5f}')

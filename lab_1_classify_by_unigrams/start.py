@@ -5,7 +5,7 @@ Language detection starter
 
 from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
                                              detect_language, detect_language_advanced,
-                                             print_report)
+                                             print_report, tokenize)
 
 
 def main() -> None:
@@ -21,27 +21,26 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
         unknown_profile = create_language_profile("unknown", unknown_text)
-    if (create_language_profile('unk', unknown_text) is None or
-    create_language_profile('en', en_text) is None or
-    create_language_profile('de', de_text) is None):
-        return None
-    if unknown_profile is None or profile_de is None or profile_en is None:
-        return None
+    result = en_text
     english: dict = profile_en
     deutch: dict = profile_de
     unknown: dict = unknown_profile
-    print(english)
-    detection = detect_language(unknown, english, deutch)
-    print(detection)
-    paths_to_profiles = [ 'assets/profiles/de.json', 'assets/profiles/en.json',
+    print(tokenize(en_text))
+    print(profile_en)
+
+    if unknown_profile and profile_de and profile_en:
+        detection = detect_language(unknown, english, deutch)
+        print(detection)
+
+    paths_to_profiles = ['assets/profiles/de.json', 'assets/profiles/en.json',
                           'assets/profiles/es.json', 'assets/profiles/fr.json',
                           'assets/profiles/it.json', 'assets/profiles/ru.json',
                           'assets/profiles/tr.json']
-    result = en_text
+
     collection = collect_profiles(paths_to_profiles)
-    if isinstance(collection, list):
+    if collection:
         profiles = detect_language_advanced(unknown, collection)
-        if isinstance(profiles, list):
+        if profiles:
             print_report(profiles)
     assert result, "Detection result is None"
 

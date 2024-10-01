@@ -178,7 +178,7 @@ def detect_language(
     if not mse_profile_1 or not mse_profile_2:
         return None
 
-    lang_list: list[str] = [profile_1['name'], profile_2['name']]
+    lang_list: list[Union[str, dict[str, float]]] = [profile_1['name'], profile_2['name']]
 
     if mse_profile_1 == mse_profile_2:
         return str(sorted(lang_list)[0])

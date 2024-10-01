@@ -1,6 +1,8 @@
 """
 Language detection starter
 """
+from cgitb import reset
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 from lab_1_classify_by_unigrams.main import (create_language_profile, detect_language)
 def main() -> None:
@@ -16,10 +18,11 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
         unk_prof = create_language_profile('unk', unknown_text)
+    result = None
     if isinstance(unk_prof, dict) and isinstance(deu_prof, dict) and isinstance(engl_prof, dict):
         answer = detect_language(unk_prof, engl_prof, deu_prof)
         result = answer
-    assert result, "Detection result is None"
+    assert result is not None, "Detection result is None"
 
 
 if __name__ == "__main__":

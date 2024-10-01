@@ -128,6 +128,8 @@ def compare_profiles(
                 return None
     first_language_prof = unknown_profile['freq']
     second_language_prof = profile_to_compare['freq']
+    if not isinstance(first_language_prof, dict) or not isinstance(second_language_prof, dict):
+        return None
     for letter in first_language_prof.keys():
         if not letter in second_language_prof.keys():
             second_language_prof[
@@ -168,6 +170,8 @@ def detect_language(
     second_metric = compare_profiles(unknown_profile, profile_2)
     if first_metric == second_metric:
         languages = [profile_1['name'], profile_2['name']]
+        if not isinstance(languages, list):
+            return None
         return sorted(languages)[0]
     if first_metric < second_metric:
         return profile_1['name']

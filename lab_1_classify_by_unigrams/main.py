@@ -68,7 +68,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     tokenized_text = tokenize(text)
     frequencies = calculate_frequencies(tokenized_text)
-    if not (isinstance(language, str) and isinstance(frequencies, dict)):
+    if not isinstance(language, str) or not isinstance(frequencies, dict):
         return None
     return {
         'name': language,
@@ -91,8 +91,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if len(predicted) != len(actual):
         return None
-    if not (all(isinstance(p, (float, int)) for p in predicted) and all(isinstance(a, (float, int))
-                                                                        for a in actual)):
+    if (not all(isinstance(p, (float, int)) for p in predicted)
+            or not all(isinstance(a, (float, int)) for a in actual)):
         return None
     mse = 0
     quantity = len(actual)
@@ -119,8 +119,8 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not ("name" in unknown_profile and "freq" in unknown_profile and "name" in profile_to_compare
-            and "freq" in profile_to_compare):
+    if (not "name" in unknown_profile or not "freq" in unknown_profile
+        or not "name" in profile_to_compare or not "freq" in profile_to_compare):
         return None
     unknown_freq = []
     profile_freq = []
@@ -212,7 +212,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
     profile_processed = {}
     quantity = 0
-    if not ("name" in profile and "freq" in profile and "n_words" in profile):
+    if not "name" in profile or not "freq" in profile or not "n_words" in profile:
         return None
     for k, v in profile.items():
         if k == 'name':
@@ -246,7 +246,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(paths_to_profiles, list) and
+    if (not isinstance(paths_to_profiles, list) or not
             all(isinstance(p, str) for p in paths_to_profiles)):
         return None
     all_profiles = []
@@ -274,7 +274,7 @@ def detect_language_advanced(
     In case of corrupt input arguments, None is returned
     """
     distance = []
-    if not (isinstance(unknown_profile, dict) and isinstance(known_profiles, list) and
+    if (not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list) or not
             all(isinstance(elem, dict) for elem in known_profiles)):
         return None
     for profile in known_profiles:

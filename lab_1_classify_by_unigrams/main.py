@@ -159,7 +159,6 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    func_result = str('')
     if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None

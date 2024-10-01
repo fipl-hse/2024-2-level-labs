@@ -112,16 +112,20 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if 'name' not in unknown_profile.keys() or 'name' not in profile_to_compare.keys():
+    if 'name' not in unknown_profile or 'name' not in profile_to_compare:
+        return None
+    if 'freq' not in unknown_profile or 'freq' not in profile_to_compare:
         return None
     if (not all(isinstance(key, str) for key in unknown_profile)
             or not all(isinstance(key, str) for key in profile_to_compare)):
         return None
     both_profiles_symbols = set(unknown_profile['freq']).union(set(profile_to_compare['freq']))
     unk_freq = unknown_profile['freq']
-    unk_sort = [(unk_freq[char] if char in unk_freq else 0.0) for char in both_profiles_symbols]
     comp_freq = profile_to_compare['freq']
-    comp_sort = [(comp_freq[char] if char in comp_freq else 0.0) for char in both_profiles_symbols]
+    if not isinstance(unk_freq, dict) or not isinstance(comp_freq, dict):
+        return None
+    unk_sort = [(unk_freq.get(char, 0.0)) for char in both_profiles_symbols]
+    comp_sort = [(comp_freq.get(char, 0.0)) for char in both_profiles_symbols]
     return calculate_mse(unk_sort, comp_sort)
 
 

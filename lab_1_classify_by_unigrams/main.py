@@ -129,7 +129,7 @@ def compare_profiles(
         return None
 
     profile_to_compare_freq: Union[str, dict[str, float]] = profile_to_compare['freq']
-    unknown_profile_freq = dict[str, float](unknown_profile['freq'])
+    unknown_profile_freq: Union[str, dict[str, float]] = unknown_profile['freq']
 
     for key in profile_to_compare_freq.keys():
         if unknown_profile_freq.get(key) is None:
@@ -181,7 +181,7 @@ def detect_language(
     lang_list = [profile_1['name'], profile_2['name']]
 
     if mse_profile_1 == mse_profile_2:
-        return sorted(lang_list)[0]
+        return str(sorted(lang_list)[0])
     if mse_profile_1 > mse_profile_2:
         return str(profile_2['name'])
     return str(profile_1['name'])
@@ -272,7 +272,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     profiles_list = []
     for path in paths_to_profiles:
-        preprocessed_profile = dict[str, str](preprocess_profile(load_profile(path)))
+        preprocessed_profile = preprocess_profile(load_profile(path))
         if not preprocessed_profile:
             return None
         profiles_list.append(preprocessed_profile)

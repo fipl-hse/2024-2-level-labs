@@ -44,8 +44,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(tokens, list) and any([isinstance(symbol, str) for symbol in tokens])):
+    if not isinstance(tokens, list):
         return None
+    else:
+        for i in tokens:
+            if not isinstance(i,str):
+                return None
 
     freq_dict = {}
     for letter in tokens:
@@ -169,6 +173,7 @@ def detect_language(
     mse_2 = compare_profiles(unknown_profile, profile_2)
     equal_lst = [profile_1['name'], profile_2['name']]
     equal_lst.sort()
+    language = equal_lst[0]
 
     if mse_1 > mse_2:
         return profile_2['name']
@@ -177,7 +182,7 @@ def detect_language(
         return profile_1['name']
 
     if mse_1 == mse_2:
-        return equal_lst[0]
+        return language
 
 
 def load_profile(path_to_file: str) -> dict | None:

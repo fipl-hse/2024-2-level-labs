@@ -25,7 +25,14 @@ def main() -> None:
     print(tokenize(en_text))
     print(profile_en)
 
-    if profile_de and profile_en and unknown_profile:
+    paths_to_profiles = ['assets/profiles/de.json', 'assets/profiles/en.json',
+                         'assets/profiles/es.json', 'assets/profiles/fr.json',
+                         'assets/profiles/it.json', 'assets/profiles/ru.json',
+                         'assets/profiles/tr.json']
+
+    collection = collect_profiles(paths_to_profiles)
+
+    if profile_de and profile_en and unknown_profile and collection:
 
         english: dict = profile_en
         deutch: dict = profile_de
@@ -33,14 +40,7 @@ def main() -> None:
         detection = detect_language(unknown, english, deutch)
         print(detection)
 
-    paths_to_profiles = ['assets/profiles/de.json', 'assets/profiles/en.json',
-                          'assets/profiles/es.json', 'assets/profiles/fr.json',
-                          'assets/profiles/it.json', 'assets/profiles/ru.json',
-                          'assets/profiles/tr.json']
-
-    collection = collect_profiles(paths_to_profiles)
-    if collection and isinstance(unknown_profile, dict):
-        profiles = detect_language_advanced(unknown_profile, collection)
+        profiles = detect_language_advanced(unknown, collection)
         if profiles:
             print_report(profiles)
     assert result, "Detection result is None"

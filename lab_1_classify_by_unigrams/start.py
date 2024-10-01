@@ -7,6 +7,7 @@ Language detection starter
 
 from main import tokenize, calculate_frequencies, create_language_profile
 
+
 def main() -> None:
     """
     Launches an implementation
@@ -25,7 +26,5 @@ def main() -> None:
     print(result, frequences, profile, sep='\n')
 
 
-
 if __name__ == "__main__":
     main()
-

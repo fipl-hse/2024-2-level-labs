@@ -168,13 +168,11 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
-            or not isinstance(profile_2, dict) \
-            or not all(isinstance(key, str) for key in unknown_profile) \
+            or not isinstance(profile_2, dict):
+        return None
+    if not all(isinstance(key, str) for key in unknown_profile) \
             or not all(isinstance(key, str) for key in profile_1) \
-            or not all(isinstance(key, str) for key in profile_2) \
-            or not isinstance(unknown_profile['freq'], dict) \
-            or not isinstance(profile_2['freq'], dict)\
-            or not isinstance(profile_1['freq'], dict):
+            or not all(isinstance(key, str) for key in profile_2):
         return None
     mse1 = compare_profiles(unknown_profile, profile_1)
     mse2 = compare_profiles(unknown_profile, profile_2)

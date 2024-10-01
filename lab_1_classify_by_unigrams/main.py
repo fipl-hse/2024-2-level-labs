@@ -78,6 +78,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     preprocessed_text = tokenize(text)
     relative_frequency = calculate_frequencies(preprocessed_text)
+    if (not isinstance(relative_frequency, dict)
+            or not all(isinstance(key, str) for key in relative_frequency)
+            or not all(isinstance(value, float) for value in relative_frequency.values())):
+        return None
     return {"name": language, "freq": relative_frequency}
 
 

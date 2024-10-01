@@ -181,7 +181,7 @@ def compare_profiles(
     conclusion = calculate_mse(list2, list1)
     if not isinstance(conclusion, float):
         return None
-    return round(conclusion, 4)
+    return conclusion
 
 
 def detect_language(
@@ -263,20 +263,20 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             or not all(x in profile for x in ['freq', 'name', 'n_words'])):
         return None
     processed_profile = {'name': profile['name'], 'freq': {}}
-    dicty = {}
+    dictionary = {}
     for unigram in profile['freq'].keys():
         if unigram.isalpha():
             pass
         if len(unigram) == 1:
-            dicty.setdefault(unigram, profile['freq'][unigram])
-    letters = list(dicty)
+            dictionary.setdefault(unigram, profile['freq'][unigram])
+    letters = list(dictionary)
     for letter in letters:
         if not letter.isupper():
-            dicty[letter] = dicty.get(letter, 0) + dicty.get(letter.upper(), 0)
-            processed_profile['freq'][letter.lower()] = dicty[letter] / profile['n_words'][0]
-            if letter.upper() in dicty:
-                del dicty[letter.upper()]
-    for i in dicty.items():
+            dictionary[letter] = dictionary.get(letter, 0) + dictionary.get(letter.upper(), 0)
+            processed_profile['freq'][letter.lower()] = dictionary[letter] / profile['n_words'][0]
+            if letter.upper() in dictionary:
+                del dictionary[letter.upper()]
+    for i in dictionary.items():
         if i[0].isupper():
             processed_profile['freq'][i[0].lower()] = i[1] / profile['n_words'][0]
     return processed_profile
@@ -302,13 +302,11 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         if load_profile(name_of_profile) is None:
             return None
         dictionary_unprocessed = load_profile(name_of_profile)
-        processed_profile = preprocess_profile(dictionary_unprocessed)
-        if (not isinstance(dictionary_unprocessed, dict)
-                or processed_profile is None):
+        if dictionary_unprocessed is None:
             return None
+        new_load: dict = dictionary_unprocessed
+        processed_profile = preprocess_profile(new_load)
         if not isinstance(processed_profile, dict):
-            return None
-        if profiles_bad_input(processed_profile) is None:
             return None
         list_for_dictionaries.append(processed_profile)
     return list_for_dictionaries

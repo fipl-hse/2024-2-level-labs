@@ -46,7 +46,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     freq = {}
     for i in tokens:
-        if not isinstance(i, str) and len(i) != 1:
+        if not isinstance(i, str):
+            return None
+        if len(i) != 1:
             return None
         if i in freq:
             continue

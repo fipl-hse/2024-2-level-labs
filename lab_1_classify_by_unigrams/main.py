@@ -127,8 +127,8 @@ def compare_profiles(
             or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
         return None
 
-    profile_to_compare_freq = profile_to_compare['freq']
-    unknown_profile_freq = unknown_profile['freq']
+    profile_to_compare_freq = dict(profile_to_compare['freq'])
+    unknown_profile_freq = dict(unknown_profile['freq'])
 
     for key in profile_to_compare_freq.keys():
         if unknown_profile_freq.get(key) is None:

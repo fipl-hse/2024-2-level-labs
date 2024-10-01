@@ -98,7 +98,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     summa = 0.0
     for index, value in enumerate(actual):
-        actual_value = float(actual[index])
+        actual_value = float(value)
         predicted_value = float(predicted[index])
         sqw_dif = float((actual_value - predicted_value)**2)
         summa = float(summa + sqw_dif)
@@ -182,8 +182,6 @@ def detect_language(
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    if not mse_1 or not mse_2:
-        return None
     if not isinstance(mse_1, float) or not isinstance(mse_2, float):
         return None
     if mse_1 < mse_2:
@@ -245,14 +243,10 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     if not isinstance(profile, dict) or not isinstance(profile.get('freq'), dict):
         return None
     frequency = profile.get("freq")
-    if not frequency:
-        return None
     name = profile.get("name")
     if not isinstance(name, str):
         return None
     tokens = list(frequency.keys())
-    if not isinstance(tokens, list):
-        return None
     letters = {}
     n_words_list = profile.get("n_words", int)
     if not isinstance(n_words_list, list):

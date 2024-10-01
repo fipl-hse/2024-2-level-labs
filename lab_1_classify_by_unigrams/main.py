@@ -238,27 +238,28 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     'freq' in arguments, None is returned
     """
 
-    if not (isinstance(profile, dict)
+    if (isinstance(profile, dict) and profile is not None
             and all(key in profile for key in ['name', 'freq', 'n_words'])
-            and isinstance(profile['name'], str) and isinstance('freq', dict)
-            and isinstance('n_words', list)):
-        return None
+            and isinstance(profile['name'], str)
+            and isinstance(profile['freq'], dict)
+            and isinstance(profile['n_words'], list)):
 
-    name: str = profile['name']
-    freq: dict = profile['freq']
-    n_words: list = profile['n_words']
+        name: str = profile['name']
+        freq: dict = profile['freq']
+        n_words: list = profile['n_words']
 
-    total_number: int = n_words[0]
-    if total_number < 1:
-        return None
+        total_number: int = n_words[0]
+        if total_number >= 1:
 
-    freq_dict = {}
-    for k, v in freq.items():
-        if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
-            freq_dict[k.lower()] = v / total_number
+            freq_dict = {}
+            for k, v in freq.items():
+                if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
+                    freq_dict[k.lower()] = v / total_number
 
-    processed_profile = {'name': name, 'freq': freq_dict}
-    return processed_profile
+            processed_profile = {'name': name, 'freq': freq_dict}
+            return processed_profile
+
+    return None
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:

@@ -170,8 +170,9 @@ def detect_language(
         languages = [profile_1['name'], profile_2['name']]
         if not isinstance(languages, list):
             return None
-        result = list(languages.sort())[0]
-    if first_metric < second_metric:
+        if languages is not None:
+            result = list(languages.sort())[0]
+    elif first_metric < second_metric:
         result = profile_1['name']
     else:
         result = profile_2['name']

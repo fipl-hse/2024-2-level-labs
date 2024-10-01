@@ -253,11 +253,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     for path in paths_to_profiles:
         profile_raw = load_profile(path)
         processed_profile = preprocess_profile(profile_raw)
-        if (not all(isinstance((k, v), str) for k, v in processed_profile.items()) or not
-        all(isinstance((k, str), (v, float)) for k, v in processed_profile['freq'].items())):
-            return None
         all_profiles.append(processed_profile)
-    return all_profiles
+    if all(isinstance(k, dict) for k in all_profiles):
+        return all_profiles
+    return None
 
 
 def detect_language_advanced(

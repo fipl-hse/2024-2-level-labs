@@ -119,7 +119,7 @@ def compare_profiles(
         return None
     both_profiles_symbols = set(unknown_profile['freq']).union(set(profile_to_compare['freq']))
     unk_freq = unknown_profile['freq']
-    unk_sort = [(unk_freq[char] if char in unk_freq else 0.0) for char in both_profiles_symbols]
+    unk_sort = slice([(unk_freq[char] if char in unk_freq else 0.0) for char in both_profiles_symbols])
     comp_freq = profile_to_compare['freq']
     comp_sort = [(comp_freq[char] if char in comp_freq else 0.0) for char in both_profiles_symbols]
     return calculate_mse(unk_sort, comp_sort)

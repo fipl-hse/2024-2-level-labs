@@ -159,6 +159,7 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    func_result = ''
     if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None
@@ -171,13 +172,13 @@ def detect_language(
         if not isinstance(languages, list):
             return None
         if languages is not None:
-            result = list(languages.sort())[0]
+            func_result = sorted(languages)[0]
     elif first_metric < second_metric:
-        result = profile_1['name']
+        func_result = profile_1['name']
     else:
-        result = profile_2['name']
-    if isinstance(result, str):
-        return result
+        func_result = profile_2['name']
+    if isinstance(func_result, str):
+        return func_result
     return None
 
 

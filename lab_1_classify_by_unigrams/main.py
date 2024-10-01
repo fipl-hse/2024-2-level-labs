@@ -25,9 +25,9 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     tokens = []
-    for symbol in text:
+    for symbol in text.lower():
         if symbol.isalpha():
-            tokens.append(symbol.lower())
+            tokens.append(symbol)
     return tokens
 
 
@@ -48,6 +48,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     freq_dict = {}
     for character in tokens:
+        if character in freq_dict.keys():
+            continue
         freq_dict[character] = (tokens.count(character) / len(tokens))
 
     return freq_dict
@@ -95,12 +97,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
 
     value = 0
-    i = 0
-    while i < len(actual):
-        value += (actual[i] - predicted[i]) ** 2
-        i += 1
+    for item_act, item_predict in zip(actual, predicted):
+        value += (item_act - item_predict) ** 2
 
-    return value / i
+    return value / len(actual)
 
 
 def compare_profiles(

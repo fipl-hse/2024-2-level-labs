@@ -237,28 +237,29 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
+    if profile is not None:
+        if (isinstance(profile, dict)
+                and all(key in profile for key in ['name', 'freq', 'n_words'])
+                and isinstance(profile['name'], str)
+                and isinstance(profile['freq'], dict)
+                and isinstance(profile['n_words'], list)):
 
-    if (isinstance(profile, dict) and profile is not None
-            and all(key in profile for key in ['name', 'freq', 'n_words'])
-            and isinstance(profile['name'], str)
-            and isinstance(profile['freq'], dict)
-            and isinstance(profile['n_words'], list)):
+            name: str = profile['name']
+            freq: dict = profile['freq']
+            n_words: list = profile['n_words']
 
-        name: str = profile['name']
-        freq: dict = profile['freq']
-        n_words: list = profile['n_words']
+            total_number: int = n_words[0]
+            if total_number >= 1:
 
-        total_number: int = n_words[0]
-        if total_number >= 1:
+                freq_dict = {}
+                for k, v in freq.items():
+                    if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
+                        freq_dict[k.lower()] = v / total_number
 
-            freq_dict = {}
-            for k, v in freq.items():
-                if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
-                    freq_dict[k.lower()] = v / total_number
+                processed_profile = {'name': name, 'freq': freq_dict}
+                return processed_profile
 
-            processed_profile = {'name': name, 'freq': freq_dict}
-            return processed_profile
-
+        return None
     return None
 
 

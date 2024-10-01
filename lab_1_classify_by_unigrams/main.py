@@ -153,8 +153,7 @@ def compare_profiles(
             mse = calculate_mse(actual_values, predicted_values)
 
             if mse is not None:
-                final_mse = round(mse, 3)
-                return final_mse
+                return mse
 
             return None
         return None
@@ -322,13 +321,12 @@ def detect_language_advanced(
                 if isinstance(profile, dict) and all(key in profile for key in ['name', 'freq']):
 
                     results_not_sorted = {}
-                    for profile in known_profiles:
-                        mse = compare_profiles(unknown_profile, profile)
-                        if mse is not None:
-                            lang = profile.get('name')
-                            if lang is not None:
-                                result = {lang: mse}
-                                results_not_sorted.update(result)
+                    mse = compare_profiles(unknown_profile, profile)
+                    if mse is not None:
+                        lang = profile.get('name')
+                        if lang is not None:
+                            result = {lang: mse}
+                            results_not_sorted.update(result)
 
                     results_lst = list(results_not_sorted.items())
                     results_sorted = sorted(results_lst, key=lambda x: (x[1], x[0]))

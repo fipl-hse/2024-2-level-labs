@@ -74,10 +74,9 @@ def create_language_profile(language: str, text: str) -> (
     freq = tokenize(text)
     if calculate_frequencies(freq) is None:
         return None
-    dictionary = calculate_frequencies(freq)
     profile = {
         "name": language,
-        "freq": dictionary
+        "freq": calculate_frequencies(freq)
     }
     return profile
 
@@ -109,35 +108,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     return round(mse, 4)
 
 
-def profiles_bad_input(profile: dict[str, str | dict[str, float]]) -> (
-        dict[str, str | dict[str, float]] | None):
-    """
-
-    Args:
-        profile (dict): we need to check this profile
-
-    Returns:
-        dict | None
-
-    """
-    if not isinstance(profile, dict):
-        return None
-    if (len(profile.keys()) != 2
-            or not all(k in profile for k in ('freq', 'name'))):
-        return None
-    if (not isinstance(profile["name"], str) or
-            not isinstance(profile["freq"], dict)):
-        return None
-    if isinstance(profile["freq"], dict):
-        for letter in profile["freq"].keys():
-            if not isinstance(letter, str):
-                return None
-        for number in profile["freq"].values():
-            if not isinstance(number, float):
-                return None
-    return profile
-
-
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_to_compare: dict[str, str | dict[str, float]],
@@ -156,8 +126,14 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if (profiles_bad_input(unknown_profile) is None or
-            profiles_bad_input(profile_to_compare) is None):
+    if ((not isinstance(unknown_profile, dict)) or
+            (not isinstance(profile_to_compare, dict))):
+        return None
+    if (len(profile_to_compare.keys()) != 2 or
+            (not all(k in profile_to_compare for k in ('freq', 'name')))):
+        return None
+    if (len(unknown_profile.keys()) != 2 or
+            (not all(k in unknown_profile for k in ('freq', 'name')))):
         return None
     unk_profile = copy.deepcopy(unknown_profile)
     from_profile1 = unk_profile["freq"]
@@ -328,7 +304,10 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if profiles_bad_input(unknown_profile) is None:
+    if not isinstance(unknown_profile, dict):
+        return None
+    if (len(unknown_profile.keys()) != 2
+            or not all(k in unknown_profile for k in ('freq', 'name'))):
         return None
     if (not isinstance(known_profiles, list) and
             not all(isinstance(path, dict) for path in known_profiles)):

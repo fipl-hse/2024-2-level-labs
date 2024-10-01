@@ -113,25 +113,8 @@ def sum67(nums: list) -> int:
     Return 0 for no numbers.
     """
     # student realization goes here
-    sum_num = 0
-    for num in nums:
-        if num == 6:
-            while True:
-                for num in nums:
-                    nums.remove(num)
-                    if num == 7:
-                        nums.remove(7)
-                        break
-                break
-        sum_num += num
 
 
-
-    return sum_num
-
-
-print(sum67([1, 2, 2]))
-print(sum67([1, 2, 2, 6, 99, 99, 7]))
 # Function calls with expected result:
 # sum67([1, 2, 2]) → 5
 # sum67([1, 2, 2, 6, 99, 99, 7]) → 5

@@ -244,21 +244,23 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
                 and isinstance(profile['freq'], dict)
                 and isinstance(profile['n_words'], list)):
 
-            name: str = profile['name']
-            freq: dict = profile['freq']
-            n_words: list = profile['n_words']
+            name = profile['name']
+            freq = profile['freq']
+            n_words = profile['n_words']
 
-            total_number: int = n_words[0]
-            if total_number >= 1:
+            total_number = n_words[0]
+            if isinstance(total_number, int) and total_number >= 1:
 
                 freq_dict = {}
                 for k, v in freq.items():
                     if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
-                        freq_dict[k.lower()] = v / total_number
+                        unigram = k.lower()
+                        freq_dict[unigram] = v / total_number
 
                 processed_profile = {'name': name, 'freq': freq_dict}
                 return processed_profile
 
+            return None
         return None
     return None
 

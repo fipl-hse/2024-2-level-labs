@@ -123,6 +123,7 @@ def compare_profiles(
         return None
     unknown_freq = []
     profile_freq = []
+
     for k, v in unknown_profile['freq'].items():
         if k not in profile_to_compare['freq'].keys():
             unknown_freq.append(v)
@@ -165,12 +166,12 @@ def detect_language(
     if mse_1 is None or mse_2 is None:
         return None
     if mse_1 < mse_2:
-        return profile_1.get('name')
+        return str(profile_1['name'])
     if mse_1 > mse_2:
-        return profile_2.get('name')
-    languages = [profile_1.get('name'), profile_2.get('name')]
+        return str(profile_2['name'])
+    languages = [profile_1['name'], profile_2['name']]
     languages.sort()
-    return languages[0]
+    return str(languages[0])
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -244,12 +245,13 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(paths_to_profiles, list) and all(isinstance(p, str)
-                                                       for p in paths_to_profiles)):
+    if not (isinstance(paths_to_profiles, list) and
+            all(isinstance(p, str) for p in paths_to_profiles)):
         return None
     all_profiles = []
     for path in paths_to_profiles:
-        all_profiles.append(preprocess_profile(load_profile(path)))
+        profile = preprocess_profile(load_profile(path))
+        all_profiles.append(profile)
     return all_profiles
 
 
@@ -274,8 +276,8 @@ def detect_language_advanced(
             all(isinstance(elem, dict) for elem in known_profiles)):
         return None
     for profile in known_profiles:
-        distance.append((profile['name'], compare_profiles(unknown_profile, profile)))
-    return sorted(distance, key=lambda i:i[1])
+        distance.append((str(profile['name']), compare_profiles(unknown_profile, profile)))
+    return sorted(distance, key=lambda i: i[1])
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -291,4 +293,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
         return None
     for elem in detections:
         print(f'{elem[0]}: MSE {elem[1]:.5f}')
-    return None

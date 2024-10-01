@@ -255,7 +255,11 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
                 for k, v in freq.items():
                     if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
                         unigram = k.lower()
-                        freq_dict[unigram] = v / total_number
+                        if unigram.isalpha() or k == '²':
+                            if freq_dict.get(unigram) is not None:
+                                freq_dict[unigram] += v / total_number
+                            else:
+                                freq_dict[unigram] = v / total_number
 
                 processed_profile = {'name': name, 'freq': freq_dict}
                 return processed_profile
@@ -283,7 +287,9 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     collected_profiles = []
 
     for path in paths_to_profiles:
-        if load_profile is not None and preprocess_profile is not None:
+        if load_profile is None and preprocess_profile is None:
+            return None
+        if isinstance(path, dict):
             new_profile = preprocess_profile(load_profile(path))
             if new_profile is None:
                 return None
@@ -293,8 +299,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
-) -> list | None:
+            unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    ) -> list | None:
     """
     Detect the language of an unknown profile.
 
@@ -308,25 +314,26 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if (unknown_profile is None or not isinstance(unknown_profile, dict)
-            or known_profiles is None or not isinstance(known_profiles, list)):
-        return None
+    if (unknown_profile is not None and isinstance(unknown_profile, dict)
+            and known_profiles is not None and isinstance(known_profiles, list)):
+        for profile in known_profiles:
+            if isinstance(profile, dict) and all(key in profile for key in ['name', 'freq']):
 
-    for profile in known_profiles:
-        if not isinstance(profile, dict) or not all(key in profile for key in ['name', 'freq']):
+                results_not_sorted = {}
+                for profile in known_profiles:
+                    mse = compare_profiles(unknown_profile, profile)
+                    if mse is not None:
+                        lang = profile.get('name')
+                        if lang is not None:
+                            result = {lang: mse}
+                            results_not_sorted.update(result)
+
+                results_lst = list(results_not_sorted.items())
+                results_sorted = sorted(results_lst, key=lambda x: (x[1], x[0]))
+                return results_sorted
+
             return None
-
-    results_not_sorted = {}
-    for profile in known_profiles:
-        mse = compare_profiles(unknown_profile, profile)
-        if mse is not None:
-            result = {profile.get('name'): mse}
-            results_not_sorted.update(result)
-
-    results_lst = list(results_not_sorted.items())
-    results_sorted = sorted(results_lst, key=lambda x: (x[1], x[0]))
-
-    return results_sorted
+    return None
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

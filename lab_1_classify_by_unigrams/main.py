@@ -130,7 +130,7 @@ def compare_profiles(
     mse = calculate_mse(freq_to_compare, unknown_freq)
     if not isinstance(mse, float):
         return None
-    return round(mse, 3)
+    return mse
 
 
 def detect_language(
@@ -213,7 +213,8 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
     if (not isinstance(profile, dict)
             or not all(key in profile for key in ('name', 'freq', 'n_words'))
-            or next((token for token in profile['freq'].keys() if isinstance(token, str)), None) is None):
+            or next((token for token in profile['freq'].keys()
+                     if isinstance(token, str)), None) is None):
         return None
     freq_dic = {}
     for token in profile['freq']:
@@ -278,6 +279,17 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
+        return None
+    lang_score_list = []
+    for known_profile in known_profiles:
+        if not isinstance(compare_profiles(unknown_profile, known_profile), float):
+            return None
+        compared_score = compare_profiles(unknown_profile, known_profile)
+        lang_score_tuple = (known_profile['name'], compared_score)
+        lang_score_list.append(lang_score_tuple)
+        lang_score_list.sort(key=lambda x: (x[1], x[0]))
+    return lang_score_list
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -289,3 +301,7 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(detections, list):
+        return None
+    for lang, score in detections:
+        print(f'{lang}: MSE {score:.5f}')

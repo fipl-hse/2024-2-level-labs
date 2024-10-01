@@ -211,7 +211,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         return None
     if 'name' not in profile or 'freq' not in profile or 'n_words' not in profile:
         return None
-    if not isinstance(profile['n_words'], list):
+    if not isinstance(profile['n_words'], list) or len(profile['n_words']) == 0:
         return None
 
     n_words = profile['n_words']
@@ -230,15 +230,12 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             preprocessed_freq[token.lower()] = number / unigram_count
 
     if not preprocessed_freq:
-        return None
-
+        return {}
     preprocessed_profile = {'name': profile['name'], 'freq': preprocessed_freq}
-
     if preprocessed_profile is None:
         return None
 
     return preprocessed_profile
-
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """

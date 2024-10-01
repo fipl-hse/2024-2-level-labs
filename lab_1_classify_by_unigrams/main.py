@@ -46,10 +46,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not isinstance(tokens, list):
         return None
-    else:
-        for i in tokens:
-            if not isinstance(i,str):
-                return None
+    for i in tokens:
+        if not isinstance(i,str):
+            return None
 
     freq_dict = {}
     for letter in tokens:
@@ -165,9 +164,9 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(unknown_profile, dict) and (isinstance(profile_1, dict)
-                                                   and isinstance(profile_2, dict))):
-        return None
+    for profile in (unknown_profile, profile_1, profile_2):
+        if not isinstance(profile, dict) or 'freq' not in profile or 'name' not in profile:
+            return None
 
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)

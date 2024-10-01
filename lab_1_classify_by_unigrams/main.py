@@ -26,10 +26,10 @@ def tokenize(text: str) -> list[str] | None:
         return None
     tokens = []
     for symbol in text:
-        if symbol.isalpha():
-            tokens.append(symbol.lower())
-        else:
+        if not symbol.isalpha():
             continue
+        else:
+            tokens.append(symbol.lower())
     return tokens
 
 
@@ -171,9 +171,9 @@ def compare_profiles(
 
 
 def detect_language(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_1: dict[str, str | dict[str, float]],
+    profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.

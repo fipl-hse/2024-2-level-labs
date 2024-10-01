@@ -82,18 +82,6 @@ def sum13(nums: list) -> int:
     also do not count.
     """
     # student realization goes here
-    num_sum = 0
-    for num in nums:
-        if num == 13:
-            break
-        else:
-            num_sum += num
-    return num_sum
-
-
-
-
-
 # Function calls with expected result:
 # sum13([1, 2, 2, 1]) → 6
 # sum13([1, 1]) → 2

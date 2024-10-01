@@ -122,10 +122,6 @@ def compare_profiles(
     if (not isinstance(profile_to_compare['name'], str) or
             not isinstance(profile_to_compare['freq'], dict)):
         return None
-    for prof in [unknown_profile['freq'], profile_to_compare['freq']]:
-        for elem, freq in prof.items():
-            if not isinstance(elem, str) or not isinstance(freq, (float, int)):
-                return None
     first_language_prof = unknown_profile['freq']
     second_language_prof = profile_to_compare['freq']
     if not isinstance(first_language_prof, dict) or not isinstance(second_language_prof, dict):

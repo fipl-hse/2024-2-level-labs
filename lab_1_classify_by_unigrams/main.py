@@ -153,10 +153,10 @@ def detect_language(
         return None
     first_comp = compare_profiles(unknown_profile, profile_1)
     second_comp = compare_profiles(unknown_profile, profile_2)
-    if first_comp < second_comp:
-        return profile_1['name']
-    if first_comp > second_comp:
-        return profile_2['name']
+    if str(first_comp) < str(second_comp):
+        return str(profile_1['name'])
+    if str(first_comp) > str(second_comp):
+        return str(profile_2['name'])
     if str(profile_2['name']) < str(profile_1['name']):
         return str(profile_2['name'])
     return str(profile_1['name'])

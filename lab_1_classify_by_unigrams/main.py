@@ -156,8 +156,7 @@ def compare_profiles(
     values_list_1 = list(dict_1_with_zeros.values())
     values_list_2 = list(dict_2_with_zeros.values())
 
-    score = calculate_mse(values_list_1, values_list_2)
-    return score
+    return calculate_mse(values_list_1, values_list_2)
 
 
 def detect_language(

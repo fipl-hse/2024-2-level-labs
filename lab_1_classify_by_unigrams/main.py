@@ -167,10 +167,8 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) \
-            or not isinstance(profile_2, dict):
-        return None
-    if not all(isinstance(key, str) for key in unknown_profile) \
+    if not all(isinstance(profile, dict) for profile in [unknown_profile, profile_1, profile_2])\
+            or not all(isinstance(key, str) for key in unknown_profile) \
             or not all(isinstance(key, str) for key in profile_1) \
             or not all(isinstance(key, str) for key in profile_2):
         return None

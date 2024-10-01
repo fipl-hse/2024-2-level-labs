@@ -165,10 +165,10 @@ def detect_language(
     if mse_1 is None or mse_2 is None:
         return None
     if mse_1 < mse_2:
-        return profile_1['name']
+        return profile_1.get('name')
     if mse_1 > mse_2:
-        return profile_2['name']
-    languages = [profile_1['name'], profile_2['name']]
+        return profile_2.get('name')
+    languages = [profile_1.get('name'), profile_2.get('name')]
     languages.sort()
     return languages[0]
 

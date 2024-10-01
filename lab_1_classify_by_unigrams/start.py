@@ -27,5 +27,6 @@ def main() -> None:
     print(func.compare_profiles(unknown_profile, en_profile))
     print(func.compare_profiles(unknown_profile, de_profile))
 
-    if __name__ == "__main__":
-        main()
+
+if __name__ == "__main__":
+    main()

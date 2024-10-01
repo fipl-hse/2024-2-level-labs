@@ -303,13 +303,12 @@ def detect_language_advanced(
             or len(unknown_profile) == 0 or len(known_profiles) == 0):
         return None
 
-    result_list = []
+    result_list: list = []
     for profile in known_profiles:
         compared_profiles = compare_profiles(unknown_profile, profile)
         if not compared_profiles:
             return None
         result_list.append((profile['name'], compared_profiles))
-
     return list(sorted(sorted(result_list, key=lambda x: x[0]), key=lambda x: x[1], reverse=False))
 
 

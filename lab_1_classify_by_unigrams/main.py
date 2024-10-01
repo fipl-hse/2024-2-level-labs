@@ -127,7 +127,7 @@ def compare_profiles(
             or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
         return None
 
-    profile_to_compare_freq = dict[str, float](profile_to_compare['freq'])
+    profile_to_compare_freq = dict[str, float](profile_to_compare.get('freq'))
     unknown_profile_freq = dict[str, float](unknown_profile['freq'])
 
     for key in profile_to_compare_freq.keys():

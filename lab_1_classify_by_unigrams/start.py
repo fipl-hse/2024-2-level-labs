@@ -3,6 +3,7 @@ Language detection starter
 """
 from lab_1_classify_by_unigrams import main as func
 
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 def main() -> None:
@@ -24,12 +25,25 @@ def main() -> None:
     un_profile = func.create_language_profile('un', unknown_text)
     if en_profile is None or du_profile is None or un_profile is None:
         return
-    detection_result = func.detect_language(un_profile, du_profile, en_profile)
+    det_result = func.detect_language(un_profile, du_profile, en_profile)
 
-    if detection_result is None:
+    if det_result is None:
         print("failed")
     else:
-        print(detection_result)
+        print(det_result)
+    profiles_paths = ["assets/profiles/de.json",
+                      "assets/profiles/en.json",
+                      "assets/profiles/es.json",
+                      "assets/profiles/fr.json",
+                      "assets/profiles/it.json",
+                      "assets/profiles/ru.json",
+                      "assets/profiles/tr.json"]
+    known_profiles = func.collect_profiles(profiles_paths)
+    if known_profiles is None:
+        return
+    advanced_detection_result = func.detect_language_advanced(un_profile, known_profiles)
+    func.print_report(advanced_detection_result)
+
     assert result, "Detection result is None"
 
 

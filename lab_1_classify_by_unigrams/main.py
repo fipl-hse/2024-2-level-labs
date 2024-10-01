@@ -3,13 +3,7 @@ Lab 1.
 
 Language detection
 """
-from idlelib.iomenu import encoding
-from itertools import count
-from os.path import split
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-from collections import Counter
-from tarfile import LENGTH_LINK
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -54,7 +48,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for char in set(tokens):
         relative_freq[char] = float(tokens.count(char)) / quantity
     return relative_freq
-print(calculate_frequencies(['a', 'b', 'a', 'c']))
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -93,7 +86,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
         return None
-    return round(sum((actual[i] - predicted[i]) ** 2 for i in range(len(actual))) / len(actual), 4)
+    return sum((actual[i] - predicted[i]) ** 2 for i in range(len(actual))) / len(actual)
 
 
 
@@ -117,13 +110,16 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    comparison = []
-    for char in profile_to_compare['freq']:
-        if char in unknown_profile['freq']:
-            comparison.append(unknown_profile['freq'][char])
-        else:
-            comparison.append(0.0)
-    return comparison
+    if 'name' not in unknown_profile.keys() or 'name' not in profile_to_compare.keys():
+        return None
+    if not all(isinstance(key, str) for key in unknown_profile) or not all(isinstance(key, str) for key in profile_to_compare):
+        return None
+    both_profiles_symbols = set(unknown_profile['freq']).union(set(profile_to_compare['freq']))
+    unk_freq = unknown_profile['freq']
+    unk_sort = [(unk_freq[char] if char in unk_freq else 0.0) for char in both_profiles_symbols]
+    comp_freq = profile_to_compare['freq']
+    comp_sort = [(comp_freq[char] if char in comp_freq else 0.0) for char in both_profiles_symbols]
+    return calculate_mse(unk_sort, comp_sort)
 
 
 def detect_language(
@@ -147,15 +143,17 @@ def detect_language(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
+    if not all(isinstance(key, str) for key in unknown_profile) or not all(isinstance(key, str) for key in profile_1) or not all(isinstance(key, str) for key in profile_2):
+        return None
     first_comp = compare_profiles(unknown_profile, profile_1)
     second_comp = compare_profiles(unknown_profile, profile_2)
     if first_comp < second_comp:
         return profile_1['name']
     if first_comp > second_comp:
         return profile_2['name']
-    if profile_2['name'] < profile_1['name']:
-        return profile_2['name']
-    return profile_1['name']
+    if str(profile_2['name']) < str(profile_1['name']):
+        return str(profile_2['name'])
+    return str(profile_1['name'])
 
 
 def load_profile(path_to_file: str) -> dict | None:

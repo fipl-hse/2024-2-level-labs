@@ -66,7 +66,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    frequencies = calculate_frequencies(tokenize(text))
+    tokenized_text = tokenize(text)
+    frequencies = calculate_frequencies(tokenized_text)
     if not (isinstance(language, str) and isinstance(frequencies, dict)):
         return None
     return {
@@ -250,8 +251,9 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         return None
     all_profiles = []
     for path in paths_to_profiles:
-        profile = preprocess_profile(load_profile(path))
-        all_profiles.append(profile)
+        profile_raw = load_profile(path)
+        processed_profile = preprocess_profile(profile_raw)
+        all_profiles.append(processed_profile)
     return all_profiles
 
 
@@ -293,3 +295,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
         return None
     for elem in detections:
         print(f'{elem[0]}: MSE {elem[1]:.5f}')
+    return None

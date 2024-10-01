@@ -239,33 +239,33 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     """
     if profile is not None:
         if (isinstance(profile, dict)
+                and all(key in profile for key in ['name', 'freq', 'n_words'])
                 and isinstance(profile['name'], str)
                 and isinstance(profile['freq'], dict)
                 and isinstance(profile['n_words'], list)):
-            if all(key in profile for key in ['name', 'freq', 'n_words']):
 
-                name = profile['name']
-                freq = profile['freq']
-                n_words = profile['n_words']
+            name = profile['name']
+            freq = profile['freq']
+            n_words = profile['n_words']
 
-                total_number = n_words[0]
-                if isinstance(total_number, int) and total_number >= 1:
-
-                    freq_dict = {}
-                    for k, v in freq.items():
-                        if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
-                            unigram = k.lower()
-                            if unigram.isalpha() or k == '²':
-                                if freq_dict.get(unigram) is not None:
-                                    freq_dict[unigram] += v / total_number
-                                else:
-                                    freq_dict[unigram] = v / total_number
-
-                    processed_profile = {'name': name, 'freq': freq_dict}
-                    return processed_profile
-
+            total_number = n_words[0]
+            print(total_number)
+            if not isinstance(total_number, int) or total_number < 1:
                 return None
-            return None
+
+            freq_dict = {}
+            for k, v in freq.items():
+                if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
+                    unigram = k.lower()
+                    if unigram.isalpha() or k == '²':
+                        if freq_dict.get(unigram) is not None:
+                            freq_dict[unigram] += v / total_number
+                        else:
+                            freq_dict[unigram] = v / total_number
+
+            processed_profile = {'name': name, 'freq': freq_dict}
+            return processed_profile
+
         return None
     return None
 

@@ -339,4 +339,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
             return None
     for block in detections:
         print(f'{block[0]}: MSE {block[1]:.5f}')
-    return None

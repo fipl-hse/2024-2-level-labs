@@ -1,4 +1,5 @@
 from main import create_language_profile
+
 """
 Language detection starter
 """

@@ -128,8 +128,8 @@ def compare_profiles(
             or len(unknown_profile.keys()) != 2 or len(profile_to_compare.keys()) != 2):
         return None
 
-    profile_to_compare_freq: Union[str, dict[str, float]] = profile_to_compare['freq']
-    unknown_profile_freq: Union[str, dict[str, float]] = unknown_profile['freq']
+    profile_to_compare_freq: Union[str, dict[str, float]] = dict(profile_to_compare['freq'])
+    unknown_profile_freq: Union[str, dict[str, float]] = dict(unknown_profile['freq'])
 
     for key in profile_to_compare_freq.keys():
         if unknown_profile_freq.get(key) is None:
@@ -272,8 +272,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     profiles_list = []
     for path in paths_to_profiles:
-        preprocessed_profile: dict[str, str | dict] = dict(preprocess_profile(load_profile(path)))
-        if not preprocessed_profile:
+        preprocessed_profile = preprocess_profile(load_profile(path))
+        if not isinstance(preprocessed_profile, dict):
             return None
         profiles_list.append(preprocessed_profile)
 

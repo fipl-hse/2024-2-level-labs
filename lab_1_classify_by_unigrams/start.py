@@ -44,7 +44,6 @@ def main() -> None:
         if isinstance(result, list):
             print_report(result)
     assert result, "Detection result is None"
-    return None
 
 if __name__ == "__main__":
     main()

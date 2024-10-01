@@ -25,7 +25,6 @@ def main() -> None:
     create_language_profile('en', en_text) is None or
     create_language_profile('de', de_text) is None):
         return None
-    result = None
     if unknown_profile is None or profile_de is None or profile_en is None:
         return None
     english: dict = profile_en
@@ -38,13 +37,14 @@ def main() -> None:
                           'assets/profiles/es.json', 'assets/profiles/fr.json',
                           'assets/profiles/it.json', 'assets/profiles/ru.json',
                           'assets/profiles/tr.json']
+    result = None
     collection = collect_profiles(paths_to_profiles)
     if isinstance(collection, list):
         result = detect_language_advanced(unknown, collection)
         if isinstance(result, list):
             print_report(result)
     assert result, "Detection result is None"
-    return result
+
 
 if __name__ == "__main__":
     main()

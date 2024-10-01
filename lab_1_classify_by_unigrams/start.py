@@ -3,6 +3,7 @@ Language detection starter
 """
 from lab_1_classify_by_unigrams import main as func
 
+
 def main() -> None:
     """
     Launches an implementation

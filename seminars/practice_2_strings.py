@@ -52,15 +52,14 @@ def multiply_string(input_string: str, how_many: int) -> str:
     Given a string and a non-negative number,
     display the given string the number of times given in the `how_many`.
     """
-    new_string = input_string * how_many
-    return new_string
+    # student realisation goes here
 
 
 # Function calls with expected result:
-print(multiply_string('Hi', 2)) # → 'HiHi'
-print(multiply_string('Hi', 3)) # → 'HiHiHi'
-print(multiply_string('Hi', 1)) # → 'Hi'
-print(multiply_string('Hi', 0)) # → ''
+# multiply_string('Hi', 2) → 'HiHi'
+# multiply_string('Hi', 3) → 'HiHiHi'
+# multiply_string('Hi', 1) → 'Hi'
+# multiply_string('Hi', 0) → ''
 
 
 # Task 2:
@@ -69,17 +68,16 @@ def front_times(input_string: str, how_many: int) -> str:
     Given the string, take its three leading characters
     and display them that many times as in `how_many`.
     """
-    new_string = input_string[:3]
-    return new_string*how_many
+    # student realisation goes here
 
 
 # Function calls with expected result:
-print(front_times('Chocolate', 2)) # → 'ChoCho'
-print(front_times('Chocolate', 3)) # → 'ChoChoCho'
-print(front_times('Abc', 3)) # → 'AbcAbcAbc'
-print(front_times('A', 4))
-print(front_times('', 4))
-front_times('Abc', 0)
+# front_times('Chocolate', 2) → 'ChoCho'
+# front_times('Chocolate', 3) → 'ChoChoCho'
+# front_times('Abc', 3) → 'AbcAbcAbc'
+# front_times('A', 4) → 'AAAA'
+# front_times('', 4) → ''
+# front_times('Abc', 0) → ''
 
 
 # Task 3:
@@ -102,10 +100,10 @@ def make_abba(first_string: str, second_string: str) -> str:
     """
     Given two strings, concatenate them as a reflection.
     """
-    return first_string + second_string + second_string + first_string
+    # student realisation goes here
 
 
-print(make_abba('Hi', 'Bye')) # → 'HiByeByeHi'
+# make_abba('Hi', 'Bye') → 'HiByeByeHi'
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
 # make_abba('', 'y') → 'yy'
@@ -120,18 +118,10 @@ def reverse_word(sentence: str) -> str:
     Strings passed in will consist of only letters and spaces.
     Spaces will be included only when more than one word is present.
     """
-    sent_l = sentence.split(' ')
-    new_sent = []
-    for word in sent_l:
-        if len(word) >= 5:
-            new_sent.append(word[::-1])
-        else:
-            new_sent.append(word)
-    return " ".join(new_sent)
+    # student realisation goes here
 
 
-
-print(reverse_word("Hey fellow warriors")) #== "Hey wollef sroirraw"
+# reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
 #
 # reverse_word("This is a test") == "This is a test"
 #

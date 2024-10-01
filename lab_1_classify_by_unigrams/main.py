@@ -168,10 +168,13 @@ def detect_language(
         languages = [profile_1['name'], profile_2['name']]
         if not isinstance(languages, list):
             return None
-        return sorted(languages)[0]
+        result = sorted(languages)[0]
     if first_metric < second_metric:
-        return profile_1['name']
-    return profile_2['name']
+        result = profile_1['name']
+    else:
+        result = profile_2['name']
+    if isinstance(result, str):
+        return result
 
 
 def load_profile(path_to_file: str) -> dict | None:

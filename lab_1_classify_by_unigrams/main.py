@@ -48,8 +48,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     frequency_dictionary = {}
     for token in tokens:
-        if token not in frequency_dictionary:
-            frequency_dictionary[token] = tokens.count(token)/len(tokens)
+        if token in frequency_dictionary:
+            continue
+        frequency_dictionary[token] = tokens.count(token)/len(tokens)
     return frequency_dictionary
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -93,7 +94,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     diff = 0
     for m, n in enumerate(actual):
         diff += (n - predicted[m])**2
-    return float(diff / len(actual))
+    return diff / len(actual)
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],

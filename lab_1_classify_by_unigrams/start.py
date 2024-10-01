@@ -26,7 +26,6 @@ def main() -> None:
     if en_profile is None or du_profile is None or un_profile is None:
         return
     detection_result = func.detect_language(un_profile, du_profile, en_profile)
-
     if detection_result is None:
         print("failed")
     else:

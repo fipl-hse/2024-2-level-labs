@@ -7,46 +7,45 @@ Language detection
 
 def tokenize(text: str) -> list[str] | None:
     """
-       Split a text into tokens.
+    Split a text into tokens.
 
-       Convert the tokens into lowercase, remove punctuation, digits and other symbols
+    Convert the tokens into lowercase, remove punctuation, digits and other symbols
 
-       Args:
-           text (str): A text
+    Args:
+        text (str): A text
 
-       Returns:
-           list[str] | None: A list of lower-cased tokens without punctuation
+    Returns:
+        list[str] | None: A list of lower-cased tokens without punctuation
 
-       In case of corrupt input arguments, None is returned
+    In case of corrupt input arguments, None is returned
     """
-    if (type(text)) != str:
+    if not isinstance(text, str):
         return None
     letters = []
     for letter in text:
         if letter.isalpha():
             letters.append(letter.lower())
-    if len(letters) == 0:
+    if not letters:
         return None
     return letters
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
-        Calculate frequencies of given tokens.
+    Calculate frequencies of given tokens.
 
-        Args:
-            tokens (list[str] | None): A list of tokens
+    Args:
+        tokens (list[str] | None): A list of tokens
 
-        Returns:
-            dict[str, float] | None: A dictionary with frequencies
+    Returns:
+        dict[str, float] | None: A dictionary with frequencies
 
-        In case of corrupt input arguments, None is returned
+    In case of corrupt input arguments, None is returned
     """
-    if (type(tokens)) != list:
+    if not isinstance(tokens, list):
         return None
-    else:
-        for i in tokens:
-            if (type(i)) != str:
-                return None
+    for i in tokens:
+        if not isinstance(i, str):
+            return None
     vocabulary = {}
     lenght = len(tokens)
     tokens_set = list(set(tokens))
@@ -59,24 +58,21 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
-        Create a language profile.
+    Create a language profile.
 
-        Args:
-            language (str): A language
-            text (str): A text
+    Args:
+        language (str): A language
+        text (str): A text
 
-        Returns:
-            dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
+    Returns:
+        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
 
-        In case of corrupt input arguments, None is returned
+    In case of corrupt input arguments, None is returned
     """
-    if (type(language)) != str or (type(text)) != str:
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
-    profile = {}
     frequency = calculate_frequencies(tokenize(text))
-    profile['name'] = language
-    profile['freq'] = frequency
-    return profile
+    return {"name": language, "freq": frequency}
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -91,15 +87,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if (type(predicted)) != list or (type(actual)) != list or len(predicted) != len(actual):
+    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
         return None
-    else:
-        n = len(predicted)
+    n = len(predicted)
     summa = 0
     for i in range(n):
         summa += (actual[i]-predicted[i])**2
-    mse = summa/n
-    return mse
+    return summa/n
 
 
 def compare_profiles(
@@ -120,16 +114,12 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    try:
-        if type(unknown_profile["name"]) == str and type(profile_to_compare["name"]) == str:
-            pass
-    except:
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if not (type(unknown_profile)) == dict or not (type(profile_to_compare)) == dict:
+    if "name" not in unknown_profile or "name" not in profile_to_compare:
         return None
-    else:
-        if not (type(unknown_profile["freq"])) == dict or not (type(profile_to_compare["freq"])) == dict:
-            return None
+    if not isinstance(unknown_profile["freq"], dict) or not isinstance(profile_to_compare["freq"], dict):
+        return None
     vocabulary = set(unknown_profile['freq'].keys()) | set(profile_to_compare['freq'].keys())
     actual = []
     predicted = []
@@ -140,7 +130,7 @@ def compare_profiles(
 
     mse = calculate_mse(predicted=predicted, actual=actual)
 
-    return round(mse, 3)
+    return mse
 
 
 def detect_language(
@@ -162,20 +152,20 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    try:
-        if type(unknown_profile["name"]) == str and type(profile_1["name"]) == str and type(profile_2["name"]) == str:
-            pass
-    except:
+    if "name" not in unknown_profile or "name" not in profile_1 or "name" not in profile_2:
         return None
-    if not (type(unknown_profile)) == dict or not (type(profile_1)) == dict or not (type(profile_2)) == dict:
+    if (not isinstance(unknown_profile, dict)
+            or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
-    else:
-        if not (type(unknown_profile["freq"])) == dict or not (type(profile_1["freq"])) == dict or not (type(profile_2["freq"])) == dict:
-            return None
+    if (not isinstance(unknown_profile["freq"], dict)
+            or not isinstance(profile_1["freq"], dict)
+            or not isinstance(profile_2["freq"], dict)):
+        return None
     voc_language = {}
     voc_language[f"{profile_1['name']}"] = compare_profiles(unknown_profile, profile_1)
     voc_language[f"{profile_2['name']}"] = compare_profiles(unknown_profile, profile_2)
-    min_value = 1
+    min_value = 1.0
     min_key = ''
     for key, value in voc_language.items():
         if value < min_value:

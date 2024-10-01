@@ -15,17 +15,14 @@ Data Type: Lists
 
 # Create a list
 example = [1, 2, 3]
-print(example)
+
 
 # List concatenation, the original list doesn't change
 first_list = example + [2, 3, 4]
-print(example)
-print(first_list)
 
 # List changes
 example.append(2)
 example.extend([2, 3, 4])
-print(example)
 
 # List copy
 # import copy
@@ -33,9 +30,9 @@ print(example)
 
 first_test = [1, 2, 3, [1, 2, 3]]
 test_copy = first_test.copy()
-print(first_test, test_copy)
+
 test_copy[3].append(4)
-print(first_test, test_copy)
+
 
 first_test = [1, 2, 3, [1, 2, 3]]
 # test_deepcopy = copy.deepcopy(first_test)
@@ -56,15 +53,22 @@ first_test = [1, 2, 3, [1, 2, 3]]
 
 # Task 1:
 # easy level
+
+
 def count_evens(nums: list) -> int:
+
     """
     Return the number of even ints in the given array.
     """
     # student realization goes here
+    counter = 0
+    for num in nums:
+        if not num % 2:
+            counter += 1
+    return counter
 
 
-# Function calls with expected result:
-# count_evens([2, 1, 2, 3, 4]) → 3
+
 # count_evens([2, 2, 0]) → 3
 # count_evens([1, 3, 5]) → 0
 
@@ -78,6 +82,17 @@ def sum13(nums: list) -> int:
     also do not count.
     """
     # student realization goes here
+    num_sum = 0
+    for num in nums:
+        if num == 13:
+            break
+        else:
+            num_sum += num
+    return num_sum
+
+
+
+
 
 # Function calls with expected result:
 # sum13([1, 2, 2, 1]) → 6
@@ -88,6 +103,8 @@ def sum13(nums: list) -> int:
 
 # Task 3
 # easy level
+
+
 def sum67(nums: list) -> int:
     """
     Return the sum of the numbers in the array,
@@ -96,7 +113,25 @@ def sum67(nums: list) -> int:
     Return 0 for no numbers.
     """
     # student realization goes here
+    sum_num = 0
+    for num in nums:
+        if num == 6:
+            while True:
+                for num in nums:
+                    nums.remove(num)
+                    if num == 7:
+                        nums.remove(7)
+                        break
+                break
+        sum_num += num
 
+
+
+    return sum_num
+
+
+print(sum67([1, 2, 2]))
+print(sum67([1, 2, 2, 6, 99, 99, 7]))
 # Function calls with expected result:
 # sum67([1, 2, 2]) → 5
 # sum67([1, 2, 2, 6, 99, 99, 7]) → 5

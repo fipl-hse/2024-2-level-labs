@@ -5,9 +5,6 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-def bestround(n, decimals=0):
-    multiplier = 10**decimals
-    return int(n * multiplier) / multiplier
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -68,7 +65,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     total_tokens = len(tokens)
 
     for key, value in token_freq.items():
-        token_freq[key] = bestround(value / total_tokens, 4)
+        token_freq[key] = value / total_tokens
 
     return token_freq
 

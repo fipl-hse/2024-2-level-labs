@@ -20,12 +20,15 @@ def main() -> None:
     en_profile = func.create_language_profile('en', en_text)
     de_profile = func.create_language_profile('de', de_text)
     unknown_profile = func.create_language_profile('unknown', unknown_text)
-    result = func.detect_language(unknown_profile, de_profile, en_profile)
 
+    if not (isinstance(en_profile, dict) and
+            isinstance(unknown_profile, dict) and
+            isinstance(de_profile, dict)):
+        return None
+
+    result = func.detect_language(unknown_profile, de_profile, en_profile)
     assert result, "Detection result is None"
     print(result)
-    print(func.compare_profiles(unknown_profile, en_profile))
-    print(func.compare_profiles(unknown_profile, de_profile))
 
 
 if __name__ == "__main__":

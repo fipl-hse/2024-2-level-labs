@@ -72,6 +72,8 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
+    if calculate_frequencies(tokenize(text)) is None:
+        return None
 
     freq_dict = calculate_frequencies(tokenize(text))
     new_profile = {"name": language, "freq": freq_dict}
@@ -124,6 +126,9 @@ def compare_profiles(
     """
     if len(profile_to_compare) != len(unknown_profile):
         return None
+    if not (isinstance(unknown_profile['freq'], dict) and
+            isinstance(profile_to_compare['freq'], dict)):
+        return None
 
     unknown_lst = []
     compare_lst = []
@@ -132,11 +137,11 @@ def compare_profiles(
     for elements in all_profile_lst:
 
         if elements not in unknown_profile['freq']:
-            unknown_lst.append(0.0)
+            unknown_lst.append(float(0))
         else:
             unknown_lst.append(unknown_profile['freq'][elements])
         if elements not in profile_to_compare['freq']:
-            compare_lst.append(0.0)
+            compare_lst.append(float(0))
         else:
             compare_lst.append(profile_to_compare['freq'][elements])
 
@@ -166,6 +171,9 @@ def detect_language(
     """
     if not (isinstance(unknown_profile, dict) and (isinstance(profile_1, dict)
                                                    and isinstance(profile_2, dict))):
+        return None
+    if (compare_profiles(unknown_profile, profile_1) and
+            compare_profiles(unknown_profile,profile_2)) is None:
         return None
 
     mse_1 = compare_profiles(unknown_profile, profile_1)

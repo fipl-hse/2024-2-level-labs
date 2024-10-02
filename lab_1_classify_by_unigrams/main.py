@@ -27,7 +27,7 @@ def tokenize(text: str) -> list[str] | None:
     text = text.lower()
     token_list = []
     for symbol in text:
-        if symbol.isalpha() and symbol != 'º':
+        if symbol.isalpha() and symbol != "º":
             token_list.append(symbol)
     return token_list
 
@@ -142,8 +142,8 @@ def compare_profiles(
             or "name" not in profile_to_compare
             or "freq" not in profile_to_compare):
         return None
-    if (not isinstance(profile_to_compare['name'], str)
-            or not isinstance(profile_to_compare['freq'], dict)):
+    if (not isinstance(profile_to_compare["name"], str)
+            or not isinstance(profile_to_compare["freq"], dict)):
         return None
 
     unknown_freq = unknown_profile["freq"]

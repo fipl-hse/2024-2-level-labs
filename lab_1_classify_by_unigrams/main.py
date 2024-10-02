@@ -98,11 +98,17 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
 
+    n = len(actual)
+
+    if len(predicted) != n:
+        return None
+
     result = 0
-    for index in range(len(actual)):
+
+    for index in range(n):
         step = (predicted[index] - actual[index]) ** 2
         result += step
-    return result/len(actual)
+    return result / n
 
 
 def compare_profiles(
@@ -125,6 +131,8 @@ def compare_profiles(
     """
 
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+    if not isinstance(unknown_profile["name"], str) or not isinstance(profile_to_compare["name"], str):
         return None
 
     unknown_freq, compare_freq = {}, {}

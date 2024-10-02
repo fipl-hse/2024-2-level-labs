@@ -4,21 +4,27 @@ Lab 1.
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-
+with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
+    en_text = file_to_read_en.read()
+with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
+    de_text = file_to_read_de.read()
+with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
+    unknown_text = file_to_read_unk.read()
 def tokenize(text: str) -> list[str] | None:
-    """
-    Split a text into tokens.
 
-    Convert the tokens into lowercase, remove punctuation, digits and other symbols
+        symbols = "1234567890!№;%:@#$%^&*{}/\|?*()_+-=.,<> "
+        list_symbols = list(symbols)
+        list_letters = []
+        list_unnes = []
+        for i in range(0, len(list(text))):
+            if text[i] not in list_symbols:
+                list_letters.append(text[i])
+            else:
+                list_unnes.append(text[i])
+        print(list_letters)
+        return list_letters
 
-    Args:
-        text (str): A text
 
-    Returns:
-        list[str] | None: A list of lower-cased tokens without punctuation
-
-    In case of corrupt input arguments, None is returned
-    """
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:

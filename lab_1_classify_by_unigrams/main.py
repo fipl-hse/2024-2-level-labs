@@ -142,7 +142,8 @@ def compare_profiles(
             or "freq" not in profile_to_compare):
         return None
 
-    unknown_freq, compare_freq = {}, {}
+    unknown_freq = dict[str, dict[str, float]]
+    compare_freq = dict[str, dict[str, float]]
     if isinstance(unknown_profile, dict):
         unknown_freq = unknown_profile["freq"]
     if isinstance(profile_to_compare, dict):

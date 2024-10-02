@@ -120,26 +120,25 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
     # bad input check:
-    if (isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and
+    if not (isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and
             len(profile_to_compare) == 2 and len(unknown_profile) == 2):
-        for k, v in unknown_profile['freq'].items():
-            if not isinstance(k, str) or not isinstance(v, (int, float)):
-                return None
-
-        freq_dict_2 = profile_to_compare['freq']
-        freq_dict_1 = unknown_profile['freq']
-        for key2 in freq_dict_2.keys():
-            if key2 in freq_dict_1.keys():
-                continue
-            if isinstance(freq_dict_1, dict) and isinstance(key2, str):
-                freq_dict_1[key2] = 0.0
-        for key1 in freq_dict_1.keys():
-            if key1 in freq_dict_2.keys():
-                continue
-            if isinstance(freq_dict_2, dict) and isinstance(key1, str):
-                freq_dict_2[key1] = 0.0
-    else:
         return None
+    for k, v in unknown_profile['freq'].items():
+        if not isinstance(k, str) or not isinstance(v, (int, float)):
+            return None
+
+    freq_dict_2 = profile_to_compare['freq']
+    freq_dict_1 = unknown_profile['freq']
+    for key2 in freq_dict_2.keys():
+        if key2 in freq_dict_1.keys():
+            continue
+        if isinstance(freq_dict_1, dict) and isinstance(key2, str):
+            freq_dict_1[key2] = 0.0
+    for key1 in freq_dict_1.keys():
+        if key1 in freq_dict_2.keys():
+            continue
+        if isinstance(freq_dict_2, dict) and isinstance(key1, str):
+            freq_dict_2[key1] = 0.0
 
     sorted_keys_of_dict_1_with_zeros = sorted(freq_dict_2.keys())
     sorted_keys_of_dict_2_with_zeros = sorted(freq_dict_1.keys())

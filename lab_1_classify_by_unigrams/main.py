@@ -230,8 +230,9 @@ def load_profile(path_to_file: str) -> dict | None:
         return None
     with open(path_to_file, 'r', encoding='UTF-8') as file:
         profile = json.load(file)
-    if isinstance(profile, dict):
-        return profile
+    if not isinstance(profile, dict):
+        return None
+    return profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -356,10 +357,11 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-    if detections is None or not isinstance(detections, list):
-        return None
-    for element in detections:
-        if not isinstance(element, tuple):
+    if detections is not None and isinstance(detections, list):
+        for element in detections:
+            if isinstance(element, tuple):
+                value = element[1]
+                print(f'{element[0]}: MSE {value:.5f}')
+
             return None
-        value = element[1]
-        print(f'{element[0]}: MSE {value:.5f}')
+    return None

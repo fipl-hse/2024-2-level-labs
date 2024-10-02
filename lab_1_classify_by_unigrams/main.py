@@ -3,9 +3,8 @@ Lab 1.
 
 Language detection
 """
-
-import copy
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+import copy
 import json
 
 
@@ -51,8 +50,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return frequency
 
 
-def create_language_profile(language: str, text: str) -> (
-        dict[str, str | dict[str, float] | None] | None):
+def create_language_profile(language: str, text: str) -> \
+        (dict[str, str | dict[str, float] | None] | None):
     """
     Create a language profile.
 
@@ -65,18 +64,13 @@ def create_language_profile(language: str, text: str) -> (
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(language, str):
-        return None
-    if not isinstance(text, str):
-        return None
-    if tokenize(text) is None:
-        return None
-    freq = tokenize(text)
-    if calculate_frequencies(freq) is None:
+    if ((not isinstance(language, str)) or
+            (not isinstance(text, str)) or (tokenize(text) is None) or
+            (calculate_frequencies(tokenize(text)) is None)):
         return None
     profile = {
         "name": language,
-        "freq": calculate_frequencies(freq)
+        "freq": calculate_frequencies(tokenize(text))
     }
     return profile
 
@@ -105,7 +99,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for index in range(length):
         difference += (actual[index] - predicted[index]) ** 2
     mse = difference / float(length)
-    return round(mse, 4)
+    return mse
 
 
 def compare_profiles(
@@ -136,22 +130,22 @@ def compare_profiles(
             (not all(k in unknown_profile for k in ('freq', 'name')))):
         return None
     unk_profile = copy.deepcopy(unknown_profile)
-    from_profile1 = unk_profile["freq"]
-    from_profile2 = profile_to_compare["freq"]
-    keys_for_1 = set(from_profile1.keys())
-    keys_for_2 = set(from_profile2.keys())
+    unknown_text = unk_profile["freq"]
+    comparing_text = profile_to_compare["freq"]
+    keys_for_1 = set(unknown_text.keys())
+    keys_for_2 = set(comparing_text.keys())
     if keys_for_1.intersection(keys_for_2) == {}:
         return None
     letters_need1 = keys_for_1.difference(keys_for_2)
     letters_need2 = keys_for_2.difference(keys_for_1)
     for i in letters_need1:
-        from_profile2.setdefault(i, 0.0)
+        comparing_text.setdefault(i, 0.0)
     for x in letters_need2:
-        from_profile1.setdefault(x, 0.0)
-    sorted1 = dict(sorted(from_profile1.items()))
+        unknown_text.setdefault(x, 0.0)
+    sorted1 = dict(sorted(unknown_text.items()))
     sorted2 = {}
     for key in sorted1:
-        sorted2[key] = from_profile2.get(key, from_profile1[key])
+        sorted2[key] = comparing_text.get(key, unknown_text[key])
     list1 = list(sorted1.values())
     list2 = list(sorted2.values())
     conclusion = calculate_mse(list2, list1)
@@ -239,7 +233,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             or not all(x in profile for x in ['freq', 'name', 'n_words'])):
         return None
     processed_profile = {'name': profile['name'], 'freq': {}}
-    dictionary = {}
+    dictionary: dict[str, int] = {}
     for unigram in profile['freq'].keys():
         if unigram.isalpha():
             pass
@@ -275,10 +269,10 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         return None
     list_for_dictionaries = []
     for name_of_profile in paths_to_profiles:
-        if load_profile(name_of_profile) is None:
+        if not load_profile(name_of_profile):
             return None
         dictionary_unprocessed = load_profile(name_of_profile)
-        if dictionary_unprocessed is None:
+        if not dictionary_unprocessed:
             return None
         new_load: dict = dictionary_unprocessed
         processed_profile = preprocess_profile(new_load)

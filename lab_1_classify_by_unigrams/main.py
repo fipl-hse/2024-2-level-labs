@@ -52,7 +52,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         if not isinstance(letter, str):
             return None
         if letter not in freq_dictionary:
-            freq_dictionary[letter] = float(0)
+            freq_dictionary[letter] = 0.0
         freq_dictionary[letter] += float(1)
 
     for letter in freq_dictionary:
@@ -174,8 +174,7 @@ def compare_profiles(
         frequency_profile_to_compare.get(element, 0) for element in sorted_tokens
     ]
 
-    some_mse = calculate_mse(new_list_unknown, new_list_to_compare)
-    return some_mse
+    return calculate_mse(new_list_unknown, new_list_to_compare)
 
 
 def detect_language(

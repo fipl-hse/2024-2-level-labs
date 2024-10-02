@@ -4,7 +4,6 @@ Lab 1.
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-from typing import Union, Dict, Any
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -145,9 +144,9 @@ def compare_profiles(
 
     unknown_freq, compare_freq = {}, {}
     if isinstance(unknown_profile, dict):
-        unknown_freq: Union[str, Dict[str, float]] = unknown_profile["freq"]
+        unknown_freq = unknown_profile["freq"]
     if isinstance(profile_to_compare, dict):
-        compare_freq: Union[str, Dict[str, float]] = profile_to_compare["freq"]
+        compare_freq = profile_to_compare["freq"]
     unknown_keys = list(unknown_freq.keys())
     compare_keys = list(compare_freq.keys())
     all_keys = (unknown_keys + list(set(compare_keys) - set(unknown_keys)))
@@ -192,19 +191,22 @@ def detect_language(
 
     mse_unknown_to_1 = compare_profiles(unknown_profile, profile_1)
     mse_unknown_to_2 = compare_profiles(unknown_profile, profile_2)
-    result: Any = ''
+    result = ''
 
     if mse_unknown_to_1 is None or mse_unknown_to_2 is None:
         return None
 
     if mse_unknown_to_1 < mse_unknown_to_2:
-        result = profile_1["name"]
+        if isinstance(profile_1["name"], str):
+            result = profile_1["name"]
     if mse_unknown_to_2 < mse_unknown_to_1:
-        result = profile_2["name"]
+        if isinstance(profile_2["name"], str):
+            result = profile_2["name"]
     if mse_unknown_to_1 == mse_unknown_to_2:
         asort = [profile_1["name"], profile_2["name"]]
         asort.sort()
-        result = asort[0]
+        if isinstance(asort[0], str):
+            result = asort[0]
     return result
 
 

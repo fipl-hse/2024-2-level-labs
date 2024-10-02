@@ -15,9 +15,17 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result = detect_language(create_language_profile("unknown", unknown_text),
-                             create_language_profile("english", en_text),
-                             create_language_profile("german", de_text))
+
+    result = None
+
+    en_profile = create_language_profile('en', en_text)
+    de_profile = create_language_profile('de', de_text)
+    unknown_profile = create_language_profile('unknown', unknown_text)
+
+    if en_profile is not None and de_profile is not None and unknown_profile is not None:
+        result = (create_language_profile("unknown", unknown_text),
+                  create_language_profile("english", en_text),
+                  create_language_profile("german", de_text))
     assert result, "Detection result is None"
 
 

@@ -3,8 +3,9 @@ Lab 1.
 
 Language detection
 """
-import copy
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+import copy
 import json
 
 
@@ -47,7 +48,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     frequency_dict = {}
     for token in tokens:
-        frequency_dict[token] = tokens.count(token) / len(tokens)
+        if token not in frequency_dict:
+            frequency_dict[token] = tokens.count(token) / len(tokens)
     return frequency_dict
 
 
@@ -222,7 +224,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             freq_dict[letter] = freq_dict.get(letter, 0) + freq_dict.get(letter.upper(), 0)
             processed_profile['freq'][letter] = freq_dict[letter] / profile['n_words'][0]
             if letter.upper() in freq_dict:
-                del freq_dict[letter.upper()]
+                freq_dict.pop(letter.upper())
     for i in freq_dict.items():
         if i[0].isupper():
             processed_profile['freq'][i[0].lower()] = i[1] / profile['n_words'][0]

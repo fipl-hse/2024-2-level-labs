@@ -6,7 +6,6 @@ Language detection
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 def tokenize(text: str) -> list[str] | None:
-
         symbols = "1234567890!№;%:@#$%^&*{}/\|?*()_+-=.,<> "
         list_symbols = list(symbols)
         list_letters = []
@@ -17,8 +16,6 @@ def tokenize(text: str) -> list[str] | None:
                 list_letters.append(text[i])
             else:
                 list_unnes.append(text[i])
-
-
         print(list_letters)
         return list_letters
 

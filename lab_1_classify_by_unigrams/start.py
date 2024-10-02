@@ -15,7 +15,7 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    #assert result, "Detection result is None"
+    # result = None
     res1 = fnc.tokenize(en_text)
     print(res1)
     res2 = fnc.calculate_frequencies(res1)
@@ -27,6 +27,7 @@ def main() -> None:
     print(fnc.compare_profiles(trg_prof, en_prof))
     print(fnc.compare_profiles(trg_prof, de_prof))
     print(fnc.detect_language(trg_prof, en_prof, de_prof))
+    # assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

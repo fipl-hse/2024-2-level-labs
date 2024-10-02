@@ -3,7 +3,6 @@ Lab 1.
 
 Language detection
 """
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -71,7 +70,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     if len(text) <= 0:
         return None
-    return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    out = calculate_frequencies(tokenize(text))
+    if not isinstance(out, dict):
+        return None
+    return {'name': language, 'freq': out}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -159,14 +161,15 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict):
-        return None
-    if not isinstance(profile_1, dict):
-        return None
-    if not isinstance(profile_2, dict):
+    if not isinstance(unknown_profile, dict) or \
+            not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
     check1 = compare_profiles(unknown_profile, profile_1)
+    if check1 is None or not isinstance(profile_1['name'], str):
+        return None
     check2 = compare_profiles(unknown_profile, profile_2)
+    if check2 is None or not isinstance(profile_1['name'], str):
+        return None
     if check1 < check2:
         return list(profile_1.values())[0]
     if check2 < check1:
@@ -221,7 +224,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

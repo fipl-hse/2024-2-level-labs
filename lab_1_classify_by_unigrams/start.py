@@ -28,8 +28,11 @@ def main() -> None:
 
     result = func.detect_language(unknown_profile, de_profile, en_profile)
     assert result, "Detection result is None"
-    print(result)
+
+    return result
 
 
 if __name__ == "__main__":
     main()
+
+    print(main())

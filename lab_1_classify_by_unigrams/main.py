@@ -3,9 +3,9 @@ Lab 1.
 
 Language detection
 """
-from typing import Tuple, Dict, Any
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+
+punct = '''!@#$%^&*()_-=+|/{}[]'"?.>,<~:;'''
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -25,7 +25,7 @@ def tokenize(text: str) -> list[str] | None:
     lowered_text = text.lower()
     tokens = []
     for elem in lowered_text:
-        if elem.isalpha() and elem != "º":
+        if elem.isalpha():
             tokens += elem
     return tokens
 
@@ -42,23 +42,11 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(tokens, list) is False:
-        return None
-
-    for elem in tokens:
-        if isinstance(elem, str) is False:
-            return None
-
     token_dict = {}
     for i in tokens:
         if i not in token_dict.keys():
-            token_dict.update({i: 0})
+            token_dict.update({i: 1})
         token_dict[i] += 1
-
-    sum_token_dict_values = sum(token_dict.values())
-    for i in token_dict:
-        new_elem = token_dict[i] / sum_token_dict_values
-        token_dict[i] = new_elem
     return token_dict
 
 
@@ -75,13 +63,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if (isinstance(language, str)) or (isinstance(text, str)):
-        return None
-
-    language_prof = {"name": language,
-                     "freq": calculate_frequencies(tokenize(text))
-                     }
-    return language_prof
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -97,17 +78,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(predicted, list) or isinstance(actual, list)):
-        return None
-    if len(predicted) != len(actual):
-        return None
-
-    mse = 0
-    for i in range(len(predicted)):
-        mse += (predicted[i] - actual[i])**2
-    mse = mse/len(predicted)
-
-    return mse
 
 
 def compare_profiles(
@@ -128,22 +98,6 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if (isinstance(unknown_profile, dict) is False) or (isinstance(profile_to_compare, dict) is False):
-        return None
-    if ("name" not in unknown_profile) or ("name" not in profile_to_compare):
-        return None
-    for char_percentage in unknown_profile["freq"]:
-        if char_percentage not in profile_to_compare["freq"]:
-            profile_to_compare["freq"].update({char_percentage: 0})
-    for char_percentage in profile_to_compare["freq"]:
-        if char_percentage not in unknown_profile["freq"]:
-            unknown_profile["freq"].update({char_percentage: 0})
-
-    if len(unknown_profile["freq"]) == len(profile_to_compare["freq"]):
-        unknown_profile_list = list(dict(sorted(unknown_profile["freq"].items())).values())
-        profile_to_compare_list = list(dict(sorted(profile_to_compare["freq"].items())).values())
-        mse = calculate_mse(unknown_profile_list, profile_to_compare_list)
-        return mse
 
 
 def detect_language(

@@ -78,9 +78,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     freq = calculate_frequencies(tokenize(text))
 
-    language_profile = {"name": language, "freq": freq}
+    if not isinstance(freq, dict):
+        return None
 
-    return language_profile
+    return {"name": language, "freq": freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -142,22 +143,20 @@ def compare_profiles(
             or "freq" not in profile_to_compare):
         return None
 
-    unknown_freq = {}
-    compare_freq = {}
+    unknown_keys = []
+    compare_keys = []
     if isinstance(unknown_profile, dict):
-        unknown_freq = unknown_profile["freq"]
+        unknown_keys = unknown_profile["freq"].keys()
     if isinstance(profile_to_compare, dict):
-        compare_freq = profile_to_compare["freq"]
-    unknown_keys = list(unknown_freq.keys())
-    compare_keys = list(compare_freq.keys())
+        compare_keys = profile_to_compare["freq"].keys()
     all_keys = (unknown_keys + list(set(compare_keys) - set(unknown_keys)))
     all_unknown_profile = dict.fromkeys(all_keys, 0)
     all_profile_to_compare = dict.fromkeys(all_keys, 0)
-    for (key, value) in unknown_freq.items():
+    for (key, value) in unknown_profile["freq"].items():
         for (all_key, all_value) in all_unknown_profile.items():
             if key == all_key:
                 all_unknown_profile[all_key] = value
-    for (key, value) in compare_freq.items():
+    for (key, value) in profile_to_compare["freq"].items():
         for (all_key, all_value) in all_profile_to_compare.items():
             if key == all_key:
                 all_profile_to_compare[all_key] = value

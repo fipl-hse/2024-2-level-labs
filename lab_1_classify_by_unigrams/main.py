@@ -3,9 +3,6 @@ Lab 1.
 
 Language detection
 """
-import json
-
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -109,12 +106,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(predicted, list) and isinstance(actual, list):
-        if len(actual) == len(predicted):
-            n = len(actual)
-            mse = float(sum((a - p) ** 2 for a, p in zip(actual, predicted)) / n)
-            return mse
-    return None
+    if not isinstance(predicted, list) or not isinstance(actual, list):
+        return None
+    if len(actual) != len(predicted):
+        return None
+    n = len(actual)
+    mse = float(sum((a - p) ** 2 for a, p in zip(actual, predicted)) / n)
+    return mse
 
 
 def compare_profiles(
@@ -135,33 +133,39 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict):
-        name1 = unknown_profile.get('name')
-        freq1 = unknown_profile.get('freq')
-        name2 = profile_to_compare.get('name')
-        freq2 = profile_to_compare.get('freq')
-
-        if (isinstance(name1, str) and isinstance(freq1, dict)
-                and isinstance(name2, str) and isinstance(freq2, dict)):
-            all_tokens_set = set(freq1.keys()) | set(freq2.keys())
-            actual_values, predicted_values = [], []
-
-            for token in all_tokens_set:
-
-                actual_value = freq1.get(token, 0.0)
-                actual_values.append(actual_value)
-
-                predicted_value = freq2.get(token, 0.0)
-                predicted_values.append(predicted_value)
-
-            mse = calculate_mse(actual_values, predicted_values)
-
-            if mse is not None:
-                return mse
-
-            return None
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    return None
+    if not all(key in unknown_profile for key in ['name', 'freq']):
+        return None
+    if not all(key in profile_to_compare for key in ['name', 'freq']):
+        return None
+
+    name1 = unknown_profile.get('name')
+    freq1 = unknown_profile.get('freq')
+    name2 = profile_to_compare.get('name')
+    freq2 = profile_to_compare.get('freq')
+
+    if not (isinstance(name1, str) or isinstance(freq1, dict)
+            or isinstance(name2, str) or isinstance(freq2, dict)):
+        return None
+
+    all_tokens_set = set(freq1.keys()) | set(freq2.keys())
+    actual_values, predicted_values = [], []
+
+    for token in all_tokens_set:
+
+        actual_value = freq1.get(token, 0.0)
+        actual_values.append(actual_value)
+
+        predicted_value = freq2.get(token, 0.0)
+        predicted_values.append(predicted_value)
+
+    mse = calculate_mse(actual_values, predicted_values)
+
+    if mse is None:
+        return None
+
+    return mse
 
 
 def detect_language(
@@ -203,4 +207,3 @@ def detect_language(
                 return result2
 
     return None
-

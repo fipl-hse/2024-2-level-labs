@@ -76,6 +76,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if frequency:
         frequencies_dict = frequency
         return {"name": language, "freq": frequencies_dict}
+    return None
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

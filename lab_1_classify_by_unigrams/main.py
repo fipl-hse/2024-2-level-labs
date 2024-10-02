@@ -274,7 +274,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         unigram = k.lower()
         if unigram.isalpha() or k == '²' or unigram == 'i̇':
             if freq_dict.get(unigram) is None:
-                freq_dict[unigram] = 0
+                freq_dict[unigram] = 0.0
             freq_dict[unigram] += v / total_number
 
     processed_profile = {'name': name, 'freq': freq_dict}

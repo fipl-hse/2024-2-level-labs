@@ -25,6 +25,7 @@ def main() -> None:
         isinstance(unknown_profile, dict) and
             isinstance(de_profile, dict)):
         result = func.detect_language(unknown_profile, de_profile, en_profile)
+
     else:
         result = None
 

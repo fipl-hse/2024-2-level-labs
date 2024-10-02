@@ -174,7 +174,6 @@ def detect_language(
     if not (isinstance(unknown_profile, dict) and (isinstance(profile_1, dict)
                                                    and isinstance(profile_2, dict))):
         return None
-
     if not isinstance(profile_1['name'], str) or not isinstance(profile_2['name'], str):
         return None
 

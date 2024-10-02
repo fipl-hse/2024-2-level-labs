@@ -40,5 +40,3 @@ else:
     print('First number * second does not equal third number')
 
 print('Program finished')
-
-

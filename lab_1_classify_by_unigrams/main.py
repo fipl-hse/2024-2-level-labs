@@ -93,8 +93,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for i, value in enumerate(actual):
         difference_between_values = (value - predicted[i]) ** 2
         sum_diff += difference_between_values
-    mse = sum_diff / len(predicted)
-    return round(mse, 4)
+    return sum_diff / len(predicted)
 
 
 def compare_profiles(
@@ -255,8 +254,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         if not pre_profile:
             return None
         profiles_collection.append(pre_profile)
-        return profiles_collection
-    return None
+    return profiles_collection
 
 
 def detect_language_advanced(

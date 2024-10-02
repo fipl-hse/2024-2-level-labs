@@ -20,7 +20,7 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if type(text) != str:
+    if not isinstance(text, str):
         return None
 
     text = text.lower()
@@ -81,7 +81,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
 
-    if isinstance(calculate_frequencies(tokenize(text)), dict):
+    if not isinstance(calculate_frequencies(tokenize(text)), dict):
         return None
 
     language_profile = {'name': language, 'freq': calculate_frequencies(tokenize(text))}

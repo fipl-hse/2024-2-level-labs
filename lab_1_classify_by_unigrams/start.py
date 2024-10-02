@@ -3,10 +3,7 @@ Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
-                                             detect_language, detect_language_advanced,
-                                             load_profile, preprocess_profile,
-                                             print_report, tokenize)
+from lab_1_classify_by_unigrams.main import create_language_profile, detect_language, tokenize
 
 
 def main() -> None:
@@ -27,21 +24,6 @@ def main() -> None:
     print(create_language_profile("eng", en_text))
     if en_profile is not None and de_profile is not None and unk_profile is not None:
         print(detect_language(en_profile, de_profile, unk_profile))
-
-    if load_profile is not None and preprocess_profile is not None:
-        processed_profile = preprocess_profile(load_profile('assets/profiles/de.json'))
-        print(processed_profile)
-
-    collected_profiles = collect_profiles(['assets/profiles/de.json', 'assets/profiles/en.json',
-                                           'assets/profiles/es.json', 'assets/profiles/fr.json',
-                                           'assets/profiles/it.json', 'assets/profiles/ru.json',
-                                           'assets/profiles/tr.json'])
-
-    if (detect_language_advanced is not None and print_report is not None
-            and collected_profiles is not None and unk_profile is not None):
-        if (isinstance(detect_language_advanced, list) and isinstance(unk_profile, dict)
-                and isinstance(collected_profiles, list)):
-            print_report(detect_language_advanced(unk_profile, collected_profiles))
 
     result = tokens
 

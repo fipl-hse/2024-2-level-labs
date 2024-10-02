@@ -81,15 +81,19 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if (language is not None and isinstance(language, str)
-            and text is not None and isinstance(text, str)):
-        tokenized_text = tokenize(text)
-        frequencies_values = calculate_frequencies(tokenized_text)
+    if (language is None or not isinstance(language, str)
+            or text is None or not isinstance(text, str)):
+        return None
 
-        if frequencies_values is not None:
-            return {"name": language, "freq": frequencies_values}
+    tokenized_text = tokenize(text)
+    if tokenized_text is None:
+        return None
 
-    return None
+    frequencies_values = calculate_frequencies(tokenized_text)
+    if frequencies_values is None:
+        return None
+
+    return {"name": language, "freq": frequencies_values}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -200,145 +204,3 @@ def detect_language(
 
     return None
 
-
-def load_profile(path_to_file: str) -> dict | None:
-    """
-    Load a language profile.
-
-    Args:
-        path_to_file (str): A path to the language profile
-
-    Returns:
-        dict | None: A dictionary with at least two keys – name, freq
-
-    In case of corrupt input arguments, None is returned
-    """
-    if isinstance(path_to_file, str):
-        with open(path_to_file, 'r', encoding='UTF-8') as file:
-            profile = json.load(file)
-        if isinstance(profile, dict):
-            return profile
-
-    return None
-
-
-def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
-    """
-    Preprocess profile for a loaded language.
-
-    Args:
-        profile (dict): A loaded profile
-
-    Returns:
-        dict[str, str | dict] | None: A dict with a lower-cased loaded profile
-            with relative frequencies without unnecessary n-grams
-
-    In case of corrupt input arguments or lack of keys 'name', 'n_words' and
-    'freq' in arguments, None is returned
-    """
-    if profile is None:
-        return None
-    if (isinstance(profile, dict)
-            and all(key in profile for key in ['name', 'freq', 'n_words'])
-            and isinstance(profile['name'], str)
-            and isinstance(profile['freq'], dict)
-            and isinstance(profile['n_words'], list)):
-
-        name = profile['name']
-        freq = profile['freq']
-        n_words = profile['n_words']
-
-        total_number = n_words[0]
-        if not isinstance(total_number, int) or total_number < 1:
-            return None
-
-        freq_dict = {}
-        for k, v in freq.items():
-            if len(k) == 1 and isinstance(k, str) and isinstance(v, int):
-                unigram = k.lower()
-                if unigram.isalpha() or k == '²':
-                    if freq_dict.get(unigram) is None:
-                        freq_dict[unigram] = 0
-                    freq_dict[unigram] += v / total_number
-
-        processed_profile = {'name': name, 'freq': freq_dict}
-        return processed_profile
-
-    return None
-
-
-def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
-    """
-    Collect profiles for a given path.
-
-    Args:
-        paths_to_profiles (list): A list of strings to the profiles
-
-    Returns:
-        list[dict[str, str | dict[str, float]]] | None: A list of loaded profiles
-
-    In case of corrupt input arguments, None is returned
-    """
-    if not isinstance(paths_to_profiles, list):
-        return None
-
-    collected_profiles = []
-
-    for path in paths_to_profiles:
-        profile = load_profile(path)
-        if profile is not None:
-            processed_profile = preprocess_profile(profile)
-            if processed_profile is not None:
-                collected_profiles.append(processed_profile)
-
-    return collected_profiles if collected_profiles else None
-
-
-def detect_language_advanced(
-            unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
-    ) -> list | None:
-    """
-    Detect the language of an unknown profile.
-
-    Args:
-        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of a profile
-            to determine the language of
-        known_profiles (list): A list of known profiles
-
-    Returns:
-        list | None: A sorted list of tuples containing a language and a distance
-
-    In case of corrupt input arguments, None is returned
-    """
-    if (unknown_profile is None or known_profiles is None
-            or not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list)):
-        return None
-    results_not_sorted = {}
-    for profile in known_profiles:
-        if isinstance(profile, dict) and all(key in profile for key in ['name', 'freq']):
-            mse = compare_profiles(unknown_profile, profile)
-            if mse is not None:
-                lang = profile['name']
-                if lang is not None:
-                    result = {lang: mse}
-                    results_not_sorted.update(result)
-
-    results_lst = list(results_not_sorted.items())
-    results_sorted = sorted(results_lst, key=lambda x: (x[1], x[0]))
-    return results_sorted
-
-
-def print_report(detections: list[tuple[str, float]]) -> None:
-    """
-    Print report for detection of language.
-
-    Args:
-        detections (list[tuple[str, float]]): A list with distances for each available language
-
-    In case of corrupt input arguments, None is returned
-    """
-    if detections is not None and isinstance(detections, list):
-        for element in detections:
-            if isinstance(element, tuple):
-                value = element[1]
-                print(f'{element[0]}: MSE {value:.5f}')

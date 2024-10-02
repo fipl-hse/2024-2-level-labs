@@ -5,7 +5,7 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-import json
+import json, typing
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -287,7 +287,7 @@ def detect_language_advanced(
         distance.append((str(profile['name']), compare_profiles(unknown_profile, profile)))
     if all(d is None for d in distance):
         return None
-    return sorted(distance, key=lambda i: i[1])
+    return sorted(distance, key=lambda i: float(i[1]))
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

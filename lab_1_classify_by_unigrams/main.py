@@ -49,7 +49,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for sy in tokens:
         if not isinstance(sy, str):
             return None
-        frq.update({sy: tokens.count(sy) / len(tokens)})
+        frq[sy] = tokens.count(sy) / len(tokens)
     return frq
 
 
@@ -91,14 +91,14 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
-    sig = 0
-    for s, (src, trg) in enumerate(zip(predicted, actual)):
-        sig += ((trg - src) ** 2)
+    summary = 0
+    for source, target in zip(predicted, actual):
+        summary += ((target - source) ** 2)
     if len(actual) == 0:
         return None
     if len(actual) != len(predicted):
         return None
-    return sig / len(actual)
+    return summary / len(actual)
 
 
 def compare_profiles(
@@ -143,9 +143,9 @@ def compare_profiles(
 
 
 def detect_language(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_1: dict[str, str | dict[str, float]],
+    profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.

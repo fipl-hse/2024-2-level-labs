@@ -44,7 +44,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(tokens, list) and all(isinstance(tokens, str) for i in tokens)):
+    if not (isinstance(tokens, list) and all(isinstance(i, str) for i in tokens)):
         return None
 
     freq_dict = {}

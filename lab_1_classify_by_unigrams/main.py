@@ -143,20 +143,22 @@ def compare_profiles(
             or "freq" not in profile_to_compare):
         return None
 
-    unknown_keys = []
-    compare_keys = []
+    unknown_freq = {}
+    compare_freq = {}
     if isinstance(unknown_profile, dict):
-        unknown_keys = unknown_profile["freq"].keys()
+        unknown_freq = unknown_profile["freq"]
     if isinstance(profile_to_compare, dict):
-        compare_keys = profile_to_compare["freq"].keys()
+        compare_freq = profile_to_compare["freq"]
+    unknown_keys = list(unknown_freq.keys())
+    compare_keys = list(compare_freq.keys())
     all_keys = (unknown_keys + list(set(compare_keys) - set(unknown_keys)))
     all_unknown_profile = dict.fromkeys(all_keys, 0)
     all_profile_to_compare = dict.fromkeys(all_keys, 0)
-    for (key, value) in unknown_profile["freq"].items():
+    for (key, value) in unknown_freq.items():
         for (all_key, all_value) in all_unknown_profile.items():
             if key == all_key:
                 all_unknown_profile[all_key] = value
-    for (key, value) in profile_to_compare["freq"].items():
+    for (key, value) in compare_freq.items():
         for (all_key, all_value) in all_profile_to_compare.items():
             if key == all_key:
                 all_profile_to_compare[all_key] = value

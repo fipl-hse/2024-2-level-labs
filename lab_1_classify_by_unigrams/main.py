@@ -93,21 +93,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    """
-    if not isinstance(predicted, list):
-        return None
-    if not isinstance(actual, list):
-        return None
-    if len(predicted) != len(actual):
-        return None
-    summa = 0
-    for i in range(len(actual)):
-        part_of_summa = (actual[i] - predicted[i])**2
-        summa += part_of_summa
-    mse = 1/len(actual)*summa
-    rounded_mse = round(mse, 3)
-    return rounded_mse
-    """
 
 
 def compare_profiles(
@@ -127,39 +112,6 @@ def compare_profiles(
 
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
-    """
-    """
-    if not isinstance(unknown_profile, dict):
-        return None
-    for i in unknown_profile.keys():
-        if i != 'name' or i != 'freq':
-            return None
-    for i in unknown_profile.values():
-        if not isinstance(i, str) or not isinstance(i, dict):
-            return None
-        if i is dict:
-            for k in i.keys():
-                if not isinstance(k, str):
-                    return None
-            for v in i.values():
-                if not isinstance(v, float):
-                    return None
-    unknown_freq = unknown_profile.get('freq')
-    compared_freq = profile_to_compare.get('freq')
-    for letter in unknown_freq:
-        if letter not in compared_freq:
-            compared_freq[letter] = 0
-    for letter in compared_freq:
-        if letter not in unknown_freq:
-            unknown_freq[letter] = 0
-    unknown_list = []
-    for element in unknown_freq.values():
-        unknown_list.append(element)
-    compared_list = []
-    for element in compared_freq.values():
-        compared_list.append(element)
-    mse = calculate_mse(unknown_list, compared_list)
-    return mse
     """
 
 
@@ -182,18 +134,6 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    """
-    mse_1 = compare_profiles(unknown_profile, profile_1)
-    mse_2 = compare_profiles(unknown_profile, profile_2)
-    if mse_1 < mse_2:
-        return profile_1['name']
-    if mse_2 < mse_1:
-        return profile_2['name']
-    if mse_1 == mse_2:
-        names = [profile_1['name'], profile_2['name']]
-        names.sort()
-        return names[0]
-        """
 
 
 def load_profile(path_to_file: str) -> dict | None:

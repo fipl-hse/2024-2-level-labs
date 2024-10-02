@@ -72,7 +72,10 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str) or not isinstance(text, str):
         return None
     frequency = calculate_frequencies(tokenize(text))
-    return {"name": language, "freq": frequency}
+    if frequency:
+        frequencies_dict = frequency
+        return {"name": language, "freq": frequencies_dict}
+
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -121,7 +124,8 @@ def compare_profiles(
     if ("name" not in unknown_profile
             or "name" not in profile_to_compare):
         return None
-    if not isinstance(unknown_profile["freq"], dict) or not isinstance(profile_to_compare["freq"], dict):
+    if (not isinstance(unknown_profile["freq"], dict)
+            or not isinstance(profile_to_compare["freq"], dict)):
         return None
     vocabulary = set(unknown_profile['freq'].keys()) | set(profile_to_compare['freq'].keys())
     actual = []
@@ -162,6 +166,9 @@ def detect_language(
             or not isinstance(profile_1["freq"], dict)
             or not isinstance(profile_2["freq"], dict)):
         return None
+    for value in unknown_profile["freq"].values():
+        if not isinstance(value, float):
+            return None
     voc_language = {}
     voc_language[f"{profile_1['name']}"] = compare_profiles(unknown_profile, profile_1)
     voc_language[f"{profile_2['name']}"] = compare_profiles(unknown_profile, profile_2)

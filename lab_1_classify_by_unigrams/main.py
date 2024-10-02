@@ -135,10 +135,10 @@ def compare_profiles(
     if (not isinstance(unknown_profile, dict)
             or not isinstance(profile_to_compare, dict)):
         return None
-    if (isinstance(unknown_profile["name"]
-                   or unknown_profile["freq"], KeyError)
-            or isinstance(profile_to_compare["name"]
-                          or profile_to_compare["freq"], KeyError)):
+    if ("name" not in unknown_profile
+            or "freq" not in unknown_profile
+            or "name" not in profile_to_compare
+            or "freq" not in profile_to_compare):
         return None
 
     unknown_freq, compare_freq = {}, {}

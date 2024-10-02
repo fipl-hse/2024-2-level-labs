@@ -3,7 +3,8 @@ Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-from lab_1_classify_by_unigrams.main import (create_language_profile, detect_language)
+from lab_1_classify_by_unigrams.main import (create_language_profile,
+                                             detect_language, tokenize)
 
 
 def main() -> None:
@@ -22,7 +23,9 @@ def main() -> None:
     result = None
     if isinstance(unk_prof, dict) and isinstance(deu_prof, dict) and isinstance(engl_prof, dict):
         answer = detect_language(unk_prof, engl_prof, deu_prof)
+        token_perform = tokenize(unknown_text)
         result = answer
+        print(token_perform, answer)
     assert result is not None, "Detection result is None"
 
 

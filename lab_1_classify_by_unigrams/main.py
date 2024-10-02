@@ -252,7 +252,11 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     all_profiles = []
     for path in paths_to_profiles:
         profile_raw = load_profile(path)
+        if profile_raw is None:
+            return None
         processed_profile = preprocess_profile(profile_raw)
+        if processed_profile is None:
+            return None
         all_profiles.append(processed_profile)
     if all(isinstance(k, dict) for k in all_profiles):
         return all_profiles

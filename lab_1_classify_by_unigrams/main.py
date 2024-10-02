@@ -87,13 +87,15 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if (not isinstance(predicted, list)
+            or not isinstance(actual, list)
+            or len(predicted) != len(actual)):
         return None
     n = len(predicted)
-    summa = 0
+    total = 0
     for i in range(n):
-        summa += (actual[i]-predicted[i])**2
-    return summa/n
+        total += (actual[i]-predicted[i])**2
+    return total/n
 
 
 def compare_profiles(
@@ -116,7 +118,8 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if "name" not in unknown_profile or "name" not in profile_to_compare:
+    if ("name" not in unknown_profile
+            or "name" not in profile_to_compare):
         return None
     if not isinstance(unknown_profile["freq"], dict) or not isinstance(profile_to_compare["freq"], dict):
         return None
@@ -125,12 +128,9 @@ def compare_profiles(
     predicted = []
     for letter in vocabulary:
         actual.append(unknown_profile['freq'].get(letter, 0))
-    for letter in vocabulary:
-        predicted.append(profile_to_compare['freq'].get(letter,0))
+        predicted.append(profile_to_compare['freq'].get(letter, 0))
 
-    mse = calculate_mse(predicted=predicted, actual=actual)
-
-    return mse
+    return calculate_mse(predicted=predicted, actual=actual)
 
 
 def detect_language(

@@ -16,7 +16,6 @@ def tokenize(text: str) -> list[str] | None:
     Args:
         text (str): A text
 
-
     Returns:
         list[str] | None: A list of lower-cased tokens without punctuation
 
@@ -72,11 +71,11 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if (not isinstance(language, str) or not isinstance(text, str)
             or not isinstance(tokenize(text), list)):
         return None
-    calced_freq = calculate_frequencies(tokenize(text))
+    calculated_freq = calculate_frequencies(tokenize(text))
 
-    if not isinstance(calced_freq, dict):
+    if not isinstance(calculated_freq, dict):
         return None
-    return {'name': language, 'freq': calced_freq}
+    return {'name': language, 'freq': calculated_freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -288,7 +287,7 @@ def detect_language_advanced(
         compared_score = compare_profiles(unknown_profile, known_profile)
         lang_score_tuple = (known_profile['name'], compared_score)
         lang_score_list.append(lang_score_tuple)
-        lang_score_list.sort(key=lambda x: (x[1], x[0]))
+        lang_score_list.sort(key=lambda lang_score: (lang_score[1], lang_score[0]))
     return lang_score_list
 
 

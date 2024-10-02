@@ -18,7 +18,6 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
-    result = en_text
     print(tokenize(en_text))
     print(create_language_profile("en", en_text))
 
@@ -32,12 +31,13 @@ def main() -> None:
                          "assets/profiles/es.json", "assets/profiles/fr.json",
                          "assets/profiles/it.json", "assets/profiles/ru.json",
                          "assets/profiles/tr.json"]
+
     collected_profiles = collect_profiles(paths_to_profiles)
     if collected_profiles and unk_profile:
-        detected_profiles = detect_language_advanced(unk_profile, collected_profiles)
-        if detected_profiles:
-            print_report(detected_profiles)
-    assert result, "Detection result is None"
+        result = detect_language_advanced(unk_profile, collected_profiles)
+        if result:
+            print_report(result)
+        assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

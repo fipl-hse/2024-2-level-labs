@@ -44,10 +44,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if (not isinstance(tokens, list) or
             not all(isinstance(stroka, str) for stroka in tokens) or not tokens):
         return None
-    quantity = len(tokens)
     relative_freq = {}
     for char in set(tokens):
-        relative_freq[char] = float(tokens.count(char)) / quantity
+        relative_freq[char] = float(tokens.count(char)) / len(tokens)
     return relative_freq
 
 

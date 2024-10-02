@@ -235,20 +235,20 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             profile_freq_key = profile_freq[key] / profile['n_words'][0]
             profile_freq_key_lower = profile_freq[key.lower()] / profile['n_words'][0]
             result_freq.update({key.lower(): profile_freq_key + profile_freq_key_lower})
-            del profile_freq[key]
-            del profile_freq[key.lower()]
+            profile_freq.pop(key)
+            profile_freq.pop(key.lower())
         elif key.islower() and profile_freq.get(key.upper()) is not None:
             profile_freq_key = profile_freq[key] / profile['n_words'][0]
             profile_freq_key_upper = profile_freq[key.upper()] / profile['n_words'][0]
             result_freq.update({key.lower(): profile_freq_key + profile_freq_key_upper})
-            del profile_freq[key]
-            del profile_freq[key.upper()]
+            profile_freq.pop(key)
+            profile_freq.pop(key.upper())
         else:
             profile_freq_key = profile_freq[key] / profile['n_words'][0]
             result_freq.update({key.lower(): profile_freq_key})
 
-    del profile['n_words']
-    del profile['freq']
+    profile.pop('n_words')
+    profile.pop('freq')
 
     profile.update({'freq': result_freq})
 

@@ -210,3 +210,76 @@ def detect_language(
         return str(profile_sorted_list[0])
 
     return result2
+
+
+def load_profile(path_to_file: str) -> dict | None:
+    """
+    Load a language profile.
+
+    Args:
+        path_to_file (str): A path to the language profile
+
+    Returns:
+        dict | None: A dictionary with at least two keys – name, freq
+
+    In case of corrupt input arguments, None is returned
+    """
+
+
+def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
+    """
+    Preprocess profile for a loaded language.
+
+    Args:
+        profile (dict): A loaded profile
+
+    Returns:
+        dict[str, str | dict] | None: A dict with a lower-cased loaded profile
+            with relative frequencies without unnecessary n-grams
+
+    In case of corrupt input arguments or lack of keys 'name', 'n_words' and
+    'freq' in arguments, None is returned
+    """
+
+
+def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
+    """
+    Collect profiles for a given path.
+
+    Args:
+        paths_to_profiles (list): A list of strings to the profiles
+
+    Returns:
+        list[dict[str, str | dict[str, float]]] | None: A list of loaded profiles
+
+    In case of corrupt input arguments, None is returned
+    """
+
+
+def detect_language_advanced(
+            unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    ) -> list | None:
+    """
+    Detect the language of an unknown profile.
+
+    Args:
+        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of a profile
+            to determine the language of
+        known_profiles (list): A list of known profiles
+
+    Returns:
+        list | None: A sorted list of tuples containing a language and a distance
+
+    In case of corrupt input arguments, None is returned
+    """
+
+
+def print_report(detections: list[tuple[str, float]]) -> None:
+    """
+    Print report for detection of language.
+
+    Args:
+        detections (list[tuple[str, float]]): A list with distances for each available language
+
+    In case of corrupt input arguments, None is returned
+    """

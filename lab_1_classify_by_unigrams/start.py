@@ -29,9 +29,9 @@ def main() -> None:
     result = detect_language_advanced(unknown_profile, collected_profiles)
     if result is None:
         return None
-    if print_report(result) is None:
-        return None
+    print_report(result)
     assert result, "Detection result is None"
+    return None
 
 
 if __name__ == "__main__":

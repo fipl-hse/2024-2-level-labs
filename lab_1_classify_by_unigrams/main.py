@@ -285,6 +285,8 @@ def detect_language_advanced(
         return None
     for profile in known_profiles:
         distance.append((str(profile['name']), compare_profiles(unknown_profile, profile)))
+    if all(d is None for d in distance):
+        return None
     return sorted(distance, key=lambda i: i[1])
 
 

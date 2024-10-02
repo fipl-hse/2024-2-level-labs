@@ -21,8 +21,14 @@ def main() -> None:
              'assets/profiles/fr.json', 'assets/profiles/it.json', 'assets/profiles/ru.json',
              'assets/profiles/tr.json']
     unknown_profile = create_language_profile('un', unknown_text)
+    if unknown_profile is None:
+        return None
     collected_profiles = collect_profiles(paths)
+    if collected_profiles is None:
+        return None
     result = detect_language_advanced(unknown_profile, collected_profiles)
+    if result is None:
+        return None
     print_report(result)
     assert result, "Detection result is None"
 

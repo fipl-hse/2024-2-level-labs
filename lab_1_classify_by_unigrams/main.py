@@ -4,10 +4,6 @@ Lab 1.
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-# pylint: disable=missing-function-docstring
-def clever_round(n: float, decimals: int) -> float :
-    multiplier = 10**decimals
-    return int(n * multiplier) / multiplier
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -63,7 +59,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             token_freq[letter] += 1
 
     for key, value in token_freq.items():
-        token_freq[key] = clever_round(value/len(tokens),4)
+        token_freq[key] = round(value/len(tokens),4)
     return token_freq
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -109,7 +105,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for i in enumerate(predicted):
         mse_sum += (predicted[i] - actual[i]) ** 2
 
-    return clever_round(mse_sum / len(predicted),4)
+    return round(mse_sum / len(predicted),4)
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],

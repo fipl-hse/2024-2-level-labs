@@ -5,6 +5,7 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -29,6 +30,7 @@ def tokenize(text: str) -> list[str] | None:
         return None
     return letters
 
+
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculate frequencies of given tokens.
@@ -47,13 +49,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         if not isinstance(i, str):
             return None
     vocabulary = {}
-    lenght = len(tokens)
+    length = len(tokens)
     tokens_set = list(set(tokens))
     for letter in tokens_set:
         amount_of_appear = tokens.count(letter)
-        vocabulary[letter] = float(amount_of_appear/lenght)
+        vocabulary[letter] = float(amount_of_appear/length)
     return vocabulary
-
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -166,25 +167,22 @@ def detect_language(
             or not isinstance(profile_1["freq"], dict)
             or not isinstance(profile_2["freq"], dict)):
         return None
-    for value in unknown_profile["freq"].values():
-        if not isinstance(value, float):
-            return None
     voc_language = {}
     voc_language[f"{profile_1['name']}"] = compare_profiles(unknown_profile, profile_1)
     voc_language[f"{profile_2['name']}"] = compare_profiles(unknown_profile, profile_2)
     min_value = 1.0
     min_key = ''
     for key, value in voc_language.items():
-        if value < min_value:
-            min_value = value
-            min_key = key
-        elif value == min_value:
-            sorted_languages = sorted(list(voc_language.keys()))
-            min_key = sorted_languages[0]
+        if isinstance(value, float):
+            if value < min_value:
+                min_value = value
+                min_key = key
+            elif value == min_value:
+                sorted_languages = sorted(list(voc_language.keys()))
+                min_key = sorted_languages[0]
+        else:
+            pass
     return min_key
-
-
-
 
 
 def load_profile(path_to_file: str) -> dict | None:

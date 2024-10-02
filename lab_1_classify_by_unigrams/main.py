@@ -71,9 +71,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     """
     tokens = tokenize(text)
     freq = calculate_frequencies(tokens)
-    if freq is not None and tokens is not None and isinstance(language, str):
-        return {'name': language, 'freq': freq}
-    return None
+    if freq is None or tokens is None or not isinstance(language, str):
+        return None
+    return {'name': language, 'freq': freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -94,8 +94,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     squa_diff = 0
     for i, x in enumerate(actual):
         squa_diff += (x - predicted[i]) ** 2
-    mse = round((squa_diff/len(actual)), 4)
-    return mse
+    return round((squa_diff/len(actual)), 4)
 
 
 def compare_profiles(

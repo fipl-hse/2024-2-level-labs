@@ -21,18 +21,18 @@ def main() -> None:
     de_profile = func.create_language_profile('de', de_text)
     unknown_profile = func.create_language_profile('unknown', unknown_text)
 
-    if not (isinstance(en_profile, dict) and
-            isinstance(unknown_profile, dict) and
+    if (isinstance(en_profile, dict) and
+        isinstance(unknown_profile, dict) and
             isinstance(de_profile, dict)):
-        return None
+        result = func.detect_language(unknown_profile, de_profile, en_profile)
+    else:
+        result = None
 
-    result = func.detect_language(unknown_profile, de_profile, en_profile)
     assert result, "Detection result is None"
-
-    return result
+    print(result)
 
 
 if __name__ == "__main__":
     main()
 
-    print(main())
+

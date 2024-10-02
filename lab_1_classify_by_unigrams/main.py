@@ -95,10 +95,16 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
+    for check in predicted:
+        if not isinstance(check, float):
+            return None
+    for check in actual:
+        if not isinstance(check, float):
+            return None
 
     result = 0
     for index in range(len(actual)):
-        step = ((predicted[index] - actual[index]) ** 2)
+        step = (predicted[index] - actual[index]) ** 2
         result += step
     return result/len(actual)
 
@@ -123,7 +129,14 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
 
-    unknown_freq, compare_freq = unknown_profile["freq"], profile_to_compare["freq"]
+    global unknown_freq, compare_freq
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+
+    if isinstance(unknown_profile, dict):
+        unknown_freq = unknown_profile["freq"]
+    if isinstance(profile_to_compare, dict):
+        compare_freq = profile_to_compare["freq"]
     unknown_keys, compare_keys = list(unknown_freq.keys()), list(compare_freq.keys())
     all_keys = (unknown_keys + list(set(compare_keys) - set(unknown_keys)))
     all_unknown_profile = dict.fromkeys(all_keys, 0)
@@ -137,7 +150,8 @@ def compare_profiles(
             if key == key_:
                 all_profile_to_compare[key_] = value
 
-    return calculate_mse(list(all_unknown_profile.values()),list(all_profile_to_compare.values()))
+    return calculate_mse(list(all_unknown_profile.values()),
+                         list(all_profile_to_compare.values()))
 
 
 def detect_language(
@@ -160,12 +174,17 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
 
+    if (not isinstance(unknown_profile, dict)
+            or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
+        return None
+
     compare_to1 = compare_profiles(unknown_profile, profile_1)
     compare_to2 = compare_profiles(unknown_profile, profile_2)
 
     if compare_to1 < compare_to2:
         return profile_1["name"]
-    elif compare_to2 < compare_to1:
+    if compare_to2 < compare_to1:
         return profile_2["name"]
     else:
         asort = [profile_1["name"], profile_2["name"]]

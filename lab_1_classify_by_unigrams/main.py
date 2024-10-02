@@ -27,9 +27,11 @@ def tokenize(text: str) -> list[str] | None:
 
     letters_list = []
 
-    for i in text:
-        if i.isalpha():
-            letters_list.append(i)
+    for letter in text:
+        if letter.isalpha():
+            letters_list.append(letter)
+        else:
+            continue
 
 
     return letters_list
@@ -50,8 +52,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens, list):
         return None
 
-    for i in tokens:
-        if not isinstance(i, str):
+    for token in tokens:
+        if not isinstance(token, str):
             return None
 
     tokens_summ = len(tokens)

@@ -28,9 +28,11 @@ def main() -> None:
     if en_profile is not None and de_profile is not None and unk_profile is not None:
         print(detect_language(en_profile, de_profile, unk_profile))
 
-    if load_profile is not None and preprocess_profile is not None:
-        processed_profile = preprocess_profile(load_profile('assets/profiles/de.json'))
-        print(processed_profile)
+    loaded_profile = load_profile('assets/profiles/de.json')
+    if loaded_profile is not None:
+        processed_profile = preprocess_profile(loaded_profile)
+        if processed_profile is not None:
+            print(processed_profile)
 
     collected_profiles = collect_profiles(['assets/profiles/de.json', 'assets/profiles/en.json',
                                            'assets/profiles/es.json', 'assets/profiles/fr.json',

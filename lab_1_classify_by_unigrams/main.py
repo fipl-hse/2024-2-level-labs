@@ -277,8 +277,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
                 freq_dict[unigram] = 0.0
             freq_dict[unigram] += v / total_number
 
-    processed_profile = {'name': name, 'freq': freq_dict}
-    return processed_profile
+    return {'name': name, 'freq': freq_dict}
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:

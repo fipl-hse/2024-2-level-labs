@@ -6,14 +6,15 @@ Language detection starter
 import main
 
 
-def run() -> None:
+def main() -> None:
     """
     Launches an implementation
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
         en_profile = main.create_language_profile("en", en_text)
-        print(en_profile)
+        mse = main.compare_profiles()
+        print(mse)
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
         de_profile = main.create_language_profile("de", de_text)
@@ -27,4 +28,4 @@ def run() -> None:
 
 
 if __name__ == "__main__":
-    run()
+    main()

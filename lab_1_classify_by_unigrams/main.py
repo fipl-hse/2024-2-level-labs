@@ -11,11 +11,14 @@ def tokenize(text: str) -> list[str] | None:
         list_symbols = list(symbols)
         list_letters = []
         list_unnes = []
-        for i in range(0, len(list(text))):
+        text = list(text)
+        for i in range(len(text)):
             if text[i] not in list_symbols:
                 list_letters.append(text[i])
             else:
                 list_unnes.append(text[i])
+
+
         print(list_letters)
         return list_letters
 

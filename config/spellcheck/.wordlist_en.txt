@@ -102,6 +102,7 @@ apart
 api
 apidoc
 appears
+append
 appends
 apple
 applying
@@ -343,6 +344,7 @@ convert
 converted
 converter
 converts
+copy
 copy-paste
 core
 corncob
@@ -395,6 +397,7 @@ debug
 decode
 decoded
 dedicated
+deepcopy
 deepen
 deeper
 def
@@ -405,6 +408,7 @@ defined
 defines
 defining
 definition
+del
 delete
 demands
 demidovskij
@@ -824,6 +828,7 @@ initializer
 initializes
 initializing
 inner
+insert
 inside
 insights
 inspect
@@ -1251,6 +1256,7 @@ png
 point
 point-of-speech
 points
+pop
 populates
 pos
 posfrequencypipeline

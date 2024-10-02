@@ -235,8 +235,6 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     processed_profile = {'name': profile['name'], 'freq': {}}
     dictionary: dict[str, int] = {}
     for unigram in profile['freq'].keys():
-        if unigram.isalpha():
-            pass
         if len(unigram) == 1:
             dictionary.setdefault(unigram, profile['freq'][unigram])
     letters = list(dictionary)

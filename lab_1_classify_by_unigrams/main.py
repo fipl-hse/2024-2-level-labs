@@ -167,7 +167,9 @@ def detect_language(
     """
     if not (isinstance(unknown_profile, dict) and
             isinstance(profile_1, dict) and
-            isinstance(profile_2, dict)):
+            isinstance(profile_2, dict) and
+            isinstance(profile_1["name"], str) and
+            isinstance(profile_2["name"], str)):
         return None
 
     diff_unk_1 = compare_profiles(unknown_profile, profile_1)

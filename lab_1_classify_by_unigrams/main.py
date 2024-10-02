@@ -7,6 +7,7 @@ Language detection
 
 import json
 
+
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.

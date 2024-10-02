@@ -47,13 +47,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     In case of corrupt input arguments, None is returned
     """
 
-    if not isinstance(tokens, list) or len(tokens) == 0:
+    if not isinstance(tokens, list) or len(tokens) == 0 \
+            or not all(isinstance(token, str) for token in tokens):
         return None
     abs_freq = {}
     total_elements = len(tokens)
     for token in tokens:
-        if not isinstance(token, str):
-            return None
         if token in abs_freq:
             abs_freq[token] += 1
         else:

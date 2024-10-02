@@ -17,8 +17,9 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
 
     english = create_language_profile("en", en_text)
-    german = create_language_profile("en", de_text)
-    unknown = create_language_profile("en", unknown_text)
+    german = create_language_profile("de", de_text)
+    unknown = create_language_profile("un", unknown_text)
+    print(unknown)
     if not isinstance(unknown, dict) or not isinstance(english, dict) \
             or not isinstance(german, dict):
         result = None

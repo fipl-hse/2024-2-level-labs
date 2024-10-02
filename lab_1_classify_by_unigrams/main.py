@@ -132,26 +132,26 @@ def compare_profiles(
     unk_profile = copy.deepcopy(unknown_profile)
     unknown_text = unk_profile["freq"]
     comparing_text = profile_to_compare["freq"]
-    keys_for_1 = set(unknown_text.keys())
-    keys_for_2 = set(comparing_text.keys())
-    if keys_for_1.intersection(keys_for_2) == {}:
+    keys_for_unk = set(unknown_text.keys())
+    keys_for_comparing = set(comparing_text.keys())
+    if keys_for_unk.intersection(keys_for_comparing) == {}:
         return None
-    letters_need1 = keys_for_1.difference(keys_for_2)
-    letters_need2 = keys_for_2.difference(keys_for_1)
-    for i in letters_need1:
+    letters_need_unk = keys_for_unk.difference(keys_for_comparing)
+    letters_need_comparing = keys_for_comparing.difference(keys_for_unk)
+    for i in letters_need_unk:
         comparing_text.setdefault(i, 0.0)
-    for x in letters_need2:
+    for x in letters_need_comparing:
         unknown_text.setdefault(x, 0.0)
-    sorted1 = dict(sorted(unknown_text.items()))
-    sorted2 = {}
-    for key in sorted1:
-        sorted2[key] = comparing_text.get(key, unknown_text[key])
-    list1 = list(sorted1.values())
-    list2 = list(sorted2.values())
-    conclusion = calculate_mse(list2, list1)
-    if not isinstance(conclusion, float):
+    sorted_unk = dict(sorted(unknown_text.items()))
+    sorted_comparing = {}
+    for key in sorted_unk:
+        sorted_comparing[key] = comparing_text.get(key, unknown_text[key])
+    list_unk = list(sorted_unk.values())
+    list_comparing = list(sorted_comparing.values())
+    mse = calculate_mse(list_comparing, list_unk)
+    if not isinstance(mse, float):
         return None
-    return conclusion
+    return mse
 
 
 def detect_language(
@@ -189,6 +189,8 @@ def detect_language(
         return str(profile_1["name"])
     if mse_1 > mse_2:
         return str(profile_2["name"])
+    if mse_1 == mse_2:
+        return sorted([profile_1["name"], profile_2["name"]])[0]
     return None
 
 

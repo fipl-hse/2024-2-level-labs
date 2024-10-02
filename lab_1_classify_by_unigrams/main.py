@@ -45,11 +45,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not (isinstance(tokens, list) and all(isinstance(t, str) for t in tokens)):
         return None
+    unique_tokens = set(tokens)
     frequencies = {}
-    for l in tokens:
-        if l in frequencies:
-            continue
-        frequencies[l] = tokens.count(l)/len(tokens)
+    for l in unique_tokens:
+        frequencies[l] = tokens.count(l) / len(tokens)
     return frequencies
 
 
@@ -89,15 +88,13 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if len(predicted) != len(actual):
-        return None
     if (not all(isinstance(p, (float, int)) for p in predicted)
-            or not all(isinstance(a, (float, int)) for a in actual)):
+            or not all(isinstance(a, (float, int))
+                       for a in actual) or len(predicted) != len(actual)):
         return None
     mse = 0
-    quantity = len(actual)
-    for i in range(quantity):
-        mse += (actual[i] - predicted[i]) ** 2
+    for i, v in enumerate(actual):
+        mse += (v - predicted[i]) ** 2
     return round((mse / len(actual)), 4)
 
 
@@ -187,7 +184,7 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(path_to_file,str):
+    if not isinstance(path_to_file, str):
         return None
     with open(path_to_file, 'r', encoding="utf-8") as file_to_read:
         profile = json.load(file_to_read)

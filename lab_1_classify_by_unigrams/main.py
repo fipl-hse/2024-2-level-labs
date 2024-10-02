@@ -200,10 +200,13 @@ def detect_language(
     result1 = str(name1)
     result2 = str(name2)
 
-    if mse_1 is not None and mse_2 is not None:
-        if mse_1 < mse_2:
-            return result1
-        if mse_1 == mse_2:
-            profile_sorted_list = sorted([result1, result2])
-            return str(profile_sorted_list[0])
-        return result2
+    if mse_1 is None or mse_2 is None:
+        return None
+
+    if mse_1 < mse_2:
+        return result1
+    if mse_1 == mse_2:
+        profile_sorted_list = sorted([result1, result2])
+        return str(profile_sorted_list[0])
+
+    return result2

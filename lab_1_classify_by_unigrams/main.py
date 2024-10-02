@@ -156,11 +156,11 @@ def compare_profiles(
     for (key, value) in unknown_freq.items():
         for (all_key, all_value) in all_unknown_profile.items():
             if key == all_key:
-                all_unknown_profile[all_key] = value
+                all_unknown_profile[all_key] = float(value)
     for (key, value) in compare_freq.items():
         for (all_key, all_value) in all_profile_to_compare.items():
             if key == all_key:
-                all_profile_to_compare[all_key] = value
+                all_profile_to_compare[all_key] = float(value)
     return calculate_mse(list(all_unknown_profile.values()),
                          list(all_profile_to_compare.values()))
 

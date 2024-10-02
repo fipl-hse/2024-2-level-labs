@@ -27,7 +27,7 @@ def tokenize(text: str) -> list[str] | None:
     symb = ',./?!:;#@*-&<>%'
     tokens = []
     for elem in text:
-        if elem not in num and elem not in symb and elem != ' ':
+        if not elem.isdigit() and elem not in symb and elem != ' ':
             tokens.append(elem)
     return tokens
 
@@ -59,7 +59,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             token_freq[letter] += 1
 
     for key, value in token_freq.items():
-        token_freq[key] = round(value/len(tokens),4)
+        token_freq[key] = value/len(tokens)
     return token_freq
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -79,11 +79,9 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     if not isinstance(language, str):
         return None
-    language_profile = {}
-    language_profile['name'] = language
-    language_profile['freq'] = calculate_frequencies(tokenize(text))
-    return language_profile
+    return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
+print(create_language_profile('de','Ich weiß nicht was ich machen möchte.'))
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculate mean squared error between predicted and actual values.
@@ -102,10 +100,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
 
-    for i in enumerate(predicted):
+    for i in range(len(predicted)):
         mse_sum += (predicted[i] - actual[i]) ** 2
 
     return round(mse_sum / len(predicted),4)
+
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],

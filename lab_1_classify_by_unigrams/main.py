@@ -99,8 +99,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     num_of_diffs = len(predicted)
     sum_of_diffs = 0
-    for i in range(num_of_diffs):
-        sum_of_diffs += (actual[i] - predicted[i]) ** 2
+    for item_index in range(num_of_diffs):
+        sum_of_diffs += (actual[item_index] - predicted[item_index]) ** 2
     mse = sum_of_diffs / num_of_diffs
 
     return mse
@@ -126,10 +126,10 @@ def compare_profiles(
     """
     if not (isinstance(unknown_profile, dict) and
             isinstance(profile_to_compare, dict) and
-            "name" in unknown_profile and 
-            "name" in profile_to_compare and
-            "freq" in unknown_profile and
-            "freq" in profile_to_compare and
+            unknown_profile.get("name") and
+            profile_to_compare.get("name") and
+            unknown_profile.get("freq") and
+            profile_to_compare.get("freq") and
             isinstance(unknown_profile["freq"], dict) and
             isinstance(profile_to_compare["freq"], dict)):
         return None
@@ -175,9 +175,9 @@ def detect_language(
         return None
 
     if diff_unk_1 < diff_unk_2:
-        res = str(profile_1["name"])
+        res = profile_1["name"]
         return res
-    res = str(profile_2["name"])
+    res = profile_2["name"]
     return res
 
 

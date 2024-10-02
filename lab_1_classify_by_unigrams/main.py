@@ -151,8 +151,8 @@ def compare_profiles(
     unknown_keys = list(unknown_freq.keys())
     compare_keys = list(compare_freq.keys())
     all_keys = (unknown_keys + list(set(compare_keys) - set(unknown_keys)))
-    all_unknown_profile = dict.fromkeys(all_keys, 0)
-    all_profile_to_compare = dict.fromkeys(all_keys, 0)
+    all_unknown_profile = dict.fromkeys(all_keys, 0.0)
+    all_profile_to_compare = dict.fromkeys(all_keys, 0.0)
     for (key, value) in unknown_freq.items():
         for (all_key, all_value) in all_unknown_profile.items():
             if key == all_key:

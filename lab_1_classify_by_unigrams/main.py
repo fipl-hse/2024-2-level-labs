@@ -130,6 +130,8 @@ def compare_profiles(
             profile_to_compare.get("name") and
             unknown_profile.get("freq") and
             profile_to_compare.get("freq") and
+            isinstance(unknown_profile["name"], str) and
+            isinstance(profile_to_compare["name"], str) and
             isinstance(unknown_profile["freq"], dict) and
             isinstance(profile_to_compare["freq"], dict)):
         return None

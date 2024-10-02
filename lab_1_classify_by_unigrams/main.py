@@ -27,7 +27,6 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-
     extra_symb = ',.:?!;%$#№"&()[]{}~0123456789‘’º -\n><*=@'
     clean_text = ''
     for symb in text:
@@ -39,8 +38,6 @@ def tokenize(text: str) -> list[str] | None:
     clean_text = list(clean_text.lower())
     # print(clean_text)
     return clean_text
-
-
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -55,21 +52,37 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    common_numb = len(tokens)
-    print(common_numb)
+    if not isinstance(tokens, list):
+        return None
 
-    from collections import Counter
+    for element in tokens:
+        if not isinstance(element, str):
+            return None
 
-    symbols = (tokens.lower()).split('')
-    print(symbols)
+    # Объединяем все токены в одну строку и преобразуем в нижний регистр
+    combined_string = ''.join(tokens).lower()
 
-    frequency_dict = Counter(symbols)
+    # Создаем частотный словарь для букв
+    freq_dictionary = dict()
+    total_letters = 0  # Счетчик для общего количества букв
 
-    return frequency_dict
+    for letter in combined_string:
+        if letter.isalpha():  # Проверяем, является ли символ буквой
+            total_letters += 1
+            if letter in freq_dictionary:
+                freq_dictionary[letter] += 1
+            else:
+                freq_dictionary[letter] = 1
+
+    # Вычисляем частоты
+    for letter in freq_dictionary:
+        freq_dictionary[letter] = freq_dictionary[letter] / total_letters
+
+    return freq_dictionary if total_letters > 0 else None  # Возвращаем None, если нет букв
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """
+    """=
     Create a language profile.
 
     Args:
@@ -81,7 +94,14 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
 
+    result = {"name": language}
+    tokens = tokenize(text)
+    freq = calculate_frequencies(tokens)
+    result['freq'] = freq
+    return result
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

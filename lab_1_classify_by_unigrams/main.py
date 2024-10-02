@@ -10,7 +10,6 @@ def tokenize(text: str) -> list[str] | None:
 
     """
     Split a text into tokens.
-
     Convert the tokens into lowercase, remove punctuation, digits, and other symbols.
 
     Args:

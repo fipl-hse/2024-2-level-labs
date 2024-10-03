@@ -192,10 +192,9 @@ def detect_language(
     if not unknown_profile or not profile_2 or not profile_1:
         return None
 
-    if isinstance(compare_profiles(unknown_profile, profile_1), float) and isinstance(compare_profiles(unknown_profile, profile_2)):
-        if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
-            return profile_1['name']
-        return profile_2['name']
+    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+        return profile_1['name']
+    return profile_2['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:

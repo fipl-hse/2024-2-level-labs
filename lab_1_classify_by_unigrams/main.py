@@ -21,7 +21,7 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned
     """
 
-    if text is None or type(text) is not str:
+    if text is None or not isinstance(text, str):
         return None
     text = text.lower()
     tozenized_text = []
@@ -51,8 +51,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     In case of corrupt input arguments, None is returned
     """
 
-    if tokens is None or not isinstance(tokens, list):
-        return  None
+    if not isinstance(tokens, list):
+        return None
     frequencies = {}
     for token in tokens:
         if not isinstance(token, str):
@@ -81,7 +81,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(language, str) or language not in ['en', 'de'] or not isinstance(text, str):
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
     return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
@@ -201,6 +201,12 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
+
+    if not isinstance(path_to_file, str):
+        return None
+
+    
+
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:

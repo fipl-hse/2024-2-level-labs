@@ -138,15 +138,11 @@ def compare_profiles(
             is_valid = False
             break
         for letter, freq in unknown_profile["freq"].items():
-            if not isinstance(letter, str):
-                is_valid = False
-                break
-            if not isinstance(freq, float):
+            if not (isinstance(letter, str) and isinstance(freq, float)):
                 is_valid = False
                 break
     if not is_valid:
         return None
-
     is_valid = True
     for i in range(1):
         if (not isinstance(profile_to_compare, dict) or profile_to_compare.get("name") is None
@@ -161,10 +157,7 @@ def compare_profiles(
             is_valid = False
             break
         for letter, freq in profile_to_compare["freq"].items():
-            if not isinstance(letter, str):
-                is_valid = False
-                break
-            if not isinstance(freq, float):
+            if not (isinstance(letter, str) and isinstance(freq, float)):
                 is_valid = False
                 break
     if not is_valid:
@@ -219,10 +212,7 @@ def detect_language(
             is_valid = False
             break
         for letter, freq in unknown_profile["freq"].items():
-            if not isinstance(letter, str):
-                is_valid = False
-                break
-            if not isinstance(freq, float):
+            if not (isinstance(letter, str) and isinstance(freq, float)):
                 is_valid = False
                 break
     if not is_valid:
@@ -241,10 +231,7 @@ def detect_language(
             is_valid = False
             break
         for letter, freq in profile_1["freq"].items():
-            if not isinstance(letter, str):
-                is_valid = False
-                break
-            if not isinstance(freq, float):
+            if not (isinstance(letter, str) and isinstance(freq, float)):
                 is_valid = False
                 break
     if not is_valid:
@@ -263,10 +250,7 @@ def detect_language(
             is_valid = False
             break
         for letter, freq in profile_2["freq"].items():
-            if not isinstance(letter, str):
-                is_valid = False
-                break
-            if not isinstance(freq, float):
+            if not (isinstance(letter, str) and isinstance(freq, float)):
                 is_valid = False
                 break
     if not is_valid:
@@ -395,10 +379,7 @@ def detect_language_advanced(
             is_valid = False
             break
         for letter, freq in unknown_profile["freq"].items():
-            if not isinstance(letter, str):
-                is_valid = False
-                break
-            if not isinstance(freq, float):
+            if not (isinstance(letter, str) and isinstance(freq, float)):
                 is_valid = False
                 break
     if not is_valid:

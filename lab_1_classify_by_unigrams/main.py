@@ -201,12 +201,12 @@ def detect_language(
         return None
 
     if mse_1 < mse_2:
-        return profile_1['name']
+        return str(profile_1['name'])
     if mse_1 == mse_2:
         profile_sorted_list = sorted([profile_1['name'], profile_2['name']])
         return str(profile_sorted_list[0])
 
-    return profile_2['name']
+    return str(profile_2['name'])
 
 
 def load_profile(path_to_file: str) -> dict | None:

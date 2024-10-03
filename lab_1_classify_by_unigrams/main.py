@@ -51,7 +51,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     frequencies_of_letters: dict[str, float] = {}
     for token in tokens:
-        if frequencies_of_letters.get(token) is None:
+        if token not in frequencies_of_letters:
             frequencies_of_letters[token] = 0
         frequencies_of_letters[token] += 1
     for token in frequencies_of_letters:
@@ -99,7 +99,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
             len(predicted) == len(actual))
     if not is_corrupt_input:
         return None
-    mse: float = 0
+    mse = 0.0
     lists_length = len(predicted)
     for index in range(lists_length):
         mse += (actual[index] - predicted[index]) ** 2
@@ -124,12 +124,6 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
-            or unknown_profile.get("freq") is None):
-        return None
-    if (not isinstance(profile_to_compare, dict) or profile_to_compare.get("name") is None
-            or profile_to_compare.get("freq") is None):
-        return None
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
     if 'name' not in unknown_profile or 'name' not in profile_to_compare:

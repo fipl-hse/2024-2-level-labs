@@ -61,7 +61,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             token_freq[letter] += 1
 
     for key, value in token_freq.items():
-        token_freq[key] = value / len(tokens)
+        token_freq[key] = value / float(len(tokens))
     return token_freq
 
 
@@ -103,8 +103,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
 
-    for i in range(len(predicted)):
-        mse_sum += (predicted[i] - actual[i]) ** 2
+    for i, a in enumerate(predicted):
+        mse_sum += (a - actual[i]) ** 2
 
     return round(mse_sum / len(predicted), 4)
 

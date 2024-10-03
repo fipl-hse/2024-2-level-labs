@@ -124,25 +124,40 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    # shared_tokens = []
-    # if len(profile_to_compare) != len(unknown_profile):
-    #     return None
-    # for elem_known in profile_to_compare:
-    #     for elem_who_knows in unknown_profile:
-    #         if elem_known == elem_who_knows:
-    #             shared_tokens.append(elem_known)
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+    if ("name" not in unknown_profile
+            or "freq" not in unknown_profile
+            or "name" not in profile_to_compare
+            or "freq" not in profile_to_compare):
+        return None
+    if (not isinstance(profile_to_compare["name"], str)
+            or not isinstance(profile_to_compare["freq"], dict)):
+        return None
+    if (not isinstance(unknown_profile["name"], str)
+            or not isinstance(unknown_profile["freq"], dict)):
+        return None
 
-#aaaaa я вообще не понимаю как работает compare_profiles даже теоретически....
-# '''В данных профилях встречаются следующие символы: ``a``, ``b``, ``c``.
-# При этом в профиле первого языка их встречаемость равна
-# ``[0.5, 0.5, 0]``, а в профиле второго языка - ``[0, 0.5, 0.5]``.
-#
-# Приняв встречаемость символов в первом языке за истинные значения и
-# встречаемость символов во втором языке за предсказанные, мы можем
-# рассчитать разницу профилей по метрике ``MSE``. Ее значение будет равно
-# ``0.167`` (с округлением до третьего знака).'''
-# '''Вот откуда берется 0.167 я не понимаю, поэтому как считать тоже :(
-# Пробовала общаться с гпт, но не помогло, помогите пожалуйста((((((('''
+    unknown_profile_freq = unknown_profile['freq']
+    profile_to_compare_freq = profile_to_compare['freq']
+
+    all_tokens = set(unknown_profile_freq).union(set(profile_to_compare_freq))
+
+    unknown_shared = []
+    for token in all_tokens:
+        if token in unknown_profile_freq:
+            unknown_shared.append(unknown_profile_freq[token])
+        else:
+            unknown_shared.append(0.0)
+
+    profile_to_compare_shared = []
+    for token in all_tokens:
+        if token in profile_to_compare_freq:
+            profile_to_compare_shared.append(profile_to_compare_freq[token])
+        else:
+            profile_to_compare_shared.append(0.0)
+
+    return calculate_mse(unknown_shared, profile_to_compare_shared)
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],

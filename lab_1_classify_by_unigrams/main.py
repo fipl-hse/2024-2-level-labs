@@ -219,7 +219,7 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(profile, dict):
+    if not isinstance(profile, dict) or not all(keys in profile for keys in('freq','name','n_words')):
         return None
     processed_profile = {'name': profile['name'], 'freq': {}}
     frequency_dict = {}
@@ -284,15 +284,16 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list)\
+            or not all(isinstance(profile, dict) for profile in known_profiles):
         return None
     list_of_profiles = []
     for profile in known_profiles:
         list_of_profiles.append((profile['name'], compare_profiles(unknown_profile, profile)))
         if not list_of_profiles:
             return None
-        list_of_profiles.sort(key=lambda i: i[1])
-        return list_of_profiles
+    list_of_profiles.sort(key=lambda i: i[1])
+    return list_of_profiles
 
 
 

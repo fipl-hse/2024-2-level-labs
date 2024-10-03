@@ -140,7 +140,7 @@ def compare_profiles(
             values_unknown_tokens.append(0)
         else:
             values_unknown_tokens.append(float(unknown_profile["freq"][letter]))
-        if profile_to_compare["freq"].get(letter) is None:
+        if letter not in profile_to_compare["freq"]:
             values_tokens_to_compare.append(0)
         else:
             values_tokens_to_compare.append(float(profile_to_compare["freq"][letter]))

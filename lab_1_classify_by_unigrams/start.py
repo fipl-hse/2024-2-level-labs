@@ -1,4 +1,4 @@
-""""
+"""
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable

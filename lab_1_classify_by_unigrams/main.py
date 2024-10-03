@@ -32,16 +32,16 @@ def tokenize(text: str) -> list[str] | None:
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
-        Calculate frequencies of given tokens.
+    Calculate frequencies of given tokens.
 
-        Args:
-            tokens (list[str] | None): A list of tokens
+    Args:
+        tokens (list[str] | None): A list of tokens
 
-        Returns:
-            dict[str, float] | None: A dictionary with frequencies
+    Returns:
+        dict[str, float] | None: A dictionary with frequencies
 
-        In case of corrupt input arguments, None is returned
-        """
+    In case of corrupt input arguments, None is returned
+    """
     if not (isinstance(tokens, list) and all(isinstance(token, str) for token in tokens)):
         return None
     dict_freq = {}
@@ -50,7 +50,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             dict_freq[token] += 1
         else:
             dict_freq[token] = 1
-    for token, count in dict_freq.items():
+    for token in dict_freq:
         dict_freq[token] /= len(tokens)
     return dict_freq
 
@@ -58,17 +58,17 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 def create_language_profile(language: str, text: str) ->\
         dict[str, str | dict[str, float]] | None:
     """
-        Create a language profile.
+    Create a language profile.
 
-        Args:
-            language (str): A language
-            text (str): A text
+    Args:
+        language (str): A language
+        text (str): A text
 
-        Returns:
-            dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
+    Returns:
+        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
 
-        In case of corrupt input arguments, None is returned
-        """
+    In case of corrupt input arguments, None is returned
+    """
     if not (isinstance(language, str) and isinstance(text, str)):
         return None
     freq_dict = calculate_frequencies(tokenize(text))
@@ -80,17 +80,17 @@ def create_language_profile(language: str, text: str) ->\
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
-        Calculate mean squared error between predicted and actual values.
+    Calculate mean squared error between predicted and actual values.
 
-        Args:
-            predicted (list): A list of predicted values
-            actual (list): A list of actual values
+    Args:
+        predicted (list): A list of predicted values
+        actual (list): A list of actual values
 
-        Returns:
-            float | None: The score
+    Returns:
+        float | None: The score
 
-        In case of corrupt input arguments, None is returned
-        """
+    In case of corrupt input arguments, None is returned
+    """
     if not (isinstance(predicted, list) and isinstance(actual, list)
             and len(predicted) == len(actual)):
         return None
@@ -171,9 +171,12 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
     return None
 
 
-def load_profile() -> dict | None:
+def load_profile(path_to_file: str) -> dict | None:
     """
     Load a language profile.
+
+     Args:
+        path_to_file (str): A path to the language profile
 
     Returns:
         dict | None: A dictionary with at least two keys – name, freq
@@ -213,7 +216,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

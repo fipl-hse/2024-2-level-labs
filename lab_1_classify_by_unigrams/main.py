@@ -164,17 +164,19 @@ def detect_language(
     if not isinstance(unknown_profile, dict) or \
             not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
         return None
-    check1 = compare_profiles(unknown_profile, profile_1)
-    if check1 is None or not isinstance(profile_1['name'], str):
+    lang1 = profile_1['name']
+    lang2 = profile_2['name']
+    if not isinstance(lang1, str) or not isinstance(lang2, str):
         return None
+    check1 = compare_profiles(unknown_profile, profile_1)
     check2 = compare_profiles(unknown_profile, profile_2)
-    if check2 is None or not isinstance(profile_1['name'], str):
+    if check1 is None or check2 is None:
         return None
     if check1 < check2:
         return str(list(profile_1.values())[0])
     if check2 < check1:
         return str(list(profile_2.values())[0])
-    failsafe = [profile_1['name'], profile_2['name']]
+    failsafe = [lang1, lang2]
     failsafe.sort(key=str.lower)
     return str(failsafe[0])
 

@@ -15,12 +15,8 @@ def main() -> None:
         print(profile)
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
-        profile = create_language_profile('de', de_text)
-        print(profile)
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-        profile = create_language_profile('unknown', unknown_text)
-        print(profile)
 
     result = profile
     assert result, "Detection result is None"

@@ -105,6 +105,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     if len(predicted) != len(actual):
         return None
+    if len(predicted) == 0:
+        return None
 
     mse = 0
     for i in enumerate(predicted):

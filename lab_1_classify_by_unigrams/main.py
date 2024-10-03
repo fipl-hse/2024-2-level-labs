@@ -180,16 +180,14 @@ def detect_language(
 
     equal_lst = [profile_1['name'], profile_2['name']]
     equal_lst.sort()
-    language = ''
 
     if mse_1 > mse_2:
-        language = profile_2['name']
+        return profile_2['name']
     if mse_1 < mse_2:
-        language = profile_1['name']
-    if mse_1 == mse_2:
-        language = equal_lst[0]
+        return profile_1['name']
 
-    return language
+    return equal_lst[0]
+
 
 def load_profile(path_to_file: str) -> dict | None:
     """

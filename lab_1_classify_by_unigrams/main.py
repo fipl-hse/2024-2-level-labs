@@ -54,7 +54,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         for i in token_dict:
             if i not in token_dict:
                 token_dict.update({i: 0.0})
-                token_dict[i] += 1.0
+            token_dict[i] += 1.0
 
     sum_token_dict_values = sum(token_dict.values())
     for i in token_dict.items():

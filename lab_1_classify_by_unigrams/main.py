@@ -3,6 +3,8 @@ Lab 1.
 
 Language detection
 """
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
@@ -102,8 +104,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -132,20 +134,20 @@ def compare_profiles(
     if not isinstance(trg_prof, dict) or not isinstance(src_prof, dict):
         return None
     for tv in list(trg_prof.keys()):
-        if src_prof.get(tv, 0.0) == 0.0:
-            src_prof.update({tv: 0.0})
+        if tv not in src_prof:
+            src_prof[tv] = 0
     for tv in list(src_prof.keys()):
-        if trg_prof.get(tv, 0.0) == 0.0:
-            trg_prof.update({tv: 0.0})
+        if tv not in trg_prof:
+            trg_prof[tv] = 0
     trg_srt = dict(sorted(trg_prof.items()))
     src_srt = dict(sorted(src_prof.items()))
     return calculate_mse(list(src_srt.values()), list(trg_srt.values()))
 
 
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -173,9 +175,9 @@ def detect_language(
     if check1 is None or check2 is None:
         return None
     if check1 < check2:
-        return str(list(profile_1.values())[0])
+        return lang1
     if check2 < check1:
-        return str(list(profile_2.values())[0])
+        return lang2
     failsafe = [lang1, lang2]
     failsafe.sort(key=str.lower)
     return str(failsafe[0])
@@ -226,7 +228,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

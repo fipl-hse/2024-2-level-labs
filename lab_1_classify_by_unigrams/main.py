@@ -130,7 +130,8 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if (isinstance(unknown_profile, dict) is False) or (isinstance(profile_to_compare, dict) is False):
+    if ((isinstance(unknown_profile, dict) is False)
+            or (isinstance(profile_to_compare, dict) is False)):
         return None
     if ("name" not in unknown_profile) or ("name" not in profile_to_compare):
         return None
@@ -167,7 +168,8 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(unknown_profile, dict) and isinstance(profile_1, dict) and isinstance(profile_2, dict)):
+    if not (isinstance(unknown_profile, dict)
+            and isinstance(profile_1, dict) and isinstance(profile_2, dict)):
         return None
 
     mse_1 = compare_profiles(unknown_profile, profile_1)

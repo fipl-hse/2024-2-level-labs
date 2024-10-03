@@ -168,13 +168,13 @@ def detect_language(
             return None
         return profile_1['name']
     if mse_1 > mse_2:
-        if not isinstance(profile_1['name'], str):
+        if not isinstance(profile_2['name'], str):
             return None
         return profile_2['name']
     languages = [profile_1['name'], profile_2['name']]
-    languages.sort()
-    if not isinstance(languages[0], str):
+    if not all(isinstance(p, str) for p in languages):
         return None
+    languages.sort()
     return languages[0]
 
 

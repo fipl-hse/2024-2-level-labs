@@ -81,7 +81,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return freq_dictionary if total_letters > 0 else None
 
 
-
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """=
     Create a language profile.

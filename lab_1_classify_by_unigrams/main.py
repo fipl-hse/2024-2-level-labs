@@ -194,8 +194,8 @@ def detect_language(
             or not isinstance(profile_2, dict)):
         return None
 
-    name1 = profile_1.get('name')
-    name2 = profile_2.get('name')
+    name1 = profile_1['name']
+    name2 = profile_2['name']
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
     result1 = name1

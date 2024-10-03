@@ -107,8 +107,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -157,9 +157,9 @@ def compare_profiles(
 
 
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -175,17 +175,10 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    is_valid = True
-    if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
-            or unknown_profile.get("freq") is None):
-        is_valid = False
-    if (not isinstance(profile_1, dict) or profile_1.get("name") is None
-            or profile_1.get("freq") is None):
-        is_valid = False
-    if (not isinstance(profile_2, dict) or profile_2.get("name") is None
-            or profile_2.get("freq") is None):
-        is_valid = False
-    if not is_valid:
+    if not all(isinstance(profile, dict) for profile in [unknown_profile, profile_1, profile_2]) \
+            or not all(isinstance(key, str) for key in unknown_profile) \
+            or not all(isinstance(key, str) for key in profile_1) \
+            or not all(isinstance(key, str) for key in profile_2):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
@@ -279,7 +272,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.
@@ -295,10 +288,7 @@ def detect_language_advanced(
     In case of corrupt input arguments, None is returned
     """
 
-    if not isinstance(known_profiles, list):
-        return None
-    if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
-            or unknown_profile.get("freq") is None):
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
         return None
     sorted_list: list[tuple[str, float]] | None
     sorted_list = []

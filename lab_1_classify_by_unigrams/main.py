@@ -3,6 +3,8 @@ Lab 1.
 
 Language detection
 """
+
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 def tokenize(text: str) -> list[str] | None:
@@ -29,6 +31,7 @@ def tokenize(text: str) -> list[str] | None:
         if not elem.isdigit() and elem not in symb:
             tokens.append(elem)
     return tokens
+
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -58,9 +61,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             token_freq[letter] += 1
 
     for key, value in token_freq.items():
-        if not isinstance(token_freq[key], float):
-            token_freq[key] = value/len(tokens)
+        token_freq[key] = value / len(tokens)
     return token_freq
+
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -80,6 +83,7 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if not isinstance(language, str):
         return None
     return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
@@ -102,12 +106,12 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     for i in range(len(predicted)):
         mse_sum += (predicted[i] - actual[i]) ** 2
 
-    return round(mse_sum / len(predicted),4)
+    return round(mse_sum / len(predicted), 4)
 
 
 def compare_profiles(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_to_compare: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -157,10 +161,11 @@ def compare_profiles(
 
     return calculate_mse(unknown_shared, compare_shared)
 
+
 def detect_language(
-    unknown_profile: dict[str, str | dict[str, float]],
-    profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]],
+        unknown_profile: dict[str, str | dict[str, float]],
+        profile_1: dict[str, str | dict[str, float]],
+        profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -188,8 +193,8 @@ def detect_language(
             return profile_2['name']
         if mse_2 > mse_1 and isinstance(profile_1['name'], str):
             return profile_1['name']
-    else:
-        return None
+    return None
+
 
 def load_profile(path_to_file: str) -> dict | None:
     """
@@ -236,7 +241,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.

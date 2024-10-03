@@ -26,8 +26,9 @@ def tokenize(text: str) -> list[str] | None:
     prepared_text = text.lower()
     tokens = []
     for tok in prepared_text:
-        if tok.isalpha():
-            tokens.append(tok)
+        if not tok.isalpha():
+            continue
+        tokens.append(tok)
     return tokens
 
 
@@ -48,11 +49,10 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     if not isinstance(tokens[0], str):
         return None
     frequency = {}
-    tokens_number = len(tokens)
     for letter in tokens:
         if not isinstance(letter, str):
             return None
-        letter_index = tokens.count(letter)/tokens_number
+        letter_index = tokens.count(letter)/len(tokens)
         letter_dict = {letter: letter_index}
         frequency.update(letter_dict)
     return frequency
@@ -98,7 +98,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     summa = 0.0
     for index, value in enumerate(actual):
-        actual_value = float(value)
+        actual_value = value
         predicted_value = float(predicted[index])
         sqw_dif = float((actual_value - predicted_value)**2)
         summa = float(summa + sqw_dif)

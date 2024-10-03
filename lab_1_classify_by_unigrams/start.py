@@ -14,7 +14,6 @@ def main() -> None:
 
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
-        #tokenize(en_text)
         en_prof = create_language_profile('en', en_text)
 
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
@@ -25,9 +24,6 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
         unknown_prof = create_language_profile('unknown', unknown_text)
 
-    #if (isinstance(en_prof, dict) and isinstance(de_prof, dict)
-            #and isinstance(unknown_prof, dict)):
-       # detect_language(en_prof, de_prof, unknown_prof)
     extra_profiles = ["assets/profiles/de.json",
                       "assets/profiles/en.json",
                       "assets/profiles/es.json",

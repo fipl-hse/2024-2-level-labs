@@ -24,13 +24,10 @@ def tokenize(text: str) -> list[str] | None:
         return None
     text = text.lower()
     text = text.replace("º", "")
-    cleaned_text = ""
-    for symbol in text:
-        if symbol.isalpha():
-            cleaned_text += symbol
     tokens = []
-    for token in cleaned_text:
-        tokens.append(token)
+    for token in text:
+        if token.isalpha():
+            tokens.append(token)
     return tokens
 
 

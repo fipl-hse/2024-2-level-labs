@@ -174,7 +174,7 @@ def detect_language(
         return str(list(profile_1.values())[0])
     if check2 < check1:
         return str(list(profile_2.values())[0])
-    failsafe = [list(profile_1.values())[0], list(profile_2.values())[0]]
+    failsafe = [profile_1['name'], profile_2['name']]
     failsafe.sort(key=str.lower)
     return str(failsafe[0])
 

@@ -182,7 +182,6 @@ def detect_language(
 
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    print(mse_1)
     if isinstance(mse_1, float) and isinstance(mse_2, float):
         if mse_1 > mse_2 :
             return profile_2['name']
@@ -191,24 +190,6 @@ def detect_language(
     else:
         return None
 
-unknown_profile = {
-            'name': 'unk',
-            'freq': {
-                'm': 0.0909, 'e': 0.0909, 'h': 0.1818, 'p': 0.1818,
-                'y': 0.0909, 's': 0.0909, 'n': 0.0909, 'a': 0.1818
-            }
-        }
-
-en_profile = []
-
-de_profile = {
-            'name': 'de',
-            'freq': {
-                't': 0.0833, 'h': 0.1666, 'n': 0.0833, 'w': 0.0833,
-                'ß': 0.0833, 'e': 0.0833, 'c': 0.1666, 'i': 0.25
-            }
-        }
-print(detect_language(unknown_profile, en_profile, de_profile))
 def load_profile(path_to_file: str) -> dict | None:
     """
     Load a language profile.

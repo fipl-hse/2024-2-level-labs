@@ -7,19 +7,7 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-    """
-    Split a text into tokens.
 
-    Convert the tokens into lowercase, remove punctuation, digits and other symbols
-
-    Args:
-        text (str): A text
-
-    Returns:
-        list[str] | None: A list of lower-cased tokens without punctuation
-
-    In case of corrupt input arguments, None is returned
-    """
     tokens = []
     for char in text:
         if char.isalpha():
@@ -28,46 +16,31 @@ def tokenize(text: str) -> list[str] | None:
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-    """
-    Calculate frequencies of given tokens.
 
-    Args:
-        tokens (list[str] | None): A list of tokens
-
-    Returns:
-        dict[str, float] | None: A dictionary with frequencies
-
-    In case of corrupt input arguments, None is returned
-    """
-    token_frequencies = {}
+    dict_freq = {}
 
     for token in tokens:
-        if token in token_frequencies:
-            token_frequencies[token] += 1
+        if token in dict_freq:
+            dict_freq[token] += 1
         else:
-            token_frequencies[token] = 1
+            dict_freq[token] = 0
 
     total_tokens = len(tokens)
-    for token in token_frequencies:
-        token_frequencies[token] /= total_tokens
+    for token in dict_freq:
+        dict_freq[token] /= total_tokens
 
-    return token_frequencies
+    return dict_freq
 
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """
-    Create a language profile.
 
-    Args:
-        language (str): A language
-        text (str): A text
-
-    Returns:
-        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
-
-    In case of corrupt input arguments, None is returned
-    """
+    if not isinstance(language, str) or not isinstance(text, str):
+        return None
+    dict_freq = calculate_frequencies(tokenize(text))
+    if dict_freq is None:
+        return None
+    return {'name': language, 'freq': dict_freq}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

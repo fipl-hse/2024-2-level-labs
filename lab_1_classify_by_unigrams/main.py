@@ -49,7 +49,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         if isinstance(elem, str) is False:
             return None
 
-    token_dict = {}
+    token_dict = {
     for i in tokens:
         if i not in token_dict.keys():
             token_dict.update({i: 0.0})

@@ -54,7 +54,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         for i in token_dict:
             if i not in token_dict:
                 token_dict.update({i: 0.0})
-            token_dict[i] += 1.0
+        token_dict[i] += 1.0
 
     sum_token_dict_values = sum(token_dict.values())
     for i in token_dict.items():
@@ -105,14 +105,15 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     if len(predicted) != len(actual):
         return None
-    if len(predicted) or len(actual) == 0:
-        return None
+    # if len(predicted) or len(actual) == 0:
+        # return None
 
     mse = 0
     for i in enumerate(predicted):
         mse += (predicted[i] - actual[i])**2
+    print(enumerate(predicted))
 
-    return mse/enumerate(predicted)
+    # return mse/enumerate(predicted)
 
 
 def compare_profiles(

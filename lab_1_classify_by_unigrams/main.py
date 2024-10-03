@@ -6,6 +6,8 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+import json
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -194,6 +196,13 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(path_to_file, str):
+        return None
+    with open(path_to_file, "r", encoding="utf-8") as read_file:
+        read_profile = json.load(read_file)
+    if not isinstance(read_profile, dict):
+        return None
+    return read_profile
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -210,6 +219,27 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
+    if not isinstance(profile, dict):
+        return None
+    processed_profile = {'name': profile['name'], 'freq': {}}
+    frequency_dict = {}
+    for token in profile['freq']:
+        if isinstance(token, str) and len(token) == 1:
+            frequency_dict[token] = profile['freq'][token]
+    token_list = list(frequency_dict)
+    for letter in token_list:
+        if not letter.isupper():
+            frequency_dict[letter] = frequency_dict.get(letter,0) + frequency_dict.get(letter.upper(),0)
+            processed_profile['freq'][letter] = frequency_dict[letter] / profile['n_words'][0]
+            if letter.upper() in frequency_dict:
+                frequency_dict.pop(letter.upper())
+    for i in frequency_dict.items():
+        if i[0].isupper():
+            processed_profile['freq'][i[0].lower()] = i[1] / profile['n_words'][0]
+    return processed_profile
+
+
+
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -224,6 +254,18 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
+    if not (isinstance(paths_to_profiles,list) and all(isinstance(i, str) for i in paths_to_profiles)):
+        return None
+    collection_of_profiles = []
+    for i in paths_to_profiles:
+        profile = load_profile(i)
+        if not profile:
+            return None
+        processed_profile = preprocess_profile(profile)
+        if not processed_profile:
+            return None
+        collection_of_profiles.append(processed_profile)
+    return collection_of_profiles
 
 
 def detect_language_advanced(
@@ -242,6 +284,16 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
+        return None
+    list_of_profiles = []
+    for profile in known_profiles:
+        list_of_profiles.append((profile['name'], compare_profiles(unknown_profile, profile)))
+        if not list_of_profiles:
+            return None
+        list_of_profiles.sort(key=lambda i: i[1])
+        return list_of_profiles
+
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -253,3 +305,9 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(detections, list):
+        return None
+
+    for i in detections:
+        print(f'{i[0]}: MSE {i[1]:.5f}')
+    return None

@@ -5,8 +5,6 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-punct = '''!@#$%^&*()_-=+|/{}[]'"?.>,<~:;'''
-
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -181,6 +179,7 @@ def detect_language(
     return unknown_profile["name"]
 
 
+'''
 def load_profile(path_to_file: str) -> dict | None:
     """
     Load a language profile.
@@ -252,3 +251,4 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
+'''

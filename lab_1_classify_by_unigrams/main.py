@@ -147,6 +147,7 @@ def compare_profiles(
         unknown_profile_list = list(dict(sorted(unknown_profile["freq"].items())).values())
         profile_to_compare_list = list(dict(sorted(profile_to_compare["freq"].items())).values())
         mse = calculate_mse(unknown_profile_list, profile_to_compare_list)
+        return mse
     return mse
 
 

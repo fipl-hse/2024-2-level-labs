@@ -15,7 +15,7 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    # result = None
+    result = None
     res1 = fnc.tokenize(en_text)
     print(res1)
     res2 = fnc.calculate_frequencies(res1)
@@ -24,10 +24,16 @@ def main() -> None:
     print(en_prof)
     de_prof = fnc.create_language_profile('de', de_text)
     trg_prof = fnc.create_language_profile('Unknown', unknown_text)
-    print(fnc.compare_profiles(trg_prof, en_prof))
-    print(fnc.compare_profiles(trg_prof, de_prof))
-    print(fnc.detect_language(trg_prof, en_prof, de_prof))
-    # assert result, "Detection result is None"
+    if isinstance(trg_prof, dict) and isinstance(en_prof, dict):
+        print(fnc.compare_profiles(trg_prof, en_prof))
+    if isinstance(trg_prof, dict) and isinstance(de_prof, dict):
+        print(fnc.compare_profiles(trg_prof, de_prof))
+    if isinstance(trg_prof, dict) and isinstance(en_prof, dict) and \
+            isinstance(de_prof, dict):
+        result = fnc.detect_language(trg_prof, en_prof, de_prof)
+        print(result)
+    if not isinstance(result, str):
+        assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

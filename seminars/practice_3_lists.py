@@ -15,7 +15,7 @@ Data Type: Lists
 
 # Create a list
 example = [1, 2, 3]
-
+print(example)
 
 # List concatenation, the original list doesn't change
 first_list = example + [2, 3, 4]

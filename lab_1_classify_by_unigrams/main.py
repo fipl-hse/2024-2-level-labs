@@ -165,17 +165,16 @@ def compare_profiles(
     freq_list_to_compare = []
 
     for key in all_keys:
-        if isinstance(key, str):
-            if not key in unknown_profile["freq"]:
-                unknown_freq_list.append(0.0)
-            else:
-                freq_of_key = unknown_profile["freq"][key]
-                unknown_freq_list.append(float(freq_of_key))
-            if not key in profile_to_compare["freq"]:
-                freq_list_to_compare.append(0.0)
-            else:
-                freq_of_key = profile_to_compare["freq"][key]
-                freq_list_to_compare.append(float(freq_of_key))
+        if not key in unknown_profile["freq"]:
+            unknown_freq_list.append(0.0)
+        else:
+            freq_of_key = unknown_profile["freq"][key]
+            unknown_freq_list.append(float(freq_of_key))
+        if not key in profile_to_compare["freq"]:
+            freq_list_to_compare.append(0.0)
+        else:
+            freq_of_key = profile_to_compare["freq"][key]
+            freq_list_to_compare.append(freq_of_key)
 
     return calculate_mse(unknown_freq_list, freq_list_to_compare)
 

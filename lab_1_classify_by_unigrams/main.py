@@ -51,10 +51,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     new_tokens = []
 
     for token in tokens:
-        if isinstance(token, str) and len(token) == 1:
-            new_tokens.append(token)
-        else:
+        if not isinstance(token, str) or len(token) != 1:
             return None
+        new_tokens.append(token)
 
     all_tokens = len(new_tokens)
     if all_tokens == 0:
@@ -112,8 +111,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     if len(actual) != len(predicted):
         return None
-    n = len(actual)
-    mse = float(sum((a - p) ** 2 for a, p in zip(actual, predicted)) / n)
+    number_of_values = len(actual)
+    mse = float(sum((a - p) ** 2 for a, p in zip(actual, predicted)) / number_of_values)
     return mse
 
 
@@ -199,8 +198,8 @@ def detect_language(
     name2 = profile_2.get('name')
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    result1 = str(name1)
-    result2 = str(name2)
+    result1 = name1
+    result2 = name2
 
     if mse_1 is None or mse_2 is None:
         return None
@@ -266,16 +265,16 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
         return None
 
     freq_dict = {}
-    for k, v in freq.items():
-        if len(k) != 1:
+    for unigram, value in freq.items():
+        if len(unigram) != 1:
             continue
-        if not isinstance(k, str) or not isinstance(v, int):
+        if not isinstance(unigram, str) or not isinstance(value, int):
             return None
-        unigram = k.lower()
-        if unigram.isalpha() or k == '²' or unigram == 'i̇':
-            if freq_dict.get(unigram) is None:
-                freq_dict[unigram] = 0.0
-            freq_dict[unigram] += v / total_number
+        letter = unigram.lower()
+        if letter.isalpha() or unigram == '²' or letter == 'i̇':
+            if freq_dict.get(letter) is None:
+                freq_dict[letter] = 0.0
+            freq_dict[letter] += value / total_number
 
     return {'name': name, 'freq': freq_dict}
 

@@ -1,17 +1,19 @@
 from typing import List, Dict, Optional
-def tokenize(text: str) -> list[str] | None:
+
+
+def tokenize(text: str) -> Optional[List[str]]:
     """
     Split a text into tokens.
 
-    Convert the tokens into lowercase, remove punctuation, digits and other symbols
+    Convert the tokens into lowercase, remove punctuation, digits and other symbols.
 
     Args:
-        text (str): A text
+        text (str): A text.
 
     Returns:
-        list[str] | None: A list of lower-cased tokens without punctuation
+        Optional[List[str]]: A list of lower-cased tokens without punctuation or None.
 
-    In case of corrupt input arguments, None is returned
+    In case of corrupt input arguments, None is returned.
     """
     if not isinstance(text, str):
         return None
@@ -20,17 +22,19 @@ def tokenize(text: str) -> list[str] | None:
     text_of_token = [element for element in text if element.isalpha()]
 
     return text_of_token
-def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
+
+
+def calculate_frequencies(tokens: Optional[List[str]]) -> Optional[Dict[str, float]]:
     """
     Calculate frequencies of given tokens.
 
     Args:
-        tokens (list[str] | None): A list of tokens
+        tokens (Optional[List[str]]): A list of tokens.
 
     Returns:
-        dict[str, float] | None: A dictionary with frequencies
+        Optional[Dict[str, float]]: A dictionary with frequencies or None.
 
-    In case of corrupt input arguments, None is returned
+    In case of corrupt input arguments, None is returned.
     """
     if not isinstance(tokens, list) or not all(isinstance(element, str) for element in tokens):
         return None
@@ -47,18 +51,19 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     return tokens_frequency
 
-def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
+
+def create_language_profile(language: str, text: str) -> Optional[Dict[str, Optional[Dict[str, float]]]]:
     """
     Create a language profile.
 
     Args:
-        language (str): A language
-        text (str): A text
+        language (str): A language.
+        text (str): A text.
 
     Returns:
-        dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
+        Optional[Dict[str, Optional[Dict[str, float]]]]: A dictionary with two keys – name, freq or None.
 
-    In case of corrupt input arguments, None is returned
+    In case of corrupt input arguments, None is returned.
     """
     if isinstance(language, str) and isinstance(text, str):
         token_list = tokenize(text)

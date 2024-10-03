@@ -9,7 +9,7 @@ Language detection
 def tokenize(text: str) -> list[str] | None:
         list_letters = []
         for i in text:
-            if i.isalpha() == True:
+            if i.isalpha():
                 list_letters.append(i)
         if len(list_letters) > 0:
             print(list_letters)

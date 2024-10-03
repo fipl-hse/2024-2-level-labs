@@ -290,10 +290,10 @@ def detect_language_advanced(
     list_of_profiles = []
     for profile in known_profiles:
         list_of_profiles.append((profile['name'], compare_profiles(unknown_profile, profile)))
-        if not list_of_profiles:
-            return None
-    list_of_profiles.sort(key=lambda i: i[1])
-    return list_of_profiles
+        if list_of_profiles:
+            list_of_profiles.sort(key=lambda i: i[1])
+            return list_of_profiles
+    return None
 
 
 

@@ -151,7 +151,7 @@ def compare_profiles(
     if 'name' not in unknown_profile:
         return None
 
-    all_keys = list(unknown_profile["freq"] | profile_to_compare["freq"])
+    all_keys = list(set(unknown_profile["freq"]) | set(profile_to_compare["freq"]))
     unknown_freq_list = []
     freq_list_to_compare = []
 

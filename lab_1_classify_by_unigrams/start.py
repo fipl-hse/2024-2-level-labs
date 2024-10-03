@@ -2,7 +2,7 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-import unittest
+import tokenize
 
 def main() -> None:
     """
@@ -23,6 +23,4 @@ def main() -> None:
     assert result, "Detection result is None"
     tokenize("assets/texts/en.txt")
     if __name__ == "__main__":
-       main()
-
-
+         main()

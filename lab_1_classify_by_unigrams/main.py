@@ -45,23 +45,26 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    token_freq = {}
     if not isinstance(tokens, list):
         return None
 
-    for letter in tokens:
-        if not isinstance(letter, str):
+    token_freq = {}
+
+    for token in tokens:
+        if not isinstance(token, str):
             return None
-        if len(letter) > 1:
+        if len(token) > 1:
             return None
-        if letter not in token_freq:
-            token_freq[letter] = 1
+        if token not in token_freq:
+            token_freq[token] = 1.0
         else:
-            token_freq[letter] += 1
+            token_freq[token] += 1.0
 
     total_tokens = len(tokens)
+
     for key, value in token_freq.items():
         token_freq[key] = value / total_tokens
+
     return token_freq
 
 

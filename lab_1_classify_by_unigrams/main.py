@@ -106,29 +106,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     return mse / lists_length
 
 
-def is_valid_profile(profile: dict[str, str | dict[str, float]]) -> bool:
-    """
-
-    Args:
-        profile (dict[str, str | dict[str, float]]): checking profile
-
-    Returns:
-        False | True: valid or invalid profile
-    """
-    if not isinstance(profile, dict) or profile.get("name") is None or profile.get("freq") is None:
-        return False
-    if not isinstance(profile.get("name"), str) or not isinstance(profile.get("freq"), dict):
-        return False
-    if isinstance(profile["freq"], str):
-        return False
-    for letter, freq in profile["freq"].items():
-        if not isinstance(letter, str):
-            return False
-        if not isinstance(freq, float):
-            return False
-    return True
-
-
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_to_compare: dict[str, str | dict[str, float]],
@@ -147,11 +124,30 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not (is_valid_profile(unknown_profile) and is_valid_profile(profile_to_compare)):
+    if not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None or unknown_profile.get("freq") is None:
         return None
-    if not (isinstance(unknown_profile["freq"], dict) and isinstance(profile_to_compare["freq"],
-                                                                     dict)):
+    if not isinstance(unknown_profile.get("name"), str) or not isinstance(unknown_profile.get("freq"), dict):
         return None
+    if isinstance(unknown_profile["freq"], str):
+        return None
+    for letter, freq in unknown_profile["freq"].items():
+        if not isinstance(letter, str):
+            return None
+        if not isinstance(freq, float):
+            return None
+    if (not isinstance(profile_to_compare, dict) or profile_to_compare.get("name") is None or
+            profile_to_compare.get("freq") is None):
+        return None
+    if (not isinstance(profile_to_compare.get("name"), str) or
+            not isinstance(profile_to_compare.get("freq"), dict)):
+        return None
+    if isinstance(profile_to_compare["freq"], str):
+        return None
+    for letter, freq in profile_to_compare["freq"].items():
+        if not isinstance(letter, str):
+            return None
+        if not isinstance(freq, float):
+            return None
     unknown_tokens = set(unknown_profile["freq"])
     tokens_to_compare = set(profile_to_compare["freq"])
     union = unknown_tokens | tokens_to_compare
@@ -188,9 +184,42 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if not (is_valid_profile(unknown_profile) and is_valid_profile(profile_1) and is_valid_profile(
-            profile_2)):
+    if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None or
+            unknown_profile.get("freq") is None):
         return None
+    if not isinstance(unknown_profile.get("name"), str) or not isinstance(unknown_profile.get("freq"), dict):
+        return None
+    if isinstance(unknown_profile["freq"], str):
+        return None
+    for letter, freq in unknown_profile["freq"].items():
+        if not isinstance(letter, str):
+            return None
+        if not isinstance(freq, float):
+            return None
+    if (not isinstance(profile_1, dict) or profile_1.get("name") is None or
+            profile_1.get("freq") is None):
+        return None
+    if not isinstance(profile_1.get("name"), str) or not isinstance(profile_1.get("freq"), dict):
+        return None
+    if isinstance(profile_1["freq"], str):
+        return None
+    for letter, freq in profile_1["freq"].items():
+        if not isinstance(letter, str):
+            return None
+        if not isinstance(freq, float):
+            return None
+    if (not isinstance(profile_2, dict) or profile_2.get("name") is None or
+            profile_2.get("freq") is None):
+        return None
+    if not isinstance(profile_2.get("name"), str) or not isinstance(profile_2.get("freq"), dict):
+        return None
+    if isinstance(profile_2["freq"], str):
+        return None
+    for letter, freq in profile_2["freq"].items():
+        if not isinstance(letter, str):
+            return None
+        if not isinstance(freq, float):
+            return None
     if not (isinstance(profile_1["name"], str) and isinstance(profile_2["name"], str)):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
@@ -300,9 +329,19 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if not (is_valid_profile(unknown_profile) and isinstance(known_profiles, list)):
+    if not isinstance(known_profiles, list):
         return None
-
+    if not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None or unknown_profile.get("freq") is None:
+        return None
+    if not isinstance(unknown_profile.get("name"), str) or not isinstance(unknown_profile.get("freq"), dict):
+        return None
+    if isinstance(unknown_profile["freq"], str):
+        return None
+    for letter, freq in unknown_profile["freq"].items():
+        if not isinstance(letter, str):
+            return None
+        if not isinstance(freq, float):
+            return None
     sorted_list: list[tuple[str, float]] | None
     sorted_list = []
     for profile in known_profiles:

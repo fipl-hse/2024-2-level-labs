@@ -101,7 +101,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(predicted, list) or not isinstance(actual,list) or\
-            (len(predicted) != len(actual)):
+            not len(predicted) == len(actual):
         return None
     sum_diff = 0
     for pair_num, actual_num in enumerate(actual):

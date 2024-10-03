@@ -136,7 +136,7 @@ def compare_profiles(
     values_unknown_tokens: list[float] = []
     values_tokens_to_compare: list[float] = []
     for letter in union:
-        if unknown_profile["freq"].get(letter) is None:
+        if letter not in unknown_profile["freq"]:
             values_unknown_tokens.append(0)
         else:
             values_unknown_tokens.append(float(unknown_profile["freq"][letter]))

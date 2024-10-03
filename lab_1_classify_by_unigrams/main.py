@@ -85,20 +85,19 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not isinstance(predicted, list) or not isinstance(actual, list):
         return None
     if isinstance(predicted, list):
-        for i in predicted:
-            if isinstance(i, (float, int)):
-                continue
-            return None
+        for el_in_predicted in predicted:
+            if not isinstance(el_in_predicted, (float, int)):
+                return None
         if isinstance(actual, list):
-            for i in actual:
-                if isinstance(i, (float, int)):
+            for el_in_actual in actual:
+                if isinstance(el_in_actual, (float, int)):
                     continue
                 return None
     if len(predicted) != len(actual):
         return None
     error_score_list = []
-    for i, el in enumerate(predicted):
-        error_score = (el - actual[i])**2
+    for ind_in_predicted, el_in_predicted in enumerate(predicted):
+        error_score = (el_in_predicted - actual[ind_in_predicted])**2
         error_score_list.append(error_score)
     mse: float = sum(error_score_list) / len(actual)
     return mse
@@ -123,8 +122,9 @@ def compare_profiles(
     if not (isinstance(unknown_profile, dict) and isinstance(profile_to_compare, dict) and
             len(profile_to_compare) == 2 and len(unknown_profile) == 2):
         return None
-    for k, v in unknown_profile['freq'].items():
-        if not isinstance(k, str) or not isinstance(v, (int, float)):
+    for key_in_unk_pr, v_in_unk_pr in unknown_profile['freq'].items():
+        if (not isinstance(key_in_unk_pr, str)
+                or not isinstance(v_in_unk_pr, (int, float))):
             return None
 
     freq_dict_2 = profile_to_compare['freq']
@@ -179,10 +179,11 @@ def detect_language(
             or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None
-    for k, v in (unknown_profile['freq'].items()
-                 and profile_1['freq'].items()
-                 and profile_2['freq'].items()):
-        if not isinstance(k, str) or not isinstance(v, (int, float)):
+    for key_in_unk_pr, v_in_unk_pr in (unknown_profile['freq'].items()
+                                       and profile_1['freq'].items()
+                                       and profile_2['freq'].items()):
+        if (not isinstance(key_in_unk_pr, str)
+                or not isinstance(v_in_unk_pr, (int, float))):
             return None
 
     mse_1_and_unknown = compare_profiles(unknown_profile, profile_1)

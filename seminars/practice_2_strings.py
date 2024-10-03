@@ -53,16 +53,8 @@ def multiply_string(s, inter):
     display the given string the number of times given in the `how_many`.
     """
     # student realisation goes here
-    if inter >= 0:
-        itog = s * inter
-        return itog
 
 
-# Function calls with expected result:
-#print(multiply_string('Hi', 2))
-#print(multiply_string('Hi', 3))
-#print(multiply_string('Hi', 1))
-#print(multiply_string('Hi', 0))
 
 
 # Task 2:
@@ -72,17 +64,9 @@ def front_times(s: str, num: int):
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
-    itog = s[:3] * num
-    return itog
 
 
-# Function calls with expected result:
-#print(front_times('Chocolate', 2))
-#print(front_times('Chocolate', 3))
-#print(front_times('Abc', 3))
-#print(front_times('A', 4))
-#print(front_times('', 4))
-#print(front_times('Abc', 0))
+
 
 
 # Task 3:
@@ -91,15 +75,9 @@ def extra_end(s: str):
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
-    itog = s[-2:] * 3
-    return itog
 
 
-# Function calls with expected result:
-#print(extra_end('Hello'))
-# extra_end('ab') → 'ababab'
-# extra_end('Hi') → 'HiHiHi'
-# extra_end('Code') → 'dedede'
+
 
 
 # Task 4:
@@ -108,14 +86,9 @@ def make_abba(s1: str, s2: str):
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
-    itog = s1 + s2 * 2 + s1
-    return itog
 
 
-#print(make_abba('Hi', 'Bye'))
-#print(make_abba('Yo', 'Alice'))
-#print(make_abba('What', 'Up'))
-#print(make_abba('', 'y'))
+
 
 
 # Task 5
@@ -128,17 +101,7 @@ def reverse_word(s: str):
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
-    l = s.split(' ')
-    for i in range(len(l)):
-        if len(l[i]) >= 5:
-            l[i] = l[i][::-1]
-    return ' '.join(l)
 
-print(reverse_word("Hey fellow warriors")) #== "Hey wollef sroirraw"
-#
-print(reverse_word("This is a test")) #== "This is a test"
-#
-print(reverse_word("This is another test")) #== "This is rehtona test"
 
 
 # Task 6
@@ -159,14 +122,7 @@ def generate_hashtag(s: str):
     ""                                        =>  false
     """
     # student realisation goes here
-    s2 = ''
-    l = s.split(' ')
-    for i in s:
-        if i == ' ':
-            i = ''
-        s2 += i
-    return '#' + s2
-print(generate_hashtag(" Hello there thanks for trying my quiz"))
+
 # Task 7:
 def combo_string(first_string: str, second_string: str) -> str:
     """

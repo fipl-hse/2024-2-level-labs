@@ -208,7 +208,8 @@ def detect_language(
         if mse1 < mse2 and isinstance(profile_1['name'], str) \
                 and isinstance(profile_2['name'], str):
             return profile_1['name']
-    return profile_2['name']
+    if isinstance(profile_2['name'], str):
+        return profile_2['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:

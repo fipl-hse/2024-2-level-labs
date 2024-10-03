@@ -1,3 +1,5 @@
+from main import create_language_profile
+from typing import Optional
 
 def main() -> None:
     """

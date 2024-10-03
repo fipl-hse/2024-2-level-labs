@@ -167,12 +167,12 @@ def compare_profiles(
     for key in all_keys:
         if not key in unknown_profile["freq"] and isinstance(key, str):
             unknown_freq_list.append(0.0)
-        else:
+        elif isinstance(key, str):
             freq_of_key = unknown_profile["freq"][key]
             unknown_freq_list.append(float(freq_of_key))
         if not key in profile_to_compare["freq"] and isinstance(key, str):
             freq_list_to_compare.append(0.0)
-        else:
+        elif isinstance(key, str):
             freq_of_key = profile_to_compare["freq"][key]
             freq_list_to_compare.append(float(freq_of_key))
 

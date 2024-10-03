@@ -208,7 +208,7 @@ def detect_language(
         if mse1 < mse2 and isinstance(profile_1['name'], str) \
                 and isinstance(profile_2['name'], str):
             return profile_1['name']
-        elif isinstance(profile_2['name'], str):
+        if isinstance(profile_2['name'], str):
             return profile_2['name']
     return None
 

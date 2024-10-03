@@ -2,8 +2,8 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-from lab_1_classify_by_unigrams.main import create_language_profile
-from lab_1_classify_by_unigrams.main import detect_language
+from main import create_language_profile
+from main import detect_language
 
 
 def main() -> None:

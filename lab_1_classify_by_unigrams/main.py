@@ -130,6 +130,15 @@ def compare_profiles(
     if (not isinstance(profile_to_compare, dict) or profile_to_compare.get("name") is None
             or profile_to_compare.get("freq") is None):
         return None
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+    if 'name' not in unknown_profile or 'name' not in profile_to_compare:
+        return None
+    if not all(isinstance(key, str) for key in unknown_profile) \
+            or not all(isinstance(key, str) for key in profile_to_compare) \
+            or not isinstance(unknown_profile['freq'], dict) \
+            or not isinstance(profile_to_compare['freq'], dict):
+        return None
     unknown_tokens = set(unknown_profile["freq"])
     tokens_to_compare = set(profile_to_compare["freq"])
     union = unknown_tokens | tokens_to_compare

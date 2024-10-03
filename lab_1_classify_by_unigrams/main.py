@@ -156,12 +156,12 @@ def compare_profiles(
     freq_list_to_compare = []
 
     for key in all_keys:
-        if not key in unknown_profile["freq"] and  isinstance(key, str):
+        if not key in unknown_profile["freq"] and isinstance(key, str):
             unknown_freq_list.append(0.0)
         else:
             freq_of_key = unknown_profile["freq"][key]
             unknown_freq_list.append(float(freq_of_key))
-        if not key in profile_to_compare["freq"] and  isinstance(key, str):
+        if not key in profile_to_compare["freq"] and isinstance(key, str):
             freq_list_to_compare.append(0.0)
         else:
             freq_of_key = profile_to_compare["freq"][key]
@@ -192,7 +192,9 @@ def detect_language(
     if not unknown_profile or not profile_2 or not profile_1:
         return None
 
-    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    if isinstance(mse_1, float) < isinstance(mse_2, float):
         return profile_1['name']
     return profile_2['name']
 

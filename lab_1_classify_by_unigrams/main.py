@@ -117,7 +117,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     mse = 0
 
-    for i in range(len(predicted)):
+    for i, n in enumerate(predicted):
         mse += (predicted[i] - actual[i]) ** 2
 
     return mse / len(predicted)
@@ -193,8 +193,7 @@ def detect_language(
 
     if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
         return profile_1['name']
-    else:
-        return profile_2['name']
+    return profile_2['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:

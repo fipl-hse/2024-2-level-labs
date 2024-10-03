@@ -21,7 +21,7 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
         unknown_profile = create_language_profile("unknown", unknown_text)
-    result = en_text
+    result = None
     print(tokenize(en_text))
     print(profile_en)
 

@@ -11,11 +11,10 @@ def tokenize(text: str) -> list[str] | None:
         for i in text:
             if i.isalpha() == True:
                 list_letters.append(i)
-        print(list_letters)
-        return list_letters
-
-
-
+        if len(list_letters) > 0:
+            print(list_letters)
+            return list_letters
+        return None
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculate frequencies of given tokens.

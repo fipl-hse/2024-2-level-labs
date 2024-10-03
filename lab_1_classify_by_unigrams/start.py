@@ -22,9 +22,7 @@ def main() -> None:
     unknown_profile = create_language_profile("unknown", unknown_text)
 
     if en_profile is not None and de_profile is not None and unknown_profile is not None:
-        result = detect_language(unknown_profile,
-                                 de_profile,
-                                 en_profile)
+        result = detect_language(unknown_profile, de_profile, en_profile)
     else:
         result = None
     assert result, "Detection result is None"

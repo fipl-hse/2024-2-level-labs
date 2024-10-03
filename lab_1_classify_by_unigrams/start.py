@@ -40,9 +40,9 @@ def main() -> None:
         detection = detect_language(unknown, english, deutch)
         print(detection)
 
-        profiles = detect_language_advanced(unknown, collection)
-        if profiles:
-            print_report(profiles)
+        result = detect_language_advanced(unknown, collection)
+        if result:
+            print_report(result)
     assert result, "Detection result is None"
 
 

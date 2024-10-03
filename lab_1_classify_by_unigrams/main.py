@@ -2,8 +2,6 @@
 Lab 1.
 
 
-
-
 Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
@@ -26,12 +24,12 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     split_text = text.lower().split()
-    split2 = []
+    dict_of_tokens = []
     for word in split_text:
         for token in word:
             if token.isalpha():
-                split2 += token
-    return split2
+                dict_of_tokens += token
+    return dict_of_tokens
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -53,14 +51,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             return None
     freq = {}
     prop = {}
-    total_tokens = len(tokens)
     for token in tokens:
         if token in freq:
             freq[token] += 1
         else:
             freq[token] = 1
     for key, value in freq.items():
-        prop[key] = value / total_tokens
+        prop[key] = value / len(tokens)
     return prop
 
 

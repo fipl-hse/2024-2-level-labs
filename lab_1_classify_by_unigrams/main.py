@@ -124,9 +124,11 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None or unknown_profile.get("freq") is None:
+    if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
+            or unknown_profile.get("freq") is None):
         return None
-    if not isinstance(unknown_profile.get("name"), str) or not isinstance(unknown_profile.get("freq"), dict):
+    if (not isinstance(unknown_profile.get("name"), str) or
+            not isinstance(unknown_profile.get("freq"), dict)):
         return None
     if isinstance(unknown_profile["freq"], str):
         return None
@@ -187,7 +189,8 @@ def detect_language(
     if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None or
             unknown_profile.get("freq") is None):
         return None
-    if not isinstance(unknown_profile.get("name"), str) or not isinstance(unknown_profile.get("freq"), dict):
+    if (not isinstance(unknown_profile.get("name"), str) or
+            not isinstance(unknown_profile.get("freq"), dict)):
         return None
     if isinstance(unknown_profile["freq"], str):
         return None
@@ -331,9 +334,11 @@ def detect_language_advanced(
     """
     if not isinstance(known_profiles, list):
         return None
-    if not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None or unknown_profile.get("freq") is None:
+    if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
+            or unknown_profile.get("freq") is None):
         return None
-    if not isinstance(unknown_profile.get("name"), str) or not isinstance(unknown_profile.get("freq"), dict):
+    if (not isinstance(unknown_profile.get("name"), str) or
+            not isinstance(unknown_profile.get("freq"), dict)):
         return None
     if isinstance(unknown_profile["freq"], str):
         return None

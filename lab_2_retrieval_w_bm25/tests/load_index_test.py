@@ -15,7 +15,8 @@ class SaveIndexTest(unittest.TestCase):
     Tests for index saving functions
     """
     def setUp(self) -> None:
-        self.metrics_file_path = str(Path(__file__).parent / "saved_metrics_example.json")
+        self.metrics_file_path = str(Path(__file__).parent / "assets" /
+                                     "saved_metrics_example.json")
 
     @pytest.mark.lab_2_retrieval_w_bm25
     @pytest.mark.mark10

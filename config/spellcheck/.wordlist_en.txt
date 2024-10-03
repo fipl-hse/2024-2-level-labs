@@ -113,7 +113,6 @@ appropriately
 april
 apro
 are
-aren
 arg
 argparse
 args
@@ -355,7 +354,6 @@ correctly
 correspondence
 corresponding
 corresponds
-couldn
 count
 course
 coverageresults
@@ -442,7 +440,6 @@ dictated
 dictionary
 dictionary-like
 did
-didn
 difference
 different
 differently
@@ -469,7 +466,6 @@ does
 doesn
 dogs
 doing
-don
 done
 dot
 double-tagging
@@ -482,6 +478,7 @@ dragon
 drive
 dto
 due
+dump
 dumping
 during
 dursley
@@ -717,7 +714,6 @@ grnd
 group
 guarantee
 had
-hadn
 handed
 handing
 handle
@@ -730,9 +726,7 @@ harder
 hardware
 harry
 has
-hasn
 have
-haven
 having
 he
 head
@@ -871,7 +865,6 @@ inverse
 io
 irina
 is
-isn
 isomorphic
 it
 iter
@@ -1887,7 +1880,6 @@ want
 warning
 was
 wash
-wasn
 way
 we
 weather
@@ -1901,7 +1893,6 @@ websites
 week
 well
 were
-weren
 what
 when
 where

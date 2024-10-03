@@ -61,6 +61,7 @@ def multiply_string(input_string: str, how_many: int) -> str:
 # multiply_string('Hi', 1) → 'Hi'
 # multiply_string('Hi', 0) → ''
 
+
 # Task 2:
 def front_times(input_string: str, how_many: int) -> str:
     """
@@ -78,6 +79,7 @@ def front_times(input_string: str, how_many: int) -> str:
 # front_times('', 4) → ''
 # front_times('Abc', 0) → ''
 
+
 # Task 3:
 def extra_end(input_string: str) -> str:
     """
@@ -92,6 +94,7 @@ def extra_end(input_string: str) -> str:
 # extra_end('Hi') → 'HiHiHi'
 # extra_end('Code') → 'dedede'
 
+
 # Task 4:
 def make_abba(first_string: str, second_string: str) -> str:
     """
@@ -104,9 +107,6 @@ def make_abba(first_string: str, second_string: str) -> str:
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
 # make_abba('', 'y') → 'yy'
-
-
-    #return f'{first_string}{second_string*2}{first_string}'
 
 
 # Task 5
@@ -128,8 +128,6 @@ def reverse_word(sentence: str) -> str:
 # reverse_word("This is another test") == "This is rehtona test"
 
 
-
-
 # Task 6
 def generate_hashtag(input_string: str) -> str:
     """
@@ -148,7 +146,6 @@ def generate_hashtag(input_string: str) -> str:
     ""                                        =>  false
     """
     # student realisation goes here
-
 
 
 # Task 7:
@@ -173,8 +170,6 @@ def string_splosion(input_string: str) -> str:
     Given the string, format it like in the example.
     """
     # student realisation goes here
-
-
 
 
 # Function calls with expected result:

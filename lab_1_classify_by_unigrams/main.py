@@ -91,10 +91,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if not isinstance(predicted, list) or not isinstance(actual, list) or \
             not len(predicted) == len(actual):
         return None
-    diff = 0
-    for m, n in enumerate(actual):
-        diff += (n - predicted[m])**2
-    return diff / len(actual)
+    difference = 0
+    for predicted_value, actual_value in enumerate(actual):
+        difference += (actual_value - predicted[predicted_value])**2
+    return difference / len(actual)
 
 def compare_profiles(
     unknown_profile: dict[str, str | dict[str, float]],

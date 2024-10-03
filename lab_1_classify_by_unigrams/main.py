@@ -138,13 +138,13 @@ def compare_profiles(
             or not isinstance(profile_to_compare['freq'], dict):
         return None
 
-    all_chars = set(unknown_profile['freq']).union(set(profile_to_compare['freq']))
-
     unknown_profile_freq = unknown_profile['freq']
+    profile_to_compare_freq = profile_to_compare['freq']
+    all_chars = set(unknown_profile_freq).union(set(profile_to_compare_freq))
+
     unknown_sorted = [(unknown_profile_freq[char] if char in unknown_profile_freq else 0.0)
                       for char in all_chars]
 
-    profile_to_compare_freq = profile_to_compare['freq']
     profile_to_compare_sorted = [(profile_to_compare_freq[char]
                                   if char in profile_to_compare_freq else 0.0)
                                  for char in all_chars]
@@ -153,9 +153,10 @@ def compare_profiles(
 
 
 def detect_language(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]]) -> str | None:
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_1: dict[str, str | dict[str, float]],
+    profile_2: dict[str, str | dict[str, float]]
+) -> str | None:
     """
     Detect the language of an unknown profile.
 
@@ -270,18 +271,18 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     loaded_profiles = []
     for path in paths_to_profiles:
         profile_loaded = load_profile(path)
-        if isinstance(profile_loaded, dict):
-            profile_preprocessed = preprocess_profile(profile_loaded)
-            if isinstance(profile_preprocessed, dict):
-                loaded_profiles.append(profile_preprocessed)
-        else:
+        if not isinstance(profile_loaded, dict):
             return None
+        profile_preprocessed = preprocess_profile(profile_loaded)
+        if not isinstance(profile_preprocessed, dict):
+            return None
+        loaded_profiles.append(profile_preprocessed)
 
     return loaded_profiles
 
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.
@@ -304,10 +305,10 @@ def detect_language_advanced(
     for profile in known_profiles:
         profile_name: str = profile['name']
         distance = compare_profiles(unknown_profile, profile)
-        if distance is None:
+        if not distance:
             return None
         distances.append((profile_name, distance))
-    distances_sorted: list[tuple['str', float]] = sorted(distances, key=lambda t: t[1])
+    distances_sorted: list[tuple['str', float]] = sorted(distances, key=lambda tuple_: tuple_[1])
     return distances_sorted
 
 

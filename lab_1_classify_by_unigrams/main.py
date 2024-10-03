@@ -5,17 +5,12 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+
 def tokenize(text: str) -> list[str] | None:
-        symbols = "1234567890!№;%:@#$%^&*{}/\|?*()_+-=.,<> "
-        list_symbols = list(symbols)
         list_letters = []
-        list_unnes = []
-        text = list(text)
         for i in text:
-            if text[i] not in list_symbols:
-                list_letters.append(text[i])
-            else:
-                list_unnes.append(text[i])
+            if i.isalpha() == True:
+                list_letters.append(i)
         print(list_letters)
         return list_letters
 

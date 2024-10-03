@@ -202,9 +202,6 @@ def load_profile(path_to_file: str) -> dict | None:
     In case of corrupt input arguments, None is returned
     """
 
-    if not isinstance(path_to_file, str):
-        return None
-
     
 
 

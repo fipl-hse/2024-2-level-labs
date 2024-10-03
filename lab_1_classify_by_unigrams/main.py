@@ -139,11 +139,11 @@ def compare_profiles(
         if unknown_profile["freq"].get(letter) is None:
             values_unknown_tokens.append(0)
         else:
-            values_unknown_tokens.append(unknown_profile["freq"][letter])
+            values_unknown_tokens.append(float(unknown_profile["freq"][letter]))
         if profile_to_compare["freq"].get(letter) is None:
             values_tokens_to_compare.append(0)
         else:
-            values_tokens_to_compare.append(profile_to_compare["freq"][letter])
+            values_tokens_to_compare.append(float(profile_to_compare["freq"][letter]))
     return calculate_mse(values_unknown_tokens, values_tokens_to_compare)
 
 

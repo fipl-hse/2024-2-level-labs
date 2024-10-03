@@ -166,17 +166,18 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    is_valid = True
     if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
             or unknown_profile.get("freq") is None):
-        return None
+        is_valid = False
     if (not isinstance(profile_1, dict) or profile_1.get("name") is None
-            or profile_1.get("freq") is None) or (not isinstance(profile_2, dict) or
-                                                  profile_2.get("name") is None or
-                                                  profile_2.get("freq") is None):
+            or profile_1.get("freq") is None):
+        is_valid = False
+    if (not isinstance(profile_2, dict) or profile_2.get("name") is None
+            or profile_2.get("freq") is None):
+        is_valid = False
+    if not is_valid:
         return None
-    # if (not isinstance(profile_2, dict) or profile_2.get("name") is None
-    #         or profile_2.get("freq") is None):
-    #     return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
     if mse_1 is None or mse_2 is None:

@@ -98,8 +98,6 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
-    #return first_string + second_string + second_string + first_string
-    #return {}{}{}.format(first_string, second_string*2, first_string)
 
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'

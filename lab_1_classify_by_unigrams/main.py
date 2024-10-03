@@ -1,10 +1,3 @@
-"""
-Lab 1.
-
-Language detection
-"""
-# pylint:disable=too-many-locals, unused-argument, unused-variable
-
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -22,15 +15,17 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
+
+    text = text.lower()
     text_of_token = []
-    if isinstance(text, str):
-        text = text.lower()
-        for element in text:
-            if element == 'º':
-                continue
-            elif element.isalpha():
-                text_of_token += element
-        return text_of_token
+
+    for element in text:
+        if element.isalpha():
+            text_of_token.append(element)
+
+    final_tokens = [''.join(text_of_token[i:i + 1]) for i in range(len(text_of_token))]
+
+    return final_tokens
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -72,12 +67,15 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(language, str):
-        if isinstance(text, str):
-            profile_of_language = {'name': language, 'freq': calculate_frequencies(tokenize(text))}
+    if isinstance(language, str) and isinstance(text, str):
+        token_list = tokenize(text)
+        frequencies = calculate_frequencies(token_list)
+
+        if frequencies is not None:
+            profile_of_language = {'name': language, 'freq': frequencies}
             return profile_of_language
 
-
+    return None
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculate mean squared error between predicted and actual values.

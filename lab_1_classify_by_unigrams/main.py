@@ -116,8 +116,9 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or not len(
-            profile_to_compare) == len(unknown_profile) == 2:
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
+        return None
+    if ('name' or 'freq') not in unknown_profile or ('name' or 'freq') not in profile_to_compare:
         return None
     copy_unk_profile = copy.deepcopy(unknown_profile)
     if (not isinstance(copy_unk_profile['freq'], dict)
@@ -244,12 +245,11 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
     In case of corrupt input arguments, None is returned
     """
     if not (isinstance(paths_to_profiles, list)
-            and all(isinstance(i, str) for i in paths_to_profiles)):
+            and all(isinstance(path, str) for path in paths_to_profiles)):
         return None
     profiles_collection = []
     for path in paths_to_profiles:
         profile = load_profile(path)
-
         if not profile:
             return None
         pre_profile = preprocess_profile(profile)

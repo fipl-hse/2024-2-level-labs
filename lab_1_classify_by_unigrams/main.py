@@ -7,7 +7,8 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-
+    if not isinstance(text, str):
+        return None
     tokens = []
     for char in text:
         if char.isalpha():
@@ -16,21 +17,18 @@ def tokenize(text: str) -> list[str] | None:
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
-
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
+        return None
     dict_freq = {}
-
     for token in tokens:
         if token in dict_freq:
             dict_freq[token] += 1
         else:
-            dict_freq[token] = 0
-
+            dict_freq[token] = 1
     total_tokens = len(tokens)
     for token in dict_freq:
         dict_freq[token] /= total_tokens
-
     return dict_freq
-
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

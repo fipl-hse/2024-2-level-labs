@@ -194,20 +194,24 @@ def detect_language(
             or not isinstance(profile_2, dict)):
         return None
 
+    name1 = profile_1['name']
+    name2 = profile_2['name']
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
 
-    if mse_1 is None or mse_2 is None:
+    if (mse_1 is None or mse_2 is None
+            or not isinstance(name1, str) or not isinstance(name2, str)):
         return None
+    result1 = name1
+    result2 = name2
 
     if mse_1 < mse_2:
-        return str(profile_1['name'])
+        return result1
     if mse_1 == mse_2:
-        list_of_names = [profile_1['name'], profile_2['name']]
-        profile_sorted_list = sorted(list_of_names)
+        profile_sorted_list = sorted([result1, result2])
         return str(profile_sorted_list[0])
 
-    return str(profile_2['name'])
+    return result2
 
 
 def load_profile(path_to_file: str) -> dict | None:

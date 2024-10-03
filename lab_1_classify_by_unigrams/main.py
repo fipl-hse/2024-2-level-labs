@@ -23,8 +23,9 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     for letter in text.lower():
-        if letter.isalpha() and letter != 'º':
-            token_list.append(letter)
+        if not letter.isalpha() or letter == 'º':
+            continue
+        token_list.append(letter)
     return token_list
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -89,9 +90,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if len(predicted) != len(actual):
         return None
     mse = 0
-    n = len(predicted)
-    for elem in range(n):
-        mse += (actual[elem] - predicted[elem]) ** 2 / n
+    number_of_elements = len(predicted)
+    for elem in range(number_of_elements):
+        mse += (actual[elem] - predicted[elem]) ** 2 / number_of_elements
     return mse
 
 

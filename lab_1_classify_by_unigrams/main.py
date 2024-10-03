@@ -113,9 +113,11 @@ def compare_profiles(
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    if not all('freq' in profile and 'name' in profile for profile in (unknown_profile, profile_to_compare)):
+    if not all('freq' in profile and 'name' in profile for profile in (
+            unknown_profile, profile_to_compare)):
         return None
-    if not isinstance(unknown_profile['freq'], dict) or not isinstance(profile_to_compare['freq'], dict):
+    if not isinstance(unknown_profile['freq'], dict) or not isinstance(
+            profile_to_compare['freq'], dict):
         return None
     unknown_freq = unknown_profile['freq']
     compare_freq = profile_to_compare['freq']

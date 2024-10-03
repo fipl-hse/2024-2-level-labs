@@ -172,10 +172,8 @@ def detect_language(
             return None
         return profile_2['name']
     languages = [profile_1['name'], profile_2['name']]
-    if not all(isinstance(p, str) for p in languages):
-        return None
     languages.sort()
-    return languages[0]
+    return str(languages[0])
 
 
 def load_profile(path_to_file: str) -> dict | None:

@@ -168,12 +168,14 @@ def detect_language(
             return None
         return profile_1['name']
     if mse_1 > mse_2:
-        if profile_2['name'] is None:
+        if not isinstance(profile_1['name'], str):
             return None
         return profile_2['name']
     languages = [profile_1['name'], profile_2['name']]
     languages.sort()
-    return str(languages[0])
+    if not isinstance(languages[0], str):
+        return None
+    return languages[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -285,7 +287,9 @@ def detect_language_advanced(
             all(isinstance(elem, dict) for elem in known_profiles)):
         return None
     for profile in known_profiles:
-        distance.append((str(profile['name']), compare_profiles(unknown_profile, profile)))
+        if not isinstance(profile['name'], str):
+            return None
+        distance.append((profile['name'], compare_profiles(unknown_profile, profile)))
     if all(d is None for d in distance):
         return None
     return sorted(distance, key=lambda i: float(i[1]))

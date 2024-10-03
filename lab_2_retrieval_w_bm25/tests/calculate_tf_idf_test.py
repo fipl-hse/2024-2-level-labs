@@ -16,7 +16,7 @@ class CalculateTfIdfTest(unittest.TestCase):
     Tests TF-IDF calculation functions
     """
     def setUp(self) -> None:
-        with open(Path(__file__).parent / 'test_scores.json', encoding='utf-8') as file:
+        with open(Path(__file__).parent / "assets" / 'test_scores.json', encoding='utf-8') as file:
             scores = json.load(file)
 
         self.tfs = scores["TF"]

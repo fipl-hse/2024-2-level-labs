@@ -145,10 +145,16 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
 
-    if not unknown_profile:
+    if (not isinstance(unknown_profile, dict)
+            or not isinstance(profile_to_compare, dict)):
         return None
-
-    if 'name' not in unknown_profile:
+    if ("name" not in unknown_profile
+            or "freq" not in unknown_profile
+            or "name" not in profile_to_compare
+            or "freq" not in profile_to_compare):
+        return None
+    if (not isinstance(profile_to_compare["name"], str)
+            or not isinstance(profile_to_compare["freq"], dict)):
         return None
 
     all_keys = list(set(unknown_profile["freq"]) | set(profile_to_compare["freq"]))
@@ -156,12 +162,12 @@ def compare_profiles(
     freq_list_to_compare = []
 
     for key in all_keys:
-        if not key in unknown_profile["freq"] and isinstance(key, str):
+        if not key in unknown_profile["freq"]:
             unknown_freq_list.append(0.0)
         else:
             freq_of_key = unknown_profile["freq"][key]
             unknown_freq_list.append(float(freq_of_key))
-        if not key in profile_to_compare["freq"] and isinstance(key, str):
+        if not key in profile_to_compare["freq"]:
             freq_list_to_compare.append(0.0)
         else:
             freq_of_key = profile_to_compare["freq"][key]

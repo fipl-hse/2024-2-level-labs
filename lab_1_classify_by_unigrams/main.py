@@ -188,19 +188,18 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    if (unknown_profile is None or profile_1 is None
-            or profile_2 is None or not isinstance(unknown_profile, dict)
-            or not isinstance(profile_1, dict) or not isinstance(profile_2, dict)):
+    if unknown_profile is None or profile_1 is None or profile_2 is None:
+        return None
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
         return None
 
     name1 = profile_1['name']
     name2 = profile_2['name']
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
-    if not isinstance(name1, str) or not isinstance(name2, str):
-        return None
-    result1 = name1
-    result2 = name2
+    result1 = str(name1)
+    result2 = str(name2)
 
     if mse_1 is None or mse_2 is None:
         return None

@@ -178,9 +178,9 @@ def detect_language(
         func_result = str(profile_1['name'])
     else:
         func_result = str(profile_2['name'])
-    if isinstance(func_result, str):
-        return func_result
-    return None
+    if not isinstance(func_result, str):
+        return None
+    return func_result
 
 
 def load_profile(path_to_file: str) -> dict | None:

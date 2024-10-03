@@ -189,7 +189,7 @@ def detect_language(
         if mse_2 > mse_1:
             return profile_1['name']
     else:
-        return Nonea
+        return None
 
 unknown_profile = {
             'name': 'unk',

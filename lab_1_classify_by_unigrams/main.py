@@ -5,6 +5,7 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -23,11 +24,10 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     text = text.lower()
-    symb = ',./?!:;#@*-&<>%1234567890 '
     tokens = []
 
     for i in text:
-        if i not in symb:
+        if i.isalpha():
             tokens.append(i)
 
     return tokens
@@ -144,7 +144,29 @@ def compare_profiles(
     'freq' in arguments, None is returned
     """
 
+    if not unknown_profile:
+        return None
 
+    if 'name' not in unknown_profile:
+        return None
+
+    all_keys = list(set(unknown_profile["freq"]) | set(profile_to_compare["freq"]))
+    unknown_freq_list = []
+    freq_list_to_compare = []
+
+    for key in all_keys:
+        if not key in unknown_profile["freq"]:
+            unknown_freq_list.append(0.0)
+        else:
+            freq_of_key = unknown_profile["freq"][key]
+            unknown_freq_list.append(freq_of_key)
+        if not key in profile_to_compare["freq"]:
+            freq_list_to_compare.append(0.0)
+        else:
+            freq_of_key = profile_to_compare["freq"][key]
+            freq_list_to_compare.append(freq_of_key)
+
+    return calculate_mse(unknown_freq_list, freq_list_to_compare)
 
 
 def detect_language(
@@ -166,7 +188,13 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    if not unknown_profile or not profile_2 or not profile_1:
+        return None
 
+    if compare_profiles(unknown_profile, profile_1) < compare_profiles(unknown_profile, profile_2):
+        return profile_1['name']
+    else:
+        return profile_2['name']
 
 
 def load_profile(path_to_file: str) -> dict | None:

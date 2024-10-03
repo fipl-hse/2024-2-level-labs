@@ -284,8 +284,7 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list)\
-            or not all(isinstance(profile, dict) for profile in known_profiles):
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
         return None
     list_of_profiles = []
     for profile in known_profiles:

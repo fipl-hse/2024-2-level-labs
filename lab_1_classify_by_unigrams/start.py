@@ -22,16 +22,15 @@ def main() -> None:
     print(res2)
     en_prof = fnc.create_language_profile('en', en_text)
     print(en_prof)
+    assert isinstance(en_prof, dict), 'Dictionary not found'
     de_prof = fnc.create_language_profile('de', de_text)
+    assert isinstance(de_prof, dict), 'Dictionary not found'
     trg_prof = fnc.create_language_profile('Unknown', unknown_text)
-    if isinstance(trg_prof, dict) and isinstance(en_prof, dict):
-        print(fnc.compare_profiles(trg_prof, en_prof))
-    if isinstance(trg_prof, dict) and isinstance(de_prof, dict):
-        print(fnc.compare_profiles(trg_prof, de_prof))
-    if isinstance(trg_prof, dict) and isinstance(en_prof, dict) and \
-            isinstance(de_prof, dict):
-        result = fnc.detect_language(trg_prof, en_prof, de_prof)
-        print(result)
+    assert isinstance(trg_prof, dict), 'Dictionary not found'
+    print(fnc.compare_profiles(trg_prof, en_prof))
+    print(fnc.compare_profiles(trg_prof, de_prof))
+    result = fnc.detect_language(trg_prof, en_prof, de_prof)
+    print(result)
     if not isinstance(result, str):
         assert result, "Detection result is None"
 

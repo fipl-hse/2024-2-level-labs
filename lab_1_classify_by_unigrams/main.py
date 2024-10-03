@@ -20,6 +20,8 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(text, str):
+        return None
     text_of_token = []
     if isinstance(text, str):
         text = text.lower()
@@ -29,7 +31,6 @@ def tokenize(text: str) -> list[str] | None:
             elif element.isalpha():
                 text_of_token += element
         return text_of_token
-
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """

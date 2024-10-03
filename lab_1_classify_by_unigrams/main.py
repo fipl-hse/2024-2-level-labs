@@ -51,12 +51,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     token_dict = {}
     for i in tokens:
-        if i not in token_dict.keys():
-            token_dict.update({i: 0.0})
+        for i in token_dict:
+            if i not in token_dict:
+                token_dict.update({i: 0.0})
         token_dict[i] += 1.0
 
     sum_token_dict_values = sum(token_dict.values())
-    for i in token_dict:
+    for i in token_dict.items():
         new_elem = token_dict[i] / sum_token_dict_values
         token_dict[i] = new_elem
     return token_dict
@@ -106,7 +107,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
 
     mse = 0
-    for i in range(len(predicted)):
+    for i in enumerate(predicted):
         mse += (predicted[i] - actual[i])**2
 
     return mse/len(predicted)
@@ -137,10 +138,10 @@ def compare_profiles(
         return None
     for char_percentage in unknown_profile["freq"]:
         if char_percentage not in profile_to_compare["freq"]:
-            profile_to_compare["freq"].update({char_percentage: 0})
+            return profile_to_compare["freq"].update({char_percentage: 0})
     for char_percentage in profile_to_compare["freq"]:
         if char_percentage not in unknown_profile["freq"]:
-            unknown_profile["freq"].update({char_percentage: 0})
+            return unknown_profile["freq"].update({char_percentage: 0})
 
     if len(unknown_profile["freq"]) == len(profile_to_compare["freq"]):
         unknown_profile_list = list(dict(sorted(unknown_profile["freq"].items())).values())

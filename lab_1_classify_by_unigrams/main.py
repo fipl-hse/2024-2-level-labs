@@ -50,8 +50,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return frequency
 
 
-def create_language_profile(language: str, text: str) -> \
-        (dict[str, str | dict[str, float] | None] | None):
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
     Create a language profile.
 
@@ -68,11 +67,11 @@ def create_language_profile(language: str, text: str) -> \
             (not isinstance(text, str)) or (tokenize(text) is None) or
             (calculate_frequencies(tokenize(text)) is None)):
         return None
-    profile = {
-        "name": language,
-        "freq": calculate_frequencies(tokenize(text))
-    }
-    return profile
+    calculate_frequency = calculate_frequencies(tokenize(text))
+    if not isinstance(calculate_frequency, dict):
+        return None
+    return {"name": language, "freq": calculate_frequency}
+
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

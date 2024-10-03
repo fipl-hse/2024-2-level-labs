@@ -219,7 +219,8 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(profile, dict) or not all(keys in profile for keys in('freq','name','n_words')):
+    if not isinstance(profile, dict)\
+            or not all(keys in profile for keys in('freq','name','n_words')):
         return None
     processed_profile = {'name': profile['name'], 'freq': {}}
     frequency_dict = {}
@@ -229,7 +230,8 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     token_list = list(frequency_dict)
     for letter in token_list:
         if not letter.isupper():
-            frequency_dict[letter] = frequency_dict.get(letter,0) + frequency_dict.get(letter.upper(),0)
+            frequency_dict[letter] = frequency_dict.get(letter,0)\
+                                     + frequency_dict.get(letter.upper(),0)
             processed_profile['freq'][letter] = frequency_dict[letter] / profile['n_words'][0]
             if letter.upper() in frequency_dict:
                 frequency_dict.pop(letter.upper())
@@ -254,7 +256,8 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(paths_to_profiles,list) and all(isinstance(i, str) for i in paths_to_profiles)):
+    if not (isinstance(paths_to_profiles,list)
+            and all(isinstance(i, str) for i in paths_to_profiles)):
         return None
     collection_of_profiles = []
     for i in paths_to_profiles:

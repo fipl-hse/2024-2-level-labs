@@ -179,10 +179,12 @@ def detect_language(
         return None
 
     if diff_unk_1 < diff_unk_2:
-        res = profile_1["name"]
-        return res
-    res = profile_2["name"]
-    return res
+        return profile_1["name"]
+    if diff_unk_1 > diff_unk_2:
+        return profile_2["name"]
+    names_sorted = [profile_1["name"], profile_2["name"]]
+    names_sorted.sort(reverse=True)
+    return names_sorted[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:

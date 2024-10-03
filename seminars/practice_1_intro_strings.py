@@ -40,8 +40,7 @@ else:
     print('First number * second does not equal third number')
 
 
-
-#print('Program finished')
+# print('Program finished')
 
 
 print("moechislo: {0:.3f}".format(1.3333333333))

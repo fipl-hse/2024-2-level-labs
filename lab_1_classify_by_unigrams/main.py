@@ -165,14 +165,14 @@ def compare_profiles(
     freq_list_to_compare = []
 
     for key in all_keys:
-        if not key in unknown_profile['freq'] and isinstance(key, str):
+        if not key in unknown_profile['freq'] and isinstance(unknown_profile['freq'], dict):
             unknown_freq_list.append(0.0)
-        if key in unknown_profile['freq'] and isinstance(key, str):
+        if key in unknown_profile['freq'] and isinstance(unknown_profile['freq'], dict):
             freq_of_key = unknown_profile['freq'][str(key)]
             unknown_freq_list.append(float(freq_of_key))
-        if not key in profile_to_compare['freq'] and isinstance(key, str):
+        if not key in profile_to_compare['freq'] and isinstance(profile_to_compare['freq'], dict):
             freq_list_to_compare.append(0.0)
-        if key in profile_to_compare['freq'] and isinstance(key, str):
+        if key in profile_to_compare['freq'] and isinstance(profile_to_compare['freq'], dict):
             freq_of_key = profile_to_compare['freq'][str(key)]
             freq_list_to_compare.append(float(freq_of_key))
 

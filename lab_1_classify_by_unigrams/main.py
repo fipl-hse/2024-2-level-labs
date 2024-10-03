@@ -184,9 +184,9 @@ def detect_language(
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
     if isinstance(mse_1, float) and isinstance(mse_2, float):
-        if mse_1 > mse_2 :
+        if mse_1 > mse_2 and isinstance(profile_2['name'], str):
             return profile_2['name']
-        if mse_2 > mse_1:
+        if mse_2 > mse_1 and isinstance(profile_1['name'], str):
             return profile_1['name']
     else:
         return None

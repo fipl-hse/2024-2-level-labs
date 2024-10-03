@@ -23,11 +23,10 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     text = text.lower()
-    num = '1234567890'
-    symb = ',./?!:;#@*-&<>%'
+    symb = ',./?!:;#@*-&<>% '
     tokens = []
     for elem in text:
-        if not elem.isdigit() and elem not in symb and elem != ' ':
+        if not elem.isdigit() and elem not in symb:
             tokens.append(elem)
     return tokens
 
@@ -81,7 +80,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     return {'name': language, 'freq': calculate_frequencies(tokenize(text))}
 
-print(create_language_profile('de','Ich weiß nicht was ich machen möchte.'))
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculate mean squared error between predicted and actual values.
@@ -138,26 +136,25 @@ def compare_profiles(
             or not isinstance(unknown_profile["freq"], dict)):
         return None
 
-    unknown_profile_freq = unknown_profile['freq']
-    profile_to_compare_freq = profile_to_compare['freq']
-
-    all_tokens = set(unknown_profile_freq).union(set(profile_to_compare_freq))
+    unknown_freq = unknown_profile['freq']
+    compare_freq = profile_to_compare['freq']
+    all_tokens = set(unknown_freq).union(set(compare_freq))
 
     unknown_shared = []
     for token in all_tokens:
-        if token in unknown_profile_freq:
-            unknown_shared.append(unknown_profile_freq[token])
+        if token in unknown_freq:
+            unknown_shared.append(unknown_freq[token])
         else:
             unknown_shared.append(0.0)
 
-    profile_to_compare_shared = []
+    compare_shared = []
     for token in all_tokens:
-        if token in profile_to_compare_freq:
-            profile_to_compare_shared.append(profile_to_compare_freq[token])
+        if token in compare_freq:
+            compare_shared.append(compare_freq[token])
         else:
-            profile_to_compare_shared.append(0.0)
+            compare_shared.append(0.0)
 
-    return calculate_mse(unknown_shared, profile_to_compare_shared)
+    return calculate_mse(unknown_shared, compare_shared)
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
@@ -178,8 +175,40 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    if not (isinstance(unknown_profile, dict)
+            or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
+        return None
 
+    mse_1 = compare_profiles(unknown_profile, profile_1)
+    mse_2 = compare_profiles(unknown_profile, profile_2)
+    print(mse_1)
+    if isinstance(mse_1, float) and isinstance(mse_2, float):
+        if mse_1 > mse_2 :
+            return profile_2['name']
+        if mse_2 > mse_1:
+            return profile_1['name']
+    else:
+        return Nonea
 
+unknown_profile = {
+            'name': 'unk',
+            'freq': {
+                'm': 0.0909, 'e': 0.0909, 'h': 0.1818, 'p': 0.1818,
+                'y': 0.0909, 's': 0.0909, 'n': 0.0909, 'a': 0.1818
+            }
+        }
+
+en_profile = []
+
+de_profile = {
+            'name': 'de',
+            'freq': {
+                't': 0.0833, 'h': 0.1666, 'n': 0.0833, 'w': 0.0833,
+                'ß': 0.0833, 'e': 0.0833, 'c': 0.1666, 'i': 0.25
+            }
+        }
+print(detect_language(unknown_profile, en_profile, de_profile))
 def load_profile(path_to_file: str) -> dict | None:
     """
     Load a language profile.

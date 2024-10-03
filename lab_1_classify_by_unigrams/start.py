@@ -29,7 +29,7 @@ def main() -> None:
     print(fnc.compare_profiles(trg_prof, en_prof))
     print(fnc.compare_profiles(trg_prof, de_prof))
     result = fnc.detect_language(trg_prof, en_prof, de_prof)
-    assert isinstance(result, str), "Detection result is None"
+    assert result, "Detection result is None"
     print(result)
 
 

@@ -124,43 +124,11 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    is_valid = True
-    for i in range(1):
-        if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
-                or unknown_profile.get("freq") is None):
-            is_valid = False
-            break
-        if (not isinstance(unknown_profile.get("name"), str) or
-                not isinstance(unknown_profile.get("freq"), dict)):
-            is_valid = False
-            break
-        if isinstance(unknown_profile["freq"], str):
-            is_valid = False
-            break
-        for letter, freq in unknown_profile["freq"].items():
-            if not (isinstance(letter, str) and isinstance(freq, float)):
-                is_valid = False
-                break
-    if not is_valid:
+    if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
+            or unknown_profile.get("freq") is None):
         return None
-    is_valid = True
-    for i in range(1):
-        if (not isinstance(profile_to_compare, dict) or profile_to_compare.get("name") is None
-                or profile_to_compare.get("freq") is None):
-            is_valid = False
-            break
-        if (not isinstance(profile_to_compare.get("name"), str) or
-                not isinstance(profile_to_compare.get("freq"), dict)):
-            is_valid = False
-            break
-        if isinstance(profile_to_compare["freq"], str):
-            is_valid = False
-            break
-        for letter, freq in profile_to_compare["freq"].items():
-            if not (isinstance(letter, str) and isinstance(freq, float)):
-                is_valid = False
-                break
-    if not is_valid:
+    if (not isinstance(profile_to_compare, dict) or profile_to_compare.get("name") is None
+            or profile_to_compare.get("freq") is None):
         return None
     unknown_tokens = set(unknown_profile["freq"])
     tokens_to_compare = set(profile_to_compare["freq"])
@@ -198,62 +166,14 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    is_valid = True
-    for i in range(1):
-        if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
-                or unknown_profile.get("freq") is None):
-            is_valid = False
-            break
-        if (not isinstance(unknown_profile.get("name"), str) or
-                not isinstance(unknown_profile.get("freq"), dict)):
-            is_valid = False
-            break
-        if isinstance(unknown_profile["freq"], str):
-            is_valid = False
-            break
-        for letter, freq in unknown_profile["freq"].items():
-            if not (isinstance(letter, str) and isinstance(freq, float)):
-                is_valid = False
-                break
-    if not is_valid:
+    if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
+            or unknown_profile.get("freq") is None):
         return None
-    is_valid = True
-    for i in range(1):
-        if (not isinstance(profile_1, dict) or profile_1.get("name") is None
-                or profile_1.get("freq") is None):
-            is_valid = False
-            break
-        if (not isinstance(profile_1.get("name"), str) or
-                not isinstance(profile_1.get("freq"), dict)):
-            is_valid = False
-            break
-        if isinstance(profile_1["freq"], str):
-            is_valid = False
-            break
-        for letter, freq in profile_1["freq"].items():
-            if not (isinstance(letter, str) and isinstance(freq, float)):
-                is_valid = False
-                break
-    if not is_valid:
+    if (not isinstance(profile_1, dict) or profile_1.get("name") is None
+            or profile_1.get("freq") is None):
         return None
-    is_valid = True
-    for i in range(1):
-        if (not isinstance(profile_2, dict) or profile_2.get("name") is None
-                or profile_2.get("freq") is None):
-            is_valid = False
-            break
-        if (not isinstance(profile_2.get("name"), str) or
-                not isinstance(profile_2.get("freq"), dict)):
-            is_valid = False
-            break
-        if isinstance(profile_2["freq"], str):
-            is_valid = False
-            break
-        for letter, freq in profile_2["freq"].items():
-            if not (isinstance(letter, str) and isinstance(freq, float)):
-                is_valid = False
-                break
-    if not is_valid:
+    if (not isinstance(profile_2, dict) or profile_2.get("name") is None
+            or profile_2.get("freq") is None):
         return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
@@ -362,27 +282,11 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    is_valid = True
-    for i in range(1):
-        if not isinstance(known_profiles, list):
-            is_valid = False
-            break
-        if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
-                or unknown_profile.get("freq") is None):
-            is_valid = False
-            break
-        if (not isinstance(unknown_profile.get("name"), str) or
-                not isinstance(unknown_profile.get("freq"), dict)):
-            is_valid = False
-            break
-        if isinstance(unknown_profile["freq"], str):
-            is_valid = False
-            break
-        for letter, freq in unknown_profile["freq"].items():
-            if not (isinstance(letter, str) and isinstance(freq, float)):
-                is_valid = False
-                break
-    if not is_valid:
+
+    if not isinstance(known_profiles, list):
+        return None
+    if (not isinstance(unknown_profile, dict) or unknown_profile.get("name") is None
+            or unknown_profile.get("freq") is None):
         return None
     sorted_list: list[tuple[str, float]] | None
     sorted_list = []

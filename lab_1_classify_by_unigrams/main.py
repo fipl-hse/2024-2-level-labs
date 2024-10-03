@@ -36,7 +36,7 @@ def tokenize(text: str) -> list[str] | None:
             clean_text += symb
 
     clean_text = list(clean_text.lower())
-    # print(clean_text)
+
     return clean_text
 
 
@@ -59,26 +59,26 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         if not isinstance(element, str):
             return None
 
-    # Объединяем все токены в одну строку и преобразуем в нижний регистр
+
     combined_string = ''.join(tokens).lower()
 
-    # Создаем частотный словарь для букв
+
     freq_dictionary = dict()
-    total_letters = 0  # Счетчик для общего количества букв
+    total_letters = 0
 
     for letter in combined_string:
-        if letter.isalpha():  # Проверяем, является ли символ буквой
+        if letter.isalpha():
             total_letters += 1
             if letter in freq_dictionary:
                 freq_dictionary[letter] += 1
             else:
                 freq_dictionary[letter] = 1
 
-    # Вычисляем частоты
+
     for letter in freq_dictionary:
         freq_dictionary[letter] = freq_dictionary[letter] / total_letters
 
-    return freq_dictionary if total_letters > 0 else None  # Возвращаем None, если нет букв
+    return freq_dictionary if total_letters > 0 else None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:

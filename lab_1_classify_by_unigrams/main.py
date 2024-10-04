@@ -202,16 +202,15 @@ def detect_language(
     if (mse_1 is None or mse_2 is None
             or not isinstance(name1, str) or not isinstance(name2, str)):
         return None
-    result1 = name1
-    result2 = name2
 
-    if mse_1 < mse_2:
-        return result1
-    if mse_1 == mse_2:
-        profile_sorted_list = sorted([result1, result2])
-        return str(profile_sorted_list[0])
+    dict_with_mse = {name1: mse_1, name2: mse_2}
+    dict_into_lst = list(dict_with_mse.items())
+    results_sorted = sorted(dict_into_lst, key=lambda x: (x[1], x[0]))
+    result = results_sorted[0][0]
 
-    return result2
+    if not isinstance(result, str):
+        return None
+    return result
 
 
 def load_profile(path_to_file: str) -> dict | None:

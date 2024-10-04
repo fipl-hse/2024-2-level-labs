@@ -45,9 +45,8 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     if not (isinstance(tokens, list) and all(isinstance(t, str) for t in tokens)):
         return None
-    unique_tokens = set(tokens)
     frequencies = {}
-    for l in unique_tokens:
+    for l in set(tokens):
         frequencies[l] = tokens.count(l) / len(tokens)
     return frequencies
 

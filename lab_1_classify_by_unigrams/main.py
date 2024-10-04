@@ -25,15 +25,8 @@ def tokenize(text: str) -> list[str] | None:
         return None
     text = text.lower()
     tozenized_text = []
-    bad_symbols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '!', '"',
-                   '#', '$', '%', '&',
-                   "'", '(', ')', '*', '+', ',', '.', '-',
-                   '/', ':', ';', '<', '=', '>',
-                        '?', '@', '[', '\\', ']', '^', '_',
-                   '`', '{', '|', '}', '~', ' ']
-
     for symb in text:
-        if symb in bad_symbols:
+        if not symb.isalpha():
             continue
         tozenized_text.append(symb)
 

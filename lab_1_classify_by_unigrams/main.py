@@ -20,14 +20,13 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text,str):
         return None
     text_of_token = []
-    if isinstance(text, str):
-        text = text.lower()
-        for element in text:
-            if element == 'º':
-                continue
-            elif element.isalpha():
-                text_of_token += element
-        return text_of_token
+    text = text.lower()
+    for element in text:
+        if element == 'º':
+            continue
+        elif element.isalpha():
+            text_of_token += element
+    return text_of_token
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -42,20 +41,25 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(tokens, list):
-        for element in tokens:
-            if isinstance(element, str):
-                number_of_tokens = len(tokens)
-                tokens_cnt = {}
-                for letter in tokens:
-                    if letter not in tokens_cnt:
-                        tokens_cnt[letter] = 1
-                    else:
-                        tokens_cnt[letter] = tokens_cnt[letter] + 1
-                tokens_frequency = {}
-                for symbol, value in tokens_cnt.items():
-                    tokens_frequency[symbol] = value/number_of_tokens
-                return tokens_frequency
+    if not isinstance(tokens, list):
+        return None
+
+    tokens_cnt = {}
+    number_of_tokens = 0
+
+    for element in tokens:
+        if isinstance(element, str):
+            number_of_tokens += 1
+            if element not in tokens_cnt:
+                tokens_cnt[element] = 1
+            else:
+                tokens_cnt[element] += 1
+        tokens_frequency = {}
+        if number_of_tokens > 0:
+            for symbol, count in tokens_cnt.items():
+                tokens_frequency[symbol] = count / number_of_tokens
+
+        return tokens_frequency
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """

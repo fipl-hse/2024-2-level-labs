@@ -298,7 +298,7 @@ def detect_language_advanced(
             return None
         dist_list.append((known_profile["name"], diff_unk_known))
 
-    dist_list.sort(key=lambda a: a[1])
+    dist_list.sort(key=lambda a: (a[1], a[0]))
     return dist_list
 
 

@@ -42,7 +42,7 @@ def main() -> None:
             print_report(finish)
 
     return None
-    #assert result, "Detection result is None"
+    # assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

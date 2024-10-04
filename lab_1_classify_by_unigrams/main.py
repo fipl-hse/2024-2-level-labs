@@ -133,7 +133,7 @@ def compare_profiles(
             or not isinstance(profile_to_compare['freq'], dict)):
         return None
     for key, value in profile_to_compare.items():
-        if not isinstance(key, str) or not (isinstance(value, (str, dict))):
+        if not isinstance(key, str) or not isinstance(value, (str, dict)):
             return None
 
     profile_to_compare_freq = profile_to_compare['freq']

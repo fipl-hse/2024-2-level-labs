@@ -110,9 +110,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     mse = 0
     for i in enumerate(predicted):
         mse += (predicted[i] - actual[i])**2
-    print(enumerate(predicted))
 
-    # return mse/enumerate(predicted)
+    return mse/len(predicted)
 
 
 def compare_profiles(
@@ -150,7 +149,6 @@ def compare_profiles(
         profile_to_compare_list = list(dict(sorted(profile_to_compare["freq"].items())).values())
         mse = calculate_mse(unknown_profile_list, profile_to_compare_list)
         return mse
-    return mse
 
 
 def detect_language(

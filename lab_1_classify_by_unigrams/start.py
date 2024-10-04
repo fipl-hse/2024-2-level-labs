@@ -21,12 +21,10 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
         unk_profile = create_language_profile("unk", unknown_text)
 
-    result_1 = len(unk_profile["freq"]), len(en_profile["freq"]), len(de_profile["freq"])
-    # result = calculate_mse(unk_profile, en_profile)
-    # result = detect_language(unk_profile, en_profile, de_profile)
-    print(result_1)
+    result = detect_language(unk_profile, en_profile, de_profile)
+    print(result)
 
-    assert result_1, "Detection result is None"
+    assert result, "Detection result is None"
 
 
 if __name__ == "__main__":

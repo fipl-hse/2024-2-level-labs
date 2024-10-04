@@ -12,7 +12,7 @@ def tokenize(text: str) -> list[str] | None:
         string += el
     string = string.lower()
     list_letters = []
-    for i in text.lower():
+    for i in string.lower():
         if i.isalpha():
             list_letters.append(i)
     if len(list_letters) > 0:

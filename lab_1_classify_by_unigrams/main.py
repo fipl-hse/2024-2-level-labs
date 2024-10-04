@@ -181,21 +181,17 @@ def detect_language(
         return None
 
     score_1 = compare_profiles(unknown_profile, profile_1)
+    if score_1 is None:
+        return None
     score_2 = compare_profiles(unknown_profile, profile_2)
+    if score_2 is None:
+        return  None
 
     if score_1 < score_2:
         return profile_1['name']
-    if score_1 == score_2:
-        alphabet = 'abcdefghijklmnopqrstuvwxyz'
-        lang1 = profile_1['name']
-        lang2 = profile_2['name']
-        if (alphabet.index(lang1[0]) < alphabet.index(lang2[0])
-                or (alphabet.index(lang1[0]) == alphabet.index(lang2[0])
-                    and alphabet.index(lang1[1]) < alphabet.index(lang2[1]))):
-            return lang1
-        return lang2
-    return profile_2['name']
-
+    if score_2 < score_1:
+        return profile_2['name']
+    return sorted([profile_2['name'], profile_1['name']])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:

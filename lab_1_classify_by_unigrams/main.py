@@ -53,7 +53,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             return None
         if letter not in freq_dictionary:
             freq_dictionary[letter] = 0.0
-        freq_dictionary[letter] += float(1)
+        freq_dictionary[letter] += 1.0
 
     for letter in freq_dictionary:
         freq_dictionary[letter] = freq_dictionary[letter] / length
@@ -79,7 +79,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     if dictionary is None:
         return None
     return {'name': language, 'freq': dictionary}
-
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:

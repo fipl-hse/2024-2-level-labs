@@ -5,7 +5,6 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -24,8 +23,8 @@ def tokenize(text: str) -> list[str] | None:
         return None
     lowered_text = text.lower()
     tokens = []
-    for elem in lowered_text:
-        if elem.isalpha() and elem != "º":
+    for elem in low_text:
+        if (elem.isalpha()) or (elem != "º"):
             tokens += elem
     return tokens
 
@@ -104,8 +103,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     if len(predicted) != len(actual):
         return None
-    # if len(predicted) or len(actual) == 0:
-        # return None
 
     mse = float(0)
     for i in enumerate(predicted):
@@ -147,8 +144,7 @@ def compare_profiles(
     if len(unknown_profile["freq"]) == len(profile_to_compare["freq"]):
         unknown_profile_list = list(dict(sorted(unknown_profile["freq"].items())).values())
         profile_to_compare_list = list(dict(sorted(profile_to_compare["freq"].items())).values())
-        mse = calculate_mse(unknown_profile_list, profile_to_compare_list)
-        return mse
+        return calculate_mse(unknown_profile_list, profile_to_compare_list)
 
 
 def detect_language(

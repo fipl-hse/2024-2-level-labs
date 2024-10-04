@@ -34,7 +34,7 @@
 2. `Оценка релевантности документов с помощью
    BM25 <https://github.com/fipl-hse/2024-2-level-labs/tree/main/lab_2_retrieval_w_bm25>`__
 
-   1. Дедлайн: 25 октября
+   1. Дедлайн: 1 ноября
 
 3. **TBD**
 

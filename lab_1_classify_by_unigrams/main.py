@@ -23,7 +23,6 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     text = text.lower()
-    text = text.replace("º", "")
     tokens = []
     for token in text:
         if token.isalpha():

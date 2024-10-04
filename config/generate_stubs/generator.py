@@ -39,7 +39,14 @@ def remove_implementation_from_function(original_declaration: ast.stmt,
                                          f'{original_declaration.name}')
 
     opening_files = []
-    for decl in original_declaration.body:
+    for index, decl in enumerate(original_declaration.body):
+        if (isinstance(decl, ast.Assign) and 'assets/fairytale_1.txt' in
+                ast.unparse(decl.value)):
+            opening_files.extend([
+                original_declaration.body[index],
+                original_declaration.body[index+1],
+                original_declaration.body[index+2]
+            ])
         if isinstance(decl, ast.With):
             if 'assets' in ast.unparse(decl.items[0].context_expr.args[0]):  # type: ignore
                 opening_files.append(decl)

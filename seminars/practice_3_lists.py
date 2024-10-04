@@ -56,27 +56,20 @@ first_test = [1, 2, 3, [1, 2, 3]]
 
 # Task 1:
 # easy level
-
-
 def count_evens(nums: list) -> int:
     """
     Return the number of even ints in the given array.
     """
-    how_many_evens = 0
-    for number in nums:
-        if number % 2 == 0:
-            how_many_evens += 1
-    return how_many_evens
+    # student realization goes here
 
 
-print(count_evens([2, 1, 2, 3, 4]))
-print(count_evens([2, 2, 0]))
-print(count_evens([1, 3, 5]))
+# Function calls with expected result:
+# count_evens([2, 1, 2, 3, 4]) → 3
+# count_evens([2, 2, 0]) → 3
+# count_evens([1, 3, 5]) → 0
 
 # Task 2:
 # easy level
-
-
 def sum13(nums: list) -> int:
     """
     Return the sum of the numbers in the array, returning 0 for an empty array.
@@ -84,29 +77,17 @@ def sum13(nums: list) -> int:
     so it does not count and numbers that come after a 13
     also do not count.
     """
-    total = 0
-    skip = False
-    for i in nums:
-        if i == 13:
-            skip = True
-            continue  # Пропускаем 13
-        if skip and i != 7:
-            continue  # Пропускаем все после 13
-        total += i
-        if i == 7:
-            skip = False  # Возобновляем подсчет после 7
-    return total
+    # student realization goes here
 
+# Function calls with expected result:
+# sum13([1, 2, 2, 1]) → 6
+# sum13([1, 1]) → 2
+# sum13([1, 2, 2, 1, 13]) → 6
+# sum13([1, 2, 2, 1, 13, 5, 6]) → 6
 
-print(sum13([1, 2, 2, 1]))
-print(sum13([1, 1]))
-print(sum13([1, 2, 2, 1, 13]))
-print(sum13([1, 2, 2, 1, 13, 5, 6]))
 
 # Task 3
 # easy level
-
-
 def sum67(nums: list) -> int:
     """
     Return the sum of the numbers in the array,
@@ -114,35 +95,22 @@ def sum67(nums: list) -> int:
     (every 6 will be followed by at least one 7).
     Return 0 for no numbers.
     """
-    result = 0
-    skip = False
+    # student realization goes here
 
-    for num in nums:
-        if num == 6:
-            skip = True
-        if not skip:
-            result += num
-        if num == 7:
-            skip = False
+# Function calls with expected result:
+# sum67([1, 2, 2]) → 5
+# sum67([1, 2, 2, 6, 99, 99, 7]) → 5
+# sum67([1, 1, 6, 7, 2]) → 4
 
-    return result
-
-
-assert sum67([1, 2, 2, 1]) == 6
-assert sum67([1, 1]) == 2
-assert sum67([1, 2, 2, 1, 6, 99, 7]) == 6
-assert sum67([1, 1, 6, 7, 2]) == 4
 
 # Task 4
 # easy level
-
-
-def create_phone_number() -> str:
+def create_phone_number(nums: list) -> str:
     """
     Write a function that accepts an array of 10 integers (between 0 and 9),
     that returns a string of those numbers in the form of a phone number.
     """
-    return '({nums[0:3]}) '
+    # student realization goes here
 
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
@@ -151,7 +119,7 @@ def create_phone_number() -> str:
 
 # Task 5
 # medium level
-def check_exam() -> int:
+def check_exam(correct_answers: list, student_answers: list) -> int:
     """
     The first input array is the key to the correct answers to an exam,
     like ["a", "a", "b", "d"].
@@ -174,7 +142,7 @@ def check_exam() -> int:
 
 # Task 6
 # medium level
-def who_likes_it() -> str:
+def who_likes_it(names: list) -> str:
     """
     You probably know the "like" system from Facebook and other pages.
     People can "like" blog posts, pictures or other items.
@@ -192,7 +160,7 @@ def who_likes_it() -> str:
 
 # Task 7
 # medium level
-def find_anagrams() -> list:
+def find_anagrams(words: list) -> list:
     """
     What is an anagram?
     Two words are anagrams of each other if they both contain the same letters.
@@ -211,7 +179,7 @@ def find_anagrams() -> list:
 
 # Task 8
 # medium level
-def scramble() -> bool:
+def scramble(words: list) -> bool:
     """
     Complete the function scramble(words: list)
     that returns true if a portion of str1 characters can be rearranged to match str2,
@@ -222,4 +190,4 @@ def scramble() -> bool:
 # Function calls with expected result:
 # scramble(['rkqodlw', 'world']) ==> True
 # scramble(['cedewaraaossoqqyt', 'codewars']) ==> True
-# scramble(['katas', 'steak']) ==> Falsegit add
+# scramble(['katas', 'steak']) ==> False

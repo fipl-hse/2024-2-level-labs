@@ -50,14 +50,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             return None
 
     token_dict = {}
-    for char in tokens:
-        for i in token_dict:
-            if char not in token_dict:
-                token_dict.update({char: 0.0})
+    for i in tokens:
+        if i not in token_dict.keys():
+            token_dict.update({i: 0.0})
         token_dict[i] += 1.0
 
     sum_token_dict_values = sum(token_dict.values())
-    for i in token_dict.items():
+    for i in token_dict:
         new_elem = token_dict[i] / sum_token_dict_values
         token_dict[i] = new_elem
     return token_dict

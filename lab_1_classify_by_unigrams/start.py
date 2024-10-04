@@ -27,6 +27,8 @@ def main() -> None:
                                  en_profile)
     else:
         result = None
+
+    print(result)
     assert result, "Detection result is None"
 
 

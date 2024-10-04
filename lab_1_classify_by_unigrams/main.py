@@ -160,7 +160,7 @@ def detect_language(
         profile_2['name']: second_comp
     }
     sorted_profiles = sorted(total_dict.items(), key=lambda item: (item[1], item[0]))
-    return sorted_profiles[0][0]
+    return str(sorted_profiles[0][0])
 
 
 def load_profile(path_to_file: str) -> dict | None:

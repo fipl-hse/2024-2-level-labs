@@ -8,9 +8,8 @@ Language detection
 
 def tokenize(text: str) -> list[str] | None:
     text = text.lower()
-    list_of_tokens = text.split(sep=None, maxsplit=-1)
     list_letters = []
-    for i in list_of_tokens:
+    for i in text:
         if i.isalpha():
             list_letters.append(i)
     if len(list_letters) > 0:

@@ -5,6 +5,7 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
+
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -46,9 +47,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         return None
     freq = {}
     for i in tokens:
-        if not isinstance(i, str):
-            return None
-        if len(i) != 1:
+        if not isinstance(i, str) or len(i) != 1:
             return None
         if i in freq:
             continue

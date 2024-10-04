@@ -7,7 +7,10 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
-    text = text.lower()
+    string = ""
+    for el in text:
+        string += el
+    string = string.lower()
     list_letters = []
     for i in text.lower():
         if i.isalpha():

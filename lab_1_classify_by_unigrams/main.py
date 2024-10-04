@@ -3,12 +3,6 @@ Lab 1.
 
 Language detection
 """
-from string import punctuation
-
-
-# pylint:disable=too-many-locals, unused-argument, unused-variable
-
-
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -39,7 +33,6 @@ def tokenize(text: str) -> list[str] | None:
 
     return clean_text
 
-
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculate frequencies of given tokens.
@@ -59,9 +52,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         if not isinstance(element, str):
             return None
 
-
     combined_string = ''.join(tokens).lower()
-
 
     freq_dictionary = dict()
     total_letters = 0
@@ -79,7 +70,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         freq_dictionary[letter] = freq_dictionary[letter] / total_letters
 
     return freq_dictionary if total_letters > 0 else None
-
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """=
@@ -102,7 +92,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     freq = calculate_frequencies(tokens)
     result['freq'] = freq
     return result
-
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

@@ -25,8 +25,12 @@ def tokenize(text: str) -> list[str] | None:
         return None
     text = text.lower()
     tozenized_text = []
-    bad_symbols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '.', '-', '/', ':', ';', '<', '=', '>',
-                        '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ']
+    bad_symbols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '!', '"',
+                   '#', '$', '%', '&',
+                   "'", '(', ')', '*', '+', ',', '.', '-',
+                   '/', ':', ';', '<', '=', '>',
+                        '?', '@', '[', '\\', ']', '^', '_',
+                   '`', '{', '|', '}', '~', ' ']
 
     for symb in text:
         if symb in bad_symbols:
@@ -99,7 +103,9 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     In case of corrupt input arguments, None is returned
     """
 
-    if not isinstance(predicted, list) or not isinstance(actual, list) or len(predicted) != len(actual):
+    if (not isinstance(predicted, list)
+            or not isinstance(actual, list)
+            or len(predicted) != len(actual)):
         return None
     mse = 0
     for i, pred_val in enumerate(predicted):
@@ -125,7 +131,12 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or unknown_profile.get('name') is None or profile_to_compare.get('name') is None or profile_to_compare.get('freq') is None or unknown_profile.get('freq') is None:
+    if (not isinstance(unknown_profile, dict)
+            or not isinstance(profile_to_compare, dict)
+            or unknown_profile.get('name') is None
+            or profile_to_compare.get('name') is None
+            or profile_to_compare.get('freq') is None
+            or unknown_profile.get('freq') is None):
         return None
 
     lang_1 = unknown_profile['freq']
@@ -182,7 +193,9 @@ def detect_language(
         alphabet = 'abcdefghijklmnopqrstuvwxyz'
         lang1 = profile_1['name']
         lang2 = profile_2['name']
-        if alphabet.index(lang1[0]) < alphabet.index(lang2[0]) or (alphabet.index(lang1[0]) == alphabet.index(lang2[0]) and alphabet.index(lang1[1]) < alphabet.index(lang2[1])):
+        if (alphabet.index(lang1[0]) < alphabet.index(lang2[0])
+                or (alphabet.index(lang1[0]) == alphabet.index(lang2[0])
+                    and alphabet.index(lang1[1]) < alphabet.index(lang2[1]))):
             return lang1
         return lang2
     return profile_2['name']

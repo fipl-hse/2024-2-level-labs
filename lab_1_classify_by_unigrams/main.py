@@ -126,8 +126,9 @@ def compare_profiles(
     """
     if (not isinstance(unknown_profile, dict)
             or not isinstance(profile_to_compare, dict)
-            or unknown_profile.get('name') is None
-            or profile_to_compare.get('name') is None
+            or unknown_profile.get('name') is None):
+        return None
+    if (profile_to_compare.get('name') is None
             or profile_to_compare.get('freq') is None
             or unknown_profile.get('freq') is None):
         return None
@@ -174,7 +175,9 @@ def detect_language(
     In case of corrupt input arguments, None is returned
     """
 
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict) or not isinstance(profile_2, dict):
+    if (not isinstance(unknown_profile, dict) or
+            not isinstance(profile_1, dict) or
+            not isinstance(profile_2, dict)):
         return None
 
     score_1 = compare_profiles(unknown_profile, profile_1)
@@ -182,7 +185,7 @@ def detect_language(
 
     if score_1 < score_2:
         return profile_1['name']
-    elif score_1 == score_2:
+    if score_1 == score_2:
         alphabet = 'abcdefghijklmnopqrstuvwxyz'
         lang1 = profile_1['name']
         lang2 = profile_2['name']
@@ -207,9 +210,6 @@ def load_profile(path_to_file: str) -> dict | None:
 
     In case of corrupt input arguments, None is returned
     """
-
-    
-
 
 
 def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
@@ -269,4 +269,3 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-

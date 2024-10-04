@@ -7,6 +7,7 @@ Language detection
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 import json
+from copy import deepcopy
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -130,9 +131,10 @@ def compare_profiles(
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict) or not\
             len(unknown_profile) ==2 or not len(profile_to_compare) == 2:
         return None
-    unknown_frequency = unknown_profile['freq']
+    copy_of_unknown = deepcopy(unknown_profile)
+    unknown_frequency = copy_of_unknown['freq']
     comparing_frequency = profile_to_compare['freq']
-    if (not isinstance(unknown_frequency, dict) or not isinstance(comparing_frequency, dict)):
+    if not isinstance(unknown_frequency, dict) or not isinstance(comparing_frequency, dict):
         return None
     for i in unknown_frequency:
         if i not in comparing_frequency:
@@ -140,7 +142,7 @@ def compare_profiles(
     for i in comparing_frequency:
         if i not in unknown_frequency:
             unknown_frequency[i] = 0
-    sorted_unknown = dict(sorted(unknown_profile['freq'].items()))
+    sorted_unknown = dict(sorted(copy_of_unknown['freq'].items()))
     sorted_compare = dict(sorted(profile_to_compare['freq'].items()))
     sort_comp_list = []
     sort_unkn_list = []

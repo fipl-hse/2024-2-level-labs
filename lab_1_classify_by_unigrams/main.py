@@ -155,13 +155,12 @@ def detect_language(
         return None
     first_comp = compare_profiles(unknown_profile, profile_1)
     second_comp = compare_profiles(unknown_profile, profile_2)
-    if str(first_comp) < str(second_comp):
-        return str(profile_1['name'])
-    if str(first_comp) > str(second_comp):
-        return str(profile_2['name'])
-    if str(profile_2['name']) < str(profile_1['name']):
-        return str(profile_2['name'])
-    return str(profile_1['name'])
+    total_dict = {
+        profile_1['name']: first_comp,
+        profile_2['name']: second_comp
+    }
+    sorted_profiles = sorted(total_dict.items(), key=lambda item: (item[1], item[0]))
+    return sorted_profiles[0][0]
 
 
 def load_profile(path_to_file: str) -> dict | None:

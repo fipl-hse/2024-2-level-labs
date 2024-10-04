@@ -41,25 +41,13 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(tokens, list):
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
-
-    tokens_cnt = {}
-    number_of_tokens = 0
-
-    for element in tokens:
-        if isinstance(element, str):
-            number_of_tokens += 1
-            if element not in tokens_cnt:
-                tokens_cnt[element] = 1
-            else:
-                tokens_cnt[element] += 1
-        tokens_frequency = {}
-        if number_of_tokens > 0:
-            for symbol, count in tokens_cnt.items():
-                tokens_frequency[symbol] = count / number_of_tokens
-
-        return tokens_frequency
+    freq_dictionary = {}
+    total_amount_of_tokens = len(tokens)
+    for elem in set(tokens):
+        freq_dictionary[elem] = float(tokens.count(elem) / total_amount_of_tokens)
+    return freq_dictionary
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """

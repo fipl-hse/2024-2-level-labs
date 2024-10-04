@@ -21,7 +21,7 @@ def main() -> None:
         unknown_text = file_to_read_unk.read()
         unk_profile = create_language_profile("unk", unknown_text)
 
-    result = detect_language(unk_profile, en_profile, de_profile)
+    result = unk_profile, en_profile, de_profile
     print(result)
 
     assert result, "Detection result is None"

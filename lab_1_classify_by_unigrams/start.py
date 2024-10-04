@@ -18,7 +18,6 @@ def main() -> None:
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
-    result = None
     paths_to_profiles = ['assets/profiles/de.json', 'assets/profiles/en.json',
                          'assets/profiles/es.json', 'assets/profiles/fr.json',
                          'assets/profiles/it.json', 'assets/profiles/ru.json',
@@ -26,16 +25,18 @@ def main() -> None:
     unk_profile = create_language_profile('unk', unknown_text)
     en_profile = create_language_profile('en', en_text)
     de_profile = create_language_profile('de', de_text)
-    if unk_profile and en_profile and de_profile:
-        print(tokenize(en_text))
-        print(create_language_profile('en', en_text))
-        print(detect_language(unk_profile, en_profile, de_profile))
-        profiles_collection = collect_profiles(paths_to_profiles)
-        if profiles_collection:
-            result = detect_language_advanced(
-                unk_profile, profiles_collection)
-            if isinstance(result, list):
-                print_report(result)
+    if not unk_profile or not en_profile or not de_profile:
+        return
+    print(tokenize(en_text))
+    print(create_language_profile('en', en_text))
+    print(detect_language(unk_profile, en_profile, de_profile))
+    profiles_collection = collect_profiles(paths_to_profiles)
+    if not profiles_collection:
+        return
+    result = detect_language_advanced(
+        unk_profile, profiles_collection)
+    if isinstance(result, list):
+        print_report(result)
     assert result, "Detection result is None"
 
 

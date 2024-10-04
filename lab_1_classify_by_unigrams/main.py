@@ -100,16 +100,16 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(predicted, list) or isinstance(actual, list)):
+    if not (isinstance(predicted, list) and isinstance(actual, list)):
         return None
     if len(predicted) != len(actual):
         return None
     # if len(predicted) or len(actual) == 0:
         # return None
 
-    mse = 0
+    mse = float(0)
     for i in enumerate(predicted):
-        mse += (predicted[i] - actual[i])**2
+        mse += (list(predicted[i]) - list(actual[i]))**2
 
     return mse/len(predicted)
 

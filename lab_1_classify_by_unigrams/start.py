@@ -4,6 +4,9 @@ Language detection starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
+from main import tokenize, create_language_profile, detect_language
+
+
 def main() -> None:
     """
     Launches an implementation
@@ -12,9 +15,14 @@ def main() -> None:
         en_text = file_to_read_en.read()
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
+
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    result = None
+    en = create_language_profile('en', en_text)
+    de = create_language_profile('de', de_text)
+    result = create_language_profile('un', unknown_text)
+    print(detect_language(result, en, de))
+
     assert result, "Detection result is None"
 
 

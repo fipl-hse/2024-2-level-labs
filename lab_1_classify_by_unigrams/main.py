@@ -7,13 +7,14 @@ Language detection
 
 
 def tokenize(text: str) -> list[str] | None:
+    if not isinstance(text, str):
+        return None
     text = text.lower()
     list_letters = []
     for i in text:
         if i.isalpha():
             list_letters.append(i)
     if len(list_letters) > 0:
-        print(list_letters)
         return list_letters
     return None
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:

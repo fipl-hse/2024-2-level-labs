@@ -24,7 +24,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    wrong_cases = list("!?/|&><%.,';:\"#\\@()*-+=`~ 1234567890")
+    wrong_cases = list("!?/|&$><%.,';:\"#\\@()*-+=`~ 1234567890")
     return [symbol for symbol in text.lower() if symbol not in wrong_cases]
 
 
@@ -63,11 +63,12 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
+    tokens = tokenize(text)
     if ((not isinstance(language, str)) or
-            (not isinstance(text, str)) or (tokenize(text) is None) or
-            (calculate_frequencies(tokenize(text)) is None)):
+            (not isinstance(text, str)) or (tokens is None) or
+            (calculate_frequencies(tokens) is None)):
         return None
-    calculate_frequency = calculate_frequencies(tokenize(text))
+    calculate_frequency = calculate_frequencies(tokens)
     if not isinstance(calculate_frequency, dict):
         return None
     return {"name": language, "freq": calculate_frequency}

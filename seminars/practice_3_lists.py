@@ -77,7 +77,7 @@ def sum13(nums: list) -> int:
     so it does not count and numbers that come after a 13
     also do not count.
     """
-
+    # student realization goes here
 
 # Function calls with expected result:
 # sum13([1, 2, 2, 1]) → 6
@@ -88,7 +88,7 @@ def sum13(nums: list) -> int:
 
 # Task 3
 # easy level
-'''def sum67(nums: list) -> int:
+def sum67(nums: list) -> int:
     """
     Return the sum of the numbers in the array,
     except ignore sections of numbers starting with a 6 and extending to the next 7
@@ -97,28 +97,10 @@ def sum13(nums: list) -> int:
     """
     # student realization goes here
 
-    result=0
-    flag = True
-    for elem in nums:
-        if elem == 6:
-            flag = False
-        if elem == 7:
-            flag = True
-        if flag:
-            result += elem
-
-        del nums[nums.index(6):nums.index(7)+1]
-        nums_sum = sum(nums)
-        print(nums_sum)
-        return nums_sum
-
 # Function calls with expected result:
-a = [1, 2, 2]
-b = [1, 2, 2, 6, 99, 99, 7]
-c = [1, 1, 6, 7, 2]
-sum67(a)
-sum67(b)
-sum67(c)'''
+# sum67([1, 2, 2]) → 5
+# sum67([1, 2, 2, 6, 99, 99, 7]) → 5
+# sum67([1, 1, 6, 7, 2]) → 4
 
 
 # Task 4
@@ -129,8 +111,6 @@ def create_phone_number(nums: list) -> str:
     that returns a string of those numbers in the form of a phone number.
     """
     # student realization goes here
-    ''
-
 
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])

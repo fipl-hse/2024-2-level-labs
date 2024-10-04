@@ -3,7 +3,8 @@ Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-from lab_1_classify_by_unigrams.main import tokenize, calculate_frequencies
+from lab_1_classify_by_unigrams.main import calculate_frequencies, tokenize
+
 
 def main() -> None:
     """

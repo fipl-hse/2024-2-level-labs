@@ -160,7 +160,7 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
-    func_result = str('')
+    '''func_result = str('')
     if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
             or not isinstance(profile_2, dict)):
         return None
@@ -180,8 +180,19 @@ def detect_language(
         func_result = str(profile_2['name'])
     if not isinstance(func_result, str):
         return None
-    return func_result
+    return func_result'''
 
+    if (not isinstance(unknown_profile, dict) or not isinstance(profile_1, dict)
+            or not isinstance(profile_2, dict)):
+        return None
+    first_metric = compare_profiles(unknown_profile, profile_1)
+    second_metric = compare_profiles(unknown_profile, profile_2)
+    mse_dictionary = {str(profile_1['name']): first_metric, str(profile_2['name']): second_metric}
+    mse_dictionary_new = dict(sorted(mse_dictionary.items(), key=lambda x: x[1]))
+    func_result = list(mse_dictionary_new.keys())[0]
+    if not isinstance(func_result, str):
+        return None
+    return func_result
 
 def load_profile(path_to_file: str) -> dict | None:
     """

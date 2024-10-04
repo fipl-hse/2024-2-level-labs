@@ -105,7 +105,7 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         return None
     sum_diff = 0
     for pair_num, actual_num in enumerate(actual):
-        sum_diff += (actual_num-predicted[pair_num])**2
+        sum_diff += (actual_num - predicted[pair_num])**2
     return sum_diff / len(predicted)
 
 
@@ -294,10 +294,9 @@ def detect_language_advanced(
         if not isinstance(compare_profiles(unknown_profile, profile), float):
             return None
         list_of_profiles.append((profile['name'], compare_profiles(unknown_profile, profile)))
-    if list_of_profiles:
-        list_of_profiles.sort(key=lambda i: (i[1], i[0]))
-        return list_of_profiles
-    return None
+
+    list_of_profiles.sort(key=lambda i: (i[1], i[0]))
+    return list_of_profiles
 
 
 

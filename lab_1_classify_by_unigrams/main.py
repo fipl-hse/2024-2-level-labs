@@ -173,9 +173,9 @@ def detect_language(
         return None
     diff_dict = {"diff_unk_1": compare_profiles(unknown_profile, profile_1),
                  "diff_unk_2": compare_profiles(unknown_profile, profile_2)}
+    diff_dict = dict(sorted(diff_dict.items()))
     if (isinstance(diff_dict["diff_unk_1"], float) and 
         isinstance(diff_dict["diff_unk_2"], float)):
-        diff_dict = dict(sorted(diff_dict.items()))
         if diff_dict["diff_unk_1"] < diff_dict["diff_unk_2"]:
             return profile_1["name"]
         if diff_dict["diff_unk_1"] > diff_dict["diff_unk_2"]:

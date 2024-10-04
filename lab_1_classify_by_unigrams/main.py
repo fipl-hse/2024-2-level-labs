@@ -17,6 +17,8 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(text,str):
+        return None
     text_of_token = []
     if isinstance(text, str):
         text = text.lower()

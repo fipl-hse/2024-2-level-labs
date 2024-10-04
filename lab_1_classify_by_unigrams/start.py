@@ -4,7 +4,7 @@ Language detection starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
 
-from lab_1_classify_by_unigrams.main import create_language_profile, detect_language
+from main import create_language_profile, detect_language
 
 
 def main() -> None:
@@ -30,6 +30,7 @@ def main() -> None:
         answer = detect_language(unknown_profile, profile_to_compare_en, profile_to_compare_de)
 
         result = answer
+        print(result)
         assert result, "Detection result is None"
 
 

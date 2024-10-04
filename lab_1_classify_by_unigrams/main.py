@@ -45,12 +45,9 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
             if not isinstance(element, str):
                 return None
     dictionary = {}
-    token_number = len(tokens)
-    for letter in tokens:
-        if letter not in dictionary:
-            dictionary[letter] = 1/token_number
-        else:
-            dictionary[letter] = (dictionary[letter]*token_number + 1)/token_number
+
+    for element in set(tokens):
+        dictionary[element] = tokens.count(element) / len(tokens)
     return dictionary
 
 

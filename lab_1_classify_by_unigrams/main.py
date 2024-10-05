@@ -94,11 +94,11 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     if (not isinstance(predicted, list) or not isinstance(actual, list)
             or len(predicted) != len(actual)):
         return None
-    squared_error_sum = sum((p - a) ** 2 for p, a in zip(predicted, actual))
+    squared_error = sum((p - a) ** 2 for p, a in zip(predicted, actual))
 
-    if not isinstance(squared_error_sum, float):
+    if not isinstance(squared_error, float):
         return None
-    return squared_error_sum / len(predicted)
+    return squared_error / len(predicted)
 
 
 def compare_profiles(

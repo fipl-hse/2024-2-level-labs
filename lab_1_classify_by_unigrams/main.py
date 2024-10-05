@@ -31,19 +31,6 @@ def tokenize(text: str) -> list[str] | None:
             tokenized_list.append(token)
     return tokenized_list
 
-    if text is None or not isinstance(text, str):
-        return None
-    text = text.lower()
-    tozenized_text = []
-    for symb in text:
-        if not symb.isalpha():
-            continue
-        tozenized_text.append(symb)
-
-    if not tozenized_text:
-        return None
-
-    return tozenized_text
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -63,22 +50,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for token in set(tokens):
         frequency_dict[token] = tokens.count(token) / len(tokens)
     return frequency_dict
-
-    if not isinstance(tokens, list):
-        return None
-    frequencies = {}
-    for token in tokens:
-        if not isinstance(token, str):
-            return None
-        if token not in frequencies:
-            frequencies[token] = 0
-        frequencies[token] += 1
-
-    for token in frequencies:
-        frequencies[token] = frequencies[token] / len(tokens)
-
-    return frequencies
-
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -124,15 +95,6 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         difference_between_values = (value - predicted[i]) ** 2
         sum_diff += difference_between_values
     return sum_diff / len(predicted)
-
-    if (not isinstance(predicted, list)
-            or not isinstance(actual, list)
-            or len(predicted) != len(actual)):
-        return None
-    mse = 0
-    for i, pred_val in enumerate(predicted):
-        mse += (pred_val - actual[i]) ** 2
-    return mse / len(predicted)
 
 
 def compare_profiles(
@@ -211,24 +173,6 @@ def detect_language(
     if mse_1 > mse_2:
         return profile_2['name']
     return sorted([profile_1['name'], profile_2['name']])[0]
-
-    if (not isinstance(unknown_profile, dict) or
-            not isinstance(profile_1, dict) or
-            not isinstance(profile_2, dict)):
-        return None
-
-    score_1 = compare_profiles(unknown_profile, profile_1)
-    if score_1 is None:
-        return None
-    score_2 = compare_profiles(unknown_profile, profile_2)
-    if score_2 is None:
-        return  None
-
-    if score_1 < score_2:
-        return profile_1['name']
-    if score_2 < score_1:
-        return profile_2['name']
-    return sorted([profile_2['name'], profile_1['name']])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:

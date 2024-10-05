@@ -156,6 +156,7 @@ def compare_profiles(
     return calculate_mse(unknown_list, compared_list)
 
 
+
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_1: dict[str, str | dict[str, float]],

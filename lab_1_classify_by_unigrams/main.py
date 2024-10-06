@@ -8,8 +8,6 @@ Language detection
 import copy
 import json
 
-import json
-
 
 def tokenize(text: str) -> list[str] | None:
     """

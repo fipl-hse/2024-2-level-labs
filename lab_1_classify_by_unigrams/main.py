@@ -12,11 +12,15 @@ import json
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
+
     Convert the tokens into lowercase, remove punctuation, digits and other symbols
+
     Args:
         text (str): A text
+
     Returns:
         list[str] | None: A list of lower-cased tokens without punctuation
+
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(text, str):
@@ -31,10 +35,13 @@ def tokenize(text: str) -> list[str] | None:
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
     Calculate frequencies of given tokens.
+
     Args:
         tokens (list[str] | None): A list of tokens
+
     Returns:
         dict[str, float] | None: A dictionary with frequencies
+
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
@@ -48,11 +55,14 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
     Create a language profile.
+
     Args:
         language (str): A language
         text (str): A text
+
     Returns:
         dict[str, str | dict[str, float]] | None: A dictionary with two keys – name, freq
+
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(language, str) or not isinstance(text, str):
@@ -67,11 +77,14 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """
     Calculate mean squared error between predicted and actual values.
+
     Args:
         predicted (list): A list of predicted values
         actual (list): A list of actual values
+
     Returns:
         float | None: The score
+
     In case of corrupt input arguments, None is returned
     """
     if (not isinstance(predicted, list) or not isinstance(actual, list)
@@ -90,12 +103,15 @@ def compare_profiles(
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
+
     Args:
         unknown_profile (dict[str, str | dict[str, float]]): A dictionary of an unknown profile
         profile_to_compare (dict[str, str | dict[str, float]]): A dictionary of a profile
             to compare the unknown profile to
+
     Returns:
         float | None: The distance between the profiles
+
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
@@ -131,13 +147,16 @@ def detect_language(
 ) -> str | None:
     """
     Detect the language of an unknown profile.
+
     Args:
         unknown_profile (dict[str, str | dict[str, float]]): A dictionary of a profile
             to determine the language of
         profile_1 (dict[str, str | dict[str, float]]): A dictionary of a known profile
         profile_2 (dict[str, str | dict[str, float]]): A dictionary of a known profile
+
     Returns:
         str | None: A language
+
     In case of corrupt input arguments, None is returned
     """
     if (not isinstance(profile_1, dict) or not isinstance(profile_2, dict)

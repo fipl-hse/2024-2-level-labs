@@ -45,7 +45,7 @@ jobs:
         run: |
           source venv/bin/activate
           export PYTHONPATH=$(pwd)
-          python config/stage_1_style_tests/pr_name_check.py --pr-name "$PR_NAME" --pr-author "$PR_AUTHOR"
+          python config/static_checks/pr_name_check.py --pr-name "$PR_NAME" --pr-author "$PR_AUTHOR"
 
   code-style:
     name: Code Style
@@ -64,7 +64,7 @@ jobs:
         run: |
           source venv/bin/activate
           export PYTHONPATH=$(pwd)
-          python config/stage_1_style_tests/check_lint.py --repository_type "$REPOSITORY_TYPE"
+          python config/static_checks/check_lint.py --repository_type "$REPOSITORY_TYPE"
 
   mypy-checks:
     name: Mypy checks
@@ -80,7 +80,7 @@ jobs:
         run: |
           source venv/bin/activate
           export PYTHONPATH=$(pwd)
-          python config/stage_1_style_tests/check_mypy.py
+          python config/static_checks/check_mypy.py
 
   unittests:
     name: Unittests
@@ -99,7 +99,7 @@ jobs:
         run: |
           source venv/bin/activate
           export PYTHONPATH=$(pwd)
-          python config/run_tests.py "$PR_NAME" "$PR_AUTHOR"
+          python config/run_tests.py --pr-name "$PR_NAME" --pr-author "$PR_AUTHOR"
 
   start:
     name: Check start.py
@@ -133,4 +133,4 @@ jobs:
         run: |
           source venv/bin/activate
           export PYTHONPATH=$(pwd)
-          python config/stage_1_style_tests/check_flake8.py
+          python config/static_checks/check_flake8.py

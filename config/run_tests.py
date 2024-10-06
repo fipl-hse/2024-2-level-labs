@@ -2,12 +2,21 @@
 Run tests for each lab using pytest.
 """
 import subprocess
-import sys
+
+from tap import Tap
 
 from config.cli_unifier import _run_console_tool, choose_python_exe
 from config.common import check_result
 from config.constants import PROJECT_CONFIG_PATH
 from config.project_config import ProjectConfig
+
+
+class CommandLineInterface(Tap):
+    """
+    Types for the argument parser.
+    """
+    pr_name: str
+    pr_author: str
 
 
 def run_tests(pr_name: str, pr_author: str, lab: str) -> subprocess.CompletedProcess:
@@ -36,8 +45,7 @@ def main() -> None:
     """
     Main function to run tests.
     """
-    pr_name = sys.argv[1]
-    pr_author = sys.argv[2]
+    args = CommandLineInterface(underscores_to_dashes=True).parse_args()
 
     project_config = ProjectConfig(PROJECT_CONFIG_PATH)
     labs = project_config.get_labs_names()
@@ -47,10 +55,10 @@ def main() -> None:
     for lab_name in labs:
         print(f"Running tests for lab {lab_name}")
 
-        result = run_tests(pr_name, pr_author, lab_name)
+        result = run_tests(args.pr_name, args.pr_author, lab_name)
 
-        print(result.stdout)
-        print(result.stderr)
+        print(result.stdout.decode('utf-8'))
+        print(result.stderr.decode('utf-8'))
 
         check_result(result.returncode)
 

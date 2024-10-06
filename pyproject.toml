@@ -5,6 +5,7 @@ markers = [
     "mark8: tests for level 8",
     "mark10: tests for level 10",
     "lab_1_classify_by_unigrams: tests for lab 1",
+    "lab_2_retrieval_w_bm25: tests for lab 2"
 ]
 norecursedirs = [
     "venv*"
@@ -58,7 +59,8 @@ force_alphabetical_sort_within_sections = true
 src_paths = [
     "core_utils",
     "config",
-    "lab_1_classify_by_unigrams"
+    "lab_1_classify_by_unigrams",
+    "lab_2_retrieval_w_bm25"
 ]
 
 [tool.mypy]
@@ -162,7 +164,7 @@ disable_error_code = [
 # fail-on =
 
 # Specify a score threshold under which the program will exit with error.
-fail-under = 10
+fail-under = 10.0
 
 # Interpret the stdin as a python script, whose filename needs to be passed as
 # the module_or_package argument.
@@ -182,10 +184,11 @@ ignore = ["CVS"]
 # file locks
 ignore-patterns = ["^\\.#"]
 
-# List of module names for which member attributes should not be checked (useful
-# for modules/projects where namespaces are manipulated during runtime and thus
-# existing member attributes cannot be deduced by static analysis). It supports
-# qualified module names, as well as Unix pattern matching.
+# List of module names for which member attributes should not be checked and will
+# not be imported (useful for modules/projects where namespaces are manipulated
+# during runtime and thus existing member attributes cannot be deduced by static
+# analysis). It supports qualified module names, as well as Unix pattern
+# matching.
 # ignored-modules =
 
 # Python code to execute, usually for sys.path manipulation such as
@@ -208,6 +211,10 @@ limit-inference-results = 100
 
 # Pickle collected data for later comparisons.
 persistent = true
+
+# Resolve imports to .pyi stubs if available. May reduce no-member messages and
+# increase not-an-iterable messages.
+# prefer-stubs =
 
 # Minimum Python version to use for version dependent checks. Will default to the
 # version used to run pylint.
@@ -498,8 +505,7 @@ confidence = ["HIGH", "CONTROL_FLOW", "INFERENCE", "INFERENCE_FAILURE", "UNDEFIN
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
-disable = []
-
+disable = ["raw-checker-failed", "bad-inline-option", "locally-disabled", "file-ignored", "suppressed-message", "useless-suppression", "deprecated-pragma", "use-symbolic-message-instead", "use-implicit-booleaness-not-comparison-to-string", "use-implicit-booleaness-not-comparison-to-zero"]
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -528,6 +534,10 @@ max-nested-blocks = 5
 # considered as an explicit return statement and no message will be printed.
 never-returning-functions = ["sys.exit", "argparse.parse_error"]
 
+# Let 'consider-using-join' be raised when the separator to join on would be non-
+# empty (resulting in expected fixes of the type: ``"- " + " - ".join(items)``)
+suggest-join-with-non-empty-separator = true
+
 [tool.pylint.reports]
 # Python expression which should return a score less than or equal to 10. You
 # have access to the variables 'fatal', 'error', 'warning', 'refactor',
@@ -540,9 +550,9 @@ evaluation = "max(0, 0 if fatal else 10.0 - ((float(5 * error + warning + refact
 # used to format the message information. See doc for all details.
 # msg-template =
 
-# Set the output format. Available formats are text, parseable, colorized, json
-# and msvs (visual studio). You can also give a reporter class, e.g.
-# mypackage.mymodule.MyReporterClass.
+# Set the output format. Available formats are: text, parseable, colorized, json2
+# (improved json format), json (old json format) and msvs (visual studio). You
+# can also give a reporter class, e.g. mypackage.mymodule.MyReporterClass.
 # output-format =
 
 # Tells whether to display a full report or only the messages.
@@ -572,7 +582,7 @@ min-similarity-lines = 4
 max-spelling-suggestions = 4
 
 # Spelling dictionary name. No available dictionaries : You need to install both
-# the python package and the system dependency for enchant to work..
+# the python package and the system dependency for enchant to work.
 # spelling-dict =
 
 # List of comma separated words that should be considered directives if they

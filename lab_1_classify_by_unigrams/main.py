@@ -11,13 +11,9 @@ import json
 
 def tokenize(text: str) -> list[str] | None:
     """
-        Split a text into tokens.
+    Split a text into tokens.
 
-        Convert the tokens into lowercase, remove punctuation, digits and other symbols
-         Args:
-            text (str): A text
-        Returns:
-            list[str] | None: A list of lower-cased tokens without punctuation
+    Convert the tokens into lowercase, remove punctuation, digits and other symbols
 
     Args:
         text (str): A text
@@ -56,8 +52,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     return frequency_dict
 
 
-def create_language_profile(language: str, text: str) ->\
-        dict[str, str | dict[str, float]] | None:
+def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
     Create a language profile.
 
@@ -102,42 +97,23 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     return sum_diff / len(predicted)
 
 
-def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
-                     profile_to_compare: dict[str, str | dict[str, float]],) -> float | None:
+def compare_profiles(
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
+) -> float | None:
     """
-        Compare profiles and calculate the distance using symbols.
+    Compare profiles and calculate the distance using symbols.
 
-        Args:
-            unknown_profile (dict[str, str | dict[str, float]]): A dictionary of an unknown profile
-            profile_to_compare (dict[str, str | dict[str, float]]): A dictionary of a profile
-                to compare the unknown profile to
+    Args:
+        unknown_profile (dict[str, str | dict[str, float]]): A dictionary of an unknown profile
+        profile_to_compare (dict[str, str | dict[str, float]]): A dictionary of a profile
+            to compare the unknown profile to
 
-        Returns:
-            float | None: The distance between the profiles
+    Returns:
+        float | None: The distance between the profiles
 
-        In case of corrupt input arguments or lack of keys 'name' and
-        'freq' in arguments, None is returned
-        """
-
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
-        return None
-    if ('name' not in unknown_profile or 'freq' not in unknown_profile or
-            'name' not in profile_to_compare or 'freq' not in profile_to_compare):
-        return None
-    profile_1 = set(unknown_profile['freq'])
-    profile_2 = set(profile_to_compare['freq'])
-    union_set = profile_1.union(profile_2)
-    act_freq = []
-    pred_freq = []
-    for token in union_set:
-        act_freq.append(unknown_profile['freq'].get(token, 0))
-        pred_freq.append(profile_to_compare['freq'].get(token, 0))
-    return calculate_mse(pred_freq, act_freq)
-
-
-def detect_language(unknown_profile: dict[str, str | dict[str, float]],
-                    profile_1: dict[str, str | dict[str, float]],
-                    profile_2: dict[str, str | dict[str, float]],) -> str | None:
+    In case of corrupt input arguments or lack of keys 'name' and
+    'freq' in arguments, None is returned
     """
     if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
@@ -163,14 +139,14 @@ def detect_language(unknown_profile: dict[str, str | dict[str, float]],
         unk_values_lst.append(freq)
     return calculate_mse(comp_values_lst, unk_values_lst)
 
-        Args:
-            unknown_profile (dict[str, str | dict[str, float]]): A dictionary of a profile
-                to determine the language of
-            profile_1 (dict[str, str | dict[str, float]]): A dictionary of a known profile
-            profile_2 (dict[str, str | dict[str, float]]): A dictionary of a known profile
 
-        Returns:
-            str | None: A language
+def detect_language(
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_1: dict[str, str | dict[str, float]],
+    profile_2: dict[str, str | dict[str, float]],
+) -> str | None:
+    """
+    Detect the language of an unknown profile.
 
     Args:
         unknown_profile (dict[str, str | dict[str, float]]): A dictionary of a profile
@@ -203,7 +179,7 @@ def load_profile(path_to_file: str) -> dict | None:
     """
     Load a language profile.
 
-     Args:
+    Args:
         path_to_file (str): A path to the language profile
 
     Returns:

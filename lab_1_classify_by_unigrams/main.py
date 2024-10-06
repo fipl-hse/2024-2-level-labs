@@ -3,7 +3,10 @@ Lab 1.
 
 Language detection
 """
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable
+import copy
+import json
 
 import json
 
@@ -24,11 +27,11 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text_tokens = []
-    for i in text:
-        if i.isalpha():
-            text_tokens += i.lower()
-    return text_tokens
+    tokenized_list = []
+    for token in text.lower():
+        if token.isalpha():
+            tokenized_list.append(token)
+    return tokenized_list
 
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
@@ -43,12 +46,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not (isinstance(tokens, list) and all(isinstance(t, str) for t in tokens)):
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
-    frequencies = {}
-    for l in set(tokens):
-        frequencies[l] = tokens.count(l) / len(tokens)
-    return frequencies
+    frequency_dict = {}
+    for token in set(tokens):
+        frequency_dict[token] = tokens.count(token) / len(tokens)
+    return frequency_dict
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -64,14 +67,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    tokenized_text = tokenize(text)
-    frequencies = calculate_frequencies(tokenized_text)
-    if not isinstance(language, str) or not isinstance(frequencies, dict):
+    if not isinstance(language, str) or not isinstance(text, str):
         return None
-    return {
-        'name': language,
-        'freq': frequencies
-    }
+    frequency_dict = calculate_frequencies(tokenize(text))
+    if not frequency_dict:
+        return None
+    return {'name': language,
+            'freq': frequency_dict}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -87,14 +89,14 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if (not all(isinstance(p, (float, int)) for p in predicted)
-            or not all(isinstance(a, (float, int))
-                       for a in actual) or len(predicted) != len(actual)):
+    if (not isinstance(predicted, list) or not isinstance(actual, list)
+            or not len(predicted) == len(actual)):
         return None
-    mse = 0
-    for i, v in enumerate(actual):
-        mse += (v - predicted[i]) ** 2
-    return round((mse / len(actual)), 4)
+    sum_diff = 0
+    for i, value in enumerate(actual):
+        difference_between_values = (value - predicted[i]) ** 2
+        sum_diff += difference_between_values
+    return sum_diff / len(predicted)
 
 
 def compare_profiles(
@@ -115,28 +117,29 @@ def compare_profiles(
     In case of corrupt input arguments or lack of keys 'name' and
     'freq' in arguments, None is returned
     """
-    if (not "name" in unknown_profile or not "freq" in unknown_profile
-        or not "name" in profile_to_compare or not "freq" in profile_to_compare):
+    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
         return None
-    unknown_freq = []
-    profile_freq = []
-
-    for k, v in unknown_profile['freq'].items():
-        if k not in profile_to_compare['freq'].keys():
-            unknown_freq.append(v)
-            profile_freq.append(0.0)
-        else:
-            for k_2, v_2 in profile_to_compare['freq'].items():
-                if k_2 == k:
-                    unknown_freq.append(v)
-                    profile_freq.append(v_2)
-
-    for k, v in profile_to_compare['freq'].items():
-        if k not in unknown_profile['freq'].keys():
-            unknown_freq.append(0.0)
-            profile_freq.append(v)
-    mse = calculate_mse(unknown_freq, profile_freq)
-    return mse
+    if ('name' or 'freq') not in unknown_profile or ('name' or 'freq') not in profile_to_compare:
+        return None
+    copy_unk_profile = copy.deepcopy(unknown_profile)
+    if (not isinstance(copy_unk_profile['freq'], dict)
+            or not isinstance(profile_to_compare['freq'], dict)):
+        return None
+    for letter in copy_unk_profile['freq']:
+        if letter not in profile_to_compare['freq']:
+            profile_to_compare['freq'][letter] = 0
+    for letter in profile_to_compare['freq']:
+        if letter not in copy_unk_profile['freq']:
+            copy_unk_profile['freq'][letter] = 0
+    sort_unk = dict(sorted(copy_unk_profile['freq'].items()))
+    sort_comp = dict(sorted(profile_to_compare['freq'].items()))
+    comp_values_lst = []
+    for freq in sort_comp.values():
+        comp_values_lst.append(freq)
+    unk_values_lst = []
+    for freq in sort_unk.values():
+        unk_values_lst.append(freq)
+    return calculate_mse(comp_values_lst, unk_values_lst)
 
 
 def detect_language(
@@ -158,21 +161,20 @@ def detect_language(
 
     In case of corrupt input arguments, None is returned
     """
+    if (not isinstance(profile_1, dict) or not isinstance(profile_2, dict)
+            or not isinstance(unknown_profile, dict)):
+        return None
     mse_1 = compare_profiles(unknown_profile, profile_1)
     mse_2 = compare_profiles(unknown_profile, profile_2)
     if mse_1 is None or mse_2 is None:
         return None
+    if not isinstance(profile_1['name'], str) or not isinstance(profile_2['name'], str):
+        return None
     if mse_1 < mse_2:
-        if not isinstance(profile_1['name'], str):
-            return None
         return profile_1['name']
     if mse_1 > mse_2:
-        if not isinstance(profile_2['name'], str):
-            return None
         return profile_2['name']
-    languages = [profile_1['name'], profile_2['name']]
-    languages.sort()
-    return str(languages[0])
+    return sorted([profile_1['name'], profile_2['name']])[0]
 
 
 def load_profile(path_to_file: str) -> dict | None:
@@ -189,9 +191,9 @@ def load_profile(path_to_file: str) -> dict | None:
     """
     if not isinstance(path_to_file, str):
         return None
-    with open(path_to_file, 'r', encoding="utf-8") as file_to_read:
-        profile = json.load(file_to_read)
-    if not isinstance(profile, dict) or profile is None:
+    with open(path_to_file, 'r', encoding='utf-8') as file_to_profile:
+        profile = json.load(file_to_profile)
+    if not isinstance(profile, dict):
         return None
     return profile
 
@@ -210,28 +212,25 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
     In case of corrupt input arguments or lack of keys 'name', 'n_words' and
     'freq' in arguments, None is returned
     """
-    profile_processed = {}
-    quantity = 0
-    if not "name" in profile or not "freq" in profile or not "n_words" in profile:
+    if not isinstance(profile, dict) or not all(k in profile for k in ('freq', 'name', 'n_words')):
         return None
-    for k, v in profile.items():
-        if k == 'name':
-            profile_processed[k] = v.lower()
-            continue
-        if k == 'n_words':
-            quantity += v[0]
-            continue
-        if k == 'freq':
-            profile_processed[k] = {}
-            for k_2, v_2 in v.items():
-                if len(k_2) == 1:
-                    if k_2.lower() not in profile_processed[k]:
-                        profile_processed[k][k_2.lower()] = v_2
-                    elif k_2.lower() in profile_processed[k]:
-                        profile_processed[k][k_2.lower()] += v_2
-    for k, v in profile_processed['freq'].items():
-        profile_processed['freq'][k] = v / quantity
-    return profile_processed
+    processed_profile = {'name': profile['name'],
+                         'freq': {}}
+    freq_dict = {}
+    for token in profile['freq']:
+        if isinstance(token, str) and len(token) == 1:
+            freq_dict[token] = profile['freq'][token]
+    letters_list = list(freq_dict)
+    for letter in letters_list:
+        if not letter.isupper():
+            freq_dict[letter] = freq_dict.get(letter, 0) + freq_dict.get(letter.upper(), 0)
+            processed_profile['freq'][letter] = freq_dict[letter] / profile['n_words'][0]
+            if letter.upper() in freq_dict:
+                freq_dict.pop(letter.upper())
+    for i in freq_dict.items():
+        if i[0].isupper():
+            processed_profile['freq'][i[0].lower()] = i[1] / profile['n_words'][0]
+    return processed_profile
 
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
@@ -246,21 +245,19 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
     In case of corrupt input arguments, None is returned
     """
-    if (not isinstance(paths_to_profiles, list) or not
-            all(isinstance(p, str) for p in paths_to_profiles)):
+    if not (isinstance(paths_to_profiles, list)
+            and all(isinstance(path, str) for path in paths_to_profiles)):
         return None
-    all_profiles = []
+    profiles_collection = []
     for path in paths_to_profiles:
-        profile_raw = load_profile(path)
-        if profile_raw is None:
+        profile = load_profile(path)
+        if not profile:
             return None
-        processed_profile = preprocess_profile(profile_raw)
-        if processed_profile is None:
+        pre_profile = preprocess_profile(profile)
+        if not pre_profile:
             return None
-        all_profiles.append(processed_profile)
-    if all(isinstance(k, dict) for k in all_profiles):
-        return all_profiles
-    return None
+        profiles_collection.append(pre_profile)
+    return profiles_collection
 
 
 def detect_language_advanced(
@@ -279,17 +276,15 @@ def detect_language_advanced(
 
     In case of corrupt input arguments, None is returned
     """
-    distance = []
-    if (not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list) or not
-            all(isinstance(elem, dict) for elem in known_profiles)):
+    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
         return None
+    profiles_list = []
     for profile in known_profiles:
-        if not isinstance(profile['name'], str):
-            return None
-        distance.append((profile['name'], compare_profiles(unknown_profile, profile)))
-    if all(d is None for d in distance):
-        return None
-    return sorted(distance, key=lambda i: float(i[1]))
+        profiles_list.append((profile['name'], compare_profiles(unknown_profile, profile)))
+    if profiles_list:
+        profiles_list.sort(key=lambda x: (x[-1], x[0]))
+        return profiles_list
+    return None
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:
@@ -301,8 +296,5 @@ def print_report(detections: list[tuple[str, float]]) -> None:
 
     In case of corrupt input arguments, None is returned
     """
-    if not all(isinstance(elem, tuple) for elem in detections):
-        return None
-    for elem in detections:
-        print(f'{elem[0]}: MSE {elem[1]:.5f}')
-    return None
+    for detection in detections:
+        print(f'{detection[0]}: MSE {detection[-1]:.5f}')

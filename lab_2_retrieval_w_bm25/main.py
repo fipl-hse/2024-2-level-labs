@@ -7,7 +7,6 @@ Text retrieval with BM25
 import json
 import math
 
-
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -30,6 +29,8 @@ def tokenize(text: str) -> list[str] | None:
         if symbol.isalpha() or symbol == ' ':
             right_symbol = symbol.lower()
             text_new += right_symbol
+        else:
+            text_new += ' '
     tokens = text_new.split()
     return tokens
 
@@ -199,7 +200,7 @@ def calculate_bm25(
     if not isinstance(idf_document, dict) or not isinstance(k1, float) \
             or not isinstance(b, float) or not isinstance(doc_len, int) \
             or not isinstance(avg_doc_len, float) or not isinstance(vocab, list) \
-            or not isinstance(document, list):
+            or not isinstance(document, list) or document == [] or vocab == []:
         return None
     if not all(isinstance(word, str) for word in vocab) \
             or not all(isinstance(token, str) for token in document) or vocab:
@@ -286,7 +287,8 @@ def calculate_bm25_with_cutoff(
     if not isinstance(idf_document, dict) or not isinstance(k1, float) \
             or not isinstance(b, float) or not isinstance(doc_len, int) \
             or not isinstance(avg_doc_len, float) or not isinstance(vocab, list) \
-            or not isinstance(document, list) or not isinstance(alpha, float):
+            or not isinstance(document, list) or not isinstance(alpha, float) \
+            or document == [] or vocab == []:
         return None
     if not all(isinstance(word, str) for word in vocab) \
             or not all(isinstance(token, str) for token in document):

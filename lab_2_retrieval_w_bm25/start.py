@@ -2,7 +2,6 @@
 Laboratory Work #2 starter
 """
 import lab_2_retrieval_w_bm25.main as func
-import math
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches,
 # too-many-statements, duplicate-code

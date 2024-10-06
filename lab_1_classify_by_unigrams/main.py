@@ -6,8 +6,6 @@ Language detection
 import json
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-import copy
-import json
 
 
 def tokenize(text: str) -> list[str] | None:

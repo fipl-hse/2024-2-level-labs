@@ -1,5 +1,3 @@
-from main import create_language_profile
-
 """
 Language detection starter
 """
@@ -44,4 +42,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

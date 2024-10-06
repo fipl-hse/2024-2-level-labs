@@ -31,15 +31,6 @@ def tokenize(text: str) -> list[str] | None:
             tokenized_list.append(token)
     return tokenized_list
 
-    if not isinstance(text, str):
-        return None
-
-    list = []
-    for symb in text:
-        if symb.isalpha():
-            list += symb.lower()
-    return list
-
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -60,17 +51,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         frequency_dict[token] = tokens.count(token) / len(tokens)
     return frequency_dict
 
-    if not tokens or not isinstance(tokens, list):
-        return None
-
-
-    dict = {}
-    for token in tokens:
-        if not isinstance(token, str):
-            return None
-        else:
-            dict[token] = tokens.count(token)/len(tokens)
-    return dict
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """
@@ -93,14 +73,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
     return {'name': language,
             'freq': frequency_dict}
 
-    if not isinstance(language, str) or not isinstance(text, str):
-        return None
-
-
-    return {
-        'name': language,
-        'freq': calculate_frequencies(tokenize(text))
-    }
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

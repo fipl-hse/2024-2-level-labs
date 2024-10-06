@@ -9,15 +9,12 @@ from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_p
 
 def main() -> None:
     """
-    
     Launches an implementation
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
-        text1 = tokenize(en_text)
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
-        text1 = tokenize(de_text)
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 
@@ -41,6 +38,7 @@ def main() -> None:
     if isinstance(result, list):
         print_report(result)
     assert result, "Detection result is None"
-    tokenize("assets/texts/en.txt")
-    if __name__ == "__main__":
-        main()
+
+
+if __name__ == "__main__":
+    main()

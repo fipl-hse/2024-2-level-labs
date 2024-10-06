@@ -37,7 +37,7 @@ class CalculateBM25WithCutoffTest(unittest.TestCase):
             ['library', 'cat', 'loved', 'stories', 'beautiful', 'cat']
         ]
 
-        with open(Path(__file__).parent / 'test_scores.json', encoding='utf-8') as file:
+        with open(Path(__file__).parent / "assets" / 'test_scores.json', encoding='utf-8') as file:
             scores = json.load(file)
         self.idf = scores["IDF"]
 

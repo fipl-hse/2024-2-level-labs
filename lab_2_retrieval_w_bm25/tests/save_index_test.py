@@ -41,7 +41,7 @@ class SaveIndexTest(unittest.TestCase):
         with open(str(self.test_path), 'r', encoding='utf-8') as f:
             saved_indexes = json.load(f)
 
-        with open(Path(__file__).parent / "saved_metrics_example.json",
+        with open(Path(__file__).parent / "assets" / "saved_metrics_example.json",
                   'r', encoding='utf-8') as f:
             example_metrics = json.load(f)
 

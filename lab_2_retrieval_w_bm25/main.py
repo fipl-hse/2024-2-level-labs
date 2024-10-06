@@ -7,6 +7,7 @@ Text retrieval with BM25
 import json
 import math
 
+
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -107,6 +108,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return None
     tf_dict = {}
     for word in vocab:
+        tf_dict[word] = document_tokens.count(word) / abs(len(document_tokens))
+    for word in document_tokens:
         tf_dict[word] = document_tokens.count(word) / abs(len(document_tokens))
     return tf_dict
 
@@ -234,7 +237,7 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
     if not isinstance(query, str) or not isinstance(stopwords, list) \
-            or not isinstance(indexes, list) or stopwords == [] or indexes == []:
+            or not isinstance(indexes, list) or stopwords == [] or indexes == [] or query == '':
         return None
     if not all(isinstance(stopword, str) for stopword in stopwords) or \
             not all(isinstance(vocab, dict) for vocab in indexes) or \
@@ -288,7 +291,12 @@ def calculate_bm25_with_cutoff(
             or not isinstance(b, float) or not isinstance(doc_len, int) \
             or not isinstance(avg_doc_len, float) or not isinstance(vocab, list) \
             or not isinstance(document, list) or not isinstance(alpha, float) \
-            or document == [] or vocab == []:
+            or document == [] or vocab == [] or idf_document == {} or isinstance(doc_len,
+                                                                                 bool) or isinstance(
+        avg_doc_len, bool) or doc_len <= 0:
+        return None
+
+    if k1 < 1.2 or k1 > 2.0 or b < 0 or b > 1:
         return None
     if not all(isinstance(word, str) for word in vocab) \
             or not all(isinstance(token, str) for token in document):

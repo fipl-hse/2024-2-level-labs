@@ -6,9 +6,6 @@ from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_p
                                              detect_language, detect_language_advanced,
                                              print_report, tokenize)
 
-from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
-                                             detect_language_advanced, print_report)
-
 
 def main() -> None:
     """
@@ -41,7 +38,6 @@ def main() -> None:
     if isinstance(result, list):
         print_report(result)
     assert result, "Detection result is None"
-    return None
 
 
 if __name__ == "__main__":

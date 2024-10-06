@@ -11,7 +11,6 @@ def main() -> None:
     """
     Launches an implementation
     """
-    tr = False
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
@@ -39,7 +38,6 @@ def main() -> None:
     if isinstance(result, list):
         print_report(result)
     assert result, "Detection result is None"
-    print(result)
 
 
 if __name__ == "__main__":

@@ -9,7 +9,6 @@ import copy
 import json
 
 
-
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -54,7 +53,7 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
-    """=
+    """
     Create a language profile.
 
     Args:

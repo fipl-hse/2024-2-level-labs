@@ -6,8 +6,6 @@ from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_p
                                              detect_language, detect_language_advanced,
                                              print_report, tokenize)
 
-from lab_1_classify_by_unigrams.main import calculate_frequencies, tokenize
-
 
 def main() -> None:
     """
@@ -15,13 +13,8 @@ def main() -> None:
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
-        crop_text = tokenize(en_text)
-        print(calculate_frequencies(crop_text))
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
-        print(tokenize(de_text))
-        crop_text = tokenize(de_text)
-        print(calculate_frequencies(crop_text))
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 

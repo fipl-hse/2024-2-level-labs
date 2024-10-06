@@ -51,19 +51,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
         frequency_dict[token] = tokens.count(token) / len(tokens)
     return frequency_dict
 
-    if not isinstance(tokens, list) or len(tokens) == 0 \
-            or not all(isinstance(token, str) for token in tokens):
-        return None
-    abs_freq = {}
-    total_elements = len(tokens)
-    for token in tokens:
-        if token in abs_freq:
-            abs_freq[token] += 1
-        else:
-            abs_freq[token] = 1
-    rel_freq = {element: freq / total_elements for element, freq in abs_freq.items()}
-    return rel_freq
-
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
     """

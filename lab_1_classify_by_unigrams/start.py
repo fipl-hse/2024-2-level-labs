@@ -2,7 +2,9 @@
 Language detection starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
-import lab_1_classify_by_unigrams.main as fnc
+from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
+                                             detect_language, detect_language_advanced,
+                                             print_report, tokenize)
 
 
 def main() -> None:
@@ -15,20 +17,26 @@ def main() -> None:
         de_text = file_to_read_de.read()
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
-    res1 = fnc.tokenize(en_text)
-    print(res1)
-    res2 = fnc.calculate_frequencies(res1)
-    print(res2)
-    en_prof = fnc.create_language_profile('en', en_text)
-    print(en_prof)
-    assert isinstance(en_prof, dict), 'Dictionary not found'
-    de_prof = fnc.create_language_profile('de', de_text)
-    assert isinstance(de_prof, dict), 'Dictionary not found'
-    trg_prof = fnc.create_language_profile('Unknown', unknown_text)
-    assert isinstance(trg_prof, dict), 'Dictionary not found'
-    print(fnc.compare_profiles(trg_prof, en_prof))
-    print(fnc.compare_profiles(trg_prof, de_prof))
-    result = fnc.detect_language(trg_prof, en_prof, de_prof)
+
+    paths_to_profiles = ['assets/profiles/de.json', 'assets/profiles/en.json',
+                         'assets/profiles/es.json', 'assets/profiles/fr.json',
+                         'assets/profiles/it.json', 'assets/profiles/ru.json',
+                         'assets/profiles/tr.json']
+    unk_profile = create_language_profile('unk', unknown_text)
+    en_profile = create_language_profile('en', en_text)
+    de_profile = create_language_profile('de', de_text)
+    if not unk_profile or not en_profile or not de_profile:
+        return
+    print(tokenize(en_text))
+    print(create_language_profile('en', en_text))
+    print(detect_language(unk_profile, en_profile, de_profile))
+    profiles_collection = collect_profiles(paths_to_profiles)
+    if not profiles_collection:
+        return
+    result = detect_language_advanced(
+        unk_profile, profiles_collection)
+    if isinstance(result, list):
+        print_report(result)
     assert result, "Detection result is None"
     print(result)
 

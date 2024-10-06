@@ -6,11 +6,6 @@ from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_p
                                              detect_language, detect_language_advanced,
                                              print_report, tokenize)
 
-from lab_1_classify_by_unigrams.main import (collect_profiles, create_language_profile,
-                                             detect_language, detect_language_advanced,
-                                             load_profile, preprocess_profile, print_report,
-                                             tokenize)
-
 
 def main() -> None:
     """
@@ -18,11 +13,8 @@ def main() -> None:
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
-        tokens = tokenize(en_text)
-        en_profile = create_language_profile("eng", en_text)
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
-        de_profile = create_language_profile("de", de_text)
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 

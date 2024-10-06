@@ -8,9 +8,6 @@ Language detection
 import copy
 import json
 
-from json import load
-from string import punctuation
-
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -34,16 +31,6 @@ def tokenize(text: str) -> list[str] | None:
             tokenized_list.append(token)
     return tokenized_list
 
-    if not isinstance(text, str):
-        return None
-
-    text = ''.join(text.split()).lower()
-
-    for char in punctuation + '1234567890º’':
-        text = text.replace(char, '')
-
-    return list(text)
-
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -63,18 +50,6 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     for token in set(tokens):
         frequency_dict[token] = tokens.count(token) / len(tokens)
     return frequency_dict
-
-    if not isinstance(tokens, list) or not all(isinstance(item, str) for item in tokens) \
-            or not tokens:
-        return None
-
-    tokens_total = len(tokens)
-
-    freq = {}
-    for char in set(tokens):
-        freq[char] = float(tokens.count(char)) / tokens_total
-
-    return freq
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -97,17 +72,6 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
         return None
     return {'name': language,
             'freq': frequency_dict}
-
-    if not isinstance(language, str) or not isinstance(text, str):
-        return None
-
-    frequencies = calculate_frequencies(tokenize(text))
-    if (not isinstance(frequencies, dict)
-            or not all(isinstance(char, str) for char in frequencies)
-            or not all(isinstance(value, float) for value in frequencies.values())):
-        return None
-
-    return {'name': language, 'freq': frequencies}
 
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
@@ -132,17 +96,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
         sum_diff += difference_between_values
     return sum_diff / len(predicted)
 
-    if not isinstance(predicted, list) or not isinstance(actual, list) \
-            or len(predicted) != len(actual):
-        return None
-
-    return float(sum((actual[i] - predicted[i]) ** 2
-                     for i in range(len(actual))) / len(actual))
-
 
 def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -182,34 +139,11 @@ def compare_profiles(
         unk_values_lst.append(freq)
     return calculate_mse(comp_values_lst, unk_values_lst)
 
-    if not isinstance(unknown_profile, dict) or not isinstance(profile_to_compare, dict):
-        return None
-    if 'name' not in unknown_profile or 'name' not in profile_to_compare:
-        return None
-    if not all(isinstance(key, str) for key in unknown_profile) \
-            or not all(isinstance(key, str) for key in profile_to_compare) \
-            or not isinstance(unknown_profile['freq'], dict) \
-            or not isinstance(profile_to_compare['freq'], dict):
-        return None
-
-    unknown_profile_freq = unknown_profile['freq']
-    profile_to_compare_freq = profile_to_compare['freq']
-    all_chars = set(unknown_profile_freq).union(set(profile_to_compare_freq))
-
-    unknown_sorted = [(unknown_profile_freq[char] if char in unknown_profile_freq else 0.0)
-                      for char in all_chars]
-
-    profile_to_compare_sorted = [(profile_to_compare_freq[char]
-                                  if char in profile_to_compare_freq else 0.0)
-                                 for char in all_chars]
-
-    return calculate_mse(unknown_sorted, profile_to_compare_sorted)
-
 
 def detect_language(
     unknown_profile: dict[str, str | dict[str, float]],
     profile_1: dict[str, str | dict[str, float]],
-    profile_2: dict[str, str | dict[str, float]]
+    profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -240,25 +174,6 @@ def detect_language(
         return profile_2['name']
     return sorted([profile_1['name'], profile_2['name']])[0]
 
-    if not all(isinstance(profile, dict) for profile in [unknown_profile, profile_1, profile_2]) \
-            or not all(isinstance(key, str) for key in unknown_profile) \
-            or not all(isinstance(key, str) for key in profile_1) \
-            or not all(isinstance(key, str) for key in profile_2):
-        return None
-
-    mse_1 = compare_profiles(unknown_profile, profile_1)
-    mse_2 = compare_profiles(unknown_profile, profile_2)
-    if not isinstance(mse_1, float) or not isinstance(mse_2, float):
-        return None
-
-    if mse_1 > mse_2:
-        return str(profile_2['name'])
-    if mse_2 > mse_1:
-        return str(profile_1['name'])
-    if str(profile_1['name']) > str(profile_2['name']):
-        return str(profile_2['name'])
-    return str(profile_1['name'])
-
 
 def load_profile(path_to_file: str) -> dict | None:
     """
@@ -278,17 +193,6 @@ def load_profile(path_to_file: str) -> dict | None:
         profile = json.load(file_to_profile)
     if not isinstance(profile, dict):
         return None
-    return profile
-
-    if not isinstance(path_to_file, str):
-        return None
-
-    with open(path_to_file, 'r', encoding='UTF-8') as file:
-        profile = load(file)
-
-    if not isinstance(profile, dict):
-        return None
-
     return profile
 
 
@@ -326,25 +230,6 @@ def preprocess_profile(profile: dict) -> dict[str, str | dict] | None:
             processed_profile['freq'][i[0].lower()] = i[1] / profile['n_words'][0]
     return processed_profile
 
-    if not isinstance(profile, dict) or not \
-            all(key in profile for key in ['name', 'n_words', 'freq']):
-        return None
-
-    profile_preprocessed = {'name': profile['name'], 'freq': {}}
-
-    all_unigrams_count = profile['n_words'][0]
-
-    for key in profile['freq']:
-        if len(key.strip()) == 1:
-            if key.lower() in profile_preprocessed['freq']:
-                profile_preprocessed['freq'][key.lower()] += profile['freq'][key] \
-                                                             / all_unigrams_count
-            else:
-                profile_preprocessed['freq'][key.lower()] = profile['freq'][key] \
-                                                            / all_unigrams_count
-
-    return profile_preprocessed
-
 
 def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, float]]] | None:
     """
@@ -372,21 +257,6 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
         profiles_collection.append(pre_profile)
     return profiles_collection
 
-    if not isinstance(paths_to_profiles, list):
-        return None
-
-    loaded_profiles = []
-    for path in paths_to_profiles:
-        profile_loaded = load_profile(path)
-        if not isinstance(profile_loaded, dict):
-            return None
-        profile_preprocessed = preprocess_profile(profile_loaded)
-        if not isinstance(profile_preprocessed, dict):
-            return None
-        loaded_profiles.append(profile_preprocessed)
-
-    return loaded_profiles
-
 
 def detect_language_advanced(
     unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
@@ -413,19 +283,6 @@ def detect_language_advanced(
         profiles_list.sort(key=lambda x: (x[-1], x[0]))
         return profiles_list
     return None
-
-    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
-        return None
-
-    distances = []
-    for profile in known_profiles:
-        profile_name: str = profile['name']
-        distance = compare_profiles(unknown_profile, profile)
-        if not distance:
-            return None
-        distances.append((profile_name, distance))
-    distances_sorted: list[tuple['str', float]] = sorted(distances, key=lambda tuple_: tuple_[1])
-    return distances_sorted
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

@@ -54,6 +54,7 @@ aggregating
 aim
 aimed
 aims
+ain
 alekseevna
 alexander
 algorithm
@@ -62,9 +63,11 @@ allowed
 allows
 along
 alongside
+alpha
 already
 also
 always
+am
 ambition
 ambitions
 amod
@@ -99,6 +102,7 @@ apart
 api
 apidoc
 appears
+append
 appends
 apple
 applying
@@ -145,6 +149,7 @@ autoformatting
 automatically
 autongramlanguagemodel
 available
+avgdl
 axmatova
 back-off
 backoff
@@ -175,6 +180,7 @@ been
 before
 beginning
 behavior
+being
 below
 best
 better
@@ -189,10 +195,12 @@ block
 blocks
 blok
 blyudova
+bm
 bonuses
 bool
 bootstrap
 both
+boy
 bpe
 brackets
 breakpoint
@@ -315,6 +323,7 @@ constants
 constraints
 constructor
 contain
+containing
 contains
 content
 contents
@@ -334,6 +343,7 @@ convert
 converted
 converter
 converts
+copy
 copy-paste
 core
 corncob
@@ -368,6 +378,7 @@ ctlr-faq-label
 ctlr-lectures-label
 ctlr-tests-label
 current
+cutoff
 cvetaeva
 data
 dataclass
@@ -384,6 +395,7 @@ debug
 decode
 decoded
 dedicated
+deepcopy
 deepen
 deeper
 def
@@ -394,6 +406,7 @@ defined
 defines
 defining
 definition
+del
 delete
 demands
 demidovskij
@@ -426,6 +439,7 @@ dict
 dictated
 dictionary
 dictionary-like
+did
 difference
 different
 differently
@@ -442,13 +456,16 @@ distribution
 dmitry
 do
 doc
+docs
 docstring
 docstrings
 document
 documentation
 documents
 does
-don
+doesn
+dogs
+doing
 done
 dot
 double-tagging
@@ -457,9 +474,11 @@ download
 downloaded
 downloading
 downloads
+dragon
 drive
 dto
 due
+dump
 dumping
 during
 dursley
@@ -572,6 +591,8 @@ f-string
 facilitates
 fact
 fails
+fairy
+fairytale
 false
 faq
 faq-label
@@ -633,6 +654,7 @@ framework
 freq
 frequencies
 frequency
+friend
 from
 frosty
 full
@@ -705,6 +727,7 @@ hardware
 harry
 has
 have
+having
 he
 head
 headers
@@ -712,13 +735,21 @@ headless
 helpful
 helsinki-nlp
 hence
+her
 here
+hers
+herself
 hey
 hidden
 hierarchy
 higher
+hill
+him
+himself
 hint
+his
 history
+home
 hope
 hours
 how
@@ -791,6 +822,7 @@ initializer
 initializes
 initializing
 inner
+insert
 inside
 insights
 inspect
@@ -829,6 +861,7 @@ introduce
 introduced
 introduction
 invalid
+inverse
 io
 irina
 is
@@ -882,6 +915,7 @@ learn
 learning
 least
 leave
+leaved
 lecture
 lecturer
 lectures
@@ -910,6 +944,7 @@ linguistic
 links
 list
 list-like
+ll
 ln
 load
 loaded
@@ -921,11 +956,13 @@ locations
 loct
 log
 logic
+loginom
 look
 looking
 loop
 lose
 love
+loved
 low-level
 lower
 lowercase
@@ -933,9 +970,11 @@ lowercased
 lutz
 lxml
 lyashevskaya
+ma
 mac
 macos
 made
+magic
 main
 make
 makes
@@ -958,12 +997,14 @@ markup
 match
 matched
 matches
+matching
 material
 materials
 math
 max
 may
 maybe
+me
 mean
 meaning
 meanings
@@ -980,7 +1021,9 @@ meth
 method
 methods
 metric
+metrics
 might
+mightn
 mikhailovna
 milestone
 mind
@@ -1003,6 +1046,7 @@ moment
 more
 moreover
 moritz
+morning
 morphological
 morphologicalanalysispipeline
 morphologically
@@ -1018,7 +1062,10 @@ mse
 much
 multiple
 must
+mustn
+my
 mypy
+myself
 n-gram
 name
 named
@@ -1031,6 +1078,7 @@ naturally
 necessary
 need
 needed
+needn
 networkx
 new
 newline
@@ -1045,6 +1093,7 @@ nightmare
 nikolaevich
 nikolaevna
 nlp
+nltk
 nmt
 nn
 no
@@ -1053,6 +1102,7 @@ nodes
 nom
 nomn
 none
+nor
 normal
 normalized
 nose
@@ -1079,6 +1129,7 @@ obtained
 obtaining
 occurrences
 of
+off
 official
 often
 ok
@@ -1109,6 +1160,7 @@ or
 oral
 ord
 order
+org
 original
 origins
 os
@@ -1116,6 +1168,8 @@ other
 others
 otherwise
 our
+ours
+ourselves
 out
 out-of-vocabulary
 output
@@ -1137,6 +1191,7 @@ parameters
 parametersmodel
 params
 parent
+parrots
 parsable
 parse
 parsed
@@ -1162,6 +1217,7 @@ patternsearchpipelinetests
 penalties
 people
 per
+perfect
 perfectly
 perform
 performance
@@ -1172,8 +1228,10 @@ permission
 perplexity
 personal
 perspective
+pets
 phrases
 pick
+picnic
 pipe
 pipeline
 pipeline-label
@@ -1191,6 +1249,7 @@ png
 point
 point-of-speech
 points
+pop
 populates
 pos
 posfrequencypipeline
@@ -1228,6 +1287,7 @@ pressing
 presumed
 previous
 previously
+princess
 principle
 print
 private
@@ -1294,6 +1354,8 @@ pytest
 python
 pythonpath
 qualitychecker
+queen
+query
 question
 questions
 quickly
@@ -1301,6 +1363,9 @@ quite
 raise
 random
 range
+rank
+rank-correlation-spearman
+rarely
 raw
 raw-dataset
 rawadvanceddatavalidator
@@ -1403,6 +1468,7 @@ run-in-terminal-label
 running
 running-tests-label
 russian
+sad
 safe
 same
 sample
@@ -1469,6 +1535,7 @@ she
 shifting
 short
 should
+shouldn
 show
 showed
 shown
@@ -1508,6 +1575,8 @@ source
 spacy
 spacy-udpipe
 speaking
+spearman
+spearman's
 special
 specific
 specifically
@@ -1517,6 +1586,7 @@ specify
 speech
 speedup
 spellchecker
+spells
 split
 splits
 splitting
@@ -1545,14 +1615,17 @@ status
 stemming
 step
 steps
+steven
 still
 stmt
 stop
+stopwords
 storage
 store
 stored
 stores
 storing
+story
 str
 streets
 strftime
@@ -1565,6 +1638,7 @@ student
 students
 studenttextadvancedpreprocesstest
 studenttextbasicpreprocesstest
+studying
 subgraph
 subgraphs
 submodules
@@ -1575,6 +1649,7 @@ subtype
 such
 suffix
 summary
+summer
 super
 support
 sure
@@ -1597,6 +1672,7 @@ tagset
 take
 taken
 takes
+tale
 talking
 target
 task
@@ -1608,6 +1684,7 @@ techniques
 tells
 term
 terms
+tests
 text
 textprocessingpipeline
 textprocessingpipelinescoreeightreferenceprocess
@@ -1624,7 +1701,9 @@ thank
 that
 the
 their
+theirs
 them
+themselves
 then
 there
 therefore
@@ -1667,6 +1746,7 @@ topics
 toppgenerator
 topprulestudent
 total
+tower
 track
 traditional
 traffic
@@ -1760,6 +1840,7 @@ various
 vary
 varying
 vasilisa
+ve
 vec
 venv
 verb
@@ -1794,11 +1875,14 @@ volume
 volumechecktest
 vyacheslavovna
 wait
+wand
 want
 warning
 was
+wash
 way
 we
+weather
 web
 webdriver
 webdriverwait
@@ -1816,11 +1900,14 @@ whereas
 which
 while
 whitejaeger
+who
 whole
+whom
 why
 wide
 width
 widths
+wiki
 wikipedia
 will
 windows
@@ -1828,7 +1915,9 @@ wise
 with
 within
 without
+wizard
 wo
+won
 word
 wordlist
 wordprocessor
@@ -1842,6 +1931,7 @@ workings
 works
 world
 would
+wouldn
 wrapper
 wrappers
 write
@@ -1855,6 +1945,9 @@ xx
 yes
 you
 your
+yours
+yourself
+yourselves
 yurievich
 zaytseva
 zharikov

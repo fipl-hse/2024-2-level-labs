@@ -162,7 +162,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
             or not all(
         (isinstance(key, str) and isinstance(value, float) for key, value in tf.items())) \
             or not all(
-        (isinstance(key, str) and isinstance(value, float) for key, value in idf.items())):
+        (isinstance(key, str) and isinstance(value, float) for key, value in idf.items())) \
+            or tf == {} or idf == {}:
         return None
 
     tf_idf_dict = {}
@@ -235,7 +236,6 @@ def rank_documents(
     if not isinstance(query, str) or not isinstance(stopwords, list) \
             or not isinstance(indexes, list) or stopwords == [] or indexes == []:
         return None
-
     if not all(isinstance(stopword, str) for stopword in stopwords) or \
             not all(isinstance(vocab, dict) for vocab in indexes) or \
             not all((isinstance(key, str) and isinstance(value, float) for key, value in vocab) for

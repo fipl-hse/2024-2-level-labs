@@ -97,8 +97,10 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
     return sum_diff / len(predicted)
 
 
-def compare_profiles(unknown_profile: dict[str, str | dict[str, float]],
-                     profile_to_compare: dict[str, str | dict[str, float]],) -> float | None:
+def compare_profiles(
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
+) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
 
@@ -191,13 +193,6 @@ def load_profile(path_to_file: str) -> dict | None:
         profile = json.load(file_to_profile)
     if not isinstance(profile, dict):
         return None
-    return profile
-
-    if not isinstance(path_to_file, str):
-        return None
-    with open(path_to_file, "r", encoding="utf-8") as file_to_read:
-        profile_r = json.load(file_to_read)
-        profile = dict(profile_r)
     return profile
 
 

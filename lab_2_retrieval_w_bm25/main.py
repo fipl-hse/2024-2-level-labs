@@ -7,6 +7,7 @@ Text retrieval with BM25
 import json
 import math
 
+
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -46,9 +47,10 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tokens, list) or not isinstance(stopwords, list) \
-            or not all(isinstance(token, str) for token in tokens) \
-            or not all(isinstance(word, str) for word in stopwords):
+    right_input = isinstance(tokens, list) and isinstance(stopwords, list) and all(
+        isinstance(token, str) for token in tokens) and all(
+        isinstance(word, str) for word in stopwords) and tokens != [] and stopwords != []
+    if not right_input:
         return None
     tokenize_doc = []
     for word in tokens:
@@ -71,8 +73,11 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
     if not isinstance(documents, list) \
             or not all(isinstance(doc, list) for doc in documents) \
-            or not all((isinstance(word, str) for word in doc) for doc in documents):
+            or documents == []:
         return None
+    for doc in documents:
+        if not all(isinstance(word, str) for word in doc):
+            return None
     vocab = []
     for tokenize_doc in documents:
         for word in tokenize_doc:
@@ -96,7 +101,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     """
     if not isinstance(vocab, list) or not isinstance(document_tokens, list) \
             or not all(isinstance(word, str) for word in vocab) \
-            or not all(isinstance(token, str) for token in document_tokens):
+            or not all(isinstance(token, str) for token in document_tokens) or vocab == [] \
+            or document_tokens == []:
         return None
     tf_dict = {}
     for word in vocab:
@@ -120,8 +126,11 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     if not isinstance(vocab, list) or not isinstance(documents, list) \
             or not all(isinstance(word, str) for word in vocab) \
             or not all(isinstance(doc, list) for doc in documents) \
-            or not all((isinstance(word, str) for word in doc) for doc in documents):
+            or vocab == [] or documents == []:
         return None
+    for doc in documents:
+        if not all(isinstance(word, str) for word in doc):
+            return None
     idf_dic = {}
     n = 0
     for text in documents:
@@ -222,8 +231,8 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(query, str) or not isinstance(stopwords, list) or not isinstance(indexes,
-                                                                                       list):
+    if not isinstance(query, str) or not isinstance(stopwords, list) \
+            or not isinstance(indexes, list) or stopwords == [] or indexes == []:
         return None
 
     if not all(isinstance(stopword, str) for stopword in stopwords) or \
@@ -341,4 +350,3 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
-

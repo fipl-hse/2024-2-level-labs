@@ -8,8 +8,6 @@ Language detection
 import copy
 import json
 
-import json
-
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -100,8 +98,8 @@ def calculate_mse(predicted: list, actual: list) -> float | None:
 
 
 def compare_profiles(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_to_compare: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_to_compare: dict[str, str | dict[str, float]],
 ) -> float | None:
     """
     Compare profiles and calculate the distance using symbols.
@@ -143,9 +141,9 @@ def compare_profiles(
 
 
 def detect_language(
-        unknown_profile: dict[str, str | dict[str, float]],
-        profile_1: dict[str, str | dict[str, float]],
-        profile_2: dict[str, str | dict[str, float]],
+    unknown_profile: dict[str, str | dict[str, float]],
+    profile_1: dict[str, str | dict[str, float]],
+    profile_2: dict[str, str | dict[str, float]],
 ) -> str | None:
     """
     Detect the language of an unknown profile.
@@ -261,7 +259,7 @@ def collect_profiles(paths_to_profiles: list) -> list[dict[str, str | dict[str, 
 
 
 def detect_language_advanced(
-        unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
+    unknown_profile: dict[str, str | dict[str, float]], known_profiles: list
 ) -> list | None:
     """
     Detect the language of an unknown profile.
@@ -285,19 +283,6 @@ def detect_language_advanced(
         profiles_list.sort(key=lambda x: (x[-1], x[0]))
         return profiles_list
     return None
-
-    if not isinstance(unknown_profile, dict) or not isinstance(known_profiles, list):
-        return None
-    sorted_list: list[tuple[str, float]] | None
-    sorted_list = []
-    for profile in known_profiles:
-        mse: float | None = compare_profiles(unknown_profile, profile)
-        if mse is None:
-            return None
-        tuple_lang_distance: tuple[str, float] = (profile["name"], mse)
-        sorted_list.append(tuple_lang_distance)
-    sorted_list.sort(key=lambda profile: (profile[1], profile[0]))
-    return sorted_list
 
 
 def print_report(detections: list[tuple[str, float]]) -> None:

@@ -7,7 +7,6 @@ Text retrieval with BM25
 import json
 import math
 
-
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -245,6 +244,8 @@ def rank_documents(
                     vocab in indexes):
         return None
     tokenize_str = remove_stopwords(tokenize(query), stopwords)
+    if not tokenize_str:
+        return None
     result = []
     n = 0
     for text in indexes:

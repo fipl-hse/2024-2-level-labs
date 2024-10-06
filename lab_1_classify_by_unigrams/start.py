@@ -13,10 +13,8 @@ def main() -> None:
     """
     with open("assets/texts/en.txt", "r", encoding="utf-8") as file_to_read_en:
         en_text = file_to_read_en.read()
-        en_profile = create_language_profile(language='en', text=en_text)
     with open("assets/texts/de.txt", "r", encoding="utf-8") as file_to_read_de:
         de_text = file_to_read_de.read()
-        de_profile = create_language_profile(language='de', text=de_text)
     with open("assets/texts/unknown.txt", "r", encoding="utf-8") as file_to_read_unk:
         unknown_text = file_to_read_unk.read()
 

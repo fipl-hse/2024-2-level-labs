@@ -3,6 +3,7 @@ Laboratory Work #2 starter
 """
 import lab_2_retrieval_w_bm25.main as func
 
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches,
 # too-many-statements, duplicate-code
 
@@ -46,8 +47,6 @@ def main() -> None:
         tf = func.calculate_tf(vocab, tokenize_doc)
         new_vocab = func.calculate_tf_idf(tf, idf)
         print(new_vocab)
-
-
 
 
 if __name__ == "__main__":

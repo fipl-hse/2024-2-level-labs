@@ -56,11 +56,18 @@ first_test = [1, 2, 3, [1, 2, 3]]
 
 # Task 1:
 # easy level
+
+
 def count_evens(nums: list) -> int:
     """
     Return the number of even ints in the given array.
     """
     # student realization goes here
+    count = 0
+    for i in nums:
+        if i % 2 == 0:
+            count += 1
+    return count
 
 
 # Function calls with expected result:
@@ -68,8 +75,15 @@ def count_evens(nums: list) -> int:
 # count_evens([2, 2, 0]) → 3
 # count_evens([1, 3, 5]) → 0
 
+print('Task 1')
+print(count_evens([2, 1, 2, 3, 4]))
+print(count_evens([2, 2, 0]))
+print(count_evens([1, 3, 5]))
+
 # Task 2:
 # easy level
+
+
 def sum13(nums: list) -> int:
     """
     Return the sum of the numbers in the array, returning 0 for an empty array.
@@ -78,12 +92,28 @@ def sum13(nums: list) -> int:
     also do not count.
     """
     # student realization goes here
+    sum = 0
+    skip = False
+    for num in nums:
+        if num == 13:
+            skip = True
+        elif not skip:
+            sum += num
+    return sum
+
 
 # Function calls with expected result:
 # sum13([1, 2, 2, 1]) → 6
 # sum13([1, 1]) → 2
 # sum13([1, 2, 2, 1, 13]) → 6
 # sum13([1, 2, 2, 1, 13, 5, 6]) → 6
+
+
+print('Task 2')
+print(sum13([1, 2, 2, 1]))
+print(sum13([1, 1]))
+print(sum13([1, 2, 2, 1, 13]))
+print(sum13([1, 2, 2, 1, 13, 5, 6]))
 
 
 # Task 3
@@ -96,11 +126,28 @@ def sum67(nums: list) -> int:
     Return 0 for no numbers.
     """
     # student realization goes here
+    sum = 0
+    skip = False
+    for num in nums:
+        if num == 6:
+            skip = True
+        elif num == 7:
+            skip = False
+        elif not skip:
+            sum += num
+    return sum
+
 
 # Function calls with expected result:
 # sum67([1, 2, 2]) → 5
 # sum67([1, 2, 2, 6, 99, 99, 7]) → 5
 # sum67([1, 1, 6, 7, 2]) → 4
+
+
+print('Task 3')
+print(sum67([1, 2, 2]))
+print(sum67([1, 2, 2, 6, 99, 99, 7]))
+print(sum67([1, 1, 6, 7, 2]))
 
 
 # Task 4
@@ -111,13 +158,18 @@ def create_phone_number(nums: list) -> str:
     that returns a string of those numbers in the form of a phone number.
     """
     # student realization goes here
+    phone_number = "(" + "".join(str(num) for num in nums[:3]) + ") " + "".join(str(num) for num in nums[3:6]) + "-" + "".join(str(num) for num in nums[6:])
+    return phone_number
+
 
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 # => returns "(123) 456-7890"
-
-
+print('Task 4')
+print(create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]))
 # Task 5
+
+
 # medium level
 def check_exam(correct_answers: list, student_answers: list) -> int:
     """
@@ -131,13 +183,29 @@ def check_exam(correct_answers: list, student_answers: list) -> int:
     and +0 for each blank answer, represented as an empty string.
     If the score < 0, return 0.
     """
-    # student realization goes here
+
+    #student realization goes here
+    score = 0
+    for i in range(len(correct_answers)):
+        if student_answers[i] == "":
+            score += 0
+        elif student_answers[i] == correct_answers[i]:
+            score += 4
+        else:
+            score -= 1
+    return max(0, score)
+
 
 # Function calls with expected result:
 # check_exam(["a", "a", "b", "b"], ["a", "c", "b", "d"]) → 6
 # check_exam(["a", "a", "c", "b"], ["a", "a", "b",  ""]) → 7
 # check_exam(["a", "a", "b", "c"], ["a", "a", "b", "c"]) → 16
 # check_exam(["b", "c", "b", "a"], ["",  "a", "a", "c"]) → 0
+print('Task 5')
+print(check_exam(["a", "a", "b", "b"], ["a", "c", "b", "d"]))
+print(check_exam(["a", "a", "c", "b"], ["a", "a", "b",  ""]))
+print(check_exam(["a", "a", "b", "c"], ["a", "a", "b", "c"]))
+print(check_exam(["b", "c", "b", "a"], ["",  "a", "a", "c"]))
 
 
 # Task 6
@@ -149,6 +217,16 @@ def who_likes_it(names: list) -> str:
     We want to create the text that should be displayed next to such an item.
     """
     # student realization goes here
+    if len(names) == 0:
+        return 'no one likes this'
+    if len(names) == 1:
+        return f'{names[0]} likes this'
+    if len(names) == 2:
+        return f'{names[0]} and {names[1]} like this'
+    if len(names) == 3:
+        return f'{names[0]}, {names[1]} and {names[2]} like this'
+    if len(names) >= 4:
+        return f'{names[0]}, {names[1]} and {len(names) - 2} others like this'
 
 # Function calls with expected result:
 # []                                -->  "no one likes this"
@@ -156,6 +234,14 @@ def who_likes_it(names: list) -> str:
 # ["Jacob", "Alex"]                 -->  "Jacob and Alex like this"
 # ["Max", "John", "Mark"]           -->  "Max, John and Mark like this"
 # ["Alex", "Jacob", "Mark", "Max"]  -->  "Alex, Jacob and 2 others like this"
+
+
+print('Task 6')
+print(who_likes_it([]))
+print(who_likes_it(['Peter']))
+print(who_likes_it(["Jacob", "Alex"]))
+print(who_likes_it(["Max", "John", "Mark"]))
+print(who_likes_it(["Alex", "Jacob", "Mark", "Max"]))
 
 
 # Task 7
@@ -172,9 +258,15 @@ def find_anagrams(words: list) -> list:
     """
     # student implementation goes here
 
+
 # Function calls with expected result:
 # find_anagrams('abba') => ['aabb', 'bbaa']
 # find_anagrams('racer') => ['carer', 'racer', ...]
+
+
+print('Task 7')
+print(find_anagrams(['abba']))
+print(find_anagrams(['racer']))
 
 
 # Task 8
@@ -186,8 +278,21 @@ def scramble(words: list) -> bool:
     otherwise returns false.
     """
     # student implementation goes here
+    str1 = words[0]
+    str2 = words[1]
+    for char in str2:
+        if char not in str1:
+            return False
+        str1 = str1.replace(char, '', 1)
+    return True
+
 
 # Function calls with expected result:
 # scramble(['rkqodlw', 'world']) ==> True
 # scramble(['cedewaraaossoqqyt', 'codewars']) ==> True
 # scramble(['katas', 'steak']) ==> False
+
+print('Task 8')
+print(scramble(['rkqodlw', 'world']))
+print(scramble(['cedewaraaossoqqyt', 'codewars']))
+print(scramble(['katas', 'steak']))

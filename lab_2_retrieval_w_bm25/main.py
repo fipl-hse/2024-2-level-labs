@@ -5,7 +5,7 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
-
+# test commit
 def tokenize(text: str) -> list[str] | None:
     """
     Tokenize the input text into lowercase words without punctuation, digits and other symbols.

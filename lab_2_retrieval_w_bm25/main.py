@@ -7,6 +7,7 @@ Text retrieval with BM25
 import json
 import math
 
+
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -203,10 +204,12 @@ def calculate_bm25(
     if not isinstance(idf_document, dict) or not isinstance(k1, float) \
             or not isinstance(b, float) or not isinstance(doc_len, int) \
             or not isinstance(avg_doc_len, float) or not isinstance(vocab, list) \
-            or not isinstance(document, list) or document == [] or vocab == []:
+            or not isinstance(document,
+                              list) or document == [] or vocab == [] or idf_document == {} or isinstance(
+        doc_len, bool):
         return None
     if not all(isinstance(word, str) for word in vocab) \
-            or not all(isinstance(token, str) for token in document) or vocab:
+            or not all(isinstance(token, str) for token in document):
         return None
     if not all((isinstance(key, str) and isinstance(value, float) for key, value in
                 idf_document.items())):
@@ -214,8 +217,18 @@ def calculate_bm25(
     bm25_dict = {}
     for word in vocab:
         n = document.count(word)
-        bm25_dict[word] = idf_document[word] * (n * (k1 + 1)) / (
-                n + k1 * (1 - b + (b * abs(doc_len) / avg_doc_len)))
+        if idf_document.get(word):
+            bm25_dict[word] = idf_document[word] * (n * (k1 + 1)) / (
+                    n + k1 * (1 - b + (b * abs(doc_len) / avg_doc_len)))
+        else:
+            bm25_dict[word] = 0.0
+    for word in document:
+        n = document.count(word)
+        if idf_document.get(word):
+            bm25_dict[word] = idf_document[word] * (n * (k1 + 1)) / (
+                    n + k1 * (1 - b + (b * abs(doc_len) / avg_doc_len)))
+        else:
+            bm25_dict[word] = 0.0
     return bm25_dict
 
 
@@ -322,7 +335,9 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
-    if not isinstance(file_path, str):
+    if not isinstance(file_path, str) or file_path == '':
+        return None
+    if not isinstance(index, list) or not all(isinstance(vocab, dict) for vocab in index):
         return None
     with open(file_path, "w") as file:
         json.dump(index, file, indent=4)
@@ -341,7 +356,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(file_path, str):
+    if not isinstance(file_path, str) or file_path == '':
         return None
     with open(file_path, 'r') as file:
         result = json.load(file)
@@ -361,3 +376,9 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(rank, list) or not isinstance(golden_rank, list) or \
+            not all(isinstance(indices, int) for indices in rank) or \
+            not all(isinstance(golden_indices, int) for golden_indices in golden_rank):
+        return None
+    if rank == [] or golden_rank == []:
+        return None

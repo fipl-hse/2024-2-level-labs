@@ -3,7 +3,7 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-
+from lab_2_retrieval_w_bm25.main import (tokenize)
 def main() -> None:
     """
     Launches an implementation
@@ -24,9 +24,15 @@ def main() -> None:
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
+        i = 0
+        tokenized_documents = []
+        for each_text in documents:
+            list_of_tokens = tokenize(documents[i])
+            i += 1
+            tokenized_documents.append(list_of_tokens)
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = None
+    result = tokenized_documents
     assert result, "Result is None"
 
 

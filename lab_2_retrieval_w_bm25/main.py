@@ -7,7 +7,6 @@ Text retrieval with BM25
 import json
 import math
 
-
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -352,7 +351,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         else:
             return None
 
-    with open(file_path, "w") as file:
+    with open(file_path, "w", encoding="UTF-8") as file:
         json.dump(index, file, indent=4)
     return None
 
@@ -371,9 +370,9 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
     """
     if not isinstance(file_path, str) or file_path == '':
         return None
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="UTF-8") as file:
         result = json.load(file)
-    return result
+        return result
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -397,5 +396,9 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
         return None
 
     n = len(rank)
-    return 1 - (6 * sum((rank[i] - golden_rank[i]) ** 2 for i in range(n)) / (
-            n * (n * n - 1)))
+    ordered_rank = sorted(rank)
+    ordered_golden_rank = sorted(golden_rank)
+    return 1 - (6 * sum(
+        (rank.index(golden_rank[i]) - i) ** 2 for i in
+        range(n) if golden_rank[i] in rank) / (
+                        n * (n * n - 1)))

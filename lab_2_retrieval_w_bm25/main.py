@@ -7,7 +7,6 @@ Text retrieval with BM25
 import json
 import math
 
-
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -202,12 +201,12 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    is_valid_input = (isinstance(idf_document, dict) and isinstance(k1, float)
-                      and isinstance(b, float) and isinstance(doc_len, int)
-                      and isinstance(avg_doc_len, float) and isinstance(vocab, list)
-                      and isinstance(document, list) and document != [] and vocab != []
+    is_valid_input = ((((isinstance(idf_document, dict) and isinstance(k1, float)
+                         and isinstance(b, float) and isinstance(doc_len, int))
+                        and isinstance(avg_doc_len, float) and isinstance(vocab, list))
+                       and isinstance(document, list) and document != [] and vocab != [])
                       and idf_document != {} and not isinstance(doc_len, bool))
-    if not is_valid_input:
+    if not is_valid_input or doc_len is None or avg_doc_len is None:
         return None
     if not all(isinstance(word, str) for word in vocab) \
             or not all(isinstance(token, str) for token in document):
@@ -220,14 +219,14 @@ def calculate_bm25(
         n = document.count(word)
         if idf_document.get(word):
             bm25_dict[word] = idf_document[word] * (n * (k1 + 1)) / (
-                    n + k1 * (1 - b + (b * abs(doc_len) / avg_doc_len)))
+                    n + k1 * (1 - b + (b * doc_len / avg_doc_len)))
         else:
             bm25_dict[word] = 0.0
     for word in document:
         n = document.count(word)
         if idf_document.get(word):
             bm25_dict[word] = idf_document[word] * (n * (k1 + 1)) / (
-                    n + k1 * (1 - b + (b * abs(doc_len) / avg_doc_len)))
+                    n + k1 * (1 - b + (b * doc_len / avg_doc_len)))
         else:
             bm25_dict[word] = 0.0
     return bm25_dict
@@ -316,7 +315,7 @@ def calculate_bm25_with_cutoff(
                       and document != [] and vocab != [] and idf_document != {}
                       and not isinstance(doc_len, bool)
                       and not isinstance(avg_doc_len, bool) and doc_len > 0)
-    if not is_valid_input:
+    if not is_valid_input or doc_len is None or avg_doc_len is None:
         return None
 
     if k1 < 1.2 or k1 > 2.0 or b < 0 or b > 1:
@@ -332,7 +331,7 @@ def calculate_bm25_with_cutoff(
         n = document.count(word)
         if idf_document[word] > alpha:
             bm25_dict[word] = idf_document[word] * (n * (k1 + 1)) / (
-                    n + k1 * (1 - b + (b * abs(doc_len) / avg_doc_len)))
+                    n + k1 * (1 - b + (b * doc_len / avg_doc_len)))
     return bm25_dict
 
 

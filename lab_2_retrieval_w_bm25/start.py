@@ -26,7 +26,11 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = None
+    documents_step_1 = []
+    for i in documents:
+        documents_step_1.append(tokenize(i))
+    result = documents_step_1
+    assert result, "Result is None"
 
 
 if __name__ == "__main__":

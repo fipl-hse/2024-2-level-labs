@@ -7,6 +7,7 @@ Text retrieval with BM25
 import json
 import math
 
+
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -100,10 +101,11 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not isinstance(document_tokens, list) \
-            or not all(isinstance(word, str) for word in vocab) \
-            or not all(isinstance(token, str) for token in document_tokens) or vocab == [] \
-            or document_tokens == []:
+    is_valid_input = (isinstance(vocab, list) and isinstance(document_tokens, list)
+                      and all(isinstance(word, str) for word in vocab)
+                      and all(isinstance(token, str) for token in document_tokens)
+                      and vocab != [] and document_tokens != [])
+    if not is_valid_input:
         return None
     tf_dict = {}
     for word in vocab:
@@ -126,18 +128,17 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not isinstance(documents, list) \
-            or not all(isinstance(word, str) for word in vocab) \
-            or not all(isinstance(doc, list) for doc in documents) \
-            or vocab == [] or documents == []:
+    is_valid_input = (isinstance(vocab, list) and isinstance(documents, list)
+                      and all(isinstance(word, str) for word in vocab)
+                      and all(isinstance(doc, list) for doc in documents) and vocab != []
+                      and documents != [])
+    if not is_valid_input:
         return None
     for doc in documents:
         if not all(isinstance(word, str) for word in doc):
             return None
     idf_dic = {}
-    n = 0
-    for text in documents:
-        n += 1
+    n = len(documents)
     for word in vocab:
         amount = 0
         for tokenize_doc in documents:
@@ -160,12 +161,13 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tf, dict) or not isinstance(idf, dict) \
-            or not all(
-        (isinstance(key, str) and isinstance(value, float) for key, value in tf.items())) \
-            or not all(
-        (isinstance(key, str) and isinstance(value, float) for key, value in idf.items())) \
-            or tf == {} or idf == {}:
+    is_valid_input = (((isinstance(tf, dict) and isinstance(idf, dict)
+                        and all((isinstance(key, str) and isinstance(value, float)
+                                 for key, value in tf.items())))
+                       and all((isinstance(key, str) and isinstance(value, float)
+                                for key, value in idf.items())))
+                      and tf != {} and idf != {})
+    if not is_valid_input:
         return None
 
     tf_idf_dict = {}
@@ -200,12 +202,12 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(idf_document, dict) or not isinstance(k1, float) \
-            or not isinstance(b, float) or not isinstance(doc_len, int) \
-            or not isinstance(avg_doc_len, float) or not isinstance(vocab, list) \
-            or not isinstance(document,
-                              list) or document == [] or vocab == [] or idf_document == {} or isinstance(
-        doc_len, bool):
+    is_valid_input = (isinstance(idf_document, dict) and isinstance(k1, float)
+                      and isinstance(b, float) and isinstance(doc_len, int)
+                      and isinstance(avg_doc_len, float) and isinstance(vocab, list)
+                      and isinstance(document, list) and document != [] and vocab != []
+                      and idf_document != {} and not isinstance(doc_len, bool))
+    if not is_valid_input:
         return None
     if not all(isinstance(word, str) for word in vocab) \
             or not all(isinstance(token, str) for token in document):
@@ -247,8 +249,10 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(query, str) or not isinstance(stopwords, list) \
-            or not isinstance(indexes, list) or stopwords == [] or indexes == [] or query == '':
+    is_valid_input = (isinstance(query, str) and isinstance(stopwords, list)
+                      and isinstance(indexes, list) and stopwords != []
+                      and indexes != [] and query != '')
+    if not is_valid_input:
         return None
     if not all(isinstance(stopword, str) for stopword in stopwords) or \
             not all(isinstance(vocab, dict) for vocab in indexes) or \
@@ -305,13 +309,14 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(idf_document, dict) or not isinstance(k1, float) \
-            or not isinstance(b, float) or not isinstance(doc_len, int) \
-            or not isinstance(avg_doc_len, float) or not isinstance(vocab, list) \
-            or not isinstance(document, list) or not isinstance(alpha, float) \
-            or document == [] or vocab == [] or idf_document == {} or isinstance(doc_len,
-                                                                                 bool) or isinstance(
-        avg_doc_len, bool) or doc_len <= 0:
+    is_valid_input = (isinstance(idf_document, dict) and isinstance(k1, float)
+                      and isinstance(b, float) and isinstance(doc_len, int)
+                      and isinstance(avg_doc_len, float) and isinstance(vocab, list)
+                      and isinstance(document, list) and isinstance(alpha, float)
+                      and document != [] and vocab != [] and idf_document != {}
+                      and not isinstance(doc_len, bool)
+                      and not isinstance(avg_doc_len, bool) and doc_len > 0)
+    if not is_valid_input:
         return None
 
     if k1 < 1.2 or k1 > 2.0 or b < 0 or b > 1:
@@ -371,7 +376,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
     if not isinstance(file_path, str) or file_path == '':
         return None
     with open(file_path, 'r', encoding="UTF-8") as file:
-        result = json.load(file)
+        result: list[dict[str, float]] = json.load(file)
         return result
 
 
@@ -396,9 +401,5 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
         return None
 
     n = len(rank)
-    ordered_rank = sorted(rank)
-    ordered_golden_rank = sorted(golden_rank)
-    return 1 - (6 * sum(
-        (rank.index(golden_rank[i]) - i) ** 2 for i in
-        range(n) if golden_rank[i] in rank) / (
-                        n * (n * n - 1)))
+    return 1 - (6 * sum((rank.index(golden_rank[i]) - i) ** 2 for i in range(n)
+                        if golden_rank[i] in rank) / (n * (n * n - 1)))

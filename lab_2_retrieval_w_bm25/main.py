@@ -1,4 +1,3 @@
-
 """
 Lab 2.
 
@@ -19,6 +18,22 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+
+    if any(symb.isalpha() for symb in text) is False:
+        return []
+    new_text = []
+    word_for_new_text = []
+
+    for every_symbol in text.lower():
+        if every_symbol.isalpha():
+            word_for_new_text.append(every_symbol)
+        else:
+            if word_for_new_text:
+                new_text.append(''.join(word_for_new_text))
+                word_for_new_text = []
+    return new_text
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -34,6 +49,20 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(tokens, list)
+            or not all(isinstance(token, str) for token in tokens)):
+        return None
+    if (not isinstance(stopwords, list)
+            or not all(isinstance(word, str) for word in stopwords)):
+        return None
+    if len(tokens) == 0 or len(stopwords) == 0:
+        return None
+
+    new_list_of_tokens = []
+    for word in tokens:
+        if word not in stopwords:
+            new_list_of_tokens.append(word)
+    return new_list_of_tokens
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

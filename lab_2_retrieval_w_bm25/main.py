@@ -337,8 +337,16 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
     """
     if not isinstance(file_path, str) or file_path == '':
         return None
-    if not isinstance(index, list) or not all(isinstance(vocab, dict) for vocab in index):
+    if not isinstance(index, list) or index == []:
         return None
+
+    for idx in index:
+        if isinstance(idx, dict):
+            if not all(isinstance(key, str) and isinstance(val, float) for key, val in idx.items()):
+                return None
+        else:
+            return None
+
     with open(file_path, "w") as file:
         json.dump(index, file, indent=4)
     return None
@@ -380,5 +388,9 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
             not all(isinstance(indices, int) for indices in rank) or \
             not all(isinstance(golden_indices, int) for golden_indices in golden_rank):
         return None
-    if rank == [] or golden_rank == []:
+    if rank == [] or golden_rank == [] or len(rank) != len(golden_rank):
         return None
+
+    n = len(rank)
+    return 1 - (6 * sum((rank[i] - golden_rank[i]) ** 2 for i in range(n)) / (
+            n * (n * n - 1)))

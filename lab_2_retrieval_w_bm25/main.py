@@ -5,7 +5,6 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
-# test commit
 def tokenize(text: str) -> list[str] | None:
     """
     Tokenize the input text into lowercase words without punctuation, digits and other symbols.
@@ -18,6 +17,22 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    token_list = []
+    token = ''
+    for i in text.lower():
+        if not i.isalpha():
+            if token:
+                token_list.append(token)
+            token = ''
+            continue
+        token += i
+    return token_list
+
+
+
+
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -33,6 +48,12 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tokens, list) or not isinstance(stopwords, list):
+        return None
+    for i in tokens[:]:
+        if i in stopwords:
+            tokens.remove(i)
+    return tokens
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

@@ -3,6 +3,7 @@ Laboratory Work #2 starter
 """
 import lab_2_retrieval_w_bm25.main as func
 
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches,
 # too-many-statements, duplicate-code
 
@@ -31,20 +32,33 @@ def main() -> None:
     result = None
     # assert result, "Result is None"
     docs = []
-    vocab = []
-    new_vocab = []
     for text in documents:
-        tokenize_doc = func.remove_stopwords(func.tokenize(text), stopwords)
-        docs.append(tokenize_doc)
+        tokenized_text = func.tokenize(text)
+        if tokenized_text is not None:
+            tokenized_text = func.remove_stopwords(tokenized_text, stopwords)
+        if tokenized_text is not None:
+            # tokenized_text = func.remove_stopwords(tokenized_text, stopwords)
+            docs.append(tokenized_text)
 
     vocab = func.build_vocabulary(docs)
-    idf = func.calculate_idf(vocab, docs)
+    if vocab is not None:
+        idf = func.calculate_idf(vocab, docs)
+    else:
+        idf = {}
 
     for text in documents:
-        tokenize_doc = func.remove_stopwords(func.tokenize(text), stopwords)
+        tokenized_text = func.tokenize(text)
+        if tokenized_text is not None:
+            tokenized_text = func.remove_stopwords(tokenized_text, stopwords)
         vocab = func.build_vocabulary(docs)
-        tf = func.calculate_tf(vocab, tokenize_doc)
-        new_vocab = func.calculate_tf_idf(tf, idf)
+        if vocab is not None and tokenized_text is not None:
+            tf = func.calculate_tf(vocab, tokenized_text)
+        else:
+            tf = {}
+        if tf is not None and idf is not None:
+            new_vocab = func.calculate_tf_idf(tf, idf)
+        else:
+            new_vocab = {}
         print(new_vocab)
 
 

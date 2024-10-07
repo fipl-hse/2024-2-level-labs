@@ -253,16 +253,21 @@ def rank_documents(
         return None
     if not all(isinstance(stopword, str) for stopword in stopwords) or \
             not all(isinstance(vocab, dict) for vocab in indexes) or \
-            not all((isinstance(key, str) and isinstance(value, float) for key, value in vocab) for
-                    vocab in indexes):
+            not all(
+                (isinstance(key, str) and isinstance(value, float) for key, value in vocab.items())
+                for vocab in indexes):
         return None
-    tokenize_str = remove_stopwords(tokenize(query), stopwords)
+
+    tokenized_query = tokenize(query)
+    if tokenized_query is None:
+        return None
+    tokenize_str = remove_stopwords(tokenized_query, stopwords)
     if not tokenize_str:
         return None
     result = []
     n = 0
     for text in indexes:
-        sum_result = 0
+        sum_result = 0.0
         for word in tokenize_str:
             if word in text.keys():
                 sum_result += text[word]

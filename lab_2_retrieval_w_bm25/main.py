@@ -56,6 +56,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     for word in stopwords:
         if not isinstance(word, str):
             return None
+    if len(tokens) == 0 or len(stopwords) == 0:
+        return None
 
     result = []
     for token in tokens:

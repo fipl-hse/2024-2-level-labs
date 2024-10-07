@@ -65,7 +65,8 @@ def main() -> None:
         bm_for_doc = calculate_bm25(vocab, tokenized_document, idf, k1, b, avg, length)
         if bm_for_doc is not None:
             bm_list.append(bm_for_doc)
-        bm_w_cutoff_for_doc = calculate_bm25_with_cutoff(vocab, tokenized_document, idf, alpha, k1, b, avg, length)
+        bm_w_cutoff_for_doc = calculate_bm25_with_cutoff(
+            vocab, tokenized_document, idf, alpha, k1, b, avg, length)
         if bm_w_cutoff_for_doc is not None:
             bm_w_cutoff_list.append(bm_w_cutoff_for_doc)
     print(tf_idf_list)

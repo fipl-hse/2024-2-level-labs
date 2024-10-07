@@ -251,13 +251,7 @@ def rank_documents(
     if (not isinstance(indexes, list) or not isinstance(indexes[0], dict)
             or not isinstance(query, str) or not isinstance(stopwords, list)):
         return None
-    query_lst = list(remove_stopwords(tokenize(query), stopwords))
-    all_results = []
-    for word in query_lst:
-        for number, metrics in enumerate(indexes):
-            value = metrics.get(word)
-            all_results.append((number, value))
-    return all_results
+
 
 
 

@@ -361,6 +361,8 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     summ = 0
     n = len(rank)
     for ind, num in enumerate(rank):
-        summ += (num - golden_rank[ind]) ** 2
+        if num not in golden_rank:
+            return 0.0
+        summ += (ind - golden_rank.index(num)) ** 2
     spearman = 1 - (6 * summ) / (n * (n ** 2 - 1))
     return spearman

@@ -3,9 +3,10 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
-                                         calculate_bm25_with_cutoff, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, load_index, rank_documents,
-                                         remove_stopwords, save_index, tokenize)
+                                         calculate_bm25_with_cutoff, calculate_idf,
+                                         calculate_spearman, calculate_tf, calculate_tf_idf,
+                                         load_index, rank_documents, remove_stopwords, save_index,
+                                         tokenize)
 
 
 def main() -> None:
@@ -54,12 +55,17 @@ def main() -> None:
         bm_w_cutoff_list.append(calculate_bm25_with_cutoff(vocab, tokenization_res, idf, alpha, k1, b, avg, length))
     print(tf_idf_list)
     print(bm_list)
-    print(rank_documents(tf_idf_list, query, stopwords))
-    print(rank_documents(bm_list, query, stopwords))
+    tf_idf_rank_tuples = rank_documents(tf_idf_list, query, stopwords)
+    bm_rank_tuples = rank_documents(bm_list, query, stopwords)
+    bm_rank = [tup[0] for tup in bm_rank_tuples]
+    tf_idf_rank = [tup[0] for tup in tf_idf_rank_tuples]
     save_index(bm_w_cutoff_list, 'assets/metrics.json')
     loaded_docs_list = load_index('assets/metrics.json')
-    result = rank_documents(loaded_docs_list, query, stopwords)
-    print(result)
+    bm_w_cutoff_rank_tuples = rank_documents(loaded_docs_list, query, stopwords)
+    bm_w_cutoff_rank = [tup[0] for tup in bm_w_cutoff_rank_tuples]
+    print(calculate_spearman(tf_idf_rank, bm_w_cutoff_rank))
+    print(calculate_spearman(bm_rank, bm_w_cutoff_rank))
+    result = calculate_spearman(bm_rank, bm_w_cutoff_rank)
     assert result, "Result is None"
 
 

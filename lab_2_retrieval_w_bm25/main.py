@@ -194,8 +194,10 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not vocab or not document or not idf_document or not isinstance(vocab, list)
-            or not isinstance(document, list) or not isinstance(idf_document, dict)):
+    if not vocab or not document or not idf_document:
+        return None
+    if (not isinstance(vocab, list) or not isinstance(document, list)
+            or not isinstance(idf_document, dict)):
         return None
     if (not all(isinstance(word, str) for word in vocab)
             or not all(isinstance(word, str) for word in document)):
@@ -285,17 +287,18 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not vocab or not document or not idf_document or not isinstance(vocab, list)
+    if (not vocab or not document or not idf_document
             or not isinstance(document, list) or not isinstance(idf_document, dict)):
         return None
-    if (not all(isinstance(word, str) for word in vocab)
+    if (not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab)
             or not all(isinstance(word, str) for word in document)):
         return None
     if not all(isinstance(key, str)
                and isinstance(value, float) for key, value in idf_document.items()):
         return None
-    if (not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float)
-            or isinstance(doc_len, bool) or not isinstance(doc_len, int)
+    if not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float):
+        return None
+    if (isinstance(doc_len, bool) or not isinstance(doc_len, int)
             or doc_len < 0 or not isinstance(alpha, float)):
         return None
     bm_dict_w_cutoff = {}
@@ -325,7 +328,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         if not all(isinstance(key, str)
                    and isinstance(value, float) for key, value in dictionary.items()):
             return None
-    with open(file_path, "w") as out_file:
+    with open(file_path, 'w', encoding='utf-8') as out_file:
         json.dump(index, out_file, indent=4)
     return None
 

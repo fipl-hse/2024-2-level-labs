@@ -98,14 +98,11 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     freq_dict = {}
     len_document_tokens = len(document_tokens)
+    for word in document_tokens:
+        freq_dict[word] = document_tokens.count(word) / len_document_tokens
     for word in vocab:
         if word not in document_tokens:
             freq_dict[word] = 0.0
-            continue
-        freq_dict[word] = document_tokens.count(word) / len_document_tokens
-    for word in document_tokens:
-        if word not in freq_dict:
-            freq_dict[word] = document_tokens.count(word) / len_document_tokens
     return freq_dict
 
 
@@ -132,13 +129,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     freq_dict = {}
     len_documents = len(documents)
-    for word in vocab:
-        if not (word in document for document in documents):
-            freq_dict[word] = 0.0
-            continue
-        num_documents_with_term = sum(1 for document_ in documents if word in document_)
-        freq_dict[word] = math.log((len_documents - num_documents_with_term + 0.5)
-                                   / (num_documents_with_term + 0.5))
     for document in documents:
         for word in document:
             if word not in freq_dict:
@@ -173,11 +163,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     tf_idf_dict = {}
     for key in tf:
-        if key in idf:
-            tf_idf_dict[key] = tf[key] * idf[key]
-    if tf_idf_dict:
-        return tf_idf_dict
-    return None
+        tf_idf_dict[key] = tf[key] * idf[key]
+    return tf_idf_dict
 
 
 def calculate_bm25(
@@ -230,7 +217,7 @@ def calculate_bm25(
             num_word_occur = document.count(word)
             bm25_dict[word] = (idf_document[word] * ((num_word_occur * (k1 + 1))
                                                      / (num_word_occur + k1
-                                                        * (1 - b + b * (doc_len / avg_doc_len)))))
+                                                        * (1 - b + b * doc_len / avg_doc_len))))
     if not bm25_dict:
         return None
     return bm25_dict
@@ -262,7 +249,6 @@ def rank_documents(
     if is_not_correct:
         return None
 
-    ranked_documents = []
     tokenized_query = tokenize(query)
     if not tokenized_query:
         return None
@@ -270,12 +256,11 @@ def rank_documents(
     if not query_preprocess:
         return None
 
+    ranked_documents = []
     for document in indexes:
-        metrics_sum = 0
-        for word in document:
-            if word in query_preprocess:
-                metrics_sum += document[word]
-        ranked_documents.append((indexes.index(document), metrics_sum))
+        ranked_documents.append((indexes.index(document),
+                                 sum(document[word] for word in document
+                                     if word in query_preprocess)))
     return sorted(ranked_documents, key=lambda x: x[1], reverse=True)
 
 
@@ -319,9 +304,23 @@ def calculate_bm25_with_cutoff(
                       not k1 or not isinstance(k1, float) or not 1.2 <= k1 <= 2.0 or
                       not b or not isinstance(b, float) or not 0 <= b <= 1 or
                       not avg_doc_len or not isinstance(avg_doc_len, float) or not doc_len or
-                      not isinstance(doc_len, int) or isinstance(doc_len, bool))
+                      not isinstance(doc_len, int) or isinstance(doc_len, bool) or doc_len < 0)
     if is_not_correct:
         return None
+
+    modified_bm25_dict = {}
+    for word in vocab:
+        if word in idf_document:
+            idf = idf_document[word]
+            if idf < alpha:
+                continue
+            num_word_occur = document.count(word)
+            modified_bm25_dict[word] = idf * ((num_word_occur * (k1 + 1)) /
+                                              (num_word_occur + k1 *
+                                               (1 - b + b * doc_len / avg_doc_len)))
+    if not modified_bm25_dict:
+        return None
+    return modified_bm25_dict
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:

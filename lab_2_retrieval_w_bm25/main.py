@@ -226,6 +226,8 @@ def calculate_bm25(
             idf_document.update({word: 0.0})
     for word in vocab:
         idf = idf_document.get(word)
+        if not isinstance(idf, float):
+            return None
         bm25 = idf * ((document.count(word) * (k1 + 1)) /
                       (document.count(word) + k1 * (1 - b + b * (doc_len / avg_doc_len))))
         bm25_dict.update({word: bm25})
@@ -248,11 +250,28 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not isinstance(indexes, list) or not isinstance(indexes[0], dict)
+    if (not isinstance(indexes, list) or len(indexes) == 0 or not isinstance(indexes[0], dict)
             or not isinstance(query, str) or not isinstance(stopwords, list)):
         return None
-
-
+    tokens = tokenize(query)
+    if not isinstance(tokens, list):
+        return None
+    correct_query = remove_stopwords(tokens, stopwords)
+    if not correct_query:
+        return None
+    result = []
+    for index, story in enumerate(indexes):
+        value = 0.0
+        for word in correct_query:
+            if word not in story.keys():
+                continue
+            num = story.get(word)
+            if not isinstance(num, float):
+                return None
+            value += num
+        result.append((index, value))
+    result.sort(key=lambda x: x[1], reverse=True)
+    return result
 
 
 def calculate_bm25_with_cutoff(

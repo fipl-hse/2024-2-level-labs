@@ -18,6 +18,20 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    text = text.lower()
+    words = text.split(' ')
+    clean_words = []
+    for each in words:
+        for symb in each:
+            if not symb.isalpha():
+                continue
+            clean_word =
+
+    clean_words.append(symb)
+    return clean_words
+
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:

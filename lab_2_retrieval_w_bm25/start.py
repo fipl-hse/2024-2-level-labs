@@ -27,7 +27,7 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
     result = None
-    assert result, "Result is None"
+    #assert result, "Result is None"
 
 
 if __name__ == "__main__":

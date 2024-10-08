@@ -152,7 +152,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     for word in tokens:
         if not isinstance(word, str):
             return None
-        idf_word = math.log((len(documents) - tokens.count(word) + 0.5) / (tokens.count(word) + 0.5))
+        idf_word = math.log((len(documents) - tokens.count(word) + 0.5) /
+                            (tokens.count(word) + 0.5))
         idf.update({word: round(idf_word, 4)})
     return idf
 
@@ -177,7 +178,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     tf_idf = {}
     for word, value in tf.items():
         value_idf = idf.get(word)
-        if not isinstance(word, str) or not isinstance(value, float) or not isinstance(value_idf, float):
+        if (not isinstance(word, str) or not isinstance(value, float)
+                or not isinstance(value_idf, float)):
             return None
         tf_idf_word = value * value_idf
         tf_idf.update({word: tf_idf_word})
@@ -210,12 +212,16 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not isinstance(vocab, list) or not isinstance(document, list) or len(vocab) == 0 or len(document) == 0
-            or not isinstance(vocab[0], str) or not isinstance(document[0], str)):
+    if (not isinstance(vocab, list) or not isinstance(document, list)
+            or len(vocab) == 0 or len(document) == 0):
         return None
-    if not isinstance(idf_document, dict) or not idf_document or not isinstance(list(idf_document.values())[0], float):
+    if not isinstance(vocab[0], str) or not isinstance(document[0], str):
         return None
-    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) or isinstance(doc_len, bool):
+    if (not isinstance(idf_document, dict) or not idf_document
+            or not isinstance(list(idf_document.values())[0], float)):
+        return None
+    if (not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)
+            or isinstance(doc_len, bool)):
         return None
     if not isinstance(k1, float) or not isinstance(b, float):
         return None

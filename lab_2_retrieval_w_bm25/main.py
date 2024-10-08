@@ -255,7 +255,8 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not indexes or not isinstance(indexes, list) or all(isinstance(i, dict) for i in indexes)
+    if (not indexes or not isinstance(indexes, list)
+            or not all(isinstance(i, dict) for i in indexes)
             or not all((isinstance(key, str) and isinstance(value, float)
                         for i in indexes for key, value in i.items()))):
         return None
@@ -264,6 +265,22 @@ def rank_documents(
     if (not stopwords or not isinstance(stopwords, list)
             or not all(isinstance(i, str) for i in stopwords)):
         return None
+
+    ranked_documents = []
+    tokenized_query = tokenize(query)
+    if not tokenized_query:
+        return None
+    query_preprocess = remove_stopwords(tokenized_query, stopwords)
+    if not query_preprocess:
+        return None
+
+    for document in indexes:
+        metrics_sum = 0
+        for word in document:
+            if word in query_preprocess:
+                metrics_sum += document[word]
+        ranked_documents.append((indexes.index(document), metrics_sum))
+    return sorted(ranked_documents, key=lambda x: x[1], reverse=True)
 
 
 def calculate_bm25_with_cutoff(
@@ -294,18 +311,26 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not isinstance(vocab, list) or not vocab
-            or not isinstance(document, list) or not document):
+    if (not vocab or not isinstance(vocab, list)
+            or not all(isinstance(i, str) for i in vocab)):
         return None
-    if (not isinstance(avg_doc_len, float) or not avg_doc_len
-            or not isinstance(doc_len, int) or not doc_len):
+    if (not document or not isinstance(document, list)
+            or not all(isinstance(i, str) for i in document)):
         return None
-    if (not isinstance(idf_document, str) or not idf_document
-            or not isinstance(alpha, float) or not alpha):
+    if (not idf_document or not isinstance(idf_document, dict)
+            or not all((isinstance(key, str) and isinstance(value, float)
+                        for key, value in idf_document.items()))
+            or all(isinstance(i, dict) for i in idf_document.values())):
         return None
-    if (not all(isinstance(i, str) for i in vocab)
-            or not all(isinstance(i, str) for i in document)
-            or not all(isinstance(i, (str, float)) for i in idf_document)):
+    if not alpha or not isinstance(alpha, float):
+        return None
+    if not k1 or not isinstance(k1, float) or not 1.2 <= k1 <= 2.0:
+        return None
+    if not b or not isinstance(b, float) or not 0 <= b <= 1:
+        return None
+    if not avg_doc_len or not isinstance(avg_doc_len, float):
+        return None
+    if not doc_len or not isinstance(doc_len, int) or isinstance(doc_len, bool):
         return None
 
 
@@ -317,13 +342,13 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
-    if (not isinstance(index, list) or not index
-            or not isinstance(file_path, str) or not file_path):
+    if (not index or not isinstance(index, list)
+            or not all(isinstance(i, dict) for i in index)
+            or not all((isinstance(key, str) and isinstance(value, float)
+                        for i in index for key, value in i.items()))):
         return None
-    if (not all(isinstance(i, dict) for i in index)
-            or not all(isinstance(i.items(), str | float) for i in index)):
+    if not file_path or not isinstance(file_path, str):
         return None
-
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -338,7 +363,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(file_path, str) or not file_path:
+    if not file_path or not isinstance(file_path, str):
         return None
 
 
@@ -355,7 +380,9 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(rank, list) or not rank or not isinstance(golden_rank, list) or not golden_rank:
+    if (not rank or not isinstance(rank, list)
+            or not all(isinstance(i, int) for i in rank)):
         return None
-    if not all(isinstance(i, int) for i in rank) or not all(isinstance(i, int) for i in golden_rank):
+    if (not golden_rank or not isinstance(golden_rank, list)
+            or not all(isinstance(i, int) for i in golden_rank)):
         return None

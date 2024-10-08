@@ -18,6 +18,22 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str) or len(text) < 1:
+        return None
+
+    for symbol in text:
+        if symbol.isalpha() or symbol == " ":
+            continue
+        text = text.replace(f"{symbol}", " ")
+
+    new_text = text.split(" ")
+    result = []
+    for word in new_text:
+        if not word.isalpha():
+            continue
+        result.append(word.lower())
+
+    return result
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -33,6 +49,19 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if tokens is None or not isinstance(tokens, list) or not isinstance(stopwords, list):
+        return None
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+    for word in stopwords:
+        if not isinstance(word, str):
+            return None
+    if len(tokens) == 0 or len(stopwords) == 0:
+        return None
+
+    result = [token for token in tokens if token not in stopwords]
+    return result
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -47,6 +76,23 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(documents, list):
+        return None
+
+    unique_words = []
+
+    for document in documents:
+        if not isinstance(document, list) or len(document) == 0:
+            return None
+        for word in document:
+            if not isinstance(word, str) or len(word) == 0:
+                return None
+            if word not in unique_words:
+                unique_words.append(word)
+
+    if not unique_words:
+        return None
+    return unique_words
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

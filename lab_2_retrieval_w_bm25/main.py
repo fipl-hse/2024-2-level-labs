@@ -5,6 +5,8 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 import re
+import math
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -38,8 +40,12 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if tokens is None or stopwords is None:
+        return None
     if (not isinstance(tokens, list) or not isinstance(stopwords, list) or
             not all(isinstance(i, str) for i in tokens) or not all(isinstance(k, str) for k in stopwords)):
+        return None
+    if not tokens or not stopwords:
         return None
     without_stop = []
     for word in tokens:
@@ -83,7 +89,20 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-
+    #vocab типа все слова из прошлой функции, а вот document.. это просто то, что мы имеем на входе без стоп слов
+    if not vocab or not document_tokens:
+        return None
+    if vocab is None or document_tokens is None:
+        return None
+    if (not isinstance(vocab, list) or not isinstance(document_tokens, list) or
+            not all(isinstance(i, str) for i in document_tokens) or not all(isinstance(k, str) for k in vocab)):
+        return None
+    dictionary_for_tf = {}
+    for word in vocab:
+        dictionary_for_tf[word] = 0.0
+        if word in document_tokens:
+            dictionary_for_tf[word] = round(document_tokens.count(word) / len(document_tokens), 3) #что за фигня? нужно какой-то другой способ округления
+    return dictionary_for_tf
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -99,7 +118,34 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not vocab or not documents:
+        return None
+    if (not isinstance(vocab, list) or not isinstance(documents, list) or
+            not all(isinstance(p, str) for p in vocab) or not all(isinstance(k, list) for k in documents)):
+        return None
+    counter_for_documents = len(documents)
+    dictionary_for_idf = {}
+    for word in vocab:
+        dictionary_for_idf[word] = 0.0
+        for freq in documents:
+            counter = 0.0
+            if word in freq:
+                counter += 1.0
+            value = round((counter_for_documents-counter+0.5)/(counter+0.5), 2)
+            dictionary_for_idf[word] = math.log(value)
+    return dictionary_for_idf
 
+print(calculate_idf(['school', 'tower', 'go', 'used', 'magic', 'perfect', 'cat',
+                     'dogs', 'best', 'top', 'studying', 'pets', 'leave', 'parrots', 'morning',
+                     'hill', 'loved', 'picnic', 'rarely', 'boy', 'every', 'weather', 'steven', 'two',
+                     'three', 'spells', 'wizard', 'home', 'leaved', 'date', 'friend', 'dragon', 'sad',
+                     'princess', 'wand', 'summer'], [['boy', 'wizard', 'used', 'wand', 'spells',
+                                                      'studying', 'magic', 'school', 'best', 'friend', 'wizard'],
+                                                     ['steven', 'boy', 'loved', 'pets', 'cat', 'two', 'dogs', 'three',
+                                                      'parrots', 'every', 'morning', 'want', 'go', 'school', 'leave',
+                                                      'pets', 'home'], ['dragon', 'princess', 'picnic', 'date', 'top',
+                                                                        'hill', 'rarely', 'leaved', 'tower', 'summer',
+                                                                        'weather', 'perfect', 'hill', 'picnic']]))
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
     """

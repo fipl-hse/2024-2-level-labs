@@ -4,6 +4,8 @@ Laboratory Work #2 starter
 from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords, build_vocabulary,
                                          calculate_tf, calculate_idf, calculate_tf_idf,
                                          calculate_bm25, rank_documents)
+# pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches,
+# too-many-statements, duplicate-code
 
 
 def main() -> None:

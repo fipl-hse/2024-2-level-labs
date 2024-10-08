@@ -4,8 +4,8 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-import math
-import json
+from math import log
+from json import dump, load
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -130,7 +130,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     for document in documents:
         for word in document:
             num_documents_with_word = sum(1 for document in documents if word in document)
-            freq_dict[word] = math.log((len(documents) - num_documents_with_word + 0.5) /
+            freq_dict[word] = log((len(documents) - num_documents_with_word + 0.5) /
                                        (num_documents_with_word + 0.5))
     return freq_dict
 
@@ -336,7 +336,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         return None
 
     with open(file_path, 'w', encoding='utf-8') as file:
-        json.dump(index, file)
+        dump(index, file)
     return None
 
 
@@ -356,7 +356,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
         return None
 
     with open(file_path, 'r', encoding='utf-8') as file:
-        loaded_index = json.load(file)
+        loaded_index = load(file)
     return loaded_index
 
 

@@ -1,3 +1,4 @@
+from copy import deepcopy
 """
 Lab 2.
 
@@ -19,6 +20,18 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned.
     """
 
+    if not isinstance(text, str):
+        return None
+
+    text_prep = ''
+    for symb in text.lower():
+        if symb == ' ' or symb.isalpha():
+            text_prep += symb
+        else:
+            continue
+    tokenized_list = text_prep.split()
+    return tokenized_list
+
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
@@ -34,6 +47,18 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     In case of corrupt input arguments, None is returned.
     """
 
+    if not isinstance(tokens, list) or not isinstance(stopwords, list):
+        return None
+
+    tokens_prep = deepcopy(tokens)
+    for token in tokens_prep:
+        if not isinstance(token, str):
+            return None
+        else:
+            if token in stopwords:
+                tokens_prep.remove(token)
+    return tokens_prep
+
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
@@ -47,6 +72,9 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+
+    if not isinstance(documents, list):
+        return None
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

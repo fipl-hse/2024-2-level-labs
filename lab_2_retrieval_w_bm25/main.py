@@ -4,7 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-
+import re
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -18,6 +18,11 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    lower = text.lower()
+    list_for_words = re.findall('[a-zа-я]+', lower)
+    return list_for_words
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -33,6 +38,14 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(tokens, list) or not isinstance(stopwords, list) or
+            not all(isinstance(i, str) for i in tokens) or not all(isinstance(k, str) for k in stopwords)):
+        return None
+    without_stop = []
+    for word in tokens:
+        if word not in stopwords:
+            without_stop.append(word)
+    return without_stop
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -47,6 +60,14 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(documents, list) or not all(isinstance(i, list) for i in documents):
+        return None
+    main_list = []
+    for words in documents:
+        for word in words:
+            if word not in main_list:
+                main_list.append(word)
+    return main_list
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -62,6 +83,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:

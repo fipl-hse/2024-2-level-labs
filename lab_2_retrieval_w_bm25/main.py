@@ -20,8 +20,7 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not text or not isinstance(text, str))
-    if is_not_correct:
+    if not text or not isinstance(text, str):
         return None
 
     for symbol in text:
@@ -336,7 +335,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
     if is_not_correct:
         return None
 
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding='utf-8') as file:
         json.dump(index, file)
     return None
 
@@ -353,11 +352,10 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not file_path or not isinstance(file_path, str))
-    if is_not_correct:
+    if not file_path or not isinstance(file_path, str):
         return None
 
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         loaded_index = json.load(file)
     return loaded_index
 

@@ -44,7 +44,9 @@ def main() -> None:
         avg += len(document)
         tokenized_document = tokenize(document)
         if tokenized_document is not None:
-            tokenized_all_documents.append(remove_stopwords(tokenized_document, stopwords))
+            tokenized_document = remove_stopwords(tokenized_document, stopwords)
+        if tokenized_document is not None:
+            tokenized_all_documents.append(tokenized_document)
     avg = avg / len(documents)
     vocab = build_vocabulary(tokenized_all_documents)
     if vocab is None:

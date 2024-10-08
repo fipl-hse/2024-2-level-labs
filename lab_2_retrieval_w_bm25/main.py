@@ -30,7 +30,7 @@ def tokenize(text: str) -> list[str] | None:
                 result.append(word)
             word = ''
             continue
-        word += token
+        word = ''.join([word, token])
     return result
 
 
@@ -55,7 +55,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     for i in tokens[:]:
         if i in stopwords:
             tokens.remove(i)
-    return tokens if tokens else None
+    return tokens or None
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -80,7 +80,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
             if not isinstance(word, str):
                 return None
     vocab = set(sum(documents, []))
-    return list(vocab) if vocab else None
+    return list(vocab) or None
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -105,7 +105,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return None
     unique_words = list(set(vocab + document_tokens))
     tf_dict = {token: document_tokens.count(token) / len(document_tokens) for token in unique_words}
-    return tf_dict if tf_dict else None
+    return tf_dict or None
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -218,7 +218,7 @@ def calculate_bm25(
             bm_dict[token] = 0.0
         else:
             bm_dict[token] = idf_document[token] * numerator / denominator
-    return bm_dict if bm_dict else None
+    return bm_dict or None
 
 
 def rank_documents(
@@ -256,7 +256,7 @@ def rank_documents(
                 num += dictionary[word]
         res.append((ind, num))
     res.sort(key=lambda x: x[-1], reverse=True)
-    return res if res else None
+    return res or None
 
 
 def calculate_bm25_with_cutoff(

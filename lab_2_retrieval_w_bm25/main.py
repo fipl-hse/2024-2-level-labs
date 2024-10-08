@@ -216,8 +216,8 @@ def calculate_bm25(
             or not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)
             or isinstance(doc_len, bool)):
         return None
-    if (not isinstance(vocab[0], str) or not isinstance(document[0], str)
-            or len(vocab) == 0 or len(document) == 0):
+    if (len(vocab) == 0 or len(document) == 0 or
+            not isinstance(vocab[0], str) or not isinstance(document[0], str)):
         return None
     if (not isinstance(idf_document, dict) or not idf_document
             or not isinstance(list(idf_document.values())[0], float)):

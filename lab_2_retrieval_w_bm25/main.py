@@ -21,17 +21,18 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str) or len(text) < 1:
         return None
 
-    tokens = ''
-    word = ''
-    for symbol in text.lower():
-        if symbol.isalpha() or symbol == ' ':
-            word += symbol
-        else:
-            if word:
-                tokens = tokens + word + ' '
-                word = ''
+    for symbol in text:
+        if symbol.isalpha() or symbol == " ":
+            continue
+        text = text.replace(f"{symbol}", " ")
 
-    result = tokens.split()
+    new_text = text.split(" ")
+    result = []
+    for word in new_text:
+        if not word.isalpha():
+            continue
+        result.append(word.lower())
+
     return result
 
 
@@ -59,11 +60,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if len(tokens) == 0 or len(stopwords) == 0:
         return None
 
-    result = []
-    for token in tokens:
-        if token in stopwords:
-            continue
-        result.append(token)
+    result = [token for token in tokens if token not in stopwords]
     return result
 
 

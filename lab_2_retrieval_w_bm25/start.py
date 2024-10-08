@@ -57,8 +57,10 @@ def main() -> None:
             new_vocab = func.calculate_tf_idf(tf, idf)
         else:
             new_vocab = {}
+            assert result, "Result is None"
         print(new_vocab)
-    assert result, "Result is None"
+
+
 
 
 if __name__ == "__main__":

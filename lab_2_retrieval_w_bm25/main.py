@@ -20,7 +20,7 @@ def tokenize(text: str) -> list[str] | None:
     In case of corrupt input arguments, None is returned.
     """
 
-    if not isinstance(text, str):
+    if not text or not isinstance(text, str):
         return None
 
     text_prep = ''
@@ -48,16 +48,16 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     In case of corrupt input arguments, None is returned.
     """
 
-    if not isinstance(tokens, list) or not isinstance(stopwords, list):
+    if not tokens or not isinstance(tokens, list) or not stopwords or not isinstance(stopwords, list):
         return None
 
-    tokens_prep = deepcopy(tokens)
-    for token in tokens_prep:
+    tokens_prep = []
+    for token in tokens:
         if not isinstance(token, str):
             return None
         else:
-            if token in stopwords:
-                tokens_prep.remove(token)
+            if token not in stopwords:
+                tokens_prep += token
     return tokens_prep
 
 

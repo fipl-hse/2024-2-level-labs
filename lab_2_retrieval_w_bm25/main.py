@@ -1,4 +1,3 @@
-from copy import deepcopy
 """
 Lab 2.
 
@@ -57,7 +56,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
             return None
         else:
             if token not in stopwords:
-                tokens_prep += token
+                tokens_prep += [token]
     return tokens_prep
 
 

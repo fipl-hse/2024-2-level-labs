@@ -49,13 +49,10 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     """
     if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
-    if (not stopwords or not isinstance(stopwords, list)
-            or not all(isinstance(stopword, str) for stopword in stopwords)):
+    if (not stopwords or not isinstance(stopwords, list) or
+            not all(isinstance(stopword, str) for stopword in stopwords)):
         return None
-    for i in tokens[:]:
-        if i in stopwords:
-            tokens.remove(i)
-    return tokens or None
+    return [token for token in tokens if token not in stopwords] or None
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -70,8 +67,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not isinstance(documents, list)
-            or not all(isinstance(document, list) for document in documents)):
+    if not isinstance(documents, list):
         return None
     for document in documents:
         if not isinstance(document, list):
@@ -96,14 +92,14 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not vocab or not document_tokens or not isinstance(vocab, list) or not isinstance(document_tokens, list):
+    if (not vocab or not document_tokens
+            or not isinstance(vocab, list) or not isinstance(document_tokens, list)):
         return None
-    if (not all(isinstance(i, str) for i in vocab)
-            or not all(isinstance(i, str) for i in document_tokens)):
+    if (not all(isinstance(word, str) for word in vocab)
+            or not all(isinstance(word, str) for word in document_tokens)):
         return None
     unique_words = list(set(vocab + document_tokens))
-    tf_dict = {token: document_tokens.count(token) / len(document_tokens) for token in unique_words}
-    return tf_dict or None
+    return {token: document_tokens.count(token) / len(document_tokens) for token in unique_words} or None
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -135,9 +131,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         for document in documents:
             if word in document:
                 word_count += 1
-        x = (len(documents) - word_count + 0.5) / (word_count + 0.5)
-        idf = math.log(x)
-        idf_dict[word] = idf
+        idf_dict[word] = math.log((len(documents) - word_count + 0.5) / (word_count + 0.5))
     return idf_dict
 
 
@@ -158,12 +152,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
         return None
     if not all(isinstance(word, str) for word in idf):
         return None
-    tf_idf_dict = {}
-    for word in tf:
-        if word not in idf:
-            return None
-        tf_idf_dict[word] = tf[word] * idf[word]
-    return tf_idf_dict
+    return {word: tf[word] * idf[word] for word in tf if word in idf} or None
 
 
 def calculate_bm25(
@@ -210,12 +199,11 @@ def calculate_bm25(
     bm_dict = {}
     unique_words = list(set(vocab + document))
     for token in unique_words:
-        numerator = document.count(token) * (k1 + 1)
-        denominator = document.count(token) + k1 * (1 - b + b * doc_len/avg_doc_len)
         if token not in idf_document:
             bm_dict[token] = 0.0
         else:
-            bm_dict[token] = idf_document[token] * numerator / denominator
+            bm_dict[token] = (idf_document[token] * document.count(token) * (k1 + 1) /
+                              (document.count(token) + k1 * (1 - b + b * doc_len/avg_doc_len)))
     return bm_dict or None
 
 
@@ -296,17 +284,15 @@ def calculate_bm25_with_cutoff(
         return None
     if not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float):
         return None
-    if (isinstance(doc_len, bool) or not isinstance(doc_len, int)
-            or doc_len < 0 or not isinstance(alpha, float)):
+    if (not isinstance(doc_len, int) or isinstance(doc_len, bool) or
+            doc_len < 0 or not isinstance(alpha, float)):
         return None
     bm_dict_w_cutoff = {}
     unique_words = list(set(vocab + document))
     for token in unique_words:
-        if token not in idf_document or idf_document[token] < alpha:
-            continue
-        numerator = document.count(token) * (k1 + 1)
-        denominator = document.count(token) + k1 * (1 - b + b * abs(doc_len) / avg_doc_len)
-        bm_dict_w_cutoff[token] = idf_document[token] * numerator / denominator
+        if token in idf_document and idf_document[token] > alpha:
+            bm_dict_w_cutoff[token] = (idf_document[token] * document.count(token) * (k1 + 1) /
+                                   (document.count(token) + k1 * (1 - b + b * doc_len / avg_doc_len)))
     return bm_dict_w_cutoff
 
 
@@ -377,5 +363,4 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
         if num not in golden_rank:
             return 0.0
         summ += (ind - golden_rank.index(num)) ** 2
-    spearman = 1 - (6 * summ) / (n * (n ** 2 - 1))
-    return spearman
+    return 1 - (6 * summ) / (n * (n ** 2 - 1))

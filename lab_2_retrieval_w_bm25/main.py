@@ -3,8 +3,11 @@ Lab 2.
 
 Text retrieval with BM25
 """
+
 import json
 import math
+
+
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -96,13 +99,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if is_not_correct:
         return None
 
-    freq_dict = {}
-    for word in document_tokens:
-        freq_dict[word] = document_tokens.count(word) / len(document_tokens)
-    for word in vocab:
-        if word not in document_tokens:
-            freq_dict[word] = 0.0
-    return freq_dict
+    return {term: document_tokens.count(term) / len(document_tokens)
+            for term in build_vocabulary([vocab, document_tokens])}
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -128,10 +126,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     freq_dict = {}
     for document in documents:
-        for word in document:
-            num_documents_with_word = sum(1 for document in documents if word in document)
-            freq_dict[word] = math.log((len(documents) - num_documents_with_word + 0.5) /
-                                       (num_documents_with_word + 0.5))
+        for term in document:
+            num_documents_with_term = sum(1 for document in documents if term in document)
+            freq_dict[term] = math.log((len(documents) - num_documents_with_term + 0.5) /
+                                       (num_documents_with_term + 0.5))
     return freq_dict
 
 
@@ -157,10 +155,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     if is_not_correct:
         return None
 
-    tf_idf_dict = {}
-    for key in tf:
-        tf_idf_dict[key] = tf[key] * idf[key]
-    return tf_idf_dict
+    tf_idf_dict = {term: tf[term] * idf[term] for term in tf if term in idf}
+    return tf_idf_dict or None
 
 
 def calculate_bm25(
@@ -205,17 +201,14 @@ def calculate_bm25(
         return None
 
     bm25_dict = {}
-    for word in document:
-        if word not in vocab:
-            bm25_dict[word] = 0.0
-    for word in vocab:
-        if word not in bm25_dict:
-            num_word_occur = document.count(word)
-            bm25_dict[word] = (idf_document[word] * ((num_word_occur * (k1 + 1))
-                                                     / (num_word_occur + k1
-                                                        * (1 - b + b * doc_len / avg_doc_len))))
-    if not bm25_dict:
-        return None
+    for term in build_vocabulary([vocab, document]):
+        if term not in vocab:
+            bm25_dict[term] = 0.0
+            continue
+        num_term_occur = document.count(term)
+        bm25_dict[term] = (idf_document[term] * ((num_term_occur * (k1 + 1)) /
+                                                 (num_term_occur + k1 *
+                                                  (1 - b + b * doc_len / avg_doc_len))))
     return bm25_dict
 
 
@@ -252,12 +245,10 @@ def rank_documents(
     if not query_preprocess:
         return None
 
-    ranked_documents = []
-    for document in indexes:
-        ranked_documents.append((indexes.index(document),
-                                 sum(document[word] for word in document
-                                     if word in query_preprocess)))
-    return sorted(ranked_documents, key=lambda x: x[1], reverse=True)
+    return sorted([(indexes.index(document),
+                    sum(document[word] for word in document
+                        if word in query_preprocess)) for document in indexes],
+                  key=lambda x: x[1], reverse=True)
 
 
 def calculate_bm25_with_cutoff(
@@ -314,8 +305,6 @@ def calculate_bm25_with_cutoff(
             modified_bm25_dict[word] = idf * ((num_word_occur * (k1 + 1)) /
                                               (num_word_occur + k1 *
                                                (1 - b + b * doc_len / avg_doc_len)))
-    if not modified_bm25_dict:
-        return None
     return modified_bm25_dict
 
 
@@ -357,7 +346,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     with open(file_path, 'r', encoding='utf-8') as file:
         loaded_index = json.load(file)
-    return loaded_index
+    return loaded_index or None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -381,10 +370,7 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     if is_not_correct:
         return None
 
-    d = 0
     n = len(rank)
-    for index, number in enumerate(rank):
-        if number not in golden_rank:
-            return 0.0
-        d += (index - golden_rank.index(number)) ** 2
-    return 1 - (6 * d) / (n * (n ** 2 - 1))
+    return 1 - (6 * sum((index - golden_rank.index(number)) ** 2
+                        for index, number in enumerate(rank)
+                        if number in golden_rank)) / (n * (n ** 2 - 1))

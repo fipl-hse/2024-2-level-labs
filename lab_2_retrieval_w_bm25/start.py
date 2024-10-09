@@ -1,8 +1,7 @@
 """
 Laboratory Work #2 starter
 """
-# pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches,
-# too-many-statements, duplicate-code
+# pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords, build_vocabulary,
                                          calculate_tf, calculate_idf, calculate_tf_idf,
                                          calculate_bm25, rank_documents, calculate_bm25_with_cutoff,
@@ -32,8 +31,10 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
+    avg_doc_len = 0.0
     clear_documents = []
     for document in documents:
+        avg_doc_len += len(document)
         tokenized_document = tokenize(document)
         if not tokenized_document:
             return None
@@ -41,28 +42,31 @@ def main() -> None:
         if not clear_document:
             return None
         clear_documents.append(clear_document)
-
     vocab = build_vocabulary(clear_documents)
     if not vocab:
         return None
     idf_dict = calculate_idf(vocab, clear_documents)
     if not idf_dict:
         return None
-
-    avg_doc_len = sum(len(document) for document in clear_documents) / len(clear_documents)
+    avg_doc_len /= len(clear_documents)
+    alpha = 0.2
+    k1 = 1.5
+    b = 0.75
     tf_idf_list = []
     bm25_list = []
     bm25_plus_list = []
+
     for document in clear_documents:
+        if not document:
+            return None
         tf_dict = calculate_tf(vocab, document)
         if not tf_dict:
             return None
         doc_len = len(document)
         tf_idf = calculate_tf_idf(tf_dict, idf_dict)
-        bm25 = calculate_bm25(vocab, document, idf_dict, 1.5, 0.75,
-                              avg_doc_len, doc_len)
+        bm25 = calculate_bm25(vocab, document, idf_dict, k1, b, avg_doc_len, doc_len)
         optimized_bm25 = calculate_bm25_with_cutoff(vocab, document, idf_dict,
-                                                    0.2, 1.5, 0.75, avg_doc_len, doc_len)
+                                                    alpha, k1, b, avg_doc_len, doc_len)
         if not tf_idf or not bm25 or not optimized_bm25:
             return None
         tf_idf_list.append(tf_idf)

@@ -7,7 +7,6 @@ Text retrieval with BM25
 import json
 import math
 
-
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -155,8 +154,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     if is_not_correct:
         return None
 
-    tf_idf_dict = {term: tf[term] * idf[term] for term in tf if term in idf}
-    return tf_idf_dict or None
+    return {term: tf[term] * idf[term] for term in tf}
 
 
 def calculate_bm25(
@@ -346,7 +344,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     with open(file_path, 'r', encoding='utf-8') as file:
         loaded_index = json.load(file)
-    return loaded_index or None
+    return loaded_index
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:

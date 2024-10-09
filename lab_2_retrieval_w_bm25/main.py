@@ -75,7 +75,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if is_not_correct:
         return None
 
-    return sum(documents, [])
+    return list(sum(documents, []))
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -207,7 +207,7 @@ def calculate_bm25(
         bm25_dict[term] = (idf_document[term] * ((num_term_occur * (k1 + 1)) /
                                                  (num_term_occur + k1 *
                                                   (1 - b + b * doc_len / avg_doc_len))))
-    return bm25_dict
+    return bm25_dict or None
 
 
 def rank_documents(
@@ -303,7 +303,7 @@ def calculate_bm25_with_cutoff(
             modified_bm25_dict[word] = idf * ((num_word_occur * (k1 + 1)) /
                                               (num_word_occur + k1 *
                                                (1 - b + b * doc_len / avg_doc_len)))
-    return modified_bm25_dict
+    return modified_bm25_dict or None
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
@@ -344,7 +344,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     with open(file_path, 'r', encoding='utf-8') as file:
         loaded_index = json.load(file)
-    return loaded_index
+    return loaded_index or None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:

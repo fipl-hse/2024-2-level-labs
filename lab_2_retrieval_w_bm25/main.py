@@ -66,7 +66,11 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list) or not all(isinstance(i, list) for i in documents):
+    if not documents:
+        return None
+    if not isinstance(documents, list):
+        return None
+    if not all(isinstance(item, list) and all(isinstance(elem, str) for elem in item) for item in documents):
         return None
     main_list = []
     for words in documents:
@@ -104,6 +108,13 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             dictionary_for_tf[word] = round(document_tokens.count(word) / len(document_tokens), 3) #что за фигня? нужно какой-то другой способ округления
     return dictionary_for_tf
 
+print(calculate_tf(['school', 'tower', 'go', 'used', 'magic', 'perfect', 'cat', 'dogs',
+                    'best', 'top', 'studying', 'pets', 'leave', 'parrots', 'morning', 'hill',
+                    'loved', 'picnic', 'rarely', 'boy', 'every', 'weather', 'steven', 'two', 'three',
+                    'spells', 'wizard', 'home', 'leaved', 'date', 'friend', 'dragon', 'sad', 'princess',
+                    'wand', 'summer'], ['dragon', 'princess', 'picnic', 'date', 'top',
+                                        'hill', 'rarely', 'leaved', 'tower', 'summer', 'weather', 'perfect',
+                                        'hill', 'picnic']))
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """
@@ -121,17 +132,18 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     if not vocab or not documents:
         return None
     if (not isinstance(vocab, list) or not isinstance(documents, list) or
-            not all(isinstance(p, str) for p in vocab) or not all(isinstance(k, list) for k in documents)):
+            not all(isinstance(p, str) for p in vocab) or
+            not all(isinstance(k, list) and all(isinstance(elem, str) for elem in k) for k in documents)):
         return None
     counter_for_documents = len(documents)
     dictionary_for_idf = {}
     for word in vocab:
         dictionary_for_idf[word] = 0.0
+        counter = 0.0
         for freq in documents:
-            counter = 0.0
             if word in freq:
                 counter += 1.0
-            value = round((counter_for_documents-counter+0.5)/(counter+0.5), 2)
+            value = (counter_for_documents - counter + 0.5)/(counter + 0.5)
             dictionary_for_idf[word] = math.log(value)
     return dictionary_for_idf
 
@@ -147,6 +159,7 @@ print(calculate_idf(['school', 'tower', 'go', 'used', 'magic', 'perfect', 'cat',
                                                                         'hill', 'rarely', 'leaved', 'tower', 'summer',
                                                                         'weather', 'perfect', 'hill', 'picnic']]))
 
+
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
     """
     Calculate TF-IDF scores for a document.
@@ -160,7 +173,24 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not tf or not idf:
+        return None
+    if not isinstance(tf, dict) or not isinstance(idf, dict):
+        return None
+    if (not all(isinstance(key, str) for key in tf.keys()) or
+            not all(isinstance(value, float) for value in tf.values())):
+        return None
+    if (not all(isinstance(key, str) for key in idf.keys()) or
+            not all(isinstance(value, float) for value in idf.values())):
+        return None
+    dictionary_for_result = {}
+    for key, value in tf.items():
+        dictionary_for_result[key] = 0.0
+        if key in idf.keys():
+            dictionary_for_result[key] = (tf[key] * idf[key])
+    return dictionary_for_result
 
+print(calculate_tf_idf({'school': 0.0, 'tower': 0.071, 'go': 0.0, 'used': 0.0, 'magic': 0.0, 'perfect': 0.071, 'cat': 0.0, 'dogs': 0.0, 'best': 0.0, 'top': 0.071, 'studying': 0.0, 'pets': 0.0, 'leave': 0.0, 'parrots': 0.0, 'morning': 0.0, 'hill': 0.143, 'loved': 0.0, 'picnic': 0.143, 'rarely': 0.071, 'boy': 0.0, 'every': 0.0, 'weather': 0.071, 'steven': 0.0, 'two': 0.0, 'three': 0.0, 'spells': 0.0, 'wizard': 0.0, 'home': 0.0, 'leaved': 0.071, 'date': 0.071, 'friend': 0.0, 'dragon': 0.071, 'sad': 0.0, 'princess': 0.071, 'wand': 0.0, 'summer': 0.071}, {'school': -0.51, 'tower': 0.51, 'go': 0.51, 'used': 0.51, 'magic': 0.51, 'perfect': 0.51, 'cat': 0.51, 'dogs': 0.51, 'best': 0.51, 'top': 0.51, 'studying': 0.51, 'pets': 0.51, 'leave': 0.51, 'parrots': 0.51, 'morning': 0.51, 'hill': 0.51, 'loved': 0.51, 'picnic': 0.51, 'rarely': 0.51, 'boy': -0.51, 'every': 0.51, 'weather': 0.51, 'steven': 0.51, 'two': 0.51, 'three': 0.51, 'spells': 0.51, 'wizard': 0.51, 'home': 0.51, 'leaved': 0.51, 'date': 0.51, 'friend': 0.51, 'dragon': 0.51, 'sad': 1.95, 'princess': 0.51, 'wand': 0.51, 'summer': 0.51}))
 
 def calculate_bm25(
     vocab: list[str],
@@ -188,6 +218,7 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+
 
 
 def rank_documents(

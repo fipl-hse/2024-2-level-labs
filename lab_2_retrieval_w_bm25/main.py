@@ -195,7 +195,8 @@ def calculate_bm25(
                       not k1 or not isinstance(k1, float) or not 1.2 <= k1 <= 2.0 or
                       not b or not isinstance(b, float) or not 0 <= b <= 1 or
                       not avg_doc_len or not isinstance(avg_doc_len, float) or
-                      not doc_len or not isinstance(doc_len, int) or isinstance(doc_len, bool))
+                      avg_doc_len is None or not doc_len or not isinstance(doc_len, int) or
+                      isinstance(doc_len, bool) or doc_len is None)
     if is_not_correct:
         return None
 
@@ -290,8 +291,9 @@ def calculate_bm25_with_cutoff(
                       not alpha or not isinstance(alpha, float) or
                       not k1 or not isinstance(k1, float) or not 1.2 <= k1 <= 2.0 or
                       not b or not isinstance(b, float) or not 0 <= b <= 1 or
-                      not avg_doc_len or not isinstance(avg_doc_len, float) or not doc_len or
-                      not isinstance(doc_len, int) or isinstance(doc_len, bool) or doc_len < 0)
+                      not avg_doc_len or not isinstance(avg_doc_len, float) or
+                      avg_doc_len is None or not doc_len or not isinstance(doc_len, int) or
+                      isinstance(doc_len, bool) or doc_len is None)
     if is_not_correct:
         return None
 

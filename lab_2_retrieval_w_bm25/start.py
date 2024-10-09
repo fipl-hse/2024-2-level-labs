@@ -30,39 +30,40 @@ def main() -> None:
         stopwords = file.read().split("\n")
 
     avg_doc_len = 0.0
-    clear_documents = []
+    clear_documents: list[list[str]] = []
     for document in documents:
         avg_doc_len += len(document)
-        tokenized_document = m.tokenize(document)
+        tokenized_document: list[str] = m.tokenize(document)
         clear_document = m.remove_stopwords(tokenized_document, stopwords)
         clear_documents.append(clear_document)
 
-    vocab = m.build_vocabulary(clear_documents)
-    idf_dict = m.calculate_idf(vocab, clear_documents)
+    vocab: list[str] = m.build_vocabulary(clear_documents)
+    idf_dict: dict[str, float] = m.calculate_idf(vocab, clear_documents)
     avg_doc_len /= len(clear_documents)
     alpha = 0.2
     k1 = 1.5
     b = 0.75
-    tf_idf_list = []
-    bm25_list = []
-    bm25_plus_list = []
+    tf_idf_list: list[dict[str, float]] = []
+    bm25_list: list[dict[str, float]] = []
+    optimized_bm25_list: list[dict[str, float]] = []
 
     for document in clear_documents:
         doc_len = len(document)
-        tf_idf = m.calculate_tf_idf(m.calculate_tf(vocab, document), idf_dict)
+        tf_dict: dict[str, float] = m.calculate_tf(vocab, document)
+        tf_idf = m.calculate_tf_idf(tf_dict, idf_dict)
         bm25 = m.calculate_bm25(vocab, document, idf_dict, k1, b, avg_doc_len, doc_len)
         optimized_bm25 = m.calculate_bm25_with_cutoff(vocab, document, idf_dict,
                                                       alpha, k1, b, avg_doc_len, doc_len)
         tf_idf_list.append(tf_idf)
         bm25_list.append(bm25)
-        bm25_plus_list.append(optimized_bm25)
+        optimized_bm25_list.append(optimized_bm25)
 
     query = 'Which fairy tale has Fairy Queen?'
     ranked_tf_idf = m.rank_documents(tf_idf_list, query, stopwords)
     ranked_bm25 = m.rank_documents(bm25_list, query, stopwords)
 
-    m.save_index(bm25_plus_list, 'assets/metrics.json')
-    loaded_index = m.load_index('assets/metrics.json')
+    m.save_index(optimized_bm25_list, 'assets/metrics.json')
+    loaded_index: list[dict[str, float]] = m.load_index('assets/metrics.json')
     ranked_index = m.rank_documents(loaded_index, query, stopwords)
 
     golden_rank = [i[0] for i in ranked_index]

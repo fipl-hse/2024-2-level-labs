@@ -33,19 +33,10 @@ def main() -> None:
     clear_documents = []
     for document in documents:
         avg_doc_len += len(document)
-        tokenized_document = m.tokenize(document)
-        if not tokenized_document:
-            return None
-        clear_document = m.remove_stopwords(tokenized_document, stopwords)
-        if not clear_document:
-            return None
+        clear_document = m.remove_stopwords(m.tokenize(document), stopwords)
         clear_documents.append(clear_document)
     vocab = m.build_vocabulary(clear_documents)
-    if not vocab:
-        return None
     idf_dict = m.calculate_idf(vocab, clear_documents)
-    if not idf_dict:
-        return None
     avg_doc_len /= len(clear_documents)
     alpha = 0.2
     k1 = 1.5
@@ -55,9 +46,8 @@ def main() -> None:
     bm25_plus_list = []
 
     for document in clear_documents:
-        tf_dict = m.calculate_tf(vocab, document)
         doc_len = len(document)
-        tf_idf = m.calculate_tf_idf(tf_dict, idf_dict)
+        tf_idf = m.calculate_tf_idf(m.calculate_tf(vocab, document), idf_dict)
         bm25 = m.calculate_bm25(vocab, document, idf_dict, k1, b, avg_doc_len, doc_len)
         optimized_bm25 = m.calculate_bm25_with_cutoff(vocab, document, idf_dict,
                                                       alpha, k1, b, avg_doc_len, doc_len)
@@ -68,7 +58,6 @@ def main() -> None:
     query = 'Which fairy tale has Fairy Queen?'
     ranked_tf_idf = m.rank_documents(tf_idf_list, query, stopwords)
     ranked_bm25 = m.rank_documents(bm25_list, query, stopwords)
-    ranked_optimized_bm25 = m.rank_documents(bm25_plus_list, query, stopwords)
 
     m.save_index(bm25_plus_list, 'assets/metrics.json')
     loaded_index = m.load_index('assets/metrics.json')

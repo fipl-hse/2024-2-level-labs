@@ -25,9 +25,10 @@ def tokenize(text: str) -> list[str] | None:
 
     text_prep = ''
     for symb in text.lower():
-        if symb == ' ' or symb.isalpha():
+        if symb.isalpha():
             text_prep += symb
         else:
+            text_prep += ' '
             continue
     tokenized_list = text_prep.split()
     return tokenized_list

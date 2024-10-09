@@ -26,7 +26,7 @@ def tokenize(text: str) -> list[str] | None:
     for symbol in text:
         if not symbol.isalpha():
             text = text.replace(symbol, ' ')
-    return text.lower().split() or None
+    return text.lower().split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -73,7 +73,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if is_not_correct:
         return None
 
-    return list(sum(documents, [])) or None
+    vocab: list[str] = sum(documents, [])
+    return vocab or None
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -96,8 +97,9 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if is_not_correct:
         return None
 
-    return {term: document_tokens.count(term) / len(document_tokens)
-            for term in build_vocabulary([vocab, document_tokens])} or None
+    tf_dict: dict[str, float] = {term: document_tokens.count(term) / len(document_tokens)
+                                 for term in build_vocabulary([vocab, document_tokens])}
+    return tf_dict or None
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -121,7 +123,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     if is_not_correct:
         return None
 
-    freq_dict = {}
+    freq_dict: dict[str, float] = {}
     for document in documents:
         for term in document:
             num_documents_with_term = sum(1 for document in documents if term in document)
@@ -152,7 +154,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     if is_not_correct:
         return None
 
-    return {term: tf[term] * idf[term] for term in tf} or None
+    tf_idf_dict: dict[str, float] = {term: tf[term] * idf[term] for term in tf}
+    return tf_idf_dict or None
 
 
 def calculate_bm25(
@@ -196,7 +199,7 @@ def calculate_bm25(
     if is_not_correct:
         return None
 
-    bm25_dict = {}
+    bm25_dict: dict[str, float] = {}
     for term in build_vocabulary([vocab, document]):
         if term not in vocab:
             bm25_dict[term] = 0.0
@@ -241,10 +244,11 @@ def rank_documents(
     if not query_preprocess:
         return None
 
-    return sorted([(indexes.index(document),
-                    sum(document[word] for word in document
-                        if word in query_preprocess)) for document in indexes],
-                  key=lambda x: x[1], reverse=True) or None
+    ranked_document: list[tuple[int, float]] = [(indexes.index(document),
+                                                 sum(document[word] for word in document
+                                                     if word in query_preprocess))
+                                                for document in indexes]
+    return sorted(ranked_document, key=lambda x: x[1], reverse=True) or None
 
 
 def calculate_bm25_with_cutoff(
@@ -291,7 +295,7 @@ def calculate_bm25_with_cutoff(
     if is_not_correct:
         return None
 
-    modified_bm25_dict = {}
+    modified_bm25_dict: dict[str, float] = {}
     for word in vocab:
         if word in idf_document:
             idf = idf_document[word]
@@ -321,7 +325,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         return None
 
     with open(file_path, 'w', encoding='utf-8') as file:
-        json.dump(index, file)
+        json.dump(index, file, indent=4)
     return None
 
 
@@ -341,7 +345,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
         return None
 
     with open(file_path, 'r', encoding='utf-8') as file:
-        loaded_index = json.load(file)
+        loaded_index: list[dict[str, float]] = json.load(file)
     return loaded_index or None
 
 
@@ -367,6 +371,7 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
         return None
 
     n = len(rank)
-    return 1 - (6 * sum((index - golden_rank.index(number)) ** 2
-                        for index, number in enumerate(rank)
-                        if number in golden_rank)) / (n * (n ** 2 - 1)) or None
+    spearman_coef: float = 1 - (6 * sum((index - golden_rank.index(number)) ** 2
+                                        for index, number in enumerate(rank)
+                                        if number in golden_rank)) / (n * (n ** 2 - 1))
+    return spearman_coef or None

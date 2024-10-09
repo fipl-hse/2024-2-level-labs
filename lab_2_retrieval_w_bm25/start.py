@@ -2,6 +2,10 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
+from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords, build_vocabulary,
+                                         calculate_tf, calculate_idf, calculate_tf_idf,
+                                         calculate_bm25, rank_documents, calculate_bm25_with_cutoff,
+                                         save_index, load_index, calculate_spearman)
 
 
 def main() -> None:
@@ -26,7 +30,7 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = None
+    result = print(build_vocabulary())
     assert result, "Result is None"
 
 

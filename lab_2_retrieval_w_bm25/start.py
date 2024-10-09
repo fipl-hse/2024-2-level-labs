@@ -33,8 +33,10 @@ def main() -> None:
     clear_documents = []
     for document in documents:
         avg_doc_len += len(document)
-        clear_document = m.remove_stopwords(m.tokenize(document), stopwords)
+        tokenized_document = m.tokenize(document)
+        clear_document = m.remove_stopwords(tokenized_document, stopwords)
         clear_documents.append(clear_document)
+
     vocab = m.build_vocabulary(clear_documents)
     idf_dict = m.calculate_idf(vocab, clear_documents)
     avg_doc_len /= len(clear_documents)
@@ -63,9 +65,9 @@ def main() -> None:
     loaded_index = m.load_index('assets/metrics.json')
     ranked_index = m.rank_documents(loaded_index, query, stopwords)
 
-    golden_rank = list(list(zip(*ranked_index))[0])
-    tf_idf_spearman = m.calculate_spearman(list(list(zip(*ranked_tf_idf))[0]), golden_rank)
-    bm25_spearman = m.calculate_spearman(list(list(zip(*ranked_bm25))[0]), golden_rank)
+    golden_rank = [i[0] for i in ranked_index]
+    tf_idf_spearman = m.calculate_spearman([i[0] for i in ranked_tf_idf], golden_rank)
+    bm25_spearman = m.calculate_spearman([i[0] for i in ranked_bm25], golden_rank)
 
     result = (tf_idf_spearman, bm25_spearman)
     print(result)

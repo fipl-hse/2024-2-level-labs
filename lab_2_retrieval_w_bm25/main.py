@@ -26,7 +26,7 @@ def tokenize(text: str) -> list[str] | None:
     for symbol in text:
         if not symbol.isalpha():
             text = text.replace(symbol, ' ')
-    return text.lower().split()
+    return text.lower().split() or None
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -52,7 +52,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     for token in tokens.copy():
         if token in stopwords:
             tokens.remove(token)
-    return tokens
+    return tokens or None
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -73,7 +73,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if is_not_correct:
         return None
 
-    return list(sum(documents, []))
+    return list(sum(documents, [])) or None
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -97,7 +97,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return None
 
     return {term: document_tokens.count(term) / len(document_tokens)
-            for term in build_vocabulary([vocab, document_tokens])}
+            for term in build_vocabulary([vocab, document_tokens])} or None
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -127,7 +127,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             num_documents_with_term = sum(1 for document in documents if term in document)
             freq_dict[term] = math.log((len(documents) - num_documents_with_term + 0.5) /
                                        (num_documents_with_term + 0.5))
-    return freq_dict
+    return freq_dict or None
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -152,7 +152,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     if is_not_correct:
         return None
 
-    return {term: tf[term] * idf[term] for term in tf}
+    return {term: tf[term] * idf[term] for term in tf} or None
 
 
 def calculate_bm25(
@@ -244,7 +244,7 @@ def rank_documents(
     return sorted([(indexes.index(document),
                     sum(document[word] for word in document
                         if word in query_preprocess)) for document in indexes],
-                  key=lambda x: x[1], reverse=True)
+                  key=lambda x: x[1], reverse=True) or None
 
 
 def calculate_bm25_with_cutoff(
@@ -369,4 +369,4 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     n = len(rank)
     return 1 - (6 * sum((index - golden_rank.index(number)) ** 2
                         for index, number in enumerate(rank)
-                        if number in golden_rank)) / (n * (n ** 2 - 1))
+                        if number in golden_rank)) / (n * (n ** 2 - 1)) or None

@@ -55,18 +55,12 @@ def main() -> None:
     bm25_plus_list = []
 
     for document in clear_documents:
-        if not document:
-            return None
         tf_dict = m.calculate_tf(vocab, document)
-        if not tf_dict:
-            return None
         doc_len = len(document)
         tf_idf = m.calculate_tf_idf(tf_dict, idf_dict)
         bm25 = m.calculate_bm25(vocab, document, idf_dict, k1, b, avg_doc_len, doc_len)
         optimized_bm25 = m.calculate_bm25_with_cutoff(vocab, document, idf_dict,
-                                                    alpha, k1, b, avg_doc_len, doc_len)
-        if not tf_idf or not bm25 or not optimized_bm25:
-            return None
+                                                      alpha, k1, b, avg_doc_len, doc_len)
         tf_idf_list.append(tf_idf)
         bm25_list.append(bm25)
         bm25_plus_list.append(optimized_bm25)
@@ -75,22 +69,14 @@ def main() -> None:
     ranked_tf_idf = m.rank_documents(tf_idf_list, query, stopwords)
     ranked_bm25 = m.rank_documents(bm25_list, query, stopwords)
     ranked_optimized_bm25 = m.rank_documents(bm25_plus_list, query, stopwords)
-    if not ranked_tf_idf or not ranked_bm25 or not ranked_optimized_bm25:
-        return None
 
     m.save_index(bm25_plus_list, 'assets/metrics.json')
     loaded_index = m.load_index('assets/metrics.json')
-    if not loaded_index:
-        return None
     ranked_index = m.rank_documents(loaded_index, query, stopwords)
-    if not ranked_index:
-        return None
 
-    golden_rank = list(list(zip(*ranked_optimized_bm25))[0])
+    golden_rank = list(list(zip(*ranked_index))[0])
     tf_idf_spearman = m.calculate_spearman(list(list(zip(*ranked_tf_idf))[0]), golden_rank)
     bm25_spearman = m.calculate_spearman(list(list(zip(*ranked_bm25))[0]), golden_rank)
-    if not tf_idf_spearman or not bm25_spearman:
-        return None
 
     result = (tf_idf_spearman, bm25_spearman)
     print(result)

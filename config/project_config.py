@@ -7,10 +7,9 @@ from dataclasses import field
 from pathlib import Path
 from re import Pattern
 
+from pydantic import TypeAdapter
 # pylint: disable=no-name-in-module
 from pydantic.dataclasses import dataclass
-from pydantic.json import pydantic_encoder
-from pydantic.tools import parse_obj_as
 
 from config.constants import PROJECT_ROOT
 
@@ -68,7 +67,7 @@ class ProjectConfig(ProjectConfigDTO):
         super().__init__()
         with config_path.open(encoding='utf-8', mode='r') as config_file:
             json_content = json.load(config_file)
-        self._dto = parse_obj_as(ProjectConfigDTO, json_content)
+        self._dto = TypeAdapter(ProjectConfigDTO).validate_python(json_content)
 
     def get_thresholds(self) -> dict:
         """
@@ -174,4 +173,4 @@ class ProjectConfig(ProjectConfigDTO):
         Returns:
             str: A json view of ProjectConfig
         """
-        return json.dumps(self._dto, indent=4, default=pydantic_encoder)
+        return str(self._dto.model_dump_json(indent=4))

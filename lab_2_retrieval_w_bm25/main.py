@@ -58,7 +58,6 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     return words_without_sw
 
-
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
     Build a vocabulary from the documents.
@@ -71,7 +70,20 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(documents, list) or documents is None \
+            or not all(isinstance(token, list) for token in documents):
+        return None
 
+    unique_words = []
+
+    for i in documents:
+        if not all(isinstance(token, str) for token in i):
+            return None
+        for j in i:
+            if j not in unique_words:
+                unique_words.append(j)
+
+    return unique_words
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """
@@ -86,6 +98,26 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or isinstance(document_tokens, list) \
+            or not all(isinstance(token, list) for token in vocab) \
+            or not all(isinstance(token, list) for token in document_tokens):
+        return None
+
+    result = {}
+
+    for token in document_tokens:
+        if token not in vocab:
+            result[token] = 0.0
+        if token in result:
+            result[token] += 1
+        if token not in result:
+            result[token] = 1
+
+    total_tokens = len(document_tokens)
+    for key, value in result.items():
+        result[key] = value / total_tokens
+
+    return result
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:

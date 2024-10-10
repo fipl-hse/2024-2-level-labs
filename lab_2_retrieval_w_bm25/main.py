@@ -20,14 +20,15 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    text2 = ''
+    words_without_symb = ''
 
     for i in text.lower():
-        if i.isalpha() or i == ' ':
-            text2 += i
+        if i.isalpha():
+            words_without_symb += i
         if not i.isalpha():
-            text2 += ' '
-    tokenized_list = text2.split()
+            words_without_symb += ' '
+
+    tokenized_list = words_without_symb.split()
 
     return tokenized_list
 
@@ -49,13 +50,14 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
             or not all(isinstance(token, str) for token in stopwords):
         return None
 
-    lst_without_stops = []
+    words_without_sw = []
 
     for i in tokens:
-        if i not in stopwords and isinstance(i, str):
-            lst_without_stops.append(i)
+        if i not in stopwords:
+            words_without_sw.append(i)
 
-    return lst_without_stops
+    return words_without_sw
+
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """

@@ -4,8 +4,8 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-from math import log
 from json import dump, load
+from math import log
 
 
 def tokenize(text: str) -> list[str] | None:

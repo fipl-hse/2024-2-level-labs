@@ -43,7 +43,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if tokens is None or stopwords is None:
         return None
     if (not isinstance(tokens, list) or not isinstance(stopwords, list) or
-            not all(isinstance(i, str) for i in tokens) or not all(isinstance(k, str) for k in stopwords)):
+            not all(isinstance(i, str) for i in tokens) or
+            not all(isinstance(k, str) for k in stopwords)):
         return None
     if not tokens or not stopwords:
         return None
@@ -70,7 +71,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         return None
     if not isinstance(documents, list):
         return None
-    if not all(isinstance(item, list) and all(isinstance(elem, str) for elem in item) for item in documents):
+    if not all(isinstance(item, list) and all(isinstance(elem, str)
+                                              for elem in item) for item in documents):
         return None
     main_list = []
     for words in documents:
@@ -93,19 +95,24 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    #vocab типа все слова из прошлой функции, а вот document.. это просто то, что мы имеем на входе без стоп слов
     if not vocab or not document_tokens:
         return None
     if vocab is None or document_tokens is None:
         return None
     if (not isinstance(vocab, list) or not isinstance(document_tokens, list) or
-            not all(isinstance(i, str) for i in document_tokens) or not all(isinstance(k, str) for k in vocab)):
+            not all(isinstance(i, str) for i in document_tokens) or
+            not all(isinstance(k, str) for k in vocab)):
         return None
     dictionary_for_tf = {}
     for word in vocab:
         dictionary_for_tf[word] = 0.0
         if word in document_tokens:
-            dictionary_for_tf[word] = round(document_tokens.count(word) / len(document_tokens), 3) #что за фигня? нужно какой-то другой способ округления
+            dictionary_for_tf[word] = document_tokens.count(word) / len(document_tokens)
+    for signal in document_tokens:
+        if signal in dictionary_for_tf:
+            continue
+        else:
+            dictionary_for_tf[signal] = document_tokens.count(signal) / len(document_tokens)
     return dictionary_for_tf
 
 print(calculate_tf(['school', 'tower', 'go', 'used', 'magic', 'perfect', 'cat', 'dogs',
@@ -133,7 +140,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         return None
     if (not isinstance(vocab, list) or not isinstance(documents, list) or
             not all(isinstance(p, str) for p in vocab) or
-            not all(isinstance(k, list) and all(isinstance(elem, str) for elem in k) for k in documents)):
+            not all(isinstance(k, list) and all(isinstance(elem, str)
+                                                for elem in k) for k in documents)):
         return None
     counter_for_documents = len(documents)
     dictionary_for_idf = {}
@@ -190,7 +198,23 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
             dictionary_for_result[key] = (tf[key] * idf[key])
     return dictionary_for_result
 
-print(calculate_tf_idf({'school': 0.0, 'tower': 0.071, 'go': 0.0, 'used': 0.0, 'magic': 0.0, 'perfect': 0.071, 'cat': 0.0, 'dogs': 0.0, 'best': 0.0, 'top': 0.071, 'studying': 0.0, 'pets': 0.0, 'leave': 0.0, 'parrots': 0.0, 'morning': 0.0, 'hill': 0.143, 'loved': 0.0, 'picnic': 0.143, 'rarely': 0.071, 'boy': 0.0, 'every': 0.0, 'weather': 0.071, 'steven': 0.0, 'two': 0.0, 'three': 0.0, 'spells': 0.0, 'wizard': 0.0, 'home': 0.0, 'leaved': 0.071, 'date': 0.071, 'friend': 0.0, 'dragon': 0.071, 'sad': 0.0, 'princess': 0.071, 'wand': 0.0, 'summer': 0.071}, {'school': -0.51, 'tower': 0.51, 'go': 0.51, 'used': 0.51, 'magic': 0.51, 'perfect': 0.51, 'cat': 0.51, 'dogs': 0.51, 'best': 0.51, 'top': 0.51, 'studying': 0.51, 'pets': 0.51, 'leave': 0.51, 'parrots': 0.51, 'morning': 0.51, 'hill': 0.51, 'loved': 0.51, 'picnic': 0.51, 'rarely': 0.51, 'boy': -0.51, 'every': 0.51, 'weather': 0.51, 'steven': 0.51, 'two': 0.51, 'three': 0.51, 'spells': 0.51, 'wizard': 0.51, 'home': 0.51, 'leaved': 0.51, 'date': 0.51, 'friend': 0.51, 'dragon': 0.51, 'sad': 1.95, 'princess': 0.51, 'wand': 0.51, 'summer': 0.51}))
+print(calculate_tf_idf({'school': 0.0, 'tower': 0.071, 'go': 0.0, 'used': 0.0, 'magic': 0.0,
+                        'perfect': 0.071, 'cat': 0.0, 'dogs': 0.0, 'best': 0.0, 'top': 0.071,
+                        'studying': 0.0, 'pets': 0.0, 'leave': 0.0, 'parrots': 0.0, 'morning': 0.0,
+                        'hill': 0.143, 'loved': 0.0, 'picnic': 0.143, 'rarely': 0.071, 'boy': 0.0,
+                        'every': 0.0, 'weather': 0.071, 'steven': 0.0, 'two': 0.0, 'three': 0.0,
+                        'spells': 0.0, 'wizard': 0.0, 'home': 0.0, 'leaved': 0.071, 'date': 0.071,
+                        'friend': 0.0, 'dragon': 0.071, 'sad': 0.0, 'princess': 0.071, 'wand': 0.0,
+                        'summer': 0.071}, {'school': -0.51, 'tower': 0.51, 'go': 0.51,
+                                           'used': 0.51, 'magic': 0.51, 'perfect': 0.51, 'cat': 0.51,
+                                           'dogs': 0.51, 'best': 0.51, 'top': 0.51, 'studying': 0.51,
+                                           'pets': 0.51, 'leave': 0.51, 'parrots': 0.51, 'morning': 0.51,
+                                           'hill': 0.51, 'loved': 0.51, 'picnic': 0.51, 'rarely': 0.51,
+                                           'boy': -0.51, 'every': 0.51, 'weather': 0.51, 'steven': 0.51,
+                                           'two': 0.51, 'three': 0.51, 'spells': 0.51, 'wizard': 0.51,
+                                           'home': 0.51, 'leaved': 0.51, 'date': 0.51, 'friend': 0.51,
+                                           'dragon': 0.51, 'sad': 1.95, 'princess': 0.51,
+                                           'wand': 0.51, 'summer': 0.51}))
 
 def calculate_bm25(
     vocab: list[str],
@@ -218,7 +242,29 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-
+    if not isinstance(vocab, list) or not all(isinstance(value, str) for value in vocab):
+        return None
+    if not isinstance(document, list) or not all(isinstance(value, str) for value in document):
+        return None
+    if (not isinstance(idf_document, dict) or not all(isinstance(key, str) for key in idf_document) or
+            not all(isinstance(value, float) for value in idf_document)):
+        return None
+    if not 1.2 <= k1 <= 2.0 or not 0 <= b <= 1:
+        return None
+    if (avg_doc_len is None or avg_doc_len <= 0 or
+            doc_len is None or doc_len <= 0):
+        return None
+    bm25 = {}
+    set_for_idf = set(i for i in idf_document.keys()) #я его создала, чтобы сравнить с vocab - чтобы все слова были в нем
+    set_for_vocab = set(vocab)
+    if set_for_vocab.difference(set_for_idf) == 0:
+        for key, value in idf_document.items():
+            if key in vocab:
+                bm25[key] = ((value * (document.count(key) * (k1 + 1))) /
+                             (document.count(key) + k1 * (1 - b + ((b * doc_len) / avg_doc_len))))
+    else:
+        return None
+    return bm25
 
 
 def rank_documents(
@@ -237,6 +283,27 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(query, str) or not isinstance(stopwords, list) or
+            not all(isinstance(i, str) for i in stopwords) or not isinstance(indexes, list)
+            or not all(isinstance(k, dict) for k in indexes)):
+        return None
+    for index in indexes:
+        if not isinstance(index, dict):
+            return None
+        for key, value in index.items():
+            if not isinstance(key, str) or not isinstance(value, float):
+                return None
+    letters = tokenize(query)
+    without_stopwords = remove_stopwords(letters, stopwords) #реализация прошла успешно, теперь ищем все слова в уже данных
+    number_of_documents = len(indexes)
+    dict_with_index = {}
+    for metrica in indexes:
+        value_of_whole_document = 0.0
+        for word in without_stopwords:
+            if word in metrica.keys():
+                value_of_whole_document += metrica[word]
+        for index, result in enumerate(dict_with_index.values()):
+
 
 
 def calculate_bm25_with_cutoff(

@@ -22,20 +22,22 @@ def main() -> None:
         "assets/fairytale_9.txt",
         "assets/fairytale_10.txt",
     ]
-    documents = []
+    documents, clear_documents, tf_idf_list, bm25_list, optimized_bm25_list = [], [], [], [], []
+    query, file_path = 'Which fairy tale has Fairy Queen?', 'assets/metrics.json'
+    alpha, k1, b, avg_doc_len = 0.2, 1.5, 0.75, 0.0
+
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-    tf_idf_list, bm25_list, optimized_bm25_list, clear_documents = [], [], [], []
-    alpha, k1, b, avg_doc_len = 0.2, 1.5, 0.75, 0.0
-    query, file_path = 'Which fairy tale has Fairy Queen?', 'assets/metrics.json'
-
     for document in documents:
         avg_doc_len += len(document)
-        clear_documents.append(m.remove_stopwords(m.tokenize(document), stopwords))
+        tokenized_document = m.tokenize(document)
+        if not tokenized_document:
+            return None
+        clear_documents.append(m.remove_stopwords(tokenized_document, stopwords))
     avg_doc_len /= len(clear_documents)
 
     vocab = m.build_vocabulary(clear_documents)
@@ -64,7 +66,7 @@ def main() -> None:
 
     m.save_index(optimized_bm25_list, file_path)
     loaded_index = m.load_index(file_path)
-    if loaded_index is None:
+    if not loaded_index:
         return None
 
     ranked_index = m.rank_documents(loaded_index, query, stopwords)

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
 from config.collect_coverage.run_coverage import get_target_score
-from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
+from config.constants import CONFIG_PACKAGE_PATH, PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.project_config import ProjectConfig
 
 
@@ -24,7 +24,7 @@ def check_skip_conditions(pr_name: str, repository_type: str) -> bool:
     """
     result = _run_console_tool(
         str(choose_python_exe()),
-        [str('config/is_admin.py'), '--pr_name', pr_name],
+        [str(Path(CONFIG_PACKAGE_PATH, 'is_admin.py')), '--pr_name', pr_name],
         debug=True
     )
     if repository_type == "public" and result.stdout.decode("utf-8").strip() == 'YES':
@@ -69,7 +69,7 @@ def check_start_content(lab_name: str) -> subprocess.CompletedProcess:
         start_py_content = f.read()
 
     return _run_console_tool(str(choose_python_exe()),
-                             [str('config/check_start_content.py'),
+                             [str(Path(CONFIG_PACKAGE_PATH, 'check_start_content.py')),
                               '--start_py_content', start_py_content],
                              cwd=PROJECT_ROOT,
                              debug=True)

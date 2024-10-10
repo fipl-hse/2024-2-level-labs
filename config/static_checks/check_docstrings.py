@@ -95,6 +95,7 @@ def main() -> None:
     for lab_path in labs_list:
         paths = (
             lab_path / 'main.py',
+            lab_path / 'start.py',
             lab_path / 'scrapper.py',
             lab_path / 'scrapper_dynamic.py',
             lab_path / 'pipeline.py',

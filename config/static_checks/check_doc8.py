@@ -43,6 +43,12 @@ def main() -> None:
 
     pyproject_path = PROJECT_ROOT / "pyproject.toml"
 
+    print("Running doc8 for main docs")
+    rst_main_files = list(PROJECT_ROOT.glob("*rst"))
+    check_doc8_on_paths(
+        rst_main_files,
+        pyproject_path)
+
     print("Running doc8 for other docs")
     docs_path = PROJECT_ROOT / "docs"
     rst_files = list(docs_path.rglob("*.rst"))

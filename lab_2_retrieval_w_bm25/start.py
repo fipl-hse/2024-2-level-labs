@@ -29,46 +29,47 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-    avg_doc_len = 0.0
-    clear_documents = []
+    tf_idf_list, bm25_list, optimized_bm25_list, clear_documents = [], [], [], []
+    alpha, k1, b, avg_doc_len = 0.2, 1.5, 0.75, 0.0
+    query, file_path = 'Which fairy tale has Fairy Queen?', 'assets/metrics.json'
+
     for document in documents:
         avg_doc_len += len(document)
-        tokenized_document = m.tokenize(document)
-        clear_document = m.remove_stopwords(tokenized_document, stopwords)
-        clear_documents.append(clear_document)
+        clear_documents.append(m.remove_stopwords(m.tokenize(document), stopwords))
+    avg_doc_len /= len(clear_documents)
 
     vocab = m.build_vocabulary(clear_documents)
+    if not vocab:
+        return None
     idf_dict = m.calculate_idf(vocab, clear_documents)
-    avg_doc_len /= len(clear_documents)
-    alpha = 0.2
-    k1 = 1.5
-    b = 0.75
-    tf_idf_list = []
-    bm25_list = []
-    optimized_bm25_list = []
+    if not idf_dict:
+        return None
 
     for document in clear_documents:
+        if not document:
+            return None
         doc_len = len(document)
         tf_dict = m.calculate_tf(vocab, document)
-        if tf_dict is None:
-            return None
-        tf_idf = m.calculate_tf_idf(tf_dict, idf_dict)
+        if tf_dict:
+            tf_idf = m.calculate_tf_idf(tf_dict, idf_dict)
+            if tf_idf:
+                tf_idf_list.append(tf_idf)
         bm25 = m.calculate_bm25(vocab, document, idf_dict, k1, b, avg_doc_len, doc_len)
+        if bm25:
+            bm25_list.append(bm25)
         optimized_bm25 = m.calculate_bm25_with_cutoff(vocab, document, idf_dict,
                                                       alpha, k1, b, avg_doc_len, doc_len)
-        tf_idf_list.append(tf_idf)
-        bm25_list.append(bm25)
-        optimized_bm25_list.append(optimized_bm25)
+        if optimized_bm25:
+            optimized_bm25_list.append(optimized_bm25)
 
-    query = 'Which fairy tale has Fairy Queen?'
-    ranked_tf_idf = m.rank_documents(tf_idf_list, query, stopwords)
-    ranked_bm25 = m.rank_documents(bm25_list, query, stopwords)
-
-    m.save_index(optimized_bm25_list, 'assets/metrics.json')
-    loaded_index = m.load_index('assets/metrics.json')
+    m.save_index(optimized_bm25_list, file_path)
+    loaded_index = m.load_index(file_path)
     if loaded_index is None:
         return None
+
     ranked_index = m.rank_documents(loaded_index, query, stopwords)
+    ranked_tf_idf = m.rank_documents(tf_idf_list, query, stopwords)
+    ranked_bm25 = m.rank_documents(bm25_list, query, stopwords)
 
     golden_rank = [i[0] for i in ranked_index]
     tf_idf_spearman = m.calculate_spearman([i[0] for i in ranked_tf_idf], golden_rank)

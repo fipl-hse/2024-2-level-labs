@@ -23,16 +23,14 @@ def tokenize(text: str) -> list[str] | None:
         return None
     tokens = []
     word = []
-    only_letters = []
     for elem in text.lower():
-        if elem.isalpha():
+        if not elem.isalpha():
             word.append(elem)
         else:
-            only_letters.append(''.join(word))
+            tokens.append(''.join(word))
             word = []
-    for token in only_letters:
-        if token:
-            tokens.append(token)
+    while '' in tokens:
+        tokens.pop(tokens.index(''))
     if not isinstance(tokens, list):
         return None
     return tokens
@@ -58,13 +56,10 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     for elem in stopwords:
         if not isinstance(elem, str):
             return None
-    tokens_without_stopwords = []
     for elem in tokens:
         if not isinstance(elem, str):
             return None
-        if elem in stopwords:
-            continue
-        tokens_without_stopwords.append(elem)
+    tokens_without_stopwords = [elem for elem in tokens if elem not in stopwords]
     return tokens_without_stopwords
 
 
@@ -145,8 +140,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         if not isinstance(doc, list):
             return None
         for word in doc:
-            freq = doc.count(word)
-            if freq > 1:
+            if doc.count(word) > 1:
                 doc.remove(word)
         tokens.extend(doc)
     for word in tokens:
@@ -226,9 +220,10 @@ def calculate_bm25(
         return None
     bm25_dict = {}
     for word in document:
-        if word not in vocab:
-            vocab.append(word)
-            idf_document.update({word: 0.0})
+        if word in vocab:
+            continue
+        vocab.append(word)
+        idf_document.update({word: 0.0})
     for word in vocab:
         idf = idf_document.get(word)
         if not isinstance(idf, float):

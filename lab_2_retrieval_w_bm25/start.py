@@ -2,7 +2,8 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-
+from main import tokenize, remove_stopwords, build_vocabulary, \
+    calculate_tf, calculate_idf, calculate_tf_idf
 
 def main() -> None:
     """
@@ -21,12 +22,32 @@ def main() -> None:
         "assets/fairytale_10.txt",
     ]
     documents = []
+    tf_idf = []
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = None
+    tokenized_documents = []
+    for document in documents:
+        tokenized_doc = tokenize(document)
+        if tokenized_doc is not None:
+            tokenized_doc = remove_stopwords(tokenized_doc, stopwords)
+        if tokenized_doc is not None:
+            tokenized_documents.append(tokenized_doc)
+    vocab = build_vocabulary(tokenized_documents)
+    if vocab is None:
+        return
+    idf = calculate_idf(vocab, tokenized_documents)
+    if idf is None:
+        return
+    for tokenized_doc in tokenized_documents:
+        tf = calculate_tf(vocab, tokenized_doc)
+        if tf is not None:
+            tf_idf_doc = calculate_tf_idf(tf, idf)
+            if tf_idf_doc is not None:
+                tf_idf.append(tf_idf_doc)
+    result = tf_idf
     assert result, "Result is None"
 
 

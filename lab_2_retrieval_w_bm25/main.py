@@ -85,6 +85,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         for j in i:
             if j not in unique_words:
                 unique_words.append(j)
+
     if not unique_words:
         return None
     return unique_words
@@ -114,6 +115,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     for token in words:
         result[token] = document_tokens.count(token) / len(document_tokens)
+
     if not result:
         return None
     return result
@@ -132,14 +134,18 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not isinstance(documents, list) \
-            or not all(isinstance(token, list) for token in vocab) \
-            or not all(isinstance(token, list) for token in documents):
+    if not vocab or not documents or not isinstance(vocab, list) or not isinstance(documents, list):
         return None
+    if not all(isinstance(word, str) for word in vocab):
+        return None
+    for document in documents:
+        if not isinstance(document, list):
+            return None
+        for word in document:
+            if not isinstance(word, str):
+                return None
 
     idf = {}
-    for word in vocab:
-        idf[word] = 0.0
 
     document_counts = {word: 0 for word in vocab}
     for document in documents:
@@ -150,7 +156,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     total_documents = len(documents)
     for word, count in document_counts.items():
         if count > 0:
-            idf[word] = math.log(total_documents / count)
+            idf[word] = math.log(total_documents - count / count)
 
     return idf
 
@@ -168,7 +174,20 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not tf or not idf or not isinstance(tf, dict) or not isinstance(idf, dict):
+        return None
+    if not all(isinstance(word, str) for word in idf):
+        return None
 
+    tf_idf = {}
+
+    for word in tf:
+        if word in idf:
+            tf_idf[word] = tf[word] * idf[word]
+
+    if not tf_idf:
+        return None
+    return tf_idf
 
 def calculate_bm25(
     vocab: list[str],

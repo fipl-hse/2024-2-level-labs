@@ -2,7 +2,7 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from main import tokenize, remove_stopwords, build_vocabulary, \
+from lab_2_retrieval_w_bm25.main import tokenize, remove_stopwords, build_vocabulary, \
     calculate_tf, calculate_idf, calculate_tf_idf
 
 def main() -> None:

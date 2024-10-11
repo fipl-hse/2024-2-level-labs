@@ -20,17 +20,20 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text = text.lower()
-    words = text.split(' ')
-    clean_words = []
-    for each in words:
-        for symb in each:
-            if not symb.isalpha():
-                continue
-            clean_word =
+    # divide by spaces - ['the', 'first%', 'sentence><.', 'the', 'sec&*ond', 'sent@ence', '#.']
 
-    clean_words.append(symb)
-    return clean_words
+    text_by_space = text.split(' ')
+
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+
+
 
 
 

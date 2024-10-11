@@ -2,12 +2,12 @@
 Run start.
 """
 import argparse
-import sys
+import subprocess
 from pathlib import Path
 
+from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
 from config.collect_coverage.run_coverage import get_target_score
-from config.common import _run_console_tool, check_result, choose_python_exe
-from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
+from config.constants import CONFIG_PACKAGE_PATH, PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.project_config import ProjectConfig
 
 
@@ -24,7 +24,7 @@ def check_skip_conditions(pr_name: str, repository_type: str) -> bool:
     """
     result = _run_console_tool(
         str(choose_python_exe()),
-        [str('config/is_admin.py'), '--pr_name', pr_name],
+        [str(Path(CONFIG_PACKAGE_PATH, 'is_admin.py')), '--pr_name', pr_name],
         debug=True
     )
     if repository_type == "public" and result.stdout.decode("utf-8").strip() == 'YES':
@@ -33,7 +33,8 @@ def check_skip_conditions(pr_name: str, repository_type: str) -> bool:
     return False
 
 
-def run_start(lab_name: str) -> tuple[bool, str]:
+@handles_console_error()
+def run_start(lab_name: str) -> subprocess.CompletedProcess:
     """
     Run start.py script in the specified lab directory.
 
@@ -41,36 +42,37 @@ def run_start(lab_name: str) -> tuple[bool, str]:
         lab_name (str): Name of the lab directory.
 
     Returns:
-        tuple[bool, str]: True if start.py runs successfully, otherwise False.
+        subprocess.CompletedProcess: Program execution values
     """
-    result = _run_console_tool(
+    return _run_console_tool(
         str(choose_python_exe()),
         [str('start.py')],
         cwd=PROJECT_ROOT / lab_name,
         debug=True
     )
-    return result.returncode == 0, result.stderr.decode('utf-8')
 
 
-def check_start_content(lab_name: str) -> None:
+@handles_console_error()
+def check_start_content(lab_name: str) -> subprocess.CompletedProcess:
     """
     Check the content of start.py script using check_start_content.py script.
 
     Args:
         lab_name (str): Name of the lab directory.
+
+    Returns:
+        subprocess.CompletedProcess: Program execution values.
     """
     lab_dir = Path(lab_name)
     start_py_file = lab_dir / 'start.py'
     with start_py_file.open() as f:
         start_py_content = f.read()
 
-    result = _run_console_tool(
-        str(choose_python_exe()),
-        [str('config/check_start_content.py'), '--start_py_content', start_py_content],
-        cwd=PROJECT_ROOT,
-        debug=True
-    )
-    check_result(result.returncode)
+    return _run_console_tool(str(choose_python_exe()),
+                             [str(Path(CONFIG_PACKAGE_PATH, 'check_start_content.py')),
+                              '--start_py_content', start_py_content],
+                             cwd=PROJECT_ROOT,
+                             debug=True)
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -108,12 +110,7 @@ def main() -> None:
         if target_score == 0:
             print("Skipping stage")
             continue
-        status, response = run_start(lab_name)
-        if not status:
-            print(f"start.py fails while running for lab {lab_name}")
-            print(f"Check for start.py file for lab {lab_name} failed.")
-            print(response)
-            sys.exit(1)
+        run_start(lab_name)
 
         print(f"Check calling lab {lab_name} passed")
 

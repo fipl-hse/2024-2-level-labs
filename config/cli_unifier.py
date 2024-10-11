@@ -1,11 +1,36 @@
 """
 CLI commands.
 """
-
+import functools
 import platform
 import subprocess
+import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
+
+LOG_TEMPLATE = """
+
+>>>>>>>>>>>>>>>>>>>>>>>>> {output_type} >>>>>>>>>>>>>>>>>>>>>>>>>
+{content}
+<<<<<<<<<<<<<<<<<<<<<<<<< {output_type} <<<<<<<<<<<<<<<<<<<<<<<<<
+
+"""
+
+
+def log_output(output_type: str, content: bytes) -> None:
+    """
+    Prints result of the command-line process.
+
+    Args:
+        output_type(str): type of output, for example stdout or stderr
+        content(bytes): raw result from the subprocess call
+    """
+    print(
+        LOG_TEMPLATE.format(
+            output_type=output_type,
+            content=content.decode("utf-8").replace('\r', ''),
+        )
+    )
 
 
 def choose_python_exe() -> Path:
@@ -36,7 +61,8 @@ def prepare_args_for_shell(args: list[object]) -> str:
     return " ".join(map(str, args))
 
 
-def _run_console_tool(exe: str, /, args: list[str], **kwargs: Any) -> subprocess.CompletedProcess:
+def _run_console_tool(exe: str, /, args: list[str],
+                      **kwargs: Any) -> subprocess.CompletedProcess:
     """
     Run CLI commands.
 
@@ -68,10 +94,64 @@ def _run_console_tool(exe: str, /, args: list[str], **kwargs: Any) -> subprocess
 
     env = kwargs.get('env')
     if env:
-        # pylint:disable = subprocess-run-check
-        return subprocess.run(options, capture_output=True, env=env)
+        return subprocess.run(options, capture_output=True, check=True, env=env)
+
     if kwargs.get('cwd'):
-        # pylint:disable = subprocess-run-check
-        return subprocess.run(options, capture_output=True, cwd=kwargs.get('cwd'))
-    # pylint:disable = subprocess-run-check
-    return subprocess.run(options, capture_output=True)
+        return subprocess.run(options, capture_output=True, check=True, cwd=kwargs.get('cwd'))
+
+    return subprocess.run(options, capture_output=True, check=True)
+
+
+def handles_console_error(exit_code_on_error: int = 1,
+                          ok_codes: tuple[int, ...] = (0,)) -> Callable:
+    """
+    Decorator to handle console tool errors.
+
+    Args:
+        exit_code_on_error (int): Exit code to use when an error occurs.
+        ok_codes (tuple[int, ...]): Exit codes considered as success. Defaults to (0,).
+
+    Returns:
+        Callable: The wrapped function.
+    """
+
+    def decorator(func: Callable) -> Callable:
+        """
+        Decorator to handle console tool errors.
+
+        Args:
+            func (Callable): The function to be decorated, expected to return a `CompletedProcess`.
+
+        Returns:
+            Callable: The wrapped function with error handling.
+        """
+
+        @functools.wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> None:
+            """
+            Wrapper function to handle console tool errors.
+
+            Args:
+                *args (Any): Variable length argument list to pass to the decorated function.
+                **kwargs (Any): Arbitrary keyword arguments to pass to the decorated function.
+            """
+            try:
+                result = func(*args, **kwargs)
+            except subprocess.CalledProcessError as error:
+                print(f"Exit code: {error.returncode}.")
+                log_output('Console run stdout', error.output)
+                # return code is not 0, but sometimes it still can be OK
+                if error.returncode in ok_codes:
+                    print(f"Exit code: {error.returncode}.")
+                    log_output('Console run stdout', error.output)
+                else:
+                    print(f"Check failed with exit code {error.returncode}.")
+                    log_output('Console run stderr', error.stderr)
+                    sys.exit(exit_code_on_error)
+            else:
+                print(f"Exit code: {result.returncode}.")
+                log_output('Console run stdout', result.stdout)
+
+        return wrapper
+
+    return decorator

@@ -2,12 +2,12 @@
 Run tests for each lab using pytest.
 """
 import subprocess
+from pathlib import Path
 
 from tap import Tap
 
-from config.cli_unifier import _run_console_tool, choose_python_exe
-from config.common import check_result
-from config.constants import PROJECT_CONFIG_PATH
+from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.constants import CONFIG_PACKAGE_PATH, PROJECT_CONFIG_PATH
 from config.project_config import ProjectConfig
 
 
@@ -18,7 +18,7 @@ class CommandLineInterface(Tap):
     pr_name: str
     pr_author: str
 
-
+@handles_console_error()
 def run_tests(pr_name: str, pr_author: str, lab: str) -> subprocess.CompletedProcess:
     """
     Run pytest tests for a specific lab.
@@ -32,7 +32,7 @@ def run_tests(pr_name: str, pr_author: str, lab: str) -> subprocess.CompletedPro
         subprocess.CompletedProcess: Result of the subprocess execution.
     """
     args = [
-        str('config/run_pytest.py'),
+        str(Path(CONFIG_PACKAGE_PATH, 'run_pytest.py')),
         '--pr_name', pr_name,
         '--pr_author', pr_author,
         '-l', lab,
@@ -55,12 +55,7 @@ def main() -> None:
     for lab_name in labs:
         print(f"Running tests for lab {lab_name}")
 
-        result = run_tests(args.pr_name, args.pr_author, lab_name)
-
-        print(result.stdout.decode('utf-8'))
-        print(result.stderr.decode('utf-8'))
-
-        check_result(result.returncode)
+        run_tests(args.pr_name, args.pr_author, lab_name)
 
     print("All tests passed.")
 

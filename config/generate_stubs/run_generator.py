@@ -1,11 +1,11 @@
 """
 Runner for generating and auto-formatting stubs.
 """
-
+import subprocess
 import sys
 from pathlib import Path
 
-from config.cli_unifier import _run_console_tool, choose_python_exe
+from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
 from config.generate_stubs.generator import ArgumentParser, NoDocStringForAMethodError
 
 
@@ -31,12 +31,16 @@ def remove_implementation(source_code_path: Path, res_stub_path: Path) -> None:
         raise NoDocStringForAMethodError(res_process.stderr.decode('utf-8'))
 
 
-def format_stub_file(res_stub_path: Path) -> None:
+@handles_console_error()
+def format_stub_file(res_stub_path: Path) -> subprocess.CompletedProcess:
     """
     Autoformat resulting stub.
 
     Args:
-        res_stub_path (Path): Path to resulting path
+        res_stub_path (Path): Path to resulting path.
+
+    Returns:
+        subprocess.CompletedProcess: Program execution values.
     """
     args = [
         '-m',
@@ -45,24 +49,26 @@ def format_stub_file(res_stub_path: Path) -> None:
         '100',
         str(res_stub_path)
     ]
-    res_process = _run_console_tool(str(choose_python_exe()), args, debug=False)
-    if res_process.returncode != 0:
-        raise ValueError(res_process.stderr.decode('utf-8'))
+
+    return _run_console_tool(str(choose_python_exe()), args, debug=False)
 
 
-def sort_stub_imports(res_stub_path: Path) -> None:
+@handles_console_error()
+def sort_stub_imports(res_stub_path: Path) -> subprocess.CompletedProcess:
     """
     Autoformat resulting stub.
 
     Args:
-        res_stub_path (Path): Path to resulting stub
+        res_stub_path (Path): Path to resulting stub.
+
+    Returns:
+        subprocess.CompletedProcess: Program execution values.
     """
     args = [
         str(res_stub_path)
     ]
-    res_process = _run_console_tool('isort', args, debug=False)
-    if res_process.returncode != 0:
-        raise ValueError(res_process.stderr.decode('utf-8'))
+
+    return _run_console_tool('isort', args, debug=False)
 
 
 def main() -> None:

@@ -3,7 +3,7 @@ Lab 2.
 
 Text retrieval with BM25
 """
-# pylint:disable=too-many-arguments, unused-argument
+## pylint:disable=too-many-arguments, unused-argument
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -18,7 +18,6 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """

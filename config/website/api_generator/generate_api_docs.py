@@ -1,12 +1,26 @@
 """
 Generator for API docs for Sphinx.
 """
-
+import subprocess
 from pathlib import Path
 
-from config.cli_unifier import _run_console_tool
+from config.cli_unifier import _run_console_tool, handles_console_error
 from config.constants import PROJECT_CONFIG_PATH
 from config.project_config import ProjectConfig
+
+
+@handles_console_error()
+def run_sphinx_apidoc(args: list[str]) -> subprocess.CompletedProcess:
+    """
+    Run sphinx-apidoc with the specified arguments.
+
+    Args:
+        args (list[str]): Arguments for sphinx-apidoc.
+
+    Returns:
+        subprocess.CompletedProcess: Program execution values.
+    """
+    return _run_console_tool('sphinx-apidoc', args, debug=False)
 
 
 def generate_api_docs(labs_paths: list[Path],
@@ -47,11 +61,7 @@ def generate_api_docs(labs_paths: list[Path],
                           lab_path.joinpath('helpers.py'))
         args.extend(map(str, excluded_paths))
 
-        res_process = _run_console_tool('sphinx-apidoc', args, debug=False)
-        if res_process.returncode == 0:
-            print(f'API DOC FOR {lab_path} GENERATED IN {lab_api_doc_path}\n')
-        else:
-            print(f'ERROR CODE: {res_process.returncode!r}. ERROR: {res_process.stderr!r}\n')
+        run_sphinx_apidoc(args)
 
 
 if __name__ == '__main__':

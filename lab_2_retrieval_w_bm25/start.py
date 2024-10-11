@@ -73,6 +73,10 @@ def main() -> None:
             bm_w_cutoff_list.append(bm_w_cutoff_for_doc)
     print(tf_idf_list)
     print(bm_list)
+    if not all(isinstance(i, tuple) for i in rank_documents(tf_idf_list, query, stopwords)):
+        return
+    if not all(isinstance(i, tuple) for i in rank_documents(bm_list, query, stopwords)):
+        return
     tf_idf_rank_tuples = rank_documents(tf_idf_list, query, stopwords)
     bm_rank_tuples = rank_documents(bm_list, query, stopwords)
     print(tf_idf_rank_tuples, bm_rank_tuples)
@@ -81,6 +85,8 @@ def main() -> None:
     save_index(bm_w_cutoff_list, 'assets/metrics.json')
     loaded_docs_list = load_index('assets/metrics.json')
     if loaded_docs_list is None:
+        return
+    if not all(isinstance(i, tuple) for i in rank_documents(loaded_docs_list, query, stopwords)):
         return
     bm_w_cutoff_rank_tuples = rank_documents(loaded_docs_list, query, stopwords)
     bm_w_cutoff_rank = [tup[0] for tup in bm_w_cutoff_rank_tuples]

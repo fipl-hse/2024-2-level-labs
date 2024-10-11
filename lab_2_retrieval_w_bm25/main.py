@@ -18,6 +18,20 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    new_text = ''
+    for i in text.lower():
+        if i.isalpha() is True:
+            new_text += i
+            continue
+        new_text += ' '
+    for_tokens = new_text.split(' ')
+    tokens = []
+    for i in for_tokens:
+        if i.isalpha() is True:
+            tokens.append(i)
+    return tokens
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
@@ -32,6 +46,18 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tokens, list) or not isinstance(stopwords, list) or not tokens or not stopwords:
+        return None
+    for i in stopwords:
+        if not isinstance(i, str):
+            return None
+    right_tokens = []
+    for i in tokens:
+        if not isinstance(i, str):
+            return None
+        if i not in stopwords:
+            right_tokens.append(i)
+    return right_tokens
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

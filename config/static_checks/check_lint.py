@@ -108,7 +108,7 @@ def main() -> None:
             [
                 PROJECT_ROOT / "core_utils"
             ],
-            pyproject_path)
+            pyproject_path, exit_zero=True)
         check_lint_level(completed_process.stdout.decode("utf-8"), 10)
 
     for lab_name in labs_list:
@@ -125,7 +125,7 @@ def main() -> None:
                 [
                     lab_path
                 ],
-                pyproject_path, ignore_tests=repository_type == "public")
+                pyproject_path, ignore_tests=repository_type == "public", exit_zero=True)
             check_lint_level(completed_process.stdout.decode("utf-8"),
                              target_score)
 

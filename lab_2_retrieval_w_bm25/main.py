@@ -47,8 +47,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     """
     if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
-    if (not stopwords or not isinstance(stopwords, list) or
-            not all(isinstance(stopword, str) for stopword in stopwords)):
+    if not stopwords or not isinstance(stopwords, list) or \
+            not all(isinstance(stopword, str) for stopword in stopwords):
         return None
 
     words_without_sw = []
@@ -102,25 +102,20 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or isinstance(document_tokens, list) \
-            or not all(isinstance(token, list) for token in vocab) \
-            or not all(isinstance(token, list) for token in document_tokens):
+    if not vocab or not document_tokens \
+            or not isinstance(vocab, list) or not isinstance(document_tokens, list):
+        return None
+    if not all(isinstance(word, str) for word in vocab) \
+            or not all(isinstance(word, str) for word in document_tokens):
         return None
 
     result = {}
+    words = list(set(vocab + document_tokens))
 
-    for token in document_tokens:
-        if token not in vocab:
-            result[token] = 0.0
-        if token in result:
-            result[token] += 1
-        if token not in result:
-            result[token] = 1
-
-    total_tokens = len(document_tokens)
-    for key, value in result.items():
-        result[key] = value / total_tokens
-
+    for token in words:
+        result[token] = document_tokens.count(token) / len(document_tokens)
+    if not result:
+        return None
     return result
 
 

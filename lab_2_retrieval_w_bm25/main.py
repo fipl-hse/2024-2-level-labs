@@ -196,6 +196,11 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    bm_dict = {}
+    for word in vocab:
+        nt = document.count(word)
+        bm_dict[vocab] = sum(idf_document[word] * (nt * (k1+1)) / (nt + k1 * (1 - b + b * (doc_len / avg_doc_len))))
+    return bm_dict
 
 
 def rank_documents(

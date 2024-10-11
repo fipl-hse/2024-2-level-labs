@@ -111,7 +111,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not isinstance(document_tokens, list):
+    if (not isinstance(vocab, list) or not isinstance(document_tokens, list)
+            or len(vocab) == 0 or len(document_tokens) == 0):
         return None
     if (not all(isinstance(v, str) for v in vocab)
             or not all(isinstance(d, str) for d in document_tokens)):
@@ -140,7 +141,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not isinstance(documents, list):
+    if (not isinstance(vocab, list) or not isinstance(documents, list)
+            or len(vocab) == 0 or len(documents) == 0):
         return None
     if (not all(isinstance(token, str) for token in vocab) or
             not all(token.isalpha() for token in vocab) or
@@ -152,12 +154,14 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             return None
     idf_dict = {}
 
-    for document in documents:
-        for token in document:
-            summ = 0
-            summ += document.count(token)
-            idf = math.log((len(documents) - summ + 0.5)/(summ + 0.5))
-            idf_dict[token] = idf
+    for token in vocab:
+        token_count = 0
+        for document in documents:
+            if token in document:
+                token_count += 1
+
+        idf = math.log((len(documents) - token_count + 0.5) / (token_count + 0.5))
+        idf_dict[token] = idf
 
     return idf_dict
 
@@ -175,6 +179,12 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(tf, dict) or not isinstance(idf, dict) or
+            not all(isinstance(key, str) for key in tf.keys()) or
+            not all(isinstance(value, float) for value in tf.values())):
+        return None
+
+    return {token: tf[token] * idf[token] for token in tf if token in idf} or None
 
 
 def calculate_bm25(

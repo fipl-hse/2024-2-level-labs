@@ -4,7 +4,8 @@ Laboratory Work #2 starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable,
 # too-many-branches, too-many-statements, duplicate-code
 
-from lab_2_retrieval_w_bm25.main import tokenize, remove_stopwords
+from lab_2_retrieval_w_bm25.main import tokenize, remove_stopwords, calculate_tf, build_vocabulary, calculate_idf, \
+    calculate_tf_idf
 
 
 def main() -> None:
@@ -30,9 +31,25 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
+    tokenized_documents = []
     for document in documents:
         if tokenize(document) is not None:
-            print(remove_stopwords(tokenize(document), stopwords))
+            new_doc = remove_stopwords(tokenize(document), stopwords)
+            if new_doc is not None:
+                tokenized_documents.append(new_doc)
+                print(new_doc)
+
+    print()
+
+    vocab = build_vocabulary(tokenized_documents)
+    idf = calculate_idf(vocab, tokenized_documents)
+    if vocab is not None and idf is not None:
+        for document in documents:
+            new_doc = remove_stopwords(tokenize(document), stopwords)
+            if new_doc is not None:
+                tf = calculate_tf(vocab, new_doc)
+                if tf is not None:
+                    print(calculate_tf_idf(tf, idf))
 
     result = 1
     assert result, "Result is None"

@@ -73,9 +73,9 @@ def main() -> None:
             bm_w_cutoff_list.append(bm_w_cutoff_for_doc)
     # print(tf_idf_list)
     # print(bm_list)
-    if not iter(rank_documents(tf_idf_list, query, stopwords)):
+    if not rank_documents(tf_idf_list, query, stopwords):
         return
-    if not iter(rank_documents(bm_list, query, stopwords)):
+    if not rank_documents(bm_list, query, stopwords):
         return
     tf_idf_rank_tuples = rank_documents(tf_idf_list, query, stopwords)
     if not all(isinstance(i, tuple) for i in tf_idf_rank_tuples):

@@ -5,7 +5,6 @@ Text retrieval with BM25
 """
 import math
 
-
 # pylint:disable=too-many-arguments, unused-argument
 
 

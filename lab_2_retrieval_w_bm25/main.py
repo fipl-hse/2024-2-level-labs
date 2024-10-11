@@ -77,7 +77,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     for list_of_tokens in documents:
         if not all(isinstance(token, str) for token in list_of_tokens):
             return None
-    words_from_all_docs_list = list(set([word for sublist in documents for word in sublist]))
+    words_from_all_docs_list = list(set(word for sublist in documents for word in sublist))
     if not words_from_all_docs_list:
         return None
     return list(words_from_all_docs_list)
@@ -107,10 +107,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     tf_figure_dict = {}
     for word in document_tokens:
-        if word not in tf_figure_dict.keys():
+        if word not in tf_figure_dict:
             tf_figure_dict[word] = 0.0
         for uniq_word in vocab:
-            if uniq_word not in tf_figure_dict.keys():
+            if uniq_word not in tf_figure_dict:
                 tf_figure_dict[uniq_word] = 0.0
             tf_figure_dict[word] = document_tokens.count(word) / len(document_tokens)
 

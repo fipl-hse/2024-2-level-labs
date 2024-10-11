@@ -99,7 +99,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             or not all(isinstance(word, str) for word in document_tokens)):
         return None
     unique_words = list(set(vocab + document_tokens))
-    return {token: document_tokens.count(token) / len(document_tokens) for token in unique_words} or None
+    return ({token: document_tokens.count(token) / len(document_tokens) for token in unique_words}
+            or None)
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -292,7 +293,8 @@ def calculate_bm25_with_cutoff(
     for token in unique_words:
         if token in idf_document and idf_document[token] > alpha:
             bm_dict_w_cutoff[token] = (idf_document[token] * document.count(token) * (k1 + 1) /
-                                   (document.count(token) + k1 * (1 - b + b * doc_len / avg_doc_len)))
+                                       (document.count(token) + k1 *
+                                        (1 - b + b * doc_len / avg_doc_len)))
     return bm_dict_w_cutoff
 
 

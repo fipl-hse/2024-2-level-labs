@@ -3,9 +3,8 @@ Run pytest for a specific lab.
 """
 import argparse
 import subprocess
-import sys
 
-from config.cli_unifier import _run_console_tool, choose_python_exe
+from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
 from config.collect_coverage.run_coverage import get_target_score
 from config.common import check_skip
 from config.constants import PROJECT_ROOT
@@ -54,6 +53,7 @@ def prepare_pytest_args(lab_path: str, target_score: int, pytest_label: str) -> 
     return pytest_args
 
 
+@handles_console_error(ok_codes=(0, 5))
 def run_pytest(pytest_args: list[str]) -> subprocess.CompletedProcess:
     """
     Run pytest with the given arguments.
@@ -62,9 +62,10 @@ def run_pytest(pytest_args: list[str]) -> subprocess.CompletedProcess:
         pytest_args (list[str]): Arguments for pytest.
 
     Returns:
-        subprocess.CompletedProcess: Program execution values
+        subprocess.CompletedProcess: Program execution values.
     """
     args = ["-m", "pytest"] + pytest_args
+
     return _run_console_tool(
         str(choose_python_exe()),
         args,
@@ -79,12 +80,11 @@ def main() -> None:
     """
     args = parse_arguments()
     pr_name = args.pr_name
-    pr_author = args.pr_author
     lab_path = args.lab_path
     pytest_label = args.pytest_label
 
     if lab_path:
-        check_skip(pr_name, pr_author, lab_path)
+        check_skip(pr_name, lab_path)
         score_path = PROJECT_ROOT / lab_path
         target_score = get_target_score(score_path)
     else:
@@ -92,17 +92,7 @@ def main() -> None:
 
     pytest_args = prepare_pytest_args(lab_path, target_score, pytest_label)
 
-    ret = run_pytest(pytest_args)
-
-    print(ret.stdout.decode("utf-8"))
-    print(ret.stderr.decode("utf-8"))
-
-    if ret.returncode == 5:
-        print("No tests collected. Exiting with 0 (instead of 5).")
-        sys.exit(0)
-
-    print(f"Pytest results (should be 0): {ret.returncode}")
-    sys.exit(ret.returncode)
+    run_pytest(pytest_args)
 
 
 if __name__ == "__main__":

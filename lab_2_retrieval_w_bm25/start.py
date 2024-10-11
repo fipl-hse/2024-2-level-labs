@@ -37,9 +37,10 @@ def main() -> None:
         stopwords = file.read().split("\n")
 
         for doc in tokenized_documents:
-            tf = calculate_tf(build_vocabulary(tokenized_documents), remove_stopwords(tokenized_documents, stopwords))
-            idf = calculate_idf(build_vocabulary(tokenized_documents), tokenized_documents)
-            tf_idf_dict = calculate_tf_idf(tf, idf)
+            tf_dict = calculate_tf(build_vocabulary(tokenized_documents),
+                              remove_stopwords(tokenized_documents, stopwords))
+            idf_dict = calculate_idf(build_vocabulary(tokenized_documents), tokenized_documents)
+            tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
 
     result = tf_idf_dict
     assert result, "Result is None"

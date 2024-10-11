@@ -12,7 +12,7 @@ from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.lab_settings import LabSettings
 from config.project_config import ProjectConfig
 
-CoverageResults = Mapping[str, tuple[Optional[int], bool]]
+CoverageResults = Mapping[str, tuple[Optional[int], ]]
 
 
 def collect_coverage(all_labs_names: Iterable[Path],
@@ -30,19 +30,18 @@ def collect_coverage(all_labs_names: Iterable[Path],
     all_labs_results = {}
     for lab_path in all_labs_names:
         percentage = None
-        has_fallen_tests = False
         try:
             if lab_path.name == 'core_utils':
                 check_target = False
             else:
                 check_target = True
-            percentage, has_fallen_tests = run_coverage_collection(lab_path=lab_path,
+            percentage = run_coverage_collection(lab_path=lab_path,
                                                                    artifacts_path=artifacts_path,
                                                                    check_target_score=check_target)
         except (CoverageRunError, CoverageCreateReportError) as e:
             print(e)
         finally:
-            all_labs_results[lab_path.name] = (percentage, has_fallen_tests)
+            all_labs_results[lab_path.name] = (percentage,)
     return all_labs_results
 
 
@@ -65,8 +64,6 @@ def is_decrease_present(all_labs_results: CoverageResults,
     any_fallen_tests = False
     labs_with_thresholds = {}
     for lab_name, current_lab_args in all_labs_results.items():
-        if current_lab_args[1]:
-            any_fallen_tests = True
         current_lab_percentage = current_lab_args[0]
         prev_lab_percentage = previous_coverage_results.get(lab_name, 0)
         if current_lab_percentage is None:

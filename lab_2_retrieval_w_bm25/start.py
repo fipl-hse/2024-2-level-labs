@@ -79,6 +79,8 @@ def main() -> None:
         return
     tf_idf_rank_tuples = rank_documents(tf_idf_list, query, stopwords)
     bm_rank_tuples = rank_documents(bm_list, query, stopwords)
+    if not isinstance(bm_rank_tuples, (list, tuple)):
+        return
     print(tf_idf_rank_tuples, bm_rank_tuples)
     bm_rank = [tup[0] for tup in bm_rank_tuples]
     tf_idf_rank = [tup[0] for tup in tf_idf_rank_tuples]

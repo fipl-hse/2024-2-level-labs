@@ -3,6 +3,9 @@ Lab 2.
 
 Text retrieval with BM25
 """
+import math
+
+
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -79,7 +82,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if not isinstance(documents, list):
         return None
 
-    unique_words = []
+    vocab = []
 
     for document in documents:
         if not isinstance(document, list) or len(document) == 0:
@@ -87,12 +90,12 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         for word in document:
             if not isinstance(word, str) or len(word) == 0:
                 return None
-            if word not in unique_words:
-                unique_words.append(word)
+            if word not in vocab:
+                vocab.append(word)
 
-    if not unique_words:
+    if not vocab:
         return None
-    return unique_words
+    return vocab
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -108,6 +111,20 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(document_tokens, list):
+        return None
+    if (not all(isinstance(v, str) for v in vocab)
+            or not all(isinstance(d, str) for d in document_tokens)):
+        return None
+
+    len_document = len(document_tokens)
+    token_set = set(set(vocab) | set(document_tokens))
+    tf_dict = {}
+    for token in token_set:
+        tf = document_tokens.count(token) / len_document
+        tf_dict[token] = tf
+
+    return tf_dict
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -123,6 +140,26 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(documents, list):
+        return None
+    if (not all(isinstance(token, str) for token in vocab) or
+            not all(token.isalpha() for token in vocab) or
+            not all(isinstance(document, list) for document in documents)):
+        return None
+    for document in documents:
+        if (not all(isinstance(token, str) for token in document) or
+                not all(token.isalpha() for token in document)):
+            return None
+    idf_dict = {}
+
+    for document in documents:
+        for token in document:
+            summ = 0
+            summ += document.count(token)
+            idf = math.log((len(documents) - summ + 0.5)/(summ + 0.5))
+            idf_dict[token] = idf
+
+    return idf_dict
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:

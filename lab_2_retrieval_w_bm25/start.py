@@ -3,7 +3,7 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-from lab_2_retrieval_w_bm25.main import tokenize
+from lab_2_retrieval_w_bm25.main import tokenize, remove_stopwords, build_vocabulary, calculate_tf, calculate_idf, calculate_tf_idf
 
 
 def main() -> None:
@@ -35,7 +35,13 @@ def main() -> None:
 
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = tokenized_documents
+
+        for doc in tokenized_documents:
+            tf = calculate_tf(build_vocabulary(tokenized_documents), remove_stopwords(tokenized_documents, stopwords))
+            idf = calculate_idf(build_vocabulary(tokenized_documents), tokenized_documents)
+            tf_idf_dict = calculate_tf_idf(tf, idf)
+
+    result = tf_idf_dict
     assert result, "Result is None"
 
 

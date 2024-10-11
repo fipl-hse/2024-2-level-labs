@@ -1448,6 +1448,7 @@ retrieved
 retrieves
 retrieving
 return
+returncode
 returned
 returning
 returns
@@ -1612,6 +1613,8 @@ stated
 statistical
 statistics
 status
+stderr
+stdout
 stemming
 step
 steps

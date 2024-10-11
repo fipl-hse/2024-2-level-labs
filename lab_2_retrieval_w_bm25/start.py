@@ -2,8 +2,10 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords, build_vocabulary,
-                                         calculate_tf, calculate_idf, calculate_tf_idf)
+from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords,
+                                         build_vocabulary, calculate_tf,
+                                         calculate_idf, calculate_tf_idf)
+
 
 def main() -> None:
     """
@@ -42,12 +44,15 @@ def main() -> None:
     if idf is None:
         return
     for tokenized_doc in tokenized_documents:
+        if tokenized_doc is None:
+            return
         tf = calculate_tf(vocab, tokenized_doc)
         if tf is not None:
             tf_idf_doc = calculate_tf_idf(tf, idf)
             if tf_idf_doc is not None:
                 tf_idf.append(tf_idf_doc)
-    result = tf_idf
+    if tf_idf:
+        result = tf_idf
     assert result, "Result is None"
 
 

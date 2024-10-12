@@ -5,6 +5,7 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 import math
+import json
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -301,6 +302,34 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(vocab, list) or not isinstance(document, list)
+            or not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)
+            or isinstance(doc_len, bool)) or doc_len < 1:
+        return None
+    if (len(vocab) == 0 or len(document) == 0 or
+            not isinstance(vocab[0], str) or not isinstance(document[0], str)):
+        return None
+    if (not isinstance(idf_document, dict) or not idf_document
+            or not isinstance(list(idf_document.values())[0], float)):
+        return None
+    if not isinstance(k1, float) or not isinstance(b, float) or not isinstance(alpha, float):
+        return None
+    bm25_dict = {}
+    for word in document:
+        if word in vocab:
+            continue
+        vocab.append(word)
+        idf_document.update({word: 0.0})
+    for word in vocab:
+        idf = idf_document.get(word)
+        if not isinstance(idf, float):
+            return None
+        if idf < alpha:
+            continue
+        bm25 = idf * ((document.count(word) * (k1 + 1)) /
+                      (document.count(word) + k1 * (1 - b + b * (doc_len / avg_doc_len))))
+        bm25_dict.update({word: bm25})
+    return bm25_dict
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
@@ -311,6 +340,11 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if not isinstance(index, list) or not isinstance(file_path, str)\
+            or len(index) == 0 or len(file_path) == 0:
+        return None
+    with open(file_path, 'w') as file:
+        json.dump(index, file)
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -325,6 +359,11 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(file_path, str) or len(file_path) == 0:
+        return None
+    with open(file_path, "r") as file:
+        result = json.load(file)
+    return result
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -340,3 +379,4 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+

@@ -178,7 +178,6 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     return tf_idf
 
 
-
 def calculate_bm25(
     vocab: list[str],
     document: list[str],
@@ -205,6 +204,32 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not vocab or not isinstance(vocab,list) or
+            not all(isinstance(token, str) for token in vocab)):
+        return None
+    if not isinstance(document,list) or not all(isinstance(token, str) for token in document):
+        return None
+    if (not isinstance(idf_document, dict) or
+            not all(isinstance(token, str) and
+                    isinstance(freq, float) for token, freq in idf_document.items())):
+        return None
+    if not isinstance(k1, float) or not 1.2 <= k1 <= 2 or not isinstance(b, float) or not 0 < b < 1:
+        return None
+    if (not isinstance(avg_doc_len, float) or avg_doc_len is None
+            or not isinstance(doc_len, int) or doc_len is None or isinstance(doc_len, bool)):
+        return None
+
+    bm25 = {}
+    common_tokens = [vocab, document]
+    common_vocab = build_vocabulary(common_tokens)
+    for token in common_vocab:
+        if token not in idf_document:
+            bm25[token] = 0.0
+        else:
+            token_count = document.count(token)
+            bm25[token] = (idf_document[token] * (token_count*(k1+1))/
+                           (token_count+k1*(1-b+b*(doc_len/avg_doc_len))))
+    return bm25
 
 
 def rank_documents(

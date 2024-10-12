@@ -1,11 +1,9 @@
 """
 Laboratory Work #2 starter
 """
-
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, remove_stopwords, tokenize)
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -32,26 +30,39 @@ def main() -> None:
         stopwords = file.read().split("\n")
 
     docs_tokenized = []
+    doc_lengths = []
+    word_count = 0
     for document in documents:
         doc_tokenized = tokenize(document)
         if not isinstance(doc_tokenized, list):
             return
+        doc_len = len(doc_tokenized)
+        doc_lengths.append(doc_len)
+        word_count += doc_len
         doc_tokenized = remove_stopwords(doc_tokenized, stopwords)
         if not isinstance(doc_tokenized, list):
             return
         docs_tokenized.append(doc_tokenized)
     print(f'Demo 1: Removing Stop-Words\n{docs_tokenized}')
-
-    vocabulary = build_vocabulary(docs_tokenized)
-    if not isinstance(vocabulary, list):
+    avg_d_l = word_count / len(documents)
+    vocab = build_vocabulary(docs_tokenized)
+    if not isinstance(vocab, list):
         return
-    print('Demo 2: Calculating TF-IDF')
+    tf_collection = []
+    tf_idf_collection = []
+    bm25_collection = []
+    no = 0
+    idf = calculate_idf(vocab, docs_tokenized)
     for doc in docs_tokenized:
-        tf = calculate_tf(vocabulary, doc)
-        idf = calculate_idf(vocabulary, docs_tokenized)
+        tf = calculate_tf(vocab, doc)
+        tf_collection.append(tf)
         if not isinstance(tf, dict) or not isinstance(idf, dict):
             return
-        print(calculate_tf_idf(tf, idf))
+        tf_idf_collection.append(calculate_tf_idf(tf, idf))
+        bm25_collection.append(calculate_bm25(vocab, doc, idf, 1.5, 0.75, avg_d_l, doc_lengths[no]))
+        no += 1
+    print(f'Demo 2: Calculating TF-IDF {tf_idf_collection}')
+    print(f'Demo 3: Calculating BM25 {bm25_collection}')
 
     result = 1
     assert result, "Result is None"

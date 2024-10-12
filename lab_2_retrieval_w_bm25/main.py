@@ -4,8 +4,8 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-import math
 import json
+import math
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -304,10 +304,11 @@ def calculate_bm25_with_cutoff(
     """
     if (not isinstance(vocab, list) or not isinstance(document, list)
             or not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)
-            or isinstance(doc_len, bool)) or doc_len < 1:
+            or isinstance(doc_len, bool)):
         return None
     if (len(vocab) == 0 or len(document) == 0 or
-            not isinstance(vocab[0], str) or not isinstance(document[0], str)):
+            not isinstance(vocab[0], str) or not isinstance(document[0], str))\
+            or doc_len < 1:
         return None
     if (not isinstance(idf_document, dict) or not idf_document
             or not isinstance(list(idf_document.values())[0], float)):
@@ -343,8 +344,9 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
     if not isinstance(index, list) or not isinstance(file_path, str)\
             or len(index) == 0 or len(file_path) == 0:
         return None
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding="utf-8") as file:
         json.dump(index, file)
+    return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -361,8 +363,10 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
     """
     if not isinstance(file_path, str) or len(file_path) == 0:
         return None
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         result = json.load(file)
+    if not isinstance(result, list):
+        return None
     return result
 
 
@@ -379,4 +383,16 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
-
+    if not isinstance(rank, list) or not isinstance(golden_rank, list):
+        return None
+    if len(rank) != len(golden_rank) or len(rank) <= 1:
+        return None
+    summa = 0.0
+    for doc in rank:
+        if not isinstance(doc, int):
+            return None
+        if doc not in golden_rank:
+            continue
+        summa += ((rank.index(doc) - golden_rank.index(doc)) ** 2)
+    spearman = 1 - (6 * summa / (len(rank) * (len(rank) ** 2 - 1)))
+    return spearman

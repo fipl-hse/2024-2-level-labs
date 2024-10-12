@@ -24,10 +24,21 @@ def tokenize(text: str) -> list[str] | None:
 
     text_by_space = text.split(' ')
 
+    # divide by puncts if puncts are not last - ['the', 'first%', 'sentence><.', 'the', 'sec', '*ond', 'sent', 'ence', '#.']
+
+    cut_words = []
+
+    for place, word in enumerate(text_by_space):
+        for i, token in enumerate(word):
+            if not token.isalpha() and token != word[-1]:
+                cut_words.append(place, [word[:i], word[i+1:]])
+
+
+
+
+    # delete puncts - ['the', 'first', 'sentence', 'the', 'sec', 'ond', 'sent', 'ence', '']
     #
-    #
-    #
-    #
+    # delete empty lines - ['the', 'first', 'sentence', 'the', 'sec', 'ond', 'sent', 'ence']
     #
     #
     #

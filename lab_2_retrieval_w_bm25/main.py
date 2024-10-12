@@ -22,13 +22,12 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     tokens = []
-    word = []
     for elem in text.lower():
+        tokens.append(elem)
         if elem.isalpha():
-            word.append(elem)
-        else:
-            tokens.append(''.join(word))
-            word = []
+            continue
+        tokens[tokens.index(elem)] = " "
+    tokens = ''.join(tokens).split(' ')
     while '' in tokens:
         tokens.remove('')
     if not isinstance(tokens, list):

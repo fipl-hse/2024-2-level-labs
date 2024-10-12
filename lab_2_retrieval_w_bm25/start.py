@@ -53,6 +53,8 @@ def main() -> None:
                 tf_idf.append(tf_idf_doc)
     if tf_idf:
         result = tf_idf
+    else:
+        result = None
     assert result, "Result is None"
 
 

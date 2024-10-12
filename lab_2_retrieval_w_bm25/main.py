@@ -150,7 +150,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     document_counts = {word: 0 for word in vocab}
     for document in documents:
         for word in document:
-            if word in vocab and word not in document_counts:
+            if word in vocab:
                 document_counts[word] += 1
 
     total_documents = len(documents)

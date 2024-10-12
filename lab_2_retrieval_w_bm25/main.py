@@ -4,6 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 import copy
+import math
 
 
 # pylint:disable=too-many-arguments, unused-argument
@@ -71,6 +72,19 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(documents, list) or not all(isinstance(text, list) for text in documents)
+            or not documents):
+        return None
+    for text in documents:
+        for word in text:
+            if not isinstance(word, str):
+                return None
+    unique_words = []
+    for text in documents:
+        for word in text:
+            if word not in unique_words:
+                unique_words.append(word)
+    return unique_words
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -86,6 +100,16 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab)
+            or not vocab):
+        return None
+    if (not isinstance(document_tokens, list) or not all(isinstance(token, str) for token in document_tokens)
+            or not document_tokens):
+        return None
+    term_frequency = {}
+    for word in vocab:
+        term_frequency[word] = document_tokens.count(word) / len(document_tokens)
+    return term_frequency
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -101,6 +125,26 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab)
+            or not vocab):
+        return None
+    if (not isinstance(documents, list) or not all(isinstance(token, list) for token in documents)
+            or not documents):
+        return None
+    for text in documents:
+        for word in text:
+            if not isinstance(word, str):
+                return None
+    inverse_document_frequency = {}
+    n = len(documents)
+    for word in vocab:
+        docs_with_word = 0
+        for text in documents:
+            if word in text:
+                docs_with_word += 1
+        idf = math.log((n - docs_with_word + 0.5)/(docs_with_word + 0.5))
+        inverse_document_frequency[word] = idf
+    return inverse_document_frequency
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -116,6 +160,15 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tf, dict) or not isinstance(idf, dict):
+        return None
+    if (not all(isinstance(key, str) and isinstance(value, float) for key, value in tf.items())
+            or not all(isinstance(key, str) and isinstance(value, float) for key, value in idf.items())):
+        return None
+    tf_idf = {}
+    for k, v in tf.items():
+        tf_idf[k] = v * idf[k]
+    return tf_idf
 
 
 def calculate_bm25(

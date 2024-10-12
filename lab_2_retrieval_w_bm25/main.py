@@ -4,6 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
+from math import log
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -30,6 +31,7 @@ def tokenize(text: str) -> list[str] | None:
             if word:
                 tokenized_list.append(''.join(word))
                 word = []
+            continue
 
     if word:
         tokenized_list.append(''.join(word))
@@ -60,7 +62,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
             all(isinstance(word, str) for word in stopwords)
     ):
         return None
-    if len(tokens) == 0 or len(stopwords) == 0:
+    if not (len(tokens) and len(stopwords)):
         return None
 
     tokens_without_stopwords = []
@@ -83,6 +85,20 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(documents, list) or not documents:
+        return None
+
+    vocabulary = set()
+
+    for element in documents:
+        if not isinstance(element, list):
+            return None
+        for sub_element in element:
+            if not isinstance(sub_element, str):
+                return None
+            vocabulary.add(sub_element)
+
+    return list(vocabulary)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -98,6 +114,28 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(vocab, list) and isinstance(document_tokens, list)):
+        return None
+    if not (len(vocab) and len(document_tokens)):
+        return None
+    if not all(isinstance(element, str) for element in vocab) or not all(
+            isinstance(element, str) for element in document_tokens):
+        return None
+
+    tf_dict = {}
+
+    for word in document_tokens:
+        if word not in tf_dict:
+            tf_dict[word] = 0.0
+        for elem in vocab:
+            if elem not in tf_dict:
+                tf_dict[elem] = 0.0
+            tf_dict[word] = document_tokens.count(word) / len(document_tokens)
+
+    if not tf_dict:
+        return None
+
+    return tf_dict
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -113,6 +151,24 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(vocab, list) and isinstance(documents, list)):
+        return None
+    if not (len(vocab) and len(documents)):
+        return None
+    if not all(isinstance(element, str) for element in vocab):
+        return None
+    if not all(isinstance(element, list) and
+               all(isinstance(sub_elem, str) for sub_elem in element)
+               for element in documents):
+        return None
+
+    idf_dict = {}
+
+    for elem in documents:
+        if elem in vocab:
+            idf_dict[elem] = log(documents.count(elem) / len(vocab))
+
+    return idf_dict
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -128,6 +184,26 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(tf, dict) and isinstance(idf, dict)):
+        return None
+    if not tf or not idf:
+        return None
+    if (not all(isinstance(key, str) for key in tf.keys()) or
+            not all(isinstance(key, str) for key in idf.keys())):
+        return None
+    if (not all(isinstance(value, float) for value in tf.values()) or
+            not all(isinstance(value, float) for value in idf.values())):
+        return None
+
+    tf_idf = {}
+    for elem, term_frequency in tf.items():
+        if elem in idf:
+            tf_idf[elem] = term_frequency * idf[elem]
+
+    if not tf_idf:
+        return None
+
+    return tf_idf
 
 
 def calculate_bm25(

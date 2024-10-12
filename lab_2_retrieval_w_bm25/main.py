@@ -1,3 +1,5 @@
+import re
+
 """
 Lab 2.
 
@@ -18,7 +20,9 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    return None
+    if not isinstance(text, str):
+        return None
+    return re.findall(r'\b[^\d\W]+\b', text.lower())
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -34,6 +38,14 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tokens, list) or not isinstance(stopwords, list):
+        return None
+    if not tokens or any(not isinstance(token, str) for token in tokens):
+        return None
+    if not stopwords or any(not isinstance(stopword, str) for stopword in stopwords):
+        return None
+    cleaned_tokens = [token for token in tokens if token not in stopwords]
+    return cleaned_tokens if cleaned_tokens else None
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

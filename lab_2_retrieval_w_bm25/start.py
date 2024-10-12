@@ -20,6 +20,7 @@ def main() -> None:
         "assets/fairytale_9.txt",
         "assets/fairytale_10.txt",
     ]
+
     documents = []
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:

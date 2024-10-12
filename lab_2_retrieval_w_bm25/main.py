@@ -18,6 +18,7 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    return None
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:

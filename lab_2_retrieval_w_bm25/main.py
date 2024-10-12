@@ -3,6 +3,9 @@ Lab 2.
 
 Text retrieval with BM25
 """
+import copy
+
+
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -18,39 +21,15 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    '''if not isinstance(text, str):
-        return None
-    uncleared_text = text.lower().split(' ')
-    tokenized_text = []
-    for element in uncleared_text:
-        word = ''
-        for letter in element:
-            if letter.isalpha():
-                word += letter
-        tokenized_text.append(word)
-    return tokenized_text'''
-    '''if not isinstance(text, str):
+    if not isinstance(text, str):
         return None
     tokenized_text_str = ''
-    text = text.lower()
-    for element in text:
+    for element in text.lower():
         if element.isalpha() or element == ' ':
             tokenized_text_str += element
-    tokenized_text = tokenized_text_str.split(' ')
-    return tokenized_text'''
-    word = ''
-    tokenized_text = []
-    flag = True
-    for element in text:
-        if element.isalpha():
-            flag = True
-        while flag is True:
-            if element.isalpha():
-                word += element
-            else:
-                tokenized_text.append(word)
-                word = ''
-                flag = False
+        else:
+            tokenized_text_str += ' '
+    tokenized_text = tokenized_text_str.split()
     return tokenized_text
 
 
@@ -67,6 +46,17 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens)
+            or not tokens):
+        return None
+    if (not isinstance(stopwords, list) or not all(isinstance(words, str) for words in stopwords)
+            or not stopwords):
+        return None
+    new_tokens = copy.deepcopy(tokens)
+    for token in tokens:
+        if token in stopwords:
+            new_tokens.remove(token)
+    return new_tokens
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

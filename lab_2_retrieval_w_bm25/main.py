@@ -221,7 +221,69 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+def calculate_bm25(
+    vocab: list[str],
+    document: list[str],
+    idf_document: dict[str, float],
+    k1: float = 1.5,
+    b: float = 0.75,
+    avg_doc_len: float | None = None,
+    doc_len: int | None = None,
+) -> dict[str, float] | None:
+    """
+    Calculate BM25 scores for a document.
 
+    Args:
+        vocab (list[str]): Vocabulary list.
+        document (list[str]): Tokenized document.
+        idf_document (dict[str, float]): Inverse document frequencies.
+        k1 (float): BM25 parameter.
+        b (float): BM25 parameter.
+        avg_doc_len (float | None): Average document length.
+        doc_len (int | None): Length of the document.
+
+    Returns:
+        dict[str, float] | None: Mapping from terms to their BM25 scores.
+
+    In case of corrupt input arguments, None is returned.
+    """
+    if (not isinstance(vocab, list)
+            or not all(isinstance(word_in_vocab, str) for word_in_vocab in vocab)
+            or not vocab):
+        return None
+    if (not isinstance(document, list)
+            or not all(isinstance(el, str) for el in document)
+            or not document):
+        return None
+    if (not isinstance(idf_document, dict)
+            or not all(isinstance(key_in_idf_dict, str) for key_in_idf_dict in idf_document.keys())
+            or not all(isinstance(value_in_idf_dict, float) for value_in_idf_dict in idf_document.values())
+            or not idf_document):
+        return None
+    if (not isinstance(k1, float) or not isinstance(b, float)
+            or not isinstance(avg_doc_len, float)
+            or not isinstance(doc_len, int)
+            or isinstance(doc_len, bool)):
+        return None
+
+    bm25_dict = {}
+
+    for word_from_doc in document:
+        bm25_dict[word_from_doc] = 0.0
+
+    for word_from_idf in idf_document.keys():
+        if word_from_idf not in vocab:
+            return None
+        if word_from_idf not in bm25_dict:
+            bm25_dict[word_from_idf] = 0.0
+        freq = document.count(word_from_idf)
+        bm25_figure = (idf_document[word_from_idf] * ((freq * (k1 + 1)) /
+                                                (freq + k1 * (1 - b + b * (doc_len / avg_doc_len)))))
+        bm25_dict[word_from_idf] = bm25_figure
+
+    if not bm25_dict:
+        return None
+    return bm25_dict
 
 def rank_documents(
     indexes: list[dict[str, float]], query: str, stopwords: list[str]
@@ -239,6 +301,39 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(indexes, list) or not all(isinstance(dict_in_indexes, dict) for dict_in_indexes in indexes):
+        return None
+    for dict_in_indexes in indexes:
+        for key, value in dict_in_indexes.items():
+            if not isinstance(key, str) or not isinstance(value, float):
+                return None
+    if (not isinstance(stopwords, list)
+            or not all(isinstance(word, str) for word in stopwords)
+            or not isinstance(query, str)):
+        return None
+
+    tokenized_query = tokenize(query)
+    if not isinstance(tokenized_query, list):
+        return None
+    tokenized_query_without_stopwords = remove_stopwords(tokenized_query, stopwords)
+    if not isinstance(tokenized_query_without_stopwords, list):
+        return None
+    list_of_tuples_DictIndex_ItsRelevance = []
+
+    for dict_index, dict_at_the_index in enumerate(indexes):
+        relevance_of_the_particular_doc = 0.0
+        for word in tokenized_query_without_stopwords:
+            if word in dict_at_the_index:
+                relevance_of_the_particular_doc += dict_at_the_index[word]
+        list_of_tuples_DictIndex_ItsRelevance.append((dict_index, relevance_of_the_particular_doc))
+
+    for a in range(len(list_of_tuples_DictIndex_ItsRelevance) - 1):
+        for b in range(len(list_of_tuples_DictIndex_ItsRelevance) - a - 1):
+            if list_of_tuples_DictIndex_ItsRelevance[b][1] < list_of_tuples_DictIndex_ItsRelevance[b + 1][1]:
+                list_of_tuples_DictIndex_ItsRelevance[b], list_of_tuples_DictIndex_ItsRelevance[b + 1] = list_of_tuples_DictIndex_ItsRelevance[b + 1], list_of_tuples_DictIndex_ItsRelevance[b]
+    if not list_of_tuples_DictIndex_ItsRelevance:
+        return None
+    return list_of_tuples_DictIndex_ItsRelevance
 
 
 def calculate_bm25_with_cutoff(

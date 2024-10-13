@@ -3,7 +3,8 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
-                                         calculate_tf, calculate_tf_idf, remove_stopwords, tokenize)
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -42,12 +43,16 @@ def main() -> None:
             idf_dict = calculate_idf(build_vocabulary(tokenized_documents), tokenized_documents)
             tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
 
-            '''avg_doc_len = len
-            for list_of_tokens in documents:
-                doc_len = len(list_of_tokens)
-                bm_25 = calculate_bm25(build_vocabulary(tokenized_documents),
-                                   tokenized_documents, idf_dict,
-                                   1.5, 0.75, avg_doc_len, doc_len)'''
+        avg_doc_len_list = []
+        for tokenized_doc in tokenized_documents:
+            avg_doc_len_list.append(len(tokenized_doc))
+        avg_doc_len = sum(avg_doc_len_list)/len(tokenized_doc)
+
+        for list_of_tokens in documents:
+            doc_len = len(list_of_tokens)
+            bm_25 = calculate_bm25(build_vocabulary(tokenized_documents),
+                               tokenized_documents, idf_dict,
+                               1.5, 0.75, avg_doc_len, doc_len)
 
     if (not isinstance(tf_idf_dict, dict) or not tf_idf_dict
             or not all(isinstance(tf_idf_dict_keys, str) for tf_idf_dict_keys in tf_idf_dict.keys()
@@ -55,7 +60,10 @@ def main() -> None:
                        for tf_idf_dict_values in tf_idf_dict.values()))):
         return
 
-    result = tf_idf_dict
+    rank_result = rank_documents(tf_idf_dict, '', stopwords)
+    rank_result = rank_documents(bm_25, '', stopwords)
+
+    result = bm_25
     assert result, "Result is None"
 
 

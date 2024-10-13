@@ -301,16 +301,16 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(indexes, list) or not all(isinstance(dict_in_indexes, dict) for dict_in_indexes in indexes):
+    if (not isinstance(indexes, list)
+        or not all(isinstance(dict_in_indexes, dict) for dict_in_indexes in indexes)
+        or not isinstance(stopwords, list)
+        or not all(isinstance(word, str) for word in stopwords)
+            or not isinstance(query, str)):
         return None
     for dict_in_indexes in indexes:
         for key, value in dict_in_indexes.items():
             if not isinstance(key, str) or not isinstance(value, float):
                 return None
-    if (not isinstance(stopwords, list)
-            or not all(isinstance(word, str) for word in stopwords)
-            or not isinstance(query, str)):
-        return None
 
     tokenized_query = tokenize(query)
     if not isinstance(tokenized_query, list):
@@ -329,8 +329,11 @@ def rank_documents(
 
     for a in range(len(list_of_tuples_DictIndex_ItsRelevance) - 1):
         for b in range(len(list_of_tuples_DictIndex_ItsRelevance) - a - 1):
-            if list_of_tuples_DictIndex_ItsRelevance[b][1] < list_of_tuples_DictIndex_ItsRelevance[b + 1][1]:
-                list_of_tuples_DictIndex_ItsRelevance[b], list_of_tuples_DictIndex_ItsRelevance[b + 1] = list_of_tuples_DictIndex_ItsRelevance[b + 1], list_of_tuples_DictIndex_ItsRelevance[b]
+            if (list_of_tuples_DictIndex_ItsRelevance[b][1] <
+                    list_of_tuples_DictIndex_ItsRelevance[b + 1][1]):
+                list_of_tuples_DictIndex_ItsRelevance[b], list_of_tuples_DictIndex_ItsRelevance[b + 1]\
+                    = list_of_tuples_DictIndex_ItsRelevance[b + 1], list_of_tuples_DictIndex_ItsRelevance[b]
+
     if not list_of_tuples_DictIndex_ItsRelevance:
         return None
     return list_of_tuples_DictIndex_ItsRelevance

@@ -249,15 +249,16 @@ def calculate_bm25(
     """
     if (not isinstance(vocab, list)
             or not all(isinstance(word_in_vocab, str) for word_in_vocab in vocab)
-            or not vocab):
-        return None
-    if (not isinstance(document, list)
+            or not vocab
+            or not isinstance(document, list)
             or not all(isinstance(el, str) for el in document)
             or not document):
         return None
     if (not isinstance(idf_document, dict)
-            or not all(isinstance(key_in_idf_dict, str) for key_in_idf_dict in idf_document.keys())
-            or not all(isinstance(value_in_idf_dict, float) for value_in_idf_dict in idf_document.values())
+            or not all(isinstance(key_in_idf_dict, str)
+                       for key_in_idf_dict in idf_document.keys())
+            or not all(isinstance(value_in_idf_dict, float)
+                       for value_in_idf_dict in idf_document.values())
             or not idf_document):
         return None
     if (not isinstance(k1, float) or not isinstance(b, float)
@@ -277,13 +278,15 @@ def calculate_bm25(
         if word_from_idf not in bm25_dict:
             bm25_dict[word_from_idf] = 0.0
         freq = document.count(word_from_idf)
-        bm25_figure = (idf_document[word_from_idf] * ((freq * (k1 + 1)) /
-                                                (freq + k1 * (1 - b + b * (doc_len / avg_doc_len)))))
+        bm25_figure = (idf_document[word_from_idf]
+                       * ((freq * (k1 + 1)) / (freq + k1
+                                               * (1 - b + b * (doc_len / avg_doc_len)))))
         bm25_dict[word_from_idf] = bm25_figure
 
     if not bm25_dict:
         return None
     return bm25_dict
+
 
 def rank_documents(
     indexes: list[dict[str, float]], query: str, stopwords: list[str]
@@ -318,25 +321,28 @@ def rank_documents(
     tokenized_query_without_stopwords = remove_stopwords(tokenized_query, stopwords)
     if not isinstance(tokenized_query_without_stopwords, list):
         return None
-    list_of_tuples_DictIndex_ItsRelevance = []
+    l_of_tuples_dict_plus_its_relevnce = []
 
     for dict_index, dict_at_the_index in enumerate(indexes):
         relevance_of_the_particular_doc = 0.0
         for word in tokenized_query_without_stopwords:
             if word in dict_at_the_index:
                 relevance_of_the_particular_doc += dict_at_the_index[word]
-        list_of_tuples_DictIndex_ItsRelevance.append((dict_index, relevance_of_the_particular_doc))
+        l_of_tuples_dict_plus_its_relevnce.append((dict_index,
+                                                      relevance_of_the_particular_doc))
 
-    for a in range(len(list_of_tuples_DictIndex_ItsRelevance) - 1):
-        for b in range(len(list_of_tuples_DictIndex_ItsRelevance) - a - 1):
-            if (list_of_tuples_DictIndex_ItsRelevance[b][1] <
-                    list_of_tuples_DictIndex_ItsRelevance[b + 1][1]):
-                list_of_tuples_DictIndex_ItsRelevance[b], list_of_tuples_DictIndex_ItsRelevance[b + 1]\
-                    = list_of_tuples_DictIndex_ItsRelevance[b + 1], list_of_tuples_DictIndex_ItsRelevance[b]
+    for a in range(len(l_of_tuples_dict_plus_its_relevnce) - 1):
+        for b in range(len(l_of_tuples_dict_plus_its_relevnce) - a - 1):
+            if (l_of_tuples_dict_plus_its_relevnce[b][1] <
+                    l_of_tuples_dict_plus_its_relevnce[b + 1][1]):
+                (l_of_tuples_dict_plus_its_relevnce[b],
+                 l_of_tuples_dict_plus_its_relevnce[b + 1])\
+                    = (l_of_tuples_dict_plus_its_relevnce[b + 1],
+                       l_of_tuples_dict_plus_its_relevnce[b])
 
-    if not list_of_tuples_DictIndex_ItsRelevance:
+    if not l_of_tuples_dict_plus_its_relevnce:
         return None
-    return list_of_tuples_DictIndex_ItsRelevance
+    return l_of_tuples_dict_plus_its_relevnce
 
 
 def calculate_bm25_with_cutoff(

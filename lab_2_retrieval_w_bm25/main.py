@@ -30,6 +30,8 @@ def tokenize(text: str) -> list[str] | None:
         else:
             only_letters_text += ' '
     tokenized_text = only_letters_text.split()
+    if not tokenized_text:
+        return None
     return tokenized_text
 
 
@@ -56,6 +58,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         return None
 
     document_tokens = [word for word in tokens if word not in stopwords]
+    if not document_tokens:
+        return None
     return document_tokens
 
 
@@ -78,6 +82,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         if not all(isinstance(token, str) for token in list_of_tokens):
             return None
     words_from_all_docs_list = list(set(word for sublist in documents for word in sublist))
+
     if not words_from_all_docs_list:
         return None
     return list(words_from_all_docs_list)
@@ -195,32 +200,6 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     return tf_idf_dict
 
 
-def calculate_bm25(
-    vocab: list[str],
-    document: list[str],
-    idf_document: dict[str, float],
-    k1: float = 1.5,
-    b: float = 0.75,
-    avg_doc_len: float | None = None,
-    doc_len: int | None = None,
-) -> dict[str, float] | None:
-    """
-    Calculate BM25 scores for a document.
-
-    Args:
-        vocab (list[str]): Vocabulary list.
-        document (list[str]): Tokenized document.
-        idf_document (dict[str, float]): Inverse document frequencies.
-        k1 (float): BM25 parameter.
-        b (float): BM25 parameter.
-        avg_doc_len (float | None): Average document length.
-        doc_len (int | None): Length of the document.
-
-    Returns:
-        dict[str, float] | None: Mapping from terms to their BM25 scores.
-
-    In case of corrupt input arguments, None is returned.
-    """
 def calculate_bm25(
     vocab: list[str],
     document: list[str],

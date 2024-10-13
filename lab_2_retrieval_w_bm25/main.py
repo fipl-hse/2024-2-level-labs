@@ -164,11 +164,19 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     idf_dict = {}
 
-    for elem in documents:
-        if elem in vocab:
-            idf_dict[elem] = log(documents.count(elem) / len(vocab))
+    for doc in documents:
+        for token in set(doc):
+            if token in vocab:
+                if not (token in idf_dict.keys()):
+                    idf_dict[token] = 1
+                else:
+                    idf_dict[token] += 1
 
-    return idf_dict
+    idf_final = {}
+    for i in idf_dict.keys():
+        idf_final[i] = log((len(documents) - idf_dict[i] + 0.5) / (idf_dict[i] + 0.5))
+
+    return idf_final
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -232,42 +240,41 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not (isinstance(vocab, list) and all(isinstance(elem, str) for elem in vocab)):
+    if not (isinstance(vocab, list) and all(isinstance(elem, str) for elem in vocab) and vocab):
         return None
-    if not (isinstance(document, list) and all(isinstance(elem, str) for elem in document)):
-        return None
-    if not (len(vocab) and len(document)):
+    if (not (isinstance(document, list) 
+             and all(isinstance(elem, str) for elem in document) and document)):
         return None
 
     if (not isinstance(idf_document, dict) or
             not all(isinstance(key, str) and isinstance(value, float)
-                    for key, value in idf_document.items())):
-        return None
-    if not idf_document:
+                    for key, value in idf_document.items()) or not idf_document):
         return None
 
     if not (isinstance(k1, float) and isinstance(b, float)):
         return None
 
-    if avg_doc_len is not None and not isinstance(avg_doc_len, float):
+    if not (isinstance(avg_doc_len, float)) or avg_doc_len is None:
         return None
-    if doc_len is not None and not isinstance(doc_len, int):
-        return None
-    if avg_doc_len is None or doc_len is None:
+
+    if not (isinstance(doc_len, int)) or doc_len is None or isinstance(doc_len, bool):
         return None
 
     bm25_dict = {}
 
-    for i in vocab:
-        if i not in bm25_dict:
-            bm25_dict[i] = 0.0
-        for elem in idf_document:
-            frequency = document.count(elem)
-            bm25_score = idf_document[elem] * ((frequency * (k1 + 1)) / (frequency + k1 * (1 - b + b * (doc_len / avg_doc_len))))
-            bm25_dict[elem] = bm25_score
+    for word in vocab:
+        bm25_dict[word] = 0.0
 
-    if not bm25_dict:
-        return None
+    for doc_word in document:
+        bm25_dict[doc_word] = 0.0
+
+    for elem in idf_document:
+        frequency = document.count(elem)
+        bm25_score = (idf_document[elem] *
+                      ((frequency * (k1 + 1)) / (frequency + k1 * (
+                              1 - b + b * (doc_len / avg_doc_len)
+                      ))))
+        bm25_dict[elem] = bm25_score
 
     return bm25_dict
 
@@ -288,6 +295,49 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (
+        not isinstance(indexes, list) or
+        not all(
+            isinstance(elem, dict) and
+            all(
+                isinstance(key, str) and
+                isinstance(value, float) for key, value in elem.items()
+            ) for elem in indexes
+        )
+    ):
+        return None
+    if not isinstance(query, str):
+        return None
+    if not isinstance(stopwords, list) or not all(isinstance(elem, str) for elem in stopwords):
+        return None
+
+    tokenized_query = tokenize(query)
+    if not isinstance(tokenized_query, list):
+        return None
+
+    final_query = remove_stopwords(tokenized_query, stopwords)
+    if not isinstance(final_query, list):
+        return None
+
+    ranged_documents = []
+
+    for index, index_value in enumerate(indexes):
+        score = 0.0
+        for word in final_query:
+            if word in index_value:
+                score += index_value[word]
+        ranged_documents.append((index, score))
+
+    for i in range(len(ranged_documents) - 1):
+        for j in range(len(ranged_documents) - i - 1):
+            if ranged_documents[j][1] < ranged_documents[j + 1][1]:
+                (ranged_documents[j], ranged_documents[j + 1]) = (ranged_documents[j + 1],
+                                                                  ranged_documents[j])
+
+    if not ranged_documents:
+        return None
+
+    return ranged_documents
 
 
 def calculate_bm25_with_cutoff(

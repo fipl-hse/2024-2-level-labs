@@ -22,30 +22,29 @@ def tokenize(text: str) -> list[str] | None:
         return None
     # divide by spaces - ['the', 'first%', 'sentence><.', 'the', 'sec&*ond', 'sent@ence', '#.']
 
+    text = text.lower()
     text_by_space = text.split(' ')
 
-    # divide by puncts if puncts are not last - ['the', 'first%', 'sentence><.', 'the', 'sec', '*ond', 'sent', 'ence', '#.']
-
-    cut_words = []
-
-    for place, word in enumerate(text_by_space):
+    separ_text = []
+    for word in text_by_space:
         for i, token in enumerate(word):
-            if not token.isalpha() and token != word[-1]:
-                cut_words.append(place, [word[:i], word[i+1:]])
+            if not token.isalpha() and word[:i] and word[i + 1:]:
+                separ_text.extend([word[:i], word[i + 1:]])
+                break
+        else:
+            separ_text.append(word)
 
+    clean_text = []
+    for word in separ_text:
+        clean_word = ''
+        for token in word:
+            if not token.isalpha():
+                continue
+            clean_word += token
+        if clean_word:
+            clean_text.append(clean_word)
 
-
-
-    # delete puncts - ['the', 'first', 'sentence', 'the', 'sec', 'ond', 'sent', 'ence', '']
-    #
-    # delete empty lines - ['the', 'first', 'sentence', 'the', 'sec', 'ond', 'sent', 'ence']
-    #
-    #
-    #
-    #
-
-
-
+    return clean_text
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -61,6 +60,32 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    clean_tokens = []
+
+    if not isinstance(tokens, list):
+        return None
+
+    if not isinstance(stopwords, list) or not stopwords:
+        return None
+
+    for word in stopwords:
+        if not isinstance(word, str):
+            return None
+
+    for token in tokens:
+        if not isinstance(token, str):
+            clean_tokens = None
+            break
+        elif token in stopwords:
+            continue
+        clean_tokens.append(token)
+    if clean_tokens:
+        return clean_tokens
+    else:
+        return None
+
+    # remove_stopwords(['there', 'was', 'a', 'boy', 'named, 'henry'], ['was', 'named'])
+    # ---> ['there', 'a', 'boy', 'henry']
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

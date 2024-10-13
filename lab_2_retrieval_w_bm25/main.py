@@ -74,7 +74,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     result = set()
     for doc in documents:
-        result = result | set(doc)
+        result |= set(doc)
     return list(result)
 
 

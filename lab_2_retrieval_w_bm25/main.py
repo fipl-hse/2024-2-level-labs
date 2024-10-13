@@ -30,7 +30,7 @@ def tokenize(text: str) -> list[str] | None:
         else:
             only_letters_text += ' '
     tokenized_text = only_letters_text.split()
-    if not tokenized_text:
+    if not all(isinstance(symbol, str) for symbol in tokenized_text):
         return None
     return tokenized_text
 

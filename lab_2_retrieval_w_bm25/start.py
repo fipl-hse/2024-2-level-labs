@@ -34,8 +34,8 @@ def main() -> None:
             tokenized_documents.append(list_of_tokens)
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    #result = tokenized_documents
-    #assert result, "Result is None"
+    result = tokenized_documents
+    assert result, "Result is None"
 
 
 if __name__ == "__main__":

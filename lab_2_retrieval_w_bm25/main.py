@@ -242,8 +242,8 @@ def calculate_bm25(
     """
     if not (isinstance(vocab, list) and all(isinstance(elem, str) for elem in vocab) and vocab):
         return None
-    if (not (isinstance(document, list) 
-             and all(isinstance(elem, str) for elem in document) and document)):
+    if (not (isinstance(document, list) and all(isinstance(elem, str) for elem in document)
+             and document)):
         return None
 
     if (not isinstance(idf_document, dict) or

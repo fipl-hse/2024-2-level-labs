@@ -34,6 +34,9 @@ def main() -> None:
             i += 1
             tokenized_documents.append(list_of_tokens)
 
+    if not isinstance(documents, list):
+        return None
+
     with (open("assets/stopwords.txt", "r", encoding="utf-8") as file):
         stopwords = file.read().split("\n")
 

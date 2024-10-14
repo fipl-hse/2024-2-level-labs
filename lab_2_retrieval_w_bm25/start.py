@@ -58,7 +58,7 @@ def main() -> None:
         if tokenized_document is None:
             return
         length = len(tokenized_document)
-        # print(tokenized_document)
+        print(tokenized_document)
         tf_dict = calculate_tf(vocab, tokenized_document)
         if tf_dict is not None:
             tf_idf_for_doc = calculate_tf_idf(tf_dict, idf)
@@ -71,16 +71,14 @@ def main() -> None:
             vocab, tokenized_document, idf, alpha, k1, b, avg, length)
         if bm_w_cutoff_for_doc is not None:
             bm_w_cutoff_list.append(bm_w_cutoff_for_doc)
-    # print(tf_idf_list)
-    # print(bm_list)
+    print(tf_idf_list)
+    print(bm_list)
     tf_idf_rank_tuples = rank_documents(tf_idf_list, query, stopwords)
-    if tf_idf_rank_tuples is None or not isinstance(tf_idf_rank_tuples, list):
-        return
-    tf_idf_rank = [rank for rank, score in tf_idf_rank_tuples]
     bm_rank_tuples = rank_documents(bm_list, query, stopwords)
-    if bm_rank_tuples is None:
+    if tf_idf_rank_tuples is None or bm_rank_tuples is None:
         return
     print(tf_idf_rank_tuples, bm_rank_tuples)
+    tf_idf_rank = [tup[0] for tup in tf_idf_rank_tuples]
     bm_rank = [tup[0] for tup in bm_rank_tuples]
     save_index(bm_w_cutoff_list, 'assets/metrics.json')
     loaded_docs_list = load_index('assets/metrics.json')

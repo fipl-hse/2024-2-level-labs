@@ -35,11 +35,7 @@ def main() -> None:
             return None
         tokenized_documents.append(list_of_tokens)
 
-    '''for every in documents:
-        if every is None:
-            return None'''
-
-    with (open("assets/stopwords.txt", "r", encoding="utf-8") as file):
+    with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
         if stopwords is None or documents is None or tokenized_documents is None:
@@ -67,7 +63,7 @@ def main() -> None:
                 return None
             list_of_tf_idf_dict.append(tf_idf_dict)
 
-        if list_of_tf_idf_dict is None or idf_dict is None:
+        if list_of_tf_idf_dict is None:
             return None
 
         avg_doc_len_list = []

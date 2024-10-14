@@ -32,10 +32,12 @@ def main() -> None:
     clean_documents = []
     for document in documents:
         tokenized_document = tokenize(document)
-        if tokenized_document:
-            clean_document = remove_stopwords(tokenized_document, stopwords)
-            if clean_document:
-                clean_documents.append(clean_document)
+        if not tokenized_document:
+            return None
+        clean_document = remove_stopwords(tokenized_document, stopwords)
+        if not clean_document:
+            return None
+        clean_documents.append(clean_document)
     vocab = build_vocabulary(clean_documents)
     if not vocab:
         return None

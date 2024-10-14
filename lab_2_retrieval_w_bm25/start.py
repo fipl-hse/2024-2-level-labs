@@ -89,6 +89,8 @@ def main() -> None:
     rank_result = rank_documents(list_of_dict_with_bm25,
                                  'A story about a wizard boy in a tower!', stopwords)
 
+    if not rank_result:
+        return None
     result = rank_result
     assert result, "Result is None"
 

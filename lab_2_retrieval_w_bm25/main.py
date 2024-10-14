@@ -222,8 +222,8 @@ def calculate_bm25(
                  or not all(isinstance(key, str) for key in idf_document.keys())
                  or not all(isinstance(value, float) for value in idf_document.values())
                  or not isinstance(k1, float) or not isinstance(b, float)
-                 or not isinstance(avg_doc_len, float) or avg_doc_len is None
-                 or not isinstance(doc_len, int) or doc_len is None
+                 or not isinstance(avg_doc_len, float)
+                 or not isinstance(doc_len, int)
                  or isinstance(doc_len, bool))
 
     if bad_input:
@@ -235,7 +235,8 @@ def calculate_bm25(
         token_count = 0
         if token in document:
             token_count += document.count(token)
-        if token in idf_document.keys():
+        if (token in idf_document.keys() and
+                doc_len is not None and avg_doc_len is not None):
             bm25_dict[token] = (idf_document[token] *
                                 ((token_count * (k1 + 1)) /
                                  (token_count + k1 * (1 - b + b *

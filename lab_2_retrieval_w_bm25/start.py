@@ -48,23 +48,24 @@ def main() -> None:
     print('\n Tf-idf dictionaries \n')
 
     vocab = build_vocabulary(tokenized_documents)
-    idf = calculate_idf(vocab, tokenized_documents)
-    tf_idf_list = []
-    bm25_list = []
-    avg_doc_len = total_number_words / len(documents)
-    if vocab is not None and idf is not None:
-        for document in tokenized_documents:
-            tf = calculate_tf(vocab, document)
-            doc_len = len(document)
-            if tf is not None:
-                tf_idf = calculate_tf_idf(tf, idf)
-                if tf_idf is not None:
-                    tf_idf_list.append(tf_idf)
-                    print(tf_idf)
+    if vocab is not None:
+        idf = calculate_idf(vocab, tokenized_documents)
+        if idf is not None:
+            tf_idf_list = []
+            bm25_list = []
+            avg_doc_len = total_number_words / len(documents)
+            for document in tokenized_documents:
+                tf = calculate_tf(vocab, document)
+                doc_len = len(document)
+                if tf is not None:
+                    tf_idf = calculate_tf_idf(tf, idf)
+                    if tf_idf is not None:
+                        tf_idf_list.append(tf_idf)
+                        print(tf_idf)
 
-            bm25 = calculate_bm25(vocab, document, idf, 1.5, 0.75, avg_doc_len, doc_len)
-            if bm25 is not None:
-                bm25_list.append(bm25)
+                bm25 = calculate_bm25(vocab, document, idf, 1.5, 0.75, avg_doc_len, doc_len)
+                if bm25 is not None:
+                    bm25_list.append(bm25)
 
     print('\n Ranking documents using tf-idf:\n')
     print(rank_documents(tf_idf_list, 'Which fairy tale has Fairy Queen?', stopwords))

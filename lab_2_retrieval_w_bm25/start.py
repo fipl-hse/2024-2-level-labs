@@ -48,11 +48,12 @@ def main() -> None:
                               remove_stopwords(tokenized_documents, stopwords))
             idf_dict = calculate_idf(build_vocabulary(tokenized_documents), tokenized_documents)
 
-            if (not isinstance(tf_dict, dict) or not tf_idf_dict
+            if (not isinstance(tf_dict, dict)
                     or not all(isinstance(tf_dict_keys, str)
                                for tf_dict_keys in tf_dict.keys()
                     or not isinstance(idf_dict, dict) or not all(isinstance(idf_dict_values, float)
-                               for idf_dict_values in idf_dict.values()))):
+                               for idf_dict_values in idf_dict.values()))
+                    or tf_dict is None or idf_dict is None):
                 return None
 
             tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)

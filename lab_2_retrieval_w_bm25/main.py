@@ -52,7 +52,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     if not tokens or not stopwords \
             or not isinstance(tokens, list) or not isinstance(stopwords, list) \
-            or not all(isinstance(token, str) for token in tokens):
+            or not all(isinstance(token, str) for token in tokens)\
+            or not all(token for token in tokens):
         return None
 
     tokens_prep = []
@@ -76,7 +77,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
 
     if not documents or not isinstance(documents, list) \
-            or not all(isinstance(lst_tokens, list) for lst_tokens in documents):
+            or not all(isinstance(lst_tokens, list) for lst_tokens in documents) \
+            or not all(lst_tokens for lst_tokens in documents):
         return None
 
     unique_words = []
@@ -166,10 +168,19 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     """
 
     if not tf or not isinstance(tf, dict) \
-            or not idf or not isinstance(idf, dict):
+            or not idf or not isinstance(idf, dict) \
+            or not tf.keys() or not tf.values() \
+            or not all(isinstance(key, str) for key in tf.keys()) \
+            or not all(isinstance(value, float) for value in tf.values()) \
+            or not idf.keys() or not idf.values() \
+            or not all(isinstance(key, str) for key in idf.keys()) \
+            or not all(isinstance(value, float) for value in idf.values()):
         return None
 
-#    tf_idf_vocab = dict(list(tf.items()) * list(idf.items()))
+    tf_idf_vocab = {}
+    for token in tf:
+        tf_idf_vocab[token] = tf[token] * idf[token]
+    return tf_idf_vocab
 
 
 def calculate_bm25(

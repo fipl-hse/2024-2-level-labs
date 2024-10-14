@@ -30,7 +30,12 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = print(build_vocabulary())
+    tok_docs = []
+    for doc in documents:
+        tokens = remove_stopwords(tokenize(doc), stopwords)
+        tok_docs.append(tokens)
+    vocab = build_vocabulary(tok_docs)
+    result = calculate_tf_idf(calculate_tf(vocab, documents), calculate_idf(vocab, tok_docs))
     assert result, "Result is None"
 
 

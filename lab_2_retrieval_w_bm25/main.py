@@ -207,6 +207,29 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(document, list)\
+        or not isinstance(idf_document, dict) or not isinstance(k1, float)\
+        or not isinstance(b, float) or not isinstance(avg_doc_len, float)\
+        or not isinstance(doc_len, int) or not vocab or not document or doc_len is True\
+        or not idf_document:
+        return None
+    for elem in vocab:
+        if not isinstance(elem, str):
+            return None
+    for elem in document:
+        if not isinstance(elem, str):
+            return None
+    for key, value in idf_document.items():
+        if not isinstance(key, str) or not isinstance(value, float):
+            return None
+    bm25 = {}
+    for word in document:
+        if word not in vocab:
+            bm25[word] = 0.0
+    for key in vocab:
+        bm25[key] = (idf_document[key]*(document.count(key)*(k1+1))/
+                     (document.count(key)+k1*(1-b+b*(doc_len/avg_doc_len))))
+    return bm25
 
 
 def rank_documents(
@@ -225,6 +248,27 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(indexes, list) or not isinstance(query, str) or not indexes or not query:
+        return None
+    for elem in indexes:
+        if not isinstance(elem, dict) or not elem:
+            return None
+    tokens_query = tokenize(query)
+    if not isinstance(tokens_query, list):
+        return None
+    lst_query = remove_stopwords(tokens_query, stopwords)
+    if lst_query is None:
+        return None
+    rang = []
+    for i, dictionary in enumerate(indexes):
+        summary = 0.0
+        for word in lst_query:
+            if word not in dictionary:
+                continue
+            summary += dictionary[word]
+        rang.append((i, round(summary, 4)))
+    rang = sorted(rang, key = lambda x: x[1], reverse = True)
+    return rang
 
 
 def calculate_bm25_with_cutoff(

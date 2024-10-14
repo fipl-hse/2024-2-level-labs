@@ -2,8 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -42,13 +43,27 @@ def main() -> None:
     if not isinstance(vocab, list):
         return None
     idf = calculate_idf(vocab, doc_tokens)
+    if not isinstance(idf, dict):
+        return None
     for lst in doc_tokens:
         tf = calculate_tf(vocab, lst)
-        if not isinstance(tf, dict) or not isinstance(idf, dict):
+        if not isinstance(tf, dict):
             return None
         tf_idf.append(calculate_tf_idf(tf, idf))
-    result = tf_idf
-    print(tf_idf)
+    indexes = []
+    length_all = 0.0
+    for lst in doc_tokens:
+        length_all += len(lst)
+    avg_doc_len = length_all/len(doc_tokens)
+    for lst in doc_tokens:
+        index = calculate_bm25(vocab, lst, idf,
+                               1.5, 0.75,
+                               avg_doc_len, len(doc_tokens))
+        if not isinstance(index, dict):
+            return None
+        indexes.append(index)
+    result = rank_documents(indexes, 'Which fairy tale has Fairy Queen?', stopwords)
+    print(result)
     assert result, "Result is None"
 
 

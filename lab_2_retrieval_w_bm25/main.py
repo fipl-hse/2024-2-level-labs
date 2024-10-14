@@ -31,7 +31,7 @@ def tokenize(text: str) -> list[str] | None:
             word = []
     if word:
         tokens.append(''.join(word))
-    return tokens or None
+    return tokens
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -52,7 +52,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         return None
     if not all(isinstance(token, str) for token in tokens) or not all(isinstance(word, str) for word in stopwords):
         return None
-    return [token for token in tokens if token not in stopwords]
+    return [token for token in tokens if token not in stopwords] or None
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """

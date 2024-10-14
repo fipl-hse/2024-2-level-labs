@@ -35,7 +35,9 @@ def main() -> None:
             tokenized_documents.append(list_of_tokens)
 
     if (not isinstance(documents, list)
-            or not all(isinstance(el, str) for el in documents)):
+            or not all(isinstance(el, str) for el in documents)
+            or not isinstance(tokenized_documents, list)
+            or not all(isinstance(list_of_tokens, list) for list_of_tokens in tokenized_documents)):
         return None
 
     with (open("assets/stopwords.txt", "r", encoding="utf-8") as file):

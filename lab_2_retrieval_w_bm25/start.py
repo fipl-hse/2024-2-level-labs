@@ -34,17 +34,13 @@ def main() -> None:
             i += 1
             tokenized_documents.append(list_of_tokens)
 
-    if (not isinstance(documents, list)
-            or not all(isinstance(el, str) for el in documents)
-            or not isinstance(tokenized_documents, list)
-            or not all(isinstance(list_of_tokens, list) for list_of_tokens in tokenized_documents)):
+    if documents is None or tokenized_documents is None:
         return None
 
     with (open("assets/stopwords.txt", "r", encoding="utf-8") as file):
         stopwords = file.read().split("\n")
 
-        if (not isinstance(stopwords, list)
-                or not all(isinstance(el, str) for el in stopwords)):
+        if stopwords is None:
             return None
 
         for doc in tokenized_documents:
@@ -65,18 +61,16 @@ def main() -> None:
             avg_doc_len_list.append(len(tokenized_doc))
         avg_doc_len = sum(avg_doc_len_list)/len(tokenized_doc)
 
-        for list_of_tokens in documents:
-            if (not isinstance(avg_doc_len, float)
-                    or not isinstance(list_of_tokens, list)
-                    or not isinstance(len(list_of_tokens), int)):
-                return None
-            doc_len = len(list_of_tokens)
-            bm_25 = calculate_bm25(build_vocabulary(tokenized_documents),
-                               tokenized_documents, idf_dict,
-                               1.5, 0.75, avg_doc_len, doc_len)
+        doc_len = len(list_of_tokens)
+        bm_25 = calculate_bm25(build_vocabulary(tokenized_documents),
+                           tokenized_documents, idf_dict,
+                           1.5, 0.75, avg_doc_len, doc_len)
 
     rank_result = rank_documents(tf_idf_dict, 'A story about a wizard boy in a tower!', stopwords)
     rank_result = rank_documents(bm_25, 'A story about a wizard boy in a tower!', stopwords)
+
+    if rank_result is None:
+        return None
 
     result = rank_result
     assert result, "Result is None"

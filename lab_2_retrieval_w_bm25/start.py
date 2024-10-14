@@ -4,6 +4,7 @@ Laboratory Work #2 starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
 import main as funcs
+from lab_2_retrieval_w_bm25.main import rank_documents
 
 
 def main() -> None:
@@ -31,10 +32,24 @@ def main() -> None:
 
     documents = [funcs.remove_stopwords(funcs.tokenize(doc), stopwords) for doc in documents]
     vocab = funcs.build_vocabulary(documents)
-    tf_idf = funcs.calculate_tf_idf(funcs.calculate_tf(vocab, documents[0]), funcs.calculate_idf(vocab, documents))
-    result = tf_idf
+    idf = funcs.calculate_idf(vocab, documents)
+    avg_len = sum([len(doc) for doc in documents]) / len(documents)
+    tf_idfs = []
+    bm25s = []
+    for doc in documents:
+        tf = funcs.calculate_tf(vocab, doc)
+        tf_idf = funcs.calculate_tf_idf(tf, idf)
+        tf_idfs.append(tf_idf)
+        bm25 = funcs.calculate_bm25(vocab, doc, idf, avg_doc_len=avg_len, doc_len=len(doc))
+        bm25s.append(bm25)
+
+    result = None
+    if isinstance(tf_idfs, list) and isinstance(bm25s, list):
+        result = rank_documents(tf_idfs, 'Which fairy tale has Fairy Queen?', stopwords)
+        print(result)
+        result = rank_documents(bm25s, 'Which fairy tale has Fairy Queen?', stopwords)
+        print(result)
     assert result, "Result is None"
-    print(result)
 
 
 if __name__ == "__main__":

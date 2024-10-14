@@ -207,10 +207,37 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not (isinstance(vocab, list) and isinstance(document, list) and isinstance(idf_document, dict) and
-            all(isinstance(word, str) for word in vocab) and all(isinstance(word, str) for word in document) and
-            all(isinstance(key, str) and isinstance(idf_document[key], float) for key in idf_document)):
+    if not (isinstance(vocab, list) and
+            len(vocab) > 0 and
+            isinstance(document, list) and
+            len(document) > 0 and
+            isinstance(idf_document, dict) and
+            len(idf_document) > 0):
         return None
+    if not (isinstance(k1, float) and
+            isinstance(b, float) and
+            isinstance(avg_doc_len, float) and
+            avg_doc_len > 0 and
+            isinstance(doc_len, int) and
+            doc_len != True):
+        return None
+    if not (all(isinstance(word, str) for word in vocab) and
+            all(isinstance(word, str) for word in document) and
+            all(isinstance(key, str) and
+                isinstance(idf_document[key], float) for key in idf_document)):
+        return None
+
+    result_dict = {}
+    for word in set(idf_document) | set(document):
+        amount = document.count(word)
+        value = 0.0
+        if word in idf_document:
+            value = (idf_document[word] *
+                    (amount * (k1 + 1)) /
+                    (amount + k1 * (1 - b + b * doc_len / avg_doc_len)))
+        result_dict[word] = value
+
+    return result_dict
 
 
 def rank_documents(
@@ -229,6 +256,27 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(indexes, list) and
+            all(isinstance(index, dict) for index in indexes) and
+            isinstance(query, str) and
+            isinstance(stopwords, list) and
+            all(isinstance(word, str) for word in stopwords)):
+        return None
+    if not (len(indexes) > 0 and len(stopwords) > 0 and len(query) > 0):
+        return None
+
+    tokenized_query = tokenize(query)
+    query_to_compare = remove_stopwords(tokenized_query, stopwords)
+    if not isinstance(query_to_compare, list):
+        return None
+
+    doc_sums = []
+    for doc_num in range(len(indexes)):
+        s = sum([indexes[doc_num][token]
+                 for token in query_to_compare if token in indexes[doc_num]])
+        doc_sums.append((doc_num, s))
+    doc_sums.sort(reverse=True, key=lambda a: a[1])
+    return doc_sums
 
 
 def calculate_bm25_with_cutoff(

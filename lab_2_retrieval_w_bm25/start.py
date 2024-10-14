@@ -54,13 +54,12 @@ def main() -> None:
         tok_doc_without_stopwords = []
         for doc in tok_doc_without_stopwords:
             without_stopwords = remove_stopwords(doc, stopwords)
+            if without_stopwords is None:
+                return None
             tok_doc_without_stopwords.append(without_stopwords)
 
         if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
             return None
-        for doc in tok_doc_without_stopwords:
-            if doc is None:
-                return None
 
         list_of_tf_idf_dict = []
         for doc in tok_doc_without_stopwords:
@@ -69,6 +68,8 @@ def main() -> None:
             if tf_dict is None or idf_dict is None:
                 return None
             tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
+            if tf_idf_dict is None:
+                return None
             list_of_tf_idf_dict.append(tf_idf_dict)
 
         if list_of_tf_idf_dict is None or idf_dict is None:
@@ -85,16 +86,12 @@ def main() -> None:
             bm_25 = calculate_bm25(vocab_made_of_tok_doc,
                                    doc, idf_dict,
                                    1.5, 0.75, avg_doc_len, doc_len)
+            if bm_25 is None:
+                return None
             list_of_dict_with_bm25.append(bm_25)
 
-    if list_of_tf_idf_dict is None or list_of_dict_with_bm25 is None:
+    if list_of_dict_with_bm25 is None:
         return None
-    for every_dict_tf_idf in list_of_tf_idf_dict:
-        if every_dict_tf_idf is None:
-            return None
-    for every_dict_bm25 in list_of_dict_with_bm25:
-        if every_dict_bm25 is None:
-            return None
 
     rank_result = rank_documents(list_of_tf_idf_dict,
                                  'A story about a wizard boy in a tower!', stopwords)

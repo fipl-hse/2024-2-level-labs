@@ -53,41 +53,39 @@ def main() -> None:
 
         vocab_made_of_tok_doc = build_vocabulary(tokenized_documents)
         tok_doc_without_stopwords = []
-        for list_of_tokens in tokenized_documents:
-            without_stopwords = remove_stopwords(list_of_tokens, stopwords)
+        for doc in tok_doc_without_stopwords:
+            without_stopwords = remove_stopwords(doc, stopwords)
             tok_doc_without_stopwords.append(without_stopwords)
         if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
             return None
 
-        for doc in tokenized_documents:
-            tf_dict = calculate_tf(vocab_made_of_tok_doc,
-                              tok_doc_without_stopwords)
+        list_of_tf_idf_dict = []
+        for doc in tok_doc_without_stopwords:
+            tf_dict = calculate_tf(vocab_made_of_tok_doc, doc)
             idf_dict = calculate_idf(vocab_made_of_tok_doc, tokenized_documents)
-
             if tf_dict is None or idf_dict is None:
                 return None
-
             tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
+            list_of_tf_idf_dict.append(tf_idf_dict)
 
-        if (not isinstance(tf_idf_dict, dict) or not tf_idf_dict
-                or not all(isinstance(tf_idf_dict_keys, str)
-                           for tf_idf_dict_keys in tf_idf_dict.keys()
-                or not all(isinstance(tf_idf_dict_values, float)
-                           for tf_idf_dict_values in tf_idf_dict.values()))):
+        if list_of_tf_idf_dict is None:
             return None
 
         avg_doc_len_list = []
-        for tokenized_doc in tokenized_documents:
-            avg_doc_len_list.append(len(tokenized_doc))
-        avg_doc_len = sum(avg_doc_len_list)/len(tokenized_doc)
+        for doc in tok_doc_without_stopwords:
+            avg_doc_len_list.append(len(doc))
+        avg_doc_len = sum(avg_doc_len_list)/len(doc)
 
-        doc_len = len(list_of_tokens)
-        bm_25 = calculate_bm25(vocab_made_of_tok_doc,
-                           tokenized_documents, idf_dict,
-                           1.5, 0.75, avg_doc_len, doc_len)
+        list_of_dict_with_bm25 = []
+        for doc in tok_doc_without_stopwords:
+            doc_len = len(doc)
+            bm_25 = calculate_bm25(vocab_made_of_tok_doc,
+                                   doc, idf_dict,
+                                   1.5, 0.75, avg_doc_len, doc_len)
+            list_of_dict_with_bm25.append(bm_25)
 
-    rank_result = rank_documents(tf_idf_dict, 'A story about a wizard boy in a tower!', stopwords)
-    rank_result = rank_documents(bm_25, 'A story about a wizard boy in a tower!', stopwords)
+    rank_result = rank_documents(list_of_tf_idf_dict, 'A story about a wizard boy in a tower!', stopwords)
+    rank_result = rank_documents(list_of_dict_with_bm25, 'A story about a wizard boy in a tower!', stopwords)
 
     result = rank_result
     assert result, "Result is None"

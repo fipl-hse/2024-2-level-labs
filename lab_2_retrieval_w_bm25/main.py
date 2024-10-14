@@ -108,7 +108,9 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if not vocab or not isinstance(vocab, list) \
             or not document_tokens or not isinstance(document_tokens, list) \
             or not all(isinstance(un_word, str) for un_word in vocab) \
-            or not all(isinstance(token, str) for token in document_tokens):
+            or not all(un_word for un_word in vocab) \
+            or not all(isinstance(token, str) for token in document_tokens) \
+            or not all(token for token in document_tokens):
         return None
 
     tf_vocab = {}
@@ -133,7 +135,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     if not vocab or not isinstance(vocab, list) \
             or not documents or not isinstance(documents, list) \
-            or not all(isinstance(tok_doc, list) for tok_doc in documents):
+            or not all(isinstance(tok_doc, list) for tok_doc in documents) \
+            or not all(tok_doc for tok_doc in documents):
         return None
 
     idf_vocab = {}

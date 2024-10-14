@@ -43,10 +43,15 @@ def main() -> None:
         if stopwords is None:
             return None
 
+        vocab_made_of_tok_doc = build_vocabulary(tokenized_documents)
+        tok_doc_without_stopwords = remove_stopwords(tokenized_documents, stopwords)
+        if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
+            return None
+
         for doc in tokenized_documents:
-            tf_dict = calculate_tf(build_vocabulary(tokenized_documents),
-                              remove_stopwords(tokenized_documents, stopwords))
-            idf_dict = calculate_idf(build_vocabulary(tokenized_documents), tokenized_documents)
+            tf_dict = calculate_tf(vocab_made_of_tok_doc,
+                              tok_doc_without_stopwords)
+            idf_dict = calculate_idf(vocab_made_of_tok_doc, tokenized_documents)
 
             if tf_dict is None or idf_dict is None:
                 return None

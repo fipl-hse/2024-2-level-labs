@@ -3,8 +3,7 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-import main as funcs
-from lab_2_retrieval_w_bm25.main import rank_documents
+import lab_2_retrieval_w_bm25.main as funcs
 
 
 def main() -> None:
@@ -33,7 +32,10 @@ def main() -> None:
     documents = [funcs.remove_stopwords(funcs.tokenize(doc), stopwords) for doc in documents]
     vocab = funcs.build_vocabulary(documents)
     idf = funcs.calculate_idf(vocab, documents)
-    avg_len = sum([len(doc) for doc in documents]) / len(documents)
+    avg_len = 0
+    for doc in documents:
+        avg_len += len(doc)
+    avg_len /= len(documents)
     tf_idfs = []
     bm25s = []
     for doc in documents:
@@ -45,9 +47,9 @@ def main() -> None:
 
     result = None
     if isinstance(tf_idfs, list) and isinstance(bm25s, list):
-        result = rank_documents(tf_idfs, 'Which fairy tale has Fairy Queen?', stopwords)
+        result = funcs.rank_documents(tf_idfs, 'Which fairy tale has Fairy Queen?', stopwords)
         print(result)
-        result = rank_documents(bm25s, 'Which fairy tale has Fairy Queen?', stopwords)
+        result = funcs.rank_documents(bm25s, 'Which fairy tale has Fairy Queen?', stopwords)
         print(result)
     assert result, "Result is None"
 

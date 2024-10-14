@@ -24,10 +24,10 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     symbol_list = list(text)
-    for index in range(len(symbol_list)):
-        if not (symbol_list[index].isalpha() or
-                symbol_list[index] == " " or
-                symbol_list[index] == "\n"):
+    for index, symbol in enumerate(symbol_list):
+        if not (symbol.isalpha() or
+                symbol == " " or
+                symbol == "\n"):
             symbol_list[index] = " "
 
     return "".join(symbol_list).lower().split()
@@ -219,7 +219,7 @@ def calculate_bm25(
             isinstance(avg_doc_len, float) and
             avg_doc_len > 0 and
             isinstance(doc_len, int) and
-            doc_len != True):
+            doc_len is not True):
         return None
     if not (all(isinstance(word, str) for word in vocab) and
             all(isinstance(word, str) for word in document) and
@@ -272,8 +272,10 @@ def rank_documents(
 
     doc_sums = []
     for doc_num in range(len(indexes)):
-        s = sum([indexes[doc_num][token]
-                 for token in query_to_compare if token in indexes[doc_num]])
+        s = 0
+        for token in query_to_compare:
+            if token in indexes[doc_num]:
+                s += indexes[doc_num][token]
         doc_sums.append((doc_num, s))
     doc_sums.sort(reverse=True, key=lambda a: a[1])
     return doc_sums

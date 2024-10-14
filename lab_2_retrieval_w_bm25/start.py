@@ -38,8 +38,8 @@ def main() -> None:
     total_number_words = 0
     for document in documents:
         tokenized_document = tokenize(document)
-        total_number_words += len(tokenized_document)
         if tokenized_document is not None:
+            total_number_words += len(tokenized_document)
             new_doc = remove_stopwords(tokenized_document, stopwords)
             if new_doc is not None:
                 tokenized_documents.append(new_doc)
@@ -55,17 +55,18 @@ def main() -> None:
             bm25_list = []
             avg_doc_len = total_number_words / len(documents)
             for document in tokenized_documents:
-                tf = calculate_tf(vocab, document)
-                doc_len = len(document)
-                if tf is not None:
-                    tf_idf = calculate_tf_idf(tf, idf)
-                    if tf_idf is not None:
-                        tf_idf_list.append(tf_idf)
-                        print(tf_idf)
+                if isinstance(document, list):
+                    tf = calculate_tf(vocab, document)
+                    doc_len = len(document)
+                    if tf is not None:
+                        tf_idf = calculate_tf_idf(tf, idf)
+                        if tf_idf is not None:
+                            tf_idf_list.append(tf_idf)
+                            print(tf_idf)
 
-                bm25 = calculate_bm25(vocab, document, idf, 1.5, 0.75, avg_doc_len, doc_len)
-                if bm25 is not None:
-                    bm25_list.append(bm25)
+                    bm25 = calculate_bm25(vocab, document, idf, 1.5, 0.75, avg_doc_len, doc_len)
+                    if bm25 is not None:
+                        bm25_list.append(bm25)
 
     print('\n Ranking documents using tf-idf:\n')
     print(rank_documents(tf_idf_list, 'Which fairy tale has Fairy Queen?', stopwords))

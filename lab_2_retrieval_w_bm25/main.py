@@ -4,7 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-
+import re
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -18,6 +18,11 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    text_only_words = re.sub('["|.|?|!|,|1|2|3|4|5|6|7|8|9|0|:|(|)]','',text.lower())
+    return text_only_words.split()
+
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -33,6 +38,16 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tokens, list) or not isinstance(stopwords, list):
+        return None
+    if not all(isinstance(stopword, str) for stopword in stopwords):
+        return None
+    removed_stopwords = []
+    for token in tokens:
+        if token in stopwords:
+            continue
+        removed_stopwords.append(token)
+    return removed_stopwords
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

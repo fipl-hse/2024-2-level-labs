@@ -43,6 +43,9 @@ def main() -> None:
             idf_dict = calculate_idf(build_vocabulary(tokenized_documents), tokenized_documents)
             tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
 
+        if not tf_idf_dict:
+            return None
+
         avg_doc_len_list = []
         for tokenized_doc in tokenized_documents:
             avg_doc_len_list.append(len(tokenized_doc))
@@ -58,7 +61,7 @@ def main() -> None:
             or not all(isinstance(tf_idf_dict_keys, str) for tf_idf_dict_keys in tf_idf_dict.keys()
             or not all(isinstance(tf_idf_dict_values, float)
                        for tf_idf_dict_values in tf_idf_dict.values()))):
-        return
+        return None
 
     rank_result = rank_documents(tf_idf_dict, '', stopwords)
     rank_result = rank_documents(bm_25, '', stopwords)

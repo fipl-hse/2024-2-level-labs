@@ -74,10 +74,10 @@ def main() -> None:
     # print(tf_idf_list)
     # print(bm_list)
     tf_idf_rank_tuples = rank_documents(tf_idf_list, query, stopwords)
-    if tf_idf_rank_tuples is None:
+    if not tf_idf_rank_tuples or not isinstance(tf_idf_rank_tuples, list):
         return
     bm_rank_tuples = rank_documents(bm_list, query, stopwords)
-    if bm_rank_tuples is None:
+    if not bm_rank_tuples or not isinstance(bm_rank_tuples, list):
         return
     print(tf_idf_rank_tuples, bm_rank_tuples)
     bm_rank = [tup[0] for tup in bm_rank_tuples]
@@ -89,7 +89,7 @@ def main() -> None:
     # if rank_documents(loaded_docs_list, query, stopwords) is None:
     #     return
     bm_w_cutoff_rank_tuples = rank_documents(loaded_docs_list, query, stopwords)
-    if bm_w_cutoff_rank_tuples is None:
+    if not bm_w_cutoff_rank_tuples or not isinstance(bm_w_cutoff_rank_tuples, list):
         return
     bm_w_cutoff_rank = [tup[0] for tup in bm_w_cutoff_rank_tuples]
     tf_result = calculate_spearman(tf_idf_rank, bm_w_cutoff_rank)

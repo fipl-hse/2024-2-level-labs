@@ -27,22 +27,23 @@ def main() -> None:
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
-        ''' i = 0
-        tokenized_documents = []
-        for each_read_text in documents:
-            list_of_tokens = tokenize(documents[i])
-            i += 1
-            tokenized_documents.append(list_of_tokens)'''
-    tokenized_documents = tokenize(str(documents))
+
+    tokenized_documents = []
+    for str_of_tokens in documents:
+        list_of_tokens = tokenize(str_of_tokens)
+        tokenized_documents.append(list_of_tokens)
 
     if documents is None or tokenized_documents is None:
         return None
     for every in documents:
         if every is None:
             return None
-    for every in tokenized_documents:
-        if every is None:
+    for list_of_tokens in tokenized_documents:
+        if list_of_tokens is None:
             return None
+        for word in list_of_tokens:
+            if word is None:
+                return None
 
     with (open("assets/stopwords.txt", "r", encoding="utf-8") as file):
         stopwords = file.read().split("\n")

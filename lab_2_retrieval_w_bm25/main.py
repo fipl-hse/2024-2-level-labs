@@ -115,13 +115,6 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             dictionary_for_tf[signal] = document_tokens.count(signal) / len(document_tokens)
     return dictionary_for_tf
 
-print(calculate_tf(['school', 'tower', 'go', 'used', 'magic', 'perfect', 'cat', 'dogs',
-                    'best', 'top', 'studying', 'pets', 'leave', 'parrots', 'morning', 'hill',
-                    'loved', 'picnic', 'rarely', 'boy', 'every', 'weather', 'steven', 'two', 'three',
-                    'spells', 'wizard', 'home', 'leaved', 'date', 'friend', 'dragon', 'sad', 'princess',
-                    'wand', 'summer'], ['dragon', 'princess', 'picnic', 'date', 'top',
-                                        'hill', 'rarely', 'leaved', 'tower', 'summer', 'weather', 'perfect',
-                                        'hill', 'picnic']))
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """
@@ -155,18 +148,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             dictionary_for_idf[word] = math.log(value)
     return dictionary_for_idf
 
-print(calculate_idf(['school', 'tower', 'go', 'used', 'magic', 'perfect', 'cat',
-                     'dogs', 'best', 'top', 'studying', 'pets', 'leave', 'parrots', 'morning',
-                     'hill', 'loved', 'picnic', 'rarely', 'boy', 'every', 'weather', 'steven', 'two',
-                     'three', 'spells', 'wizard', 'home', 'leaved', 'date', 'friend', 'dragon', 'sad',
-                     'princess', 'wand', 'summer'], [['boy', 'wizard', 'used', 'wand', 'spells',
-                                                      'studying', 'magic', 'school', 'best', 'friend', 'wizard'],
-                                                     ['steven', 'boy', 'loved', 'pets', 'cat', 'two', 'dogs', 'three',
-                                                      'parrots', 'every', 'morning', 'want', 'go', 'school', 'leave',
-                                                      'pets', 'home'], ['dragon', 'princess', 'picnic', 'date', 'top',
-                                                                        'hill', 'rarely', 'leaved', 'tower', 'summer',
-                                                                        'weather', 'perfect', 'hill', 'picnic']]))
-
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
     """
@@ -198,23 +179,6 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
             dictionary_for_result[key] = (tf[key] * idf[key])
     return dictionary_for_result
 
-print(calculate_tf_idf({'school': 0.0, 'tower': 0.071, 'go': 0.0, 'used': 0.0, 'magic': 0.0,
-                        'perfect': 0.071, 'cat': 0.0, 'dogs': 0.0, 'best': 0.0, 'top': 0.071,
-                        'studying': 0.0, 'pets': 0.0, 'leave': 0.0, 'parrots': 0.0, 'morning': 0.0,
-                        'hill': 0.143, 'loved': 0.0, 'picnic': 0.143, 'rarely': 0.071, 'boy': 0.0,
-                        'every': 0.0, 'weather': 0.071, 'steven': 0.0, 'two': 0.0, 'three': 0.0,
-                        'spells': 0.0, 'wizard': 0.0, 'home': 0.0, 'leaved': 0.071, 'date': 0.071,
-                        'friend': 0.0, 'dragon': 0.071, 'sad': 0.0, 'princess': 0.071, 'wand': 0.0,
-                        'summer': 0.071}, {'school': -0.51, 'tower': 0.51, 'go': 0.51,
-                                           'used': 0.51, 'magic': 0.51, 'perfect': 0.51, 'cat': 0.51,
-                                           'dogs': 0.51, 'best': 0.51, 'top': 0.51, 'studying': 0.51,
-                                           'pets': 0.51, 'leave': 0.51, 'parrots': 0.51, 'morning': 0.51,
-                                           'hill': 0.51, 'loved': 0.51, 'picnic': 0.51, 'rarely': 0.51,
-                                           'boy': -0.51, 'every': 0.51, 'weather': 0.51, 'steven': 0.51,
-                                           'two': 0.51, 'three': 0.51, 'spells': 0.51, 'wizard': 0.51,
-                                           'home': 0.51, 'leaved': 0.51, 'date': 0.51, 'friend': 0.51,
-                                           'dragon': 0.51, 'sad': 1.95, 'princess': 0.51,
-                                           'wand': 0.51, 'summer': 0.51}))
 
 def calculate_bm25(
     vocab: list[str],
@@ -242,28 +206,30 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not all(isinstance(value, str) for value in vocab):
+    if not vocab or not document or not idf_document:
         return None
-    if not isinstance(document, list) or not all(isinstance(value, str) for value in document):
+    if (not isinstance(vocab, list) or not isinstance(document, list) or
+            not isinstance(idf_document, dict)):
         return None
-    if (not isinstance(idf_document, dict) or not all(isinstance(key, str) for key in idf_document) or
-            not all(isinstance(value, float) for value in idf_document)):
+    if ((not all(isinstance(value, str) for value in vocab)) or
+            (not all(isinstance(value, str) for value in document)) or
+            (not all(isinstance(key, str) and isinstance(value, float) for key, value in idf_document.items()))):
         return None
-    if not 1.2 <= k1 <= 2.0 or not 0 <= b <= 1:
+    if ((not isinstance(k1, float)) or (not isinstance(b, float)) or
+            (not isinstance(avg_doc_len, float)) or (not isinstance(doc_len, int))):
         return None
-    if (avg_doc_len is None or avg_doc_len <= 0 or
-            doc_len is None or doc_len <= 0):
+    if (not 1.2 <= k1 <= 2.0) or (not 0 <= b <= 1):
         return None
     bm25 = {}
-    set_for_idf = set(i for i in idf_document.keys()) #я его создала, чтобы сравнить с vocab - чтобы все слова были в нем
     set_for_vocab = set(vocab)
-    if set_for_vocab.difference(set_for_idf) == 0:
-        for key, value in idf_document.items():
-            if key in vocab:
-                bm25[key] = ((value * (document.count(key) * (k1 + 1))) /
-                             (document.count(key) + k1 * (1 - b + ((b * doc_len) / avg_doc_len))))
-    else:
-        return None
+    set_for_doc = set(document)
+    all_need = list(set_for_doc.union(set_for_vocab))
+    for word in all_need:
+        if word in idf_document:
+            bm25[word] = ((idf_document[word] * (document.count(word) * (k1 + 1))) /
+                          (document.count(word) + k1 * (1 - b + b * doc_len) / avg_doc_len))
+        else:
+            bm25[word] = 0.0
     return bm25
 
 
@@ -294,16 +260,18 @@ def rank_documents(
             if not isinstance(key, str) or not isinstance(value, float):
                 return None
     letters = tokenize(query)
-    without_stopwords = remove_stopwords(letters, stopwords) #реализация прошла успешно, теперь ищем все слова в уже данных
+    without_stopwords = remove_stopwords(letters, stopwords)
     number_of_documents = len(indexes)
     dict_with_index = {}
     for metrica in indexes:
-        value_of_whole_document = 0.0
-        for word in without_stopwords:
-            if word in metrica.keys():
-                value_of_whole_document += metrica[word]
-        for index, result in enumerate(dict_with_index.values()):
-
+        for score in range(number_of_documents):
+            value_of_whole_document = 0.0
+            for word in without_stopwords:
+                if word in metrica.keys():
+                    value_of_whole_document += metrica[word]
+            dict_with_index[score] = value_of_whole_document
+    pairs = list(dict_with_index.items())
+    return sorted(pairs, key=lambda pair: pair[1], reverse=True)
 
 
 def calculate_bm25_with_cutoff(

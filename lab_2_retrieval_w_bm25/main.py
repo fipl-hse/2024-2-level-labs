@@ -52,8 +52,9 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     if not tokens or not stopwords \
             or not isinstance(tokens, list) or not isinstance(stopwords, list) \
-            or not all(isinstance(token, str) for token in tokens)\
-            or not all(token for token in tokens):
+            or not all(isinstance(token, str) for token in tokens) \
+            or not all(isinstance(word, str) for word in stopwords) \
+            or not all(token for token in tokens) or not all(word for word in stopwords):
         return None
 
     tokens_prep = []
@@ -84,7 +85,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     unique_words = []
     for lst_tokens in documents:
         for token in lst_tokens:
-            if not isinstance(token, str):
+            if not token or not isinstance(token, str):
                 return None
             if token not in unique_words:
                 unique_words += [token]
@@ -143,6 +144,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     idf_vocab = {}
     for un_word in vocab:
+        if not un_word or not isinstance(un_word, str):
+            return None
         count = 0
         for doc in documents:
             if un_word in doc:

@@ -230,15 +230,13 @@ def calculate_bm25(
             or not all(isinstance(word_in_vocab, str) for word_in_vocab in vocab)
             or not vocab
             or not isinstance(document, list)
-            or not all(isinstance(el, str) for el in document)
-            or not document):
+            or not all(isinstance(el, str) for el in document)):
         return None
     if (not isinstance(idf_document, dict)
             or not all(isinstance(key_in_idf_dict, str)
                        for key_in_idf_dict in idf_document.keys())
             or not all(isinstance(value_in_idf_dict, float)
-                       for value_in_idf_dict in idf_document.values())
-            or not idf_document):
+                       for value_in_idf_dict in idf_document.values())):
         return None
     if (not isinstance(k1, float) or not isinstance(b, float)
             or not isinstance(avg_doc_len, float)
@@ -300,28 +298,28 @@ def rank_documents(
     tokenized_query_without_stopwords = remove_stopwords(tokenized_query, stopwords)
     if not isinstance(tokenized_query_without_stopwords, list):
         return None
-    l_of_tuples_dict_plus_its_relevnce = []
+    l_of_tuples_dict_plus_its_relevance = []
 
     for dict_index, dict_at_the_index in enumerate(indexes):
         relevance_of_the_particular_doc = 0.0
         for word in tokenized_query_without_stopwords:
             if word in dict_at_the_index:
                 relevance_of_the_particular_doc += dict_at_the_index[word]
-        l_of_tuples_dict_plus_its_relevnce.append((dict_index,
-                                                      relevance_of_the_particular_doc))
+        l_of_tuples_dict_plus_its_relevance.append((dict_index,
+            relevance_of_the_particular_doc))
 
-    for a in range(len(l_of_tuples_dict_plus_its_relevnce) - 1):
-        for b in range(len(l_of_tuples_dict_plus_its_relevnce) - a - 1):
-            if (l_of_tuples_dict_plus_its_relevnce[b][1] <
-                    l_of_tuples_dict_plus_its_relevnce[b + 1][1]):
-                (l_of_tuples_dict_plus_its_relevnce[b],
-                 l_of_tuples_dict_plus_its_relevnce[b + 1])\
-                    = (l_of_tuples_dict_plus_its_relevnce[b + 1],
-                       l_of_tuples_dict_plus_its_relevnce[b])
+    for a in range(len(l_of_tuples_dict_plus_its_relevance) - 1):
+        for b in range(len(l_of_tuples_dict_plus_its_relevance) - a - 1):
+            if (l_of_tuples_dict_plus_its_relevance[b][1] <
+                    l_of_tuples_dict_plus_its_relevance[b + 1][1]):
+                (l_of_tuples_dict_plus_its_relevance[b],
+                 l_of_tuples_dict_plus_its_relevance[b + 1])\
+                    = (l_of_tuples_dict_plus_its_relevance[b + 1],
+                       l_of_tuples_dict_plus_its_relevance[b])
 
-    if not l_of_tuples_dict_plus_its_relevnce:
+    if not l_of_tuples_dict_plus_its_relevance:
         return None
-    return l_of_tuples_dict_plus_its_relevnce
+    return l_of_tuples_dict_plus_its_relevance
 
 
 def calculate_bm25_with_cutoff(

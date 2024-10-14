@@ -47,13 +47,21 @@ def main() -> None:
             tf_dict = calculate_tf(build_vocabulary(tokenized_documents),
                               remove_stopwords(tokenized_documents, stopwords))
             idf_dict = calculate_idf(build_vocabulary(tokenized_documents), tokenized_documents)
+
+            if (not isinstance(tf_dict, dict) or not tf_idf_dict
+                    or not all(isinstance(tf_dict_keys, str)
+                               for tf_dict_keys in tf_dict.keys()
+                    or not isinstance(idf_dict, dict) or not all(isinstance(idf_dict_values, float)
+                               for idf_dict_values in idf_dict.values()))):
+                return None
+
             tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
 
         if (not isinstance(tf_idf_dict, dict) or not tf_idf_dict
-                or not all(isinstance(tf_idf_dict_keys, str) for tf_idf_dict_keys in tf_idf_dict.keys()
-                                                                                     or not all(
-                    isinstance(tf_idf_dict_values, float)
-                    for tf_idf_dict_values in tf_idf_dict.values()))):
+                or not all(isinstance(tf_idf_dict_keys, str)
+                           for tf_idf_dict_keys in tf_idf_dict.keys()
+                or not all(isinstance(tf_idf_dict_values, float)
+                           for tf_idf_dict_values in tf_idf_dict.values()))):
             return None
 
         avg_doc_len_list = []
@@ -65,9 +73,6 @@ def main() -> None:
         bm_25 = calculate_bm25(build_vocabulary(tokenized_documents),
                            tokenized_documents, idf_dict,
                            1.5, 0.75, avg_doc_len, doc_len)
-
-    if tf_idf_dict is None or bm_25 is None:
-        return None
 
     rank_result = rank_documents(tf_idf_dict, 'A story about a wizard boy in a tower!', stopwords)
     rank_result = rank_documents(bm_25, 'A story about a wizard boy in a tower!', stopwords)

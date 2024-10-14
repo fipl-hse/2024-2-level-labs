@@ -52,7 +52,10 @@ def main() -> None:
             return None
 
         vocab_made_of_tok_doc = build_vocabulary(tokenized_documents)
-        tok_doc_without_stopwords = remove_stopwords(tokenized_documents, stopwords)
+        tok_doc_without_stopwords = []
+        for list_of_tokens in tokenized_documents:
+            without_stopwords = remove_stopwords(list_of_tokens, stopwords)
+            tok_doc_without_stopwords.append(without_stopwords)
         if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
             return None
 

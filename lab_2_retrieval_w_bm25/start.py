@@ -36,6 +36,12 @@ def main() -> None:
 
     if documents is None or tokenized_documents is None:
         return None
+    for every in documents:
+        if every is None:
+            return None
+    for every in tokenized_documents:
+        if every is None:
+            return None
 
     with (open("assets/stopwords.txt", "r", encoding="utf-8") as file):
         stopwords = file.read().split("\n")
@@ -71,7 +77,7 @@ def main() -> None:
         avg_doc_len = sum(avg_doc_len_list)/len(tokenized_doc)
 
         doc_len = len(list_of_tokens)
-        bm_25 = calculate_bm25(build_vocabulary(tokenized_documents),
+        bm_25 = calculate_bm25(vocab_made_of_tok_doc,
                            tokenized_documents, idf_dict,
                            1.5, 0.75, avg_doc_len, doc_len)
 

@@ -235,7 +235,10 @@ def calculate_bm25(
         if token in document:
             token_count += document.count(token)
         if token in idf_document.keys():
-            bm25_dict[token] = (idf_document[token] * ((token_count * (k1 + 1)) / (token_count + k1 * (1 - b + b * (doc_len / avg_doc_len)))))
+            bm25_dict[token] = (idf_document[token] *
+                                ((token_count * (k1 + 1)) /
+                                 (token_count + k1 * (1 - b + b *
+                                                      (doc_len / avg_doc_len)))))
         else:
             bm25_dict[token] = 0
 
@@ -258,7 +261,8 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    bad_input = (not isinstance(indexes, list) or not all(isinstance(index, dict) for index in indexes)
+    bad_input = (not isinstance(indexes, list)
+                 or not all(isinstance(index, dict) for index in indexes)
                  or not all(isinstance(key, str) and isinstance(value, float)
                             for index in indexes for key, value in index.items())
                  or indexes is None or indexes == []

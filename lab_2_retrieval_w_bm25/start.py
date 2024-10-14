@@ -34,7 +34,7 @@ def main() -> None:
             i += 1
             tokenized_documents.append(list_of_tokens)
 
-    with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
+    with (open("assets/stopwords.txt", "r", encoding="utf-8") as file):
         stopwords = file.read().split("\n")
 
         for doc in tokenized_documents:
@@ -43,7 +43,11 @@ def main() -> None:
             idf_dict = calculate_idf(build_vocabulary(tokenized_documents), tokenized_documents)
             tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
 
-        if not tf_idf_dict:
+        if (not isinstance(tf_idf_dict, dict) or not tf_idf_dict
+                or not all(isinstance(tf_idf_dict_keys, str) for tf_idf_dict_keys in tf_idf_dict.keys()
+                                                                                     or not all(
+                    isinstance(tf_idf_dict_values, float)
+                    for tf_idf_dict_values in tf_idf_dict.values()))):
             return None
 
         avg_doc_len_list = []
@@ -52,21 +56,19 @@ def main() -> None:
         avg_doc_len = sum(avg_doc_len_list)/len(tokenized_doc)
 
         for list_of_tokens in documents:
+            if (not isinstance(avg_doc_len, float)
+                    or not isinstance(list_of_tokens, list)
+                    or not isinstance(len(list_of_tokens), int)):
+                return None
             doc_len = len(list_of_tokens)
             bm_25 = calculate_bm25(build_vocabulary(tokenized_documents),
                                tokenized_documents, idf_dict,
                                1.5, 0.75, avg_doc_len, doc_len)
 
-    if (not isinstance(tf_idf_dict, dict) or not tf_idf_dict
-            or not all(isinstance(tf_idf_dict_keys, str) for tf_idf_dict_keys in tf_idf_dict.keys()
-            or not all(isinstance(tf_idf_dict_values, float)
-                       for tf_idf_dict_values in tf_idf_dict.values()))):
-        return None
+    rank_result = rank_documents(tf_idf_dict, 'A story about a wizard boy in a tower!', stopwords)
+    rank_result = rank_documents(bm_25, 'A story about a wizard boy in a tower!', stopwords)
 
-    rank_result = rank_documents(tf_idf_dict, '', stopwords)
-    rank_result = rank_documents(bm_25, '', stopwords)
-
-    result = bm_25
+    result = rank_result
     assert result, "Result is None"
 
 

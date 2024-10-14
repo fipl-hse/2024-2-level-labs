@@ -243,7 +243,9 @@ def rank_documents(
                 num += dictionary[word]
         res.append((ind, num))
     res.sort(key=lambda x: x[-1], reverse=True)
-    return res or None
+    if not res:
+        return None
+    return res
 
 
 def calculate_bm25_with_cutoff(

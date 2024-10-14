@@ -228,10 +228,8 @@ def calculate_bm25(
     """
     if (not isinstance(vocab, list)
             or not all(isinstance(word_in_vocab, str) for word_in_vocab in vocab)
-            or not vocab
             or not isinstance(document, list)
-            or not all(isinstance(el, str) for el in document)
-            or not document):
+            or not all(isinstance(el, str) for el in document)):
         return None
     if (not isinstance(idf_document, dict)
             or not all(isinstance(key_in_idf_dict, str)
@@ -295,7 +293,7 @@ def rank_documents(
                 return None
 
     tokenized_query = tokenize(query)
-    if not isinstance(tokenized_query, list):
+    if not isinstance(tokenized_query, list) or not stopwords:
         return None
     tokenized_query_without_stopwords = remove_stopwords(tokenized_query, stopwords)
     if not isinstance(tokenized_query_without_stopwords, list):
@@ -310,14 +308,8 @@ def rank_documents(
         l_of_tuples_dict_plus_its_relevance.append((dict_index,
             relevance_of_the_particular_doc))
 
-    for a in range(len(l_of_tuples_dict_plus_its_relevance) - 1):
-        for b in range(len(l_of_tuples_dict_plus_its_relevance) - a - 1):
-            if (l_of_tuples_dict_plus_its_relevance[b][1] <
-                    l_of_tuples_dict_plus_its_relevance[b + 1][1]):
-                (l_of_tuples_dict_plus_its_relevance[b],
-                 l_of_tuples_dict_plus_its_relevance[b + 1])\
-                    = (l_of_tuples_dict_plus_its_relevance[b + 1],
-                       l_of_tuples_dict_plus_its_relevance[b])
+    l_of_tuples_dict_plus_its_relevance = sorted(l_of_tuples_dict_plus_its_relevance,
+                                                 key=lambda x: x[1], reverse=True)
 
     if not l_of_tuples_dict_plus_its_relevance:
         return None

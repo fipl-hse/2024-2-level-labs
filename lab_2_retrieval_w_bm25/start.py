@@ -63,7 +63,7 @@ def main() -> None:
                 return None
             list_of_tf_idf_dict.append(tf_idf_dict)
 
-        if list_of_tf_idf_dict is None:
+        if list_of_tf_idf_dict is None or idf_dict is None:
             return None
 
         avg_doc_len_list = []

@@ -27,12 +27,13 @@ def main() -> None:
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
-        i = 0
+        ''' i = 0
         tokenized_documents = []
         for each_read_text in documents:
             list_of_tokens = tokenize(documents[i])
             i += 1
-            tokenized_documents.append(list_of_tokens)
+            tokenized_documents.append(list_of_tokens)'''
+    tokenized_documents = tokenize(str(documents))
 
     if documents is None or tokenized_documents is None:
         return None

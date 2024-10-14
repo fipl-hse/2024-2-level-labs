@@ -212,6 +212,34 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    bad_input = (not isinstance(vocab, list)
+                 or not all(isinstance(token, str) for token in vocab)
+                 or not isinstance(document, list)
+                 or not all(isinstance(token, str) for token in document)
+                 or len(vocab) == 0 or len(document) == 0
+                 or not isinstance(idf_document, dict)
+                 or len(idf_document) == 0
+                 or not all(isinstance(key, str) for key in idf_document.keys())
+                 or not all(isinstance(value, float) for value in idf_document.values())
+                 or not isinstance(k1, float) or not isinstance(b, float)
+                 or not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)
+                 or isinstance(doc_len, bool))
+
+    if bad_input:
+        return None
+
+    bm25_dict = {}
+    all_token_list = list(set(vocab) | set(document))
+    for token in all_token_list:
+        token_count = 0
+        if token in document:
+            token_count += document.count(token)
+        if token in idf_document.keys():
+            bm25_dict[token] = (idf_document[token] * ((token_count * (k1 + 1)) / (token_count + k1 * (1 - b + b * (doc_len / avg_doc_len)))))
+        else:
+            bm25_dict[token] = 0
+
+    return bm25_dict
 
 
 def rank_documents(
@@ -230,6 +258,38 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    bad_input = (not isinstance(indexes, list) or not all(isinstance(index, dict) for index in indexes)
+                 or not all(isinstance(key, str) and isinstance(value, float)
+                            for index in indexes for key, value in index.items())
+                 or indexes is None or indexes == []
+                 or not isinstance(query, str) or isinstance(query, bool)
+                 or query is None or query == ''
+                 or not isinstance(stopwords, list) or
+                 stopwords is None or stopwords == []
+                 or not all(isinstance(word, str) for word in stopwords))
+    if bad_input:
+        return None
+
+    tokenized_query = tokenize(query)
+    if tokenized_query is None:
+        return None
+    processed_query = remove_stopwords(tokenized_query, stopwords)
+    if processed_query is None:
+        return None
+
+    result_not_sorted = {}
+
+    for bm25_tfidf_dict in indexes:
+        value_sum = 0.0
+        i = indexes.index(bm25_tfidf_dict)
+        for token in processed_query:
+            if token in bm25_tfidf_dict:
+                value_sum += bm25_tfidf_dict[token]
+        result_not_sorted[i] = value_sum
+
+    result_lst = list(result_not_sorted.items())
+    result_sorted = sorted(result_lst, key=lambda x: x[1], reverse=True)
+    return result_sorted
 
 
 def calculate_bm25_with_cutoff(

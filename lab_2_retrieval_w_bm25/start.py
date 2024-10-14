@@ -2,8 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -37,19 +38,35 @@ def main() -> None:
                 clean_documents.append(clean_document)
     vocab = build_vocabulary(clean_documents)
     if not vocab:
-        return
+        return None
     idf = calculate_idf(vocab, clean_documents)
-    for clean_document in clean_documents:
-        tf = calculate_tf(vocab, clean_document)
-        if not tf or not idf:
-            return
-        tf_idf_dict = calculate_tf_idf(tf, idf)
-        tf_idf_list = []
-        if tf_idf_dict:
-            tf_idf_list.append(tf_idf_dict)
-        result = tf_idf_list
-        print(result)
-        assert result, "Result is None"
+    if not idf:
+        return None
+    avg_doc_len = sum(len(document) for document in clean_documents) / len(clean_documents)
+    tf_idf_list = []
+    bm25_list = []
+    for doc in clean_documents:
+        tf = calculate_tf(vocab, doc)
+        if not tf:
+            return None
+        tf_idf = calculate_tf_idf(tf, idf)
+        if not tf_idf:
+            return None
+        tf_idf_list.append(tf_idf)
+        bm25 = calculate_bm25(vocab, doc, idf, 1.5, 0.75, avg_doc_len, len(doc))
+        if not bm25:
+            return None
+        bm25_list.append(bm25)
+    query = "Which fairy tale has Fairy Queen?"
+    tfidf_ranking = rank_documents(tf_idf_list, query, stopwords)
+    bm25_ranking = rank_documents(bm25_list, query, stopwords)
+    if not tfidf_ranking or not bm25_ranking:
+        return None
+    print(f"{tfidf_ranking}\n{bm25_ranking}")
+    result = [index_score_1 for index_score_1, index_score_2 in zip(tfidf_ranking, bm25_ranking)
+              if index_score_1 == index_score_2]
+    print(result)
+    assert result, "Result is None"
 
 
 if __name__ == "__main__":

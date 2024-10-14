@@ -48,7 +48,7 @@ def main() -> None:
     with (open("assets/stopwords.txt", "r", encoding="utf-8") as file):
         stopwords = file.read().split("\n")
 
-        if stopwords is None or tokenized_documents is None:
+        if stopwords is None:
             return None
 
         vocab_made_of_tok_doc = build_vocabulary(tokenized_documents)
@@ -56,8 +56,12 @@ def main() -> None:
         for doc in tok_doc_without_stopwords:
             without_stopwords = remove_stopwords(doc, stopwords)
             tok_doc_without_stopwords.append(without_stopwords)
+
         if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
             return None
+        for doc in tok_doc_without_stopwords:
+            if doc is None:
+                return None
 
         list_of_tf_idf_dict = []
         for doc in tok_doc_without_stopwords:

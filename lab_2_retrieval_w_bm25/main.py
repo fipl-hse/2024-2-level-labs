@@ -207,9 +207,10 @@ def calculate_bm25(
     if (not vocab or not isinstance(vocab,list) or
             not all(isinstance(token, str) for token in vocab)):
         return None
-    if not isinstance(document,list) or not all(isinstance(token, str) for token in document):
+    if (not document or not isinstance(document,list) or
+            not all(isinstance(token, str) for token in document)):
         return None
-    if (not isinstance(idf_document, dict) or
+    if (not idf_document or not isinstance(idf_document, dict) or
             not all(isinstance(token, str) and
                     isinstance(freq, float) for token, freq in idf_document.items())):
         return None
@@ -248,6 +249,35 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not query or not isinstance(query, str) or
+            not stopwords or not isinstance(stopwords, list) or
+            not all(isinstance(word, str) for word in stopwords)):
+        return None
+    if (not indexes or not isinstance(indexes, list) or
+            not all(isinstance(index, dict) for index in indexes)):
+        return None
+    for document in indexes:
+        if not all(isinstance(token, str) and
+                   isinstance(freq, float) for token, freq in document.items()):
+            return None
+
+    query_tokenized = tokenize(query)
+    if not query_tokenized:
+        return None
+    query_tokenized = remove_stopwords(query_tokenized, stopwords)
+    if not query_tokenized:
+        return None
+    doc_index_score = []
+    index = 0
+    for document in indexes:
+        freq_cumulative = 0.0
+        for token in query_tokenized:
+            if token in document:
+                freq_cumulative += document[token]
+        doc_index_score.append((index, freq_cumulative))
+        index += 1
+    return sorted(doc_index_score, key=lambda tup: tup[1], reverse=True)
+
 
 
 def calculate_bm25_with_cutoff(

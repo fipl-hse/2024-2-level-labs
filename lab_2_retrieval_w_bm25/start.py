@@ -66,11 +66,11 @@ def main() -> None:
                            tokenized_documents, idf_dict,
                            1.5, 0.75, avg_doc_len, doc_len)
 
+    if tf_idf_dict is None or bm_25 is None:
+        return None
+
     rank_result = rank_documents(tf_idf_dict, 'A story about a wizard boy in a tower!', stopwords)
     rank_result = rank_documents(bm_25, 'A story about a wizard boy in a tower!', stopwords)
-
-    if rank_result is None:
-        return None
 
     result = rank_result
     assert result, "Result is None"

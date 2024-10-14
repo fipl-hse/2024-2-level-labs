@@ -176,13 +176,14 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
     if (not vocab or not document or not idf_document or not isinstance(vocab, list) or
-            not isinstance(document, list) or not isinstance(idf_document, dict) or
-            not isinstance(doc_len, int) or not isinstance(k1, float)):
+            not isinstance(document, list)):
         return None
-    if (not isinstance(b, float) or not isinstance(avg_doc_len, float) or
-            isinstance(doc_len, bool) or not all(isinstance(term, str) for term in vocab)):
+    if (not isinstance(idf_document, dict) or not isinstance(doc_len, int) or
+            not isinstance(k1, float) or not isinstance(b, float) or
+            not isinstance(avg_doc_len, float)):
         return None
-    if not all(isinstance(term, str) for term in idf_document):
+    if (isinstance(doc_len, bool) or not all(isinstance(term, str) for term in vocab) or
+            not all(isinstance(term, str) for term in idf_document)):
         return None
     if (not all(isinstance(term, str) for term in document) or
             not all(isinstance(freq, float) for freq in idf_document.values())):
@@ -212,8 +213,9 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
     if (not indexes or not query or not stopwords or not isinstance(indexes, list) or
-            not isinstance(stopwords, list) or not isinstance(query, str) or
-            not all(isinstance(word, str) for word in stopwords) or
+            not isinstance(stopwords, list)):
+        return None
+    if (not isinstance(query, str) or not all(isinstance(word, str) for word in stopwords) or
             not all(isinstance(index, dict) for index in indexes)):
         return None
     tokenized_query = tokenize(query)

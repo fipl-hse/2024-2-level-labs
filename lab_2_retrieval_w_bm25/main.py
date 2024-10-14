@@ -1,12 +1,10 @@
-from math import log
 """
 Lab 2.
 
 Text retrieval with BM25
 """
-
-
 # pylint:disable=too-many-arguments, unused-argument
+from math import log
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -148,6 +146,9 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             return None
         count = 0
         for doc in documents:
+            for i in doc:
+                if not i or not isinstance(i, str):
+                    return None
             if un_word in doc:
                 count += 1
             else:

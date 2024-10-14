@@ -222,7 +222,8 @@ def calculate_bm25(
                  or not all(isinstance(key, str) for key in idf_document.keys())
                  or not all(isinstance(value, float) for value in idf_document.values())
                  or not isinstance(k1, float) or not isinstance(b, float)
-                 or not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)
+                 or not isinstance(avg_doc_len, float) or avg_doc_len is None
+                 or not isinstance(doc_len, int) or doc_len is None
                  or isinstance(doc_len, bool))
 
     if bad_input:

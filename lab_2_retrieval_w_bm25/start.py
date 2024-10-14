@@ -78,7 +78,7 @@ def main() -> None:
         avg_doc_len_list = []
         for tok_doc in tok_doc_without_stopwords:
             avg_doc_len_list.append(len(doc))
-        avg_doc_len = sum(avg_doc_len_list)/len(tok_doc)
+        avg_doc_len = sum(avg_doc_len_list)/len(tok_doc_without_stopwords)
 
         list_of_dict_with_bm25 = []
         for doc in tok_doc_without_stopwords:
@@ -90,6 +90,12 @@ def main() -> None:
 
     if list_of_tf_idf_dict is None or list_of_dict_with_bm25 is None:
         return None
+    for every_dict_tf_idf in list_of_tf_idf_dict:
+        if every_dict_tf_idf is None:
+            return None
+    for every_dict_bm25 in list_of_dict_with_bm25:
+        if every_dict_bm25 is None:
+            return None
 
     rank_result = rank_documents(list_of_tf_idf_dict,
                                  'A story about a wizard boy in a tower!', stopwords)

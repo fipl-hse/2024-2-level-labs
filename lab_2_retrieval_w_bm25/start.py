@@ -50,11 +50,11 @@ def main() -> None:
         if not isinstance(tf, dict):
             return None
         tf_idf.append(calculate_tf_idf(tf, idf))
-    indexes = []
     length_all = 0.0
     for lst in doc_tokens:
         length_all += len(lst)
     avg_doc_len = length_all/len(doc_tokens)
+    indexes = []
     for lst in doc_tokens:
         index = calculate_bm25(vocab, lst, idf,
                                1.5, 0.75,

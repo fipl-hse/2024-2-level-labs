@@ -47,7 +47,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tokens, list) or not isinstance(stopwords, list) or not tokens or not stopwords:
+    if not isinstance(tokens, list) or not isinstance(stopwords, list)\
+            or not tokens or not stopwords:
         return None
     for i in stopwords:
         if not isinstance(i, str):
@@ -209,9 +210,12 @@ def calculate_bm25(
     """
     if not isinstance(vocab, list) or not isinstance(document, list)\
         or not isinstance(idf_document, dict) or not isinstance(k1, float)\
-        or not isinstance(b, float) or not isinstance(avg_doc_len, float)\
-        or not isinstance(doc_len, int) or not vocab or not document or doc_len is True\
-        or not idf_document:
+        or not isinstance(b, float):
+        return None
+    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)\
+            or not vocab or not document or doc_len is True:
+        return None
+    if not idf_document:
         return None
     for elem in vocab:
         if not isinstance(elem, str):

@@ -74,14 +74,14 @@ def main() -> None:
     # print(tf_idf_list)
     # print(bm_list)
     tf_idf_rank_tuples = rank_documents(tf_idf_list, query, stopwords)
-    if not tf_idf_rank_tuples or not isinstance(tf_idf_rank_tuples, list):
+    if tf_idf_rank_tuples is None:
         return None
+    tf_idf_rank = [tup[0] for tup in tf_idf_rank_tuples]
     bm_rank_tuples = rank_documents(bm_list, query, stopwords)
     if not bm_rank_tuples or not isinstance(bm_rank_tuples, list):
         return None
     print(tf_idf_rank_tuples, bm_rank_tuples)
     bm_rank = [tup[0] for tup in bm_rank_tuples]
-    tf_idf_rank = [tup[0] for tup in tf_idf_rank_tuples]
     save_index(bm_w_cutoff_list, 'assets/metrics.json')
     loaded_docs_list = load_index('assets/metrics.json')
     if loaded_docs_list is None:

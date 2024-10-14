@@ -34,11 +34,16 @@ def main() -> None:
             i += 1
             tokenized_documents.append(list_of_tokens)
 
-    if not isinstance(documents, list):
+    if (not isinstance(documents, list)
+            or not all(isinstance(el, str) for el in documents)):
         return None
 
     with (open("assets/stopwords.txt", "r", encoding="utf-8") as file):
         stopwords = file.read().split("\n")
+
+        if (not isinstance(stopwords, list)
+                or not all(isinstance(el, str) for el in stopwords)):
+            return None
 
         for doc in tokenized_documents:
             tf_dict = calculate_tf(build_vocabulary(tokenized_documents),

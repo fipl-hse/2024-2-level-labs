@@ -215,10 +215,8 @@ def calculate_bm25(
     if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)\
             or not vocab or not document or doc_len is True:
         return None
-    if not idf_document:
-        return None
     for elem in vocab:
-        if not isinstance(elem, str):
+        if not isinstance(elem, str) or not idf_document:
             return None
     for elem in document:
         if not isinstance(elem, str):

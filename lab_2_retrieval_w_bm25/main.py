@@ -24,9 +24,9 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     only_letters_text = ''
-    for letter in text:
+    for letter in text.lower():
         if letter.isalpha() or letter == ' ':
-            only_letters_text += letter.lower()
+            only_letters_text += letter
         else:
             only_letters_text += ' '
     tokenized_text = only_letters_text.split()
@@ -85,7 +85,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     if not words_from_all_docs_list:
         return None
-    return list(words_from_all_docs_list)
+    return words_from_all_docs_list
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -152,10 +152,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     idf_figure_dict = {}
     for word in vocab:
-        in_how_many_docs_is_met = 0
         for one_doc_text in documents:
-            if word in one_doc_text:
-                in_how_many_docs_is_met += 1
+            in_how_many_docs_is_met = sum([1 for one_doc_text in documents if word in one_doc_text])
             if documents.index(one_doc_text) == (len(documents) - 1):
                 idf_figure_dict[word] \
                     = round(math.log((len(documents) - in_how_many_docs_is_met + 0.5) /

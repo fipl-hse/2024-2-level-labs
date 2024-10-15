@@ -27,6 +27,10 @@ def tokenize(text: str) -> list[str] | None:
         for char in token:
             if char.isalpha():
                 cleared_tokens.append(char)
+            else:
+                if cleared_tokens:
+                    tokens.append(''.join(cleared_tokens))
+                    cleared_tokens = []
         if cleared_tokens:
             tokens.append(''.join(cleared_tokens))
     return tokens

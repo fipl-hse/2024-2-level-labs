@@ -81,16 +81,14 @@ def main() -> None:
                 return None
             list_of_dict_with_bm25.append(bm_25)
 
-    if list_of_dict_with_bm25 is None:
-        return None
+        '''if list_of_dict_with_bm25 is None:
+        return None'''
 
     rank_result = rank_documents(list_of_tf_idf_dict,
                                  'A story about a wizard boy in a tower!', stopwords)
     rank_result = rank_documents(list_of_dict_with_bm25,
                                  'A story about a wizard boy in a tower!', stopwords)
 
-    if not rank_result:
-        return None
     result = rank_result
     assert result, "Result is None"
 

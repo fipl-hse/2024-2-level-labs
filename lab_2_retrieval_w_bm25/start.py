@@ -32,7 +32,7 @@ def main() -> None:
     for str_of_tokens in documents:
         list_of_tokens = tokenize(str_of_tokens)
         if list_of_tokens is None:
-            return None
+            return
         tokenized_documents.append(list_of_tokens)
 
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
@@ -43,25 +43,25 @@ def main() -> None:
         for doc in tokenized_documents:
             without_stopwords = remove_stopwords(doc, stopwords)
             if without_stopwords is None:
-                return None
+                return
             tok_doc_without_stopwords.append(without_stopwords)
 
         if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
-            return None
+            return
 
         list_of_tf_idf_dict = []
         for doc in tok_doc_without_stopwords:
             tf_dict = calculate_tf(vocab_made_of_tok_doc, doc)
             idf_dict = calculate_idf(vocab_made_of_tok_doc, tok_doc_without_stopwords)
             if tf_dict is None or idf_dict is None:
-                return None
+                return
             tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
             if tf_idf_dict is None:
-                return None
+                return
             list_of_tf_idf_dict.append(tf_idf_dict)
 
         if list_of_tf_idf_dict is None or idf_dict is None:
-            return None
+            return
 
         avg_doc_len_list = []
         for tok_doc in tok_doc_without_stopwords:
@@ -75,7 +75,7 @@ def main() -> None:
                                    doc, idf_dict,
                                    1.5, 0.75, avg_doc_len, doc_len)
             if bm_25 is None:
-                return None
+                return
             list_of_dict_with_bm25.append(bm_25)
 
     rank_result = rank_documents(list_of_tf_idf_dict,

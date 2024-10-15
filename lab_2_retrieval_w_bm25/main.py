@@ -254,10 +254,8 @@ def calculate_bm25(
     if not (isinstance(k1, float) and isinstance(b, float)):
         return None
 
-    if not (isinstance(avg_doc_len, float)) or avg_doc_len is None:
-        return None
-
-    if not (isinstance(doc_len, int)) or doc_len is None or isinstance(doc_len, bool):
+    if not (isinstance(avg_doc_len, float)) or avg_doc_len is None or \
+            not (isinstance(doc_len, int)) or doc_len is None or isinstance(doc_len, bool):
         return None
 
     bm25_dict = {}

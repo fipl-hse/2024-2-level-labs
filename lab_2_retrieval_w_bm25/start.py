@@ -3,8 +3,9 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, rank_documents, remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -41,24 +42,27 @@ def main() -> None:
 
     vocab = []
     if len(prep_documents) == len(documents):
-        vocab = build_vocabulary(prep_documents)
-    if isinstance(vocab, list) and len(vocab) > 0:
+        temp_vocab = build_vocabulary(prep_documents)
+        if isinstance(temp_vocab, list):
+            vocab = temp_vocab[:]
+
+    if len(vocab) > 0:
         idf = calculate_idf(vocab, prep_documents)
         if isinstance(idf, dict):
-            avg_len = 0
-            for doc in prep_documents:
-                avg_len += len(doc)
+            avg_len = 0.0
+            for prep_doc in prep_documents:
+                avg_len += len(prep_doc)
             avg_len /= len(prep_documents)
             tf_idfs = []
             bm25s = []
-            for doc in prep_documents:
-                tf = calculate_tf(vocab, doc)
+            for prep_doc in prep_documents:
+                tf = calculate_tf(vocab, prep_doc)
                 if isinstance(tf, dict):
                     tf_idf = calculate_tf_idf(tf, idf)
                     if isinstance(tf_idf, dict):
                         tf_idfs.append(tf_idf)
                 bm25 = calculate_bm25(
-                    vocab, doc, idf, avg_doc_len=avg_len, doc_len=len(doc))
+                    vocab, prep_doc, idf, avg_doc_len=avg_len, doc_len=len(prep_doc))
                 if isinstance(bm25, dict):
                     bm25s.append(bm25)
 

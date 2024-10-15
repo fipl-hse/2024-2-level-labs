@@ -83,7 +83,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
             return None
     words_from_all_docs_list = list(set(word for sublist in documents for word in sublist))
 
-    if not words_from_all_docs_list or words_from_all_docs_list is None:
+    if not words_from_all_docs_list:
         return None
     return list(words_from_all_docs_list)
 

@@ -46,6 +46,9 @@ def main() -> None:
                 return
             tok_doc_without_stopwords.append(without_stopwords)
 
+        if vocab_made_of_tok_doc is None:
+            return
+
         list_of_tf_idf_dict = []
         for doc in tok_doc_without_stopwords:
             tf_dict = calculate_tf(vocab_made_of_tok_doc, doc)
@@ -72,7 +75,7 @@ def main() -> None:
                                    doc, idf_dict,
                                    1.5, 0.75, avg_doc_len, doc_len)
             if bm_25 is None:
-                return
+                break
             list_of_dict_with_bm25.append(bm_25)
 
     rank_result = rank_documents(list_of_tf_idf_dict,

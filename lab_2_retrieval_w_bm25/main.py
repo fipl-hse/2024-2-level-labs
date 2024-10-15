@@ -153,7 +153,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     idf_figure_dict = {}
     for word in vocab:
         for one_doc_text in documents:
-            in_how_many_docs_is_met = sum([1 for one_doc_text in documents if word in one_doc_text])
+            in_how_many_docs_is_met = sum(1 for one_doc_text in documents if word in one_doc_text)
             if documents.index(one_doc_text) == (len(documents) - 1):
                 idf_figure_dict[word] \
                     = round(math.log((len(documents) - in_how_many_docs_is_met + 0.5) /

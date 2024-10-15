@@ -46,9 +46,6 @@ def main() -> None:
                 return
             tok_doc_without_stopwords.append(without_stopwords)
 
-        if vocab_made_of_tok_doc is None:
-            return
-
         list_of_tf_idf_dict = []
         for doc in tok_doc_without_stopwords:
             tf_dict = calculate_tf(vocab_made_of_tok_doc, doc)

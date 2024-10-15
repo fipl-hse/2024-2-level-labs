@@ -49,8 +49,8 @@ def main() -> None:
                 return None
             tok_doc_without_stopwords.append(without_stopwords)
 
-        if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
-            return None
+        '''if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
+            return None'''
 
         list_of_tf_idf_dict = []
         for doc in tok_doc_without_stopwords:
@@ -63,8 +63,8 @@ def main() -> None:
                 return None
             list_of_tf_idf_dict.append(tf_idf_dict)
 
-        '''if list_of_tf_idf_dict is None or idf_dict is None:
-            return None'''
+        if list_of_tf_idf_dict is None or idf_dict is None:
+            return None
 
         avg_doc_len_list = []
         for tok_doc in tok_doc_without_stopwords:

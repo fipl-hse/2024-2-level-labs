@@ -167,13 +167,13 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     for doc in documents:
         for token in set(doc):
             if token in vocab:
-                if not (token in idf_dict.keys()):
+                if not token in idf_dict:
                     idf_dict[token] = 1
                 else:
                     idf_dict[token] += 1
 
     idf_final = {}
-    for i in idf_dict.keys():
+    for i in idf_dict:
         idf_final[i] = log((len(documents) - idf_dict[i] + 0.5) / (idf_dict[i] + 0.5))
 
     return idf_final

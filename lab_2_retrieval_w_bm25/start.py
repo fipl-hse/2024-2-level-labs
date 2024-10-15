@@ -42,19 +42,19 @@ def main() -> None:
         tok_doc_without_stopwords = []
         for doc in tokenized_documents:
             without_stopwords = remove_stopwords(doc, stopwords)
-            if without_stopwords is None or vocab_made_of_tok_doc is None:
+            if without_stopwords is None:
                 return None
             tok_doc_without_stopwords.append(without_stopwords)
 
-        '''if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
-            return None'''
+        if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
+            return None
 
         list_of_tf_idf_dict = []
         for doc in tok_doc_without_stopwords:
             tf_dict = calculate_tf(vocab_made_of_tok_doc, doc)
             idf_dict = calculate_idf(vocab_made_of_tok_doc, tok_doc_without_stopwords)
-            if tf_dict is None or idf_dict is None:
-                return None
+            '''if tf_dict is None or idf_dict is None:
+                return None'''
             tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
             if tf_idf_dict is None:
                 return None

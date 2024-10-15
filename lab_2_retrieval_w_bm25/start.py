@@ -53,11 +53,11 @@ def main() -> None:
         for doc in tok_doc_without_stopwords:
             tf_dict = calculate_tf(vocab_made_of_tok_doc, doc)
             idf_dict = calculate_idf(vocab_made_of_tok_doc, tok_doc_without_stopwords)
-            '''if tf_dict is None or idf_dict is None:
-                return None'''
-            tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
-            if tf_idf_dict is None:
+            if tf_dict is None or idf_dict is None:
                 return None
+            tf_idf_dict = calculate_tf_idf(tf_dict, idf_dict)
+            '''if tf_idf_dict is None:
+                return None'''
             list_of_tf_idf_dict.append(tf_idf_dict)
 
         if list_of_tf_idf_dict is None or idf_dict is None:

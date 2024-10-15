@@ -3,7 +3,8 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-import lab_2_retrieval_w_bm25.main as funcs
+from main import (build_vocabulary, calculate_bm25, calculate_idf, calculate_tf, calculate_tf_idf,
+                  rank_documents, remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -29,28 +30,44 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-    documents = [funcs.remove_stopwords(funcs.tokenize(doc), stopwords) for doc in documents]
-    vocab = funcs.build_vocabulary(documents)
-    idf = funcs.calculate_idf(vocab, documents)
-    avg_len = 0
-    for doc in documents:
-        avg_len += len(doc)
-    avg_len /= len(documents)
-    tf_idfs = []
-    bm25s = []
-    for doc in documents:
-        tf = funcs.calculate_tf(vocab, doc)
-        tf_idf = funcs.calculate_tf_idf(tf, idf)
-        tf_idfs.append(tf_idf)
-        bm25 = funcs.calculate_bm25(vocab, doc, idf, avg_doc_len=avg_len, doc_len=len(doc))
-        bm25s.append(bm25)
-
     result = None
-    if isinstance(tf_idfs, list) and isinstance(bm25s, list):
-        result = funcs.rank_documents(tf_idfs, 'Which fairy tale has Fairy Queen?', stopwords)
-        print(result)
-        result = funcs.rank_documents(bm25s, 'Which fairy tale has Fairy Queen?', stopwords)
-        print(result)
+    prep_documents = []
+    for doc in documents:
+        token_doc = tokenize(doc)
+        if isinstance(token_doc, list):
+            no_sw_doc = remove_stopwords(token_doc, stopwords)
+            if isinstance(no_sw_doc, list):
+                prep_documents.append(no_sw_doc)
+
+    if len(prep_documents) == len(documents):
+        vocab = build_vocabulary(prep_documents)
+        if isinstance(vocab, list):
+            idf = calculate_idf(vocab, prep_documents)
+            if isinstance(idf, dict):
+                avg_len = 0
+                for doc in prep_documents:
+                    avg_len += len(doc)
+                avg_len /= len(prep_documents)
+                tf_idfs = []
+                bm25s = []
+                for doc in prep_documents:
+                    tf = calculate_tf(vocab, doc)
+                    if isinstance(tf, dict):
+                        tf_idf = calculate_tf_idf(tf, idf)
+                        if isinstance(tf_idf, dict):
+                            tf_idfs.append(tf_idf)
+                    bm25 = calculate_bm25(
+                        vocab, doc, idf, avg_doc_len=avg_len, doc_len=len(doc))
+                    if isinstance(bm25, dict):
+                        bm25s.append(bm25)
+
+                if len(tf_idfs) == len(prep_documents) and len(bm25s) == len(prep_documents):
+                    result = rank_documents(
+                        tf_idfs, 'Which fairy tale has Fairy Queen?', stopwords)
+                    print(result)
+                    result = rank_documents(
+                        bm25s, 'Which fairy tale has Fairy Queen?', stopwords)
+                    print(result)
     assert result, "Result is None"
 
 

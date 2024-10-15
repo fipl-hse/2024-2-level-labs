@@ -23,14 +23,13 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    symbol_list = list(text)
-    for index, symbol in enumerate(symbol_list):
+    for symbol in text:
         if not (symbol.isalpha() or
                 symbol == " " or
                 symbol == "\n"):
-            symbol_list[index] = " "
+            text = text.replace(symbol, " ")
 
-    return "".join(symbol_list).lower().split()
+    return text.lower().split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -54,11 +53,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
             all(isinstance(word, str) for word in stopwords)):
         return None
 
-    new_tokens = tokens[:]
-    for token in tokens:
-        if token in stopwords:
-            new_tokens.remove(token)
-
+    new_tokens = [token for token in tokens if not token in stopwords]
     return new_tokens
 
 
@@ -266,17 +261,19 @@ def rank_documents(
         return None
 
     tokenized_query = tokenize(query)
+    if not isinstance(tokenized_query, list):
+        return None
     query_to_compare = remove_stopwords(tokenized_query, stopwords)
     if not isinstance(query_to_compare, list):
         return None
 
     doc_sums = []
-    for doc_num in range(len(indexes)):
-        s = 0
+    for doc_num, doc in enumerate(indexes):
+        values_sum = 0.0
         for token in query_to_compare:
-            if token in indexes[doc_num]:
-                s += indexes[doc_num][token]
-        doc_sums.append((doc_num, s))
+            if token in doc:
+                values_sum += doc[token]
+        doc_sums.append((doc_num, values_sum))
     doc_sums.sort(reverse=True, key=lambda a: a[1])
     return doc_sums
 

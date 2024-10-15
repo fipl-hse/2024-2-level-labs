@@ -31,15 +31,12 @@ def main() -> None:
     tokenized_documents = []
     for str_of_tokens in documents:
         list_of_tokens = tokenize(str_of_tokens)
-        if list_of_tokens is None:
-            return None
+        '''if list_of_tokens is None:
+            return None'''
         tokenized_documents.append(list_of_tokens)
 
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-
-        '''if stopwords is None or documents is None or tokenized_documents is None:
-            return None'''
 
         vocab_made_of_tok_doc = build_vocabulary(tokenized_documents)
         tok_doc_without_stopwords = []

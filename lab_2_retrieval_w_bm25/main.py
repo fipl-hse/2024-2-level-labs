@@ -23,14 +23,13 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    tokenized_text_str = ''
+    tokenized_text = ''
     for element in text.lower():
         if element.isalpha() or element == ' ':
-            tokenized_text_str += element
+            tokenized_text += element
         else:
-            tokenized_text_str += ' '
-    tokenized_text = tokenized_text_str.split()
-    return tokenized_text
+            tokenized_text += ' '
+    return tokenized_text.split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -106,6 +105,9 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             or not document_tokens):
         return None
     term_frequency = {}
+    for word in document_tokens:
+        if word not in vocab:
+            vocab.append(word)
     for word in vocab:
         term_frequency[word] = document_tokens.count(word) / len(document_tokens)
     return term_frequency
@@ -159,7 +161,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tf, dict) or not isinstance(idf, dict):
+    if not isinstance(tf, dict) or not isinstance(idf, dict) or not tf or not idf:
         return None
     if (not all(isinstance(key, str) and isinstance(value, float) for key, value in tf.items())
             or not all(isinstance(key, str) and isinstance(value, float) for key, value in idf.items())):

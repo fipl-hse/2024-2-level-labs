@@ -31,8 +31,8 @@ def main() -> None:
     tokenized_documents = []
     for str_of_tokens in documents:
         list_of_tokens = tokenize(str_of_tokens)
-        '''if list_of_tokens is None:
-            return None'''
+        if list_of_tokens is None:
+            return None
         tokenized_documents.append(list_of_tokens)
 
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
@@ -42,12 +42,12 @@ def main() -> None:
         tok_doc_without_stopwords = []
         for doc in tokenized_documents:
             without_stopwords = remove_stopwords(doc, stopwords)
-            if without_stopwords is None:
+            if without_stopwords is None or vocab_made_of_tok_doc is None:
                 return None
             tok_doc_without_stopwords.append(without_stopwords)
 
-        if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
-            return None
+        '''if vocab_made_of_tok_doc is None or tok_doc_without_stopwords is None:
+            return None'''
 
         list_of_tf_idf_dict = []
         for doc in tok_doc_without_stopwords:

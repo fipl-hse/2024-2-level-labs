@@ -304,9 +304,8 @@ def rank_documents(
         )
     ):
         return None
-    if not isinstance(query, str):
-        return None
-    if not isinstance(stopwords, list) or not all(isinstance(elem, str) for elem in stopwords):
+    if not isinstance(stopwords, list) or not all(isinstance(elem, str) for elem in stopwords) or\
+            not isinstance(query, str):
         return None
 
     tokenized_query = tokenize(query)

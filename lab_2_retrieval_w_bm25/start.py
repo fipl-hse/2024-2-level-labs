@@ -38,7 +38,11 @@ def main() -> None:
         avg_doc_len += len(document)
         tokenized_document = m.tokenize(document)
         if tokenized_document:
-            clear_documents.append(m.remove_stopwords(tokenized_document, stopwords))
+            clear_document = m.remove_stopwords(tokenized_document, stopwords)
+            if clear_document:
+                clear_documents.append(clear_document)
+                continue
+        return None
     avg_doc_len /= len(clear_documents)
 
     vocab = m.build_vocabulary(clear_documents)
@@ -60,11 +64,15 @@ def main() -> None:
                                                           alpha, k1, b, avg_doc_len, doc_len)
             if optimized_bm25:
                 optimized_bm25_list.append(optimized_bm25)
+                continue
+        return None
 
     m.save_index(optimized_bm25_list, file_path)
     loaded_index = m.load_index(file_path)
     if loaded_index:
         ranked_index = m.rank_documents(loaded_index, query, stopwords)
+    else:
+        return None
     ranked_tf_idf = m.rank_documents(tf_idf_list, query, stopwords)
     ranked_bm25 = m.rank_documents(bm25_list, query, stopwords)
 
@@ -72,7 +80,7 @@ def main() -> None:
     tf_idf_spearman = m.calculate_spearman([i[0] for i in ranked_tf_idf], golden_rank)
     bm25_spearman = m.calculate_spearman([i[0] for i in ranked_bm25], golden_rank)
 
-    result = (tf_idf_spearman, bm25_spearman)
+    result = (golden_rank, tf_idf_spearman, bm25_spearman)
     print(result)
     assert result, "Result is None"
 

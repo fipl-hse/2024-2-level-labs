@@ -3,6 +3,11 @@ Lab 2.
 
 Text retrieval with BM25
 """
+
+
+from docutils.nodes import document
+from sphinx.cmd.quickstart import nonempty
+from math import log
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -18,11 +23,12 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-
-
-
-
-
+    if not isinstance(text, str):
+        return None
+    for item in text:
+        if not item.isalpha() and item != ' ':
+            text = text.replace(item, ' ')
+    return text.lower().split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -38,6 +44,10 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tokens, list) or not isinstance(stopwords, list) or not all(isinstance(symbol, str) for symbol in tokens) or not all(isinstance(symb, str) for symb in stopwords) or not tokens or not stopwords:
+        return None
+    filtered_tokens = [word for word in tokens if word not in stopwords]
+    return filtered_tokens
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -52,6 +62,17 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(documents, list) or not documents:
+        return None
+    unique_voc = set()
+    for tokens_list in documents:
+        if not isinstance(tokens_list, list):
+            return None
+        for token in tokens_list:
+            if not isinstance(token, str):
+                return None
+        unique_voc.update(tokens_list)
+    return list(unique_voc)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -67,6 +88,13 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab) or not vocab or not isinstance(document_tokens, list) or not all(isinstance(item, str) for item in document_tokens) or not document_tokens:
+        return None
+    tf_result = {}
+    union = set(vocab).union(set(document_tokens))
+    for word in union:
+        tf_result[word] = document_tokens.count(word) / len(document_tokens)
+    return tf_result
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -82,6 +110,16 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab) or not isinstance(documents, list) or not all(isinstance(docum, list) for docum in documents) or not all(isinstance(item, str) for docum in documents for item in docum) or not vocab or not documents:
+        return None
+    idf_result = {}
+    for word in vocab:
+        words_count = 0
+        for doc in documents:
+            if word in doc:
+                words_count += 1
+        idf_result[word] = log((len(documents) - words_count + 0.5) / (words_count + 0.5))
+    return idf_result
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -97,6 +135,12 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tf, dict) or not isinstance(idf, dict) or not all(isinstance(key, str) for key in tf) or not all(isinstance(key, str) for key in idf) or not all(isinstance(value, float) for value in tf.values()) or not all(isinstance(value, float) for value in idf.values()) or not tf or not idf:
+        return None
+    tf_idf_result = {}
+    for word in tf:
+        tf_idf_result[word] = tf[word] * idf[word]
+    return tf_idf_result
 
 
 def calculate_bm25(

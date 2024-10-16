@@ -52,7 +52,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     for token in tokens.copy():
         if token in stopwords:
             tokens.remove(token)
-    return tokens or None
+    return tokens
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -78,7 +78,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """
-     Calculate term frequency for the given tokens based on the vocabulary.
+    Calculate term frequency for the given tokens based on the vocabulary.
 
     Args:
         vocab (list[str]): Vocabulary list.
@@ -96,8 +96,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if is_not_correct:
         return None
 
-    return {term: document_tokens.count(term) / len(document_tokens)
-            for term in build_vocabulary([vocab, document_tokens])}
+    document_tokens_length = len(document_tokens)
+    built_vocabulary = build_vocabulary([vocab, document_tokens])
+    return {term: document_tokens.count(term) / document_tokens_length
+            for term in built_vocabulary}
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -121,11 +123,12 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     if is_not_correct:
         return None
 
+    documents_length = len(documents)
     freq_dict = {}
     for document in documents:
         for term in document:
             num_documents_with_term = sum(1 for document in documents if term in document)
-            freq_dict[term] = math.log((len(documents) - num_documents_with_term + 0.5) /
+            freq_dict[term] = math.log((documents_length - num_documents_with_term + 0.5) /
                                        (num_documents_with_term + 0.5))
     return freq_dict
 
@@ -156,13 +159,13 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
 
 def calculate_bm25(
-        vocab: list[str],
-        document: list[str],
-        idf_document: dict[str, float],
-        k1: float = 1.5,
-        b: float = 0.75,
-        avg_doc_len: float | None = None,
-        doc_len: int | None = None,
+    vocab: list[str],
+    document: list[str],
+    idf_document: dict[str, float],
+    k1: float = 1.5,
+    b: float = 0.75,
+    avg_doc_len: float | None = None,
+    doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document.
@@ -189,8 +192,8 @@ def calculate_bm25(
                       not all((isinstance(key, str) and isinstance(value, float)
                                for key, value in idf_document.items())) or
                       all(isinstance(i, dict) for i in idf_document.values()) or
-                      not k1 or not isinstance(k1, float) or not 1.2 <= k1 <= 2.0 or
-                      not b or not isinstance(b, float) or not 0 <= b <= 1 or
+                      not k1 or not isinstance(k1, float) or
+                      not b or not isinstance(b, float) or
                       not avg_doc_len or not isinstance(avg_doc_len, float) or
                       avg_doc_len is None or not doc_len or not isinstance(doc_len, int) or
                       isinstance(doc_len, bool) or doc_len is None)
@@ -198,7 +201,8 @@ def calculate_bm25(
         return None
 
     bm25_dict = {}
-    for term in build_vocabulary([vocab, document]):
+    built_vocabulary = build_vocabulary([vocab, document])
+    for term in built_vocabulary:
         if term not in vocab:
             bm25_dict[term] = 0.0
             continue
@@ -210,7 +214,7 @@ def calculate_bm25(
 
 
 def rank_documents(
-        indexes: list[dict[str, float]], query: str, stopwords: list[str]
+    indexes: list[dict[str, float]], query: str, stopwords: list[str]
 ) -> list[tuple[int, float]] | None:
     """
     Rank documents for the given query.
@@ -242,20 +246,26 @@ def rank_documents(
     if not query_preprocess:
         return None
 
-    return sorted([(indexes.index(document), sum(document[word] for word in document
-                                                 if word in query_preprocess))
-                   for document in indexes], key=lambda x: x[1], reverse=True)
+    ranked_documents = []
+    for document in indexes:
+        sum_indexes = 0.0
+        document_index = indexes.index(document)
+        for word in document:
+            if word in query_preprocess:
+                sum_indexes += document[word]
+        ranked_documents.append((document_index, sum_indexes))
+    return sorted(ranked_documents, key=lambda x: x[1], reverse=True)
 
 
 def calculate_bm25_with_cutoff(
-        vocab: list[str],
-        document: list[str],
-        idf_document: dict[str, float],
-        alpha: float,
-        k1: float = 1.5,
-        b: float = 0.75,
-        avg_doc_len: float | None = None,
-        doc_len: int | None = None,
+    vocab: list[str],
+    document: list[str],
+    idf_document: dict[str, float],
+    alpha: float,
+    k1: float = 1.5,
+    b: float = 0.75,
+    avg_doc_len: float | None = None,
+    doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document with IDF cutoff.
@@ -284,8 +294,8 @@ def calculate_bm25_with_cutoff(
                                for key, value in idf_document.items())) or
                       all(isinstance(i, dict) for i in idf_document.values()) or
                       not alpha or not isinstance(alpha, float) or
-                      not k1 or not isinstance(k1, float) or not 1.2 <= k1 <= 2.0 or
-                      not b or not isinstance(b, float) or not 0 <= b <= 1 or
+                      not k1 or not isinstance(k1, float) or
+                      not b or not isinstance(b, float) or
                       not avg_doc_len or not isinstance(avg_doc_len, float) or
                       not doc_len or avg_doc_len is None or not isinstance(doc_len, int) or
                       isinstance(doc_len, bool) or doc_len < 0 or doc_len is None)
@@ -372,7 +382,9 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     if is_not_correct:
         return None
 
-    n = len(rank)
-    return 1 - (6 * sum((index - golden_rank.index(number)) ** 2
-                                        for index, number in enumerate(rank)
-                                        if number in golden_rank)) / (n * (n ** 2 - 1))
+    rank_difference = 0.0
+    rank_length = len(rank)
+    for index, number in enumerate(rank):
+        if number in golden_rank:
+            rank_difference += (index - golden_rank.index(number)) ** 2
+    return 1 - (6 * rank_difference) / (rank_length * (rank_length ** 2 - 1))

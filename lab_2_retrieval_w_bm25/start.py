@@ -27,7 +27,8 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = remove_stopwords([], stopwords)
+    result = remove_stopwords(tokenize('''There was a boy, who was a wizard. He used his wand to do
+    spells. He was studying in a magic school. His best friend was a wizard too.'''), stopwords)
     print(result)
     assert result, "Result is None"
 

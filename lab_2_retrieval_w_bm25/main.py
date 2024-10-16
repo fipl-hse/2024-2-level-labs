@@ -55,7 +55,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     """
     right_input = isinstance(tokens, list) and isinstance(stopwords, list) and all(
         isinstance(token, str) for token in tokens) and all(
-        isinstance(word, str) for word in stopwords) and tokens != [] and stopwords != []
+        isinstance(word, str) for word in stopwords) and tokens and stopwords
     if not right_input:
         return None
     tokenize_doc = []
@@ -79,7 +79,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
     if not isinstance(documents, list) \
             or not all(isinstance(doc, list) for doc in documents) \
-            or documents == []:
+            or not documents:
         return None
     for doc in documents:
         if not all(isinstance(word, str) for word in doc):
@@ -108,7 +108,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     is_valid_input = (isinstance(vocab, list) and isinstance(document_tokens, list)
                       and all(isinstance(word, str) for word in vocab)
                       and all(isinstance(token, str) for token in document_tokens)
-                      and vocab != [] and document_tokens != [])
+                      and vocab and document_tokens)
     if not is_valid_input:
         return None
     tf_dict = {}
@@ -142,13 +142,13 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         if not all(isinstance(word, str) for word in doc):
             return None
     idf_dic = {}
-    n = len(documents)
+    len_doc = len(documents)
     for word in vocab:
         amount = 0
         for tokenize_doc in documents:
             if word in tokenize_doc:
                 amount += 1
-        idf_dic[word] = math.log((n - amount + 0.5) / (amount + 0.5))
+        idf_dic[word] = math.log((len_doc - amount + 0.5) / (amount + 0.5))
     return idf_dic
 
 
@@ -170,7 +170,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
                                  for key, value in tf.items())))
                        and all((isinstance(key, str) and isinstance(value, float)
                                 for key, value in idf.items())))
-                      and tf != {} and idf != {})
+                      and tf and idf)
     if not is_valid_input:
         return None
 
@@ -209,8 +209,8 @@ def calculate_bm25(
     is_valid_input = ((((isinstance(idf_document, dict) and isinstance(k1, float)
                          and isinstance(b, float) and isinstance(doc_len, int))
                         and isinstance(avg_doc_len, float) and isinstance(vocab, list))
-                       and isinstance(document, list) and document != [] and vocab != [])
-                      and idf_document != {} and not isinstance(doc_len, bool))
+                       and isinstance(document, list) and document and vocab)
+                      and idf_document and not isinstance(doc_len, bool))
     if not is_valid_input or doc_len is None or avg_doc_len is None:
         return None
     if not all(isinstance(word, str) for word in vocab) \

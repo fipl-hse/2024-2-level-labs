@@ -4,6 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
+import math
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -18,6 +19,20 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    out = []
+    wrd = ''
+    for char in text.lower():
+        if char.isalpha():
+            wrd += char
+        else:
+            if wrd != '':
+                out.append(wrd)
+            wrd = ''
+    if not out:
+        return None
+    return out
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -33,6 +48,15 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tokens, list):
+        return None
+    if not isinstance(stopwords, list):
+        return None
+    srtd = []
+    for e in tokens:
+        if isinstance(e, str) and e not in stopwords:
+            srtd.append(e)
+    return srtd
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -47,6 +71,18 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(documents, list):
+        return None
+    out = []
+    for a in documents:
+        if not isinstance(a, list):
+            return None
+        for el in a:
+            if not isinstance(el, str):
+                return None
+            if el not in out:
+                out.append(el)
+    return out
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -62,6 +98,17 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or \
+            not isinstance(document_tokens, list):
+        return None
+    if len(document_tokens) == 0:
+        return None
+    outpt = {}
+    for el in vocab:
+        if not isinstance(el, str):
+            return None
+        outpt[el] = document_tokens.count(el) / len(document_tokens)
+    return outpt
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -77,6 +124,22 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or \
+            not isinstance(documents, list):
+        return None
+    ttl = len(documents)
+    out = {}
+    for el in vocab:
+        if not isinstance(el, str):
+            return None
+        temp = 0
+        for a in documents:
+            if not (isinstance(a, list)):
+                return None
+            if a.count(el) > 0:
+                temp += 1
+        out[el] = math.log1p(ttl / temp)
+    return out
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -92,16 +155,23 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tf, dict) or \
+            not isinstance(idf, dict):
+        return None
+    out = {}
+    for el in tf.keys():
+        out[el] = tf[el] * idf[el]
+    return out
 
 
 def calculate_bm25(
-    vocab: list[str],
-    document: list[str],
-    idf_document: dict[str, float],
-    k1: float = 1.5,
-    b: float = 0.75,
-    avg_doc_len: float | None = None,
-    doc_len: int | None = None,
+        vocab: list[str],
+        document: list[str],
+        idf_document: dict[str, float],
+        k1: float = 1.5,
+        b: float = 0.75,
+        avg_doc_len: float | None = None,
+        doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document.
@@ -120,10 +190,25 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or \
+            not isinstance(document, list) or \
+            not isinstance(avg_doc_len, float) or \
+            not isinstance(doc_len, int) or \
+            not isinstance(idf_document, dict):
+        return None
+    # if vocab != idf_document.keys:
+    # return None
+    out = {}
+    for el in vocab:
+        curidf = idf_document[el]
+        curcnt = document.count(el)
+        tmpvar = (curcnt * (k1 + 1)) / (curcnt + k1 * (1 - b + b * (doc_len / avg_doc_len)))
+        out[el] = curidf * tmpvar
+    return out
 
 
 def rank_documents(
-    indexes: list[dict[str, float]], query: str, stopwords: list[str]
+        indexes: list[dict[str, float]], query: str, stopwords: list[str]
 ) -> list[tuple[int, float]] | None:
     """
     Rank documents for the given query.
@@ -138,17 +223,23 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(indexes, list) or \
+            not isinstance(query, str) or \
+            not isinstance(stopwords, list):
+        return None
+    prcsd = remove_stopwords(tokenize(query), stopwords)
+
 
 
 def calculate_bm25_with_cutoff(
-    vocab: list[str],
-    document: list[str],
-    idf_document: dict[str, float],
-    alpha: float,
-    k1: float = 1.5,
-    b: float = 0.75,
-    avg_doc_len: float | None = None,
-    doc_len: int | None = None,
+        vocab: list[str],
+        document: list[str],
+        idf_document: dict[str, float],
+        alpha: float,
+        k1: float = 1.5,
+        b: float = 0.75,
+        avg_doc_len: float | None = None,
+        doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document with IDF cutoff.

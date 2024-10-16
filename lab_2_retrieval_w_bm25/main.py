@@ -188,9 +188,11 @@ def calculate_bm25(
                       not all(isinstance(i, str) for i in vocab) or
                       not document or not isinstance(document, list) or
                       not all(isinstance(i, str) for i in document) or
+                      document is None or
                       not idf_document or not isinstance(idf_document, dict) or
                       not all((isinstance(key, str) and isinstance(value, float)
                                for key, value in idf_document.items())) or
+                      idf_document is None or
                       all(isinstance(i, dict) for i in idf_document.values()) or
                       not k1 or not isinstance(k1, float) or
                       not b or not isinstance(b, float) or
@@ -289,10 +291,12 @@ def calculate_bm25_with_cutoff(
                       not all(isinstance(i, str) for i in vocab) or
                       not document or not isinstance(document, list) or
                       not all(isinstance(i, str) for i in document) or
+                      document is None or
                       not idf_document or not isinstance(idf_document, dict) or
                       not all((isinstance(key, str) and isinstance(value, float)
                                for key, value in idf_document.items())) or
                       all(isinstance(i, dict) for i in idf_document.values()) or
+                      idf_document is None or
                       not alpha or not isinstance(alpha, float) or
                       not k1 or not isinstance(k1, float) or
                       not b or not isinstance(b, float) or

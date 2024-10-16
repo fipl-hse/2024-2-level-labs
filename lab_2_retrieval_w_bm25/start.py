@@ -35,13 +35,14 @@ def main() -> None:
         stopwords = file.read().split("\n")
 
     for document in documents:
-        avg_doc_len += len(document)
-        tokenized_document = m.tokenize(document)
-        if tokenized_document is not None:
-            clear_document = m.remove_stopwords(tokenized_document, stopwords)
-            if clear_document is not None:
-                clear_documents.append(clear_document)
-                continue
+        if document is not None:
+            avg_doc_len += len(document)
+            tokenized_document = m.tokenize(document)
+            if tokenized_document is not None:
+                clear_document = m.remove_stopwords(tokenized_document, stopwords)
+                if clear_document is not None:
+                    clear_documents.append(clear_document)
+                    continue
         return None
     avg_doc_len /= len(clear_documents)
 

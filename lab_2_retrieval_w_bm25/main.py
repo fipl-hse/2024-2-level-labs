@@ -198,6 +198,31 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(doc_len, int) or not isinstance(avg_doc_len, float)
+            or not isinstance(k1, float) or not isinstance(b, float)):
+        return None
+    if not vocab or not document or not idf_document:
+        return None
+    if (not isinstance(vocab, list) or not isinstance(document, list)
+            or not isinstance(idf_document, dict)):
+        return None
+    if (not all(isinstance(word, str) for word in vocab)
+            or not all(isinstance(word, str) for word in document)
+            or not all(isinstance(k, str) and isinstance(v, float) for k, v in idf_document.items())):
+        return None
+    for word in document:
+        if word not in vocab:
+            vocab.append(word)
+    '''for word in document:
+        if word not in idf_document:
+            idf_document[word] = 0'''
+    n_t = {}
+    for word in vocab:
+        n_t[word] = document.count(word)
+    bm25 = {}
+    for token, idf in idf_document.items():
+        bm25[token] = idf * ((n_t[token] * (k1 + 1))/(n_t[token] + k1 * (1 + b - b * (doc_len/avg_doc_len))))
+    return bm25
 
 
 def rank_documents(

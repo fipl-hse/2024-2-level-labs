@@ -74,7 +74,9 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         return None
 
     vocab = set(sum(documents, []))
-    return list(vocab)
+    if all(isinstance(i, str) for i in vocab):
+        return list(vocab)
+    return None
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -160,13 +162,13 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
 
 def calculate_bm25(
-    vocab: list[str],
-    document: list[str],
-    idf_document: dict[str, float],
-    k1: float = 1.5,
-    b: float = 0.75,
-    avg_doc_len: float | None = None,
-    doc_len: int | None = None,
+        vocab: list[str],
+        document: list[str],
+        idf_document: dict[str, float],
+        k1: float = 1.5,
+        b: float = 0.75,
+        avg_doc_len: float | None = None,
+        doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document.
@@ -210,14 +212,13 @@ def calculate_bm25(
             bm25_dict[term] = 0.0
             continue
         num_term_occur = document.count(term)
-        bm25_dict[term] = (idf_document[term] * ((num_term_occur * (k1 + 1)) /
-                                                 (num_term_occur + k1 *
-                                                  (1 - b + b * doc_len / avg_doc_len))))
+        bm25_dict[term] = (idf_document[term] * num_term_occur * (k1 + 1) /
+                           (num_term_occur + k1 * (1 - b + b * doc_len / avg_doc_len)))
     return bm25_dict
 
 
 def rank_documents(
-    indexes: list[dict[str, float]], query: str, stopwords: list[str]
+        indexes: list[dict[str, float]], query: str, stopwords: list[str]
 ) -> list[tuple[int, float]] | None:
     """
     Rank documents for the given query.
@@ -261,14 +262,14 @@ def rank_documents(
 
 
 def calculate_bm25_with_cutoff(
-    vocab: list[str],
-    document: list[str],
-    idf_document: dict[str, float],
-    alpha: float,
-    k1: float = 1.5,
-    b: float = 0.75,
-    avg_doc_len: float | None = None,
-    doc_len: int | None = None,
+        vocab: list[str],
+        document: list[str],
+        idf_document: dict[str, float],
+        alpha: float,
+        k1: float = 1.5,
+        b: float = 0.75,
+        avg_doc_len: float | None = None,
+        doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document with IDF cutoff.
@@ -308,15 +309,15 @@ def calculate_bm25_with_cutoff(
         return None
 
     modified_bm25_dict = {}
-    for word in vocab:
-        if word in idf_document:
-            idf = idf_document[word]
+    built_vocabulary = build_vocabulary([vocab, document])
+    for term in built_vocabulary:
+        if term in idf_document:
+            idf = idf_document[term]
             if idf < alpha:
                 continue
-            num_word_occur = document.count(word)
-            modified_bm25_dict[word] = idf * ((num_word_occur * (k1 + 1)) /
-                                              (num_word_occur + k1 *
-                                               (1 - b + b * doc_len / avg_doc_len)))
+            num_term_occur = document.count(term)
+            modified_bm25_dict[term] = (idf * num_term_occur * (k1 + 1) /
+                                        (num_term_occur + k1 * (1 - b + b * doc_len / avg_doc_len)))
     return modified_bm25_dict
 
 

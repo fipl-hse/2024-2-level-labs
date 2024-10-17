@@ -172,13 +172,13 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
 
 def calculate_bm25(
-        vocab: list[str],
-        document: list[str],
-        idf_document: dict[str, float],
-        k1: float = 1.5,
-        b: float = 0.75,
-        avg_doc_len: float | None = None,
-        doc_len: int | None = None,
+    vocab: list[str],
+    document: list[str],
+    idf_document: dict[str, float],
+    k1: float = 1.5,
+    b: float = 0.75,
+    avg_doc_len: float | None = None,
+    doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document.
@@ -215,13 +215,10 @@ def calculate_bm25(
                       not isinstance(b, float) or
 
                       not isinstance(avg_doc_len, float) or
-                      isinstance(avg_doc_len, bool) or
-                      avg_doc_len is None or
 
                       not isinstance(doc_len, int) or
-                      isinstance(doc_len, bool) or
-                      doc_len is None)
-    if is_not_correct:
+                      isinstance(doc_len, bool))
+    if is_not_correct or avg_doc_len is None or doc_len is None:
         return None
 
     bm25_dict = {}
@@ -237,7 +234,7 @@ def calculate_bm25(
 
 
 def rank_documents(
-        indexes: list[dict[str, float]], query: str, stopwords: list[str]
+    indexes: list[dict[str, float]], query: str, stopwords: list[str]
 ) -> list[tuple[int, float]] | None:
     """
     Rank documents for the given query.
@@ -279,14 +276,14 @@ def rank_documents(
 
 
 def calculate_bm25_with_cutoff(
-        vocab: list[str],
-        document: list[str],
-        idf_document: dict[str, float],
-        alpha: float,
-        k1: float = 1.5,
-        b: float = 0.75,
-        avg_doc_len: float | None = None,
-        doc_len: int | None = None,
+    vocab: list[str],
+    document: list[str],
+    idf_document: dict[str, float],
+    alpha: float,
+    k1: float = 1.5,
+    b: float = 0.75,
+    avg_doc_len: float | None = None,
+    doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document with IDF cutoff.

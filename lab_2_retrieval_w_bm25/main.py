@@ -323,14 +323,11 @@ def calculate_bm25_with_cutoff(
                       not isinstance(b, float) or
 
                       not isinstance(avg_doc_len, float) or
-                      isinstance(avg_doc_len, bool) or
-                      avg_doc_len is None or
 
                       not isinstance(doc_len, int) or
                       isinstance(doc_len, bool) or
-                      doc_len is None or
                       doc_len < 0)
-    if is_not_correct:
+    if is_not_correct or avg_doc_len is None or doc_len is None:
         return None
 
     modified_bm25_dict = {}

@@ -77,8 +77,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if is_not_correct:
         return None
 
-    vocab = set(sum(documents, []))
-    return list(vocab)
+    return list(set(sum(documents, [])))
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -134,12 +133,12 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     if is_not_correct:
         return None
 
-    documents_length = len(documents)
+    num_documents = len(documents)
     freq_dict = {}
     for document in documents:
         for term in document:
             num_documents_with_term = sum(1 for document in documents if term in document)
-            freq_dict[term] = math.log((documents_length - num_documents_with_term + 0.5) /
+            freq_dict[term] = math.log((num_documents - num_documents_with_term + 0.5) /
                                        (num_documents_with_term + 0.5))
     return freq_dict
 
@@ -216,9 +215,11 @@ def calculate_bm25(
                       not isinstance(b, float) or
 
                       not isinstance(avg_doc_len, float) or
+                      avg_doc_len is None or
 
                       not isinstance(doc_len, int) or
-                      isinstance(doc_len, bool))
+                      isinstance(doc_len, bool) or
+                      doc_len is None)
     if is_not_correct:
         return None
 
@@ -324,9 +325,11 @@ def calculate_bm25_with_cutoff(
                       not isinstance(b, float) or
 
                       not isinstance(avg_doc_len, float) or
+                      avg_doc_len is None or
 
                       not isinstance(doc_len, int) or
                       isinstance(doc_len, bool) or
+                      doc_len is None or
                       doc_len < 0)
     if is_not_correct:
         return None

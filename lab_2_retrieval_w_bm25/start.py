@@ -1,7 +1,12 @@
 """
 Laboratory Work #2 starter
 """
-# pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
+# pylint:disable=too-many-locals, unused-argument, unused-variable,
+# too-many-branches, too-many-statements, duplicate-code
+
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -26,7 +31,53 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = None
+
+    print('Tokenized_documents \n')
+
+    tokenized_documents = []
+    total_number_words = 0
+    for document in documents:
+        tokenized_document = tokenize(document)
+        if tokenized_document is not None:
+            total_number_words += len(tokenized_document)
+            new_doc = remove_stopwords(tokenized_document, stopwords)
+            if new_doc is not None:
+                tokenized_documents.append(new_doc)
+                print(new_doc)
+
+    print('\n Tf-idf dictionaries \n')
+
+    vocab = build_vocabulary(tokenized_documents)
+    if vocab is not None:
+        idf = calculate_idf(vocab, tokenized_documents)
+    else:
+        idf = {}
+
+    tf_idf_list = []
+    bm25_list = []
+    avg_doc_len = total_number_words / len(documents)
+    if idf is not None:
+        for tokenized_doc in tokenized_documents:
+            if isinstance(tokenized_doc, list) and vocab is not None:
+                tf = calculate_tf(vocab, tokenized_doc)
+                doc_len = len(tokenized_doc)
+                if tf is not None:
+                    tf_idf = calculate_tf_idf(tf, idf)
+                    if tf_idf is not None:
+                        tf_idf_list.append(tf_idf)
+                        print(tf_idf)
+
+                bm25 = calculate_bm25(vocab, tokenized_doc, idf, 1.5, 0.75, avg_doc_len, doc_len)
+                if bm25 is not None:
+                    bm25_list.append(bm25)
+
+    print('\n Ranking documents using tf-idf:\n')
+    print(rank_documents(tf_idf_list, 'Which fairy tale has Fairy Queen?', stopwords))
+
+    print('\n Ranking documents using bm25:\n')
+    print(rank_documents(bm25_list, 'Which fairy tale has Fairy Queen?', stopwords))
+
+    result = 'aaaaa please work'
     assert result, "Result is None"
 
 

@@ -383,7 +383,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     with open(file_path, 'r', encoding='utf-8') as file:
         loaded_index = json.load(file)
-    return loaded_index
+    return loaded_index if isinstance(loaded_index, list) else None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:

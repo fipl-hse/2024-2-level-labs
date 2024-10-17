@@ -65,9 +65,7 @@ def main() -> None:
                     tf_idf = calculate_tf_idf(tf, idf)
                     if tf_idf is not None:
                         tf_idf_list.append(tf_idf)
-                    else:
-                        tf_idf = {}
-                    print(tf_idf)
+                        print(tf_idf)
 
                 bm25 = calculate_bm25(vocab, document, idf, 1.5, 0.75, avg_doc_len, doc_len)
                 if bm25 is not None:

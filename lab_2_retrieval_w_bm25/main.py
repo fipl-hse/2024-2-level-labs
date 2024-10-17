@@ -77,23 +77,17 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list):
+    if (not isinstance(documents, list) or not documents
+            or not all(isinstance(document, list) for document in documents)
+            or not all(len(document) > 1 for document in documents)):
         return None
 
-    vocab = []
-
-    for document in documents:
-        if not isinstance(document, list) or len(document) == 0:
-            return None
-        for word in document:
-            if not isinstance(word, str) or len(word) == 0:
-                return None
-            if word not in vocab:
-                vocab.append(word)
-
-    if not vocab:
+    vocab_set = {word for document in documents for word in document
+                 if isinstance(word, str) and word}
+    if not vocab_set:
         return None
-    return vocab
+
+    return list(vocab_set)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

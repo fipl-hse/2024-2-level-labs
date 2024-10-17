@@ -253,6 +253,8 @@ def rank_documents(
                       not isinstance(indexes, list) or
                       not all(isinstance(index, dict) for index in indexes) or
 
+                      not isinstance(query, str) or
+
                       not isinstance(stopwords, list))
     if is_not_correct:
         return None
@@ -381,12 +383,6 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     with open(file_path, 'r', encoding='utf-8') as file:
         loaded_index = json.load(file)
-    if (not loaded_index or
-            not isinstance(loaded_index, list) or
-            not all(isinstance(index_dict, dict) for index_dict in loaded_index) or
-            not all((isinstance(key, str) and isinstance(value, float)
-                     for index_dict in loaded_index for key, value in index_dict.items()))):
-        return None
     return loaded_index
 
 

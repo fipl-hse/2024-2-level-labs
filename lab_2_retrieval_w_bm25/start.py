@@ -26,7 +26,6 @@ def main() -> None:
     alpha, k1, b, avg_doc_len = 0.2, 1.5, 0.75, 0.0
     tf_idf_list, bm25_list, optimized_bm25_list = [], [], []
     documents, clear_documents, vocab = [], [], []
-    idf_dict, ranked_index = {}, []
 
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
@@ -39,37 +38,35 @@ def main() -> None:
             avg_doc_len += len(document)
             tokenized_document = m.tokenize(document)
             if tokenized_document is not None:
-                clear_document = m.remove_stopwords(tokenized_document, stopwords)
-                if clear_document is not None:
-                    clear_documents.append(clear_document)
-                    continue
-        return None
+                tokenized_document = m.remove_stopwords(tokenized_document, stopwords)
+            if tokenized_document is not None:
+                clear_documents.append(tokenized_document)
+
     avg_doc_len /= len(clear_documents)
 
-    if clear_documents is None:
-        return None
     vocab = m.build_vocabulary(clear_documents)
     if vocab is None:
         return None
     idf_dict = m.calculate_idf(vocab, clear_documents)
+    if idf_dict is None:
+        return None
 
     for document in clear_documents:
-        if document is not None and vocab is not None:
-            doc_len = len(document)
-            tf_dict = m.calculate_tf(vocab, document)
-            if tf_dict is not None:
-                tf_idf = m.calculate_tf_idf(tf_dict, idf_dict)
-                if tf_idf is not None:
-                    tf_idf_list.append(tf_idf)
-            bm25 = m.calculate_bm25(vocab, document, idf_dict, k1, b, avg_doc_len, doc_len)
-            if bm25 is not None:
-                bm25_list.append(bm25)
-            optimized_bm25 = m.calculate_bm25_with_cutoff(vocab, document, idf_dict,
-                                                          alpha, k1, b, avg_doc_len, doc_len)
-            if optimized_bm25 is not None:
-                optimized_bm25_list.append(optimized_bm25)
-                continue
-        return None
+        if document is None:
+            return None
+        doc_len = len(document)
+        tf_dict = m.calculate_tf(vocab, document)
+        if tf_dict is not None:
+            tf_idf = m.calculate_tf_idf(tf_dict, idf_dict)
+            if tf_idf is not None:
+                tf_idf_list.append(tf_idf)
+        bm25 = m.calculate_bm25(vocab, document, idf_dict, k1, b, avg_doc_len, doc_len)
+        if bm25 is not None:
+            bm25_list.append(bm25)
+        optimized_bm25 = m.calculate_bm25_with_cutoff(vocab, document, idf_dict,
+                                                      alpha, k1, b, avg_doc_len, doc_len)
+        if optimized_bm25 is not None:
+            optimized_bm25_list.append(optimized_bm25)
 
     m.save_index(optimized_bm25_list, file_path)
     loaded_index = m.load_index(file_path)

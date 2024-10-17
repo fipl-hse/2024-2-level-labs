@@ -20,7 +20,7 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not text or not isinstance(text, str):
+    if not isinstance(text, str):
         return None
 
     for symbol in text:
@@ -42,10 +42,13 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not tokens or not isinstance(tokens, list) or
-                      not all(isinstance(i, str) for i in tokens) or
-                      not stopwords or not isinstance(stopwords, list) or
-                      not all(isinstance(i, str) for i in stopwords))
+    is_not_correct = (not tokens or
+                      not isinstance(tokens, list) or
+                      not all(isinstance(token, str) for token in tokens) or
+
+                      not stopwords or
+                      not isinstance(stopwords, list) or
+                      not all(isinstance(word, str) for word in stopwords))
     if is_not_correct:
         return None
 
@@ -67,16 +70,15 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not documents or not isinstance(documents, list) or
-                      not all(isinstance(i, list) for i in documents) or
-                      not all(isinstance(i, str) for j in documents for i in j))
+    is_not_correct = (not documents or
+                      not isinstance(documents, list) or
+                      not all(isinstance(document, list) for document in documents) or
+                      not all(isinstance(term, str) for document in documents for term in document))
     if is_not_correct:
         return None
 
     vocab = set(sum(documents, []))
-    if all(isinstance(i, str) for i in vocab):
-        return list(vocab)
-    return None
+    return list(vocab)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -92,10 +94,13 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not vocab or not isinstance(vocab, list) or
-                      not all(isinstance(i, str) for i in vocab) or
-                      not document_tokens or not isinstance(document_tokens, list) or
-                      not all(isinstance(i, str) for i in document_tokens))
+    is_not_correct = (not vocab or
+                      not isinstance(vocab, list) or
+                      not all(isinstance(term, str) for term in vocab) or
+
+                      not document_tokens or
+                      not isinstance(document_tokens, list) or
+                      not all(isinstance(token, str) for token in document_tokens))
     if is_not_correct:
         return None
 
@@ -118,11 +123,14 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not vocab or not isinstance(vocab, list) or
-                      not all(isinstance(i, str) for i in vocab) or
-                      not documents or not isinstance(documents, list) or
-                      not all(isinstance(i, list) for i in documents) or
-                      not all(isinstance(i, str) for j in documents for i in j))
+    is_not_correct = (not vocab or
+                      not isinstance(vocab, list) or
+                      not all(isinstance(term, str) for term in vocab) or
+
+                      not documents or
+                      not isinstance(documents, list) or
+                      not all(isinstance(document, list) for document in documents) or
+                      not all(isinstance(term, str) for document in documents for term in document))
     if is_not_correct:
         return None
 
@@ -149,12 +157,15 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not tf or not isinstance(tf, dict) or
+    is_not_correct = (not tf or
+                      not isinstance(tf, dict) or
                       not all((isinstance(key, str) and isinstance(value, float)
                                for key, value in tf.items())) or
-                      not idf or not isinstance(idf, dict) or
-                      not all((isinstance(key, str) and isinstance(value, float)
-                               for key, value in idf.items())))
+
+                      not idf or
+                      not isinstance(idf, dict) or
+                      not all(isinstance(key, str) and isinstance(value, float)
+                              for key, value in idf.items()))
     if is_not_correct:
         return None
 
@@ -187,28 +198,34 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not vocab or not isinstance(vocab, list) or
-                      not all(isinstance(i, str) for i in vocab) or
-                      not document or not isinstance(document, list) or
-                      not all(isinstance(i, str) for i in document) or
-                      document is None or
-                      not idf_document or not isinstance(idf_document, dict) or
-                      not all((isinstance(key, str) and isinstance(value, float)
-                               for key, value in idf_document.items())) or
-                      idf_document is None or
-                      all(isinstance(i, dict) for i in idf_document.values()) or
-                      not k1 or not isinstance(k1, float) or
-                      not b or not isinstance(b, float) or
-                      not avg_doc_len or not isinstance(avg_doc_len, float) or
-                      avg_doc_len is None or not doc_len or not isinstance(doc_len, int) or
-                      isinstance(doc_len, bool) or doc_len is None)
+    is_not_correct = (not vocab or
+                      not isinstance(vocab, list) or
+                      not all(isinstance(term, str) for term in vocab) or
+
+                      not document or
+                      not isinstance(document, list) or
+                      not all(isinstance(term, str) for term in document) or
+
+                      not idf_document or
+                      not isinstance(idf_document, dict) or
+                      not all(isinstance(key, str) and isinstance(value, float)
+                              for key, value in idf_document.items()) or
+
+                      not isinstance(k1, float) or
+
+                      not isinstance(b, float) or
+
+                      not isinstance(avg_doc_len, float) or
+
+                      not isinstance(doc_len, int) or
+                      isinstance(doc_len, bool))
     if is_not_correct:
         return None
 
     bm25_dict = {}
     built_vocabulary = build_vocabulary([vocab, document])
     for term in built_vocabulary:
-        if term not in vocab:
+        if term not in idf_document:
             bm25_dict[term] = 0.0
             continue
         num_term_occur = document.count(term)
@@ -233,13 +250,11 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not indexes or not isinstance(indexes, list) or
-                      not all(isinstance(i, dict) for i in indexes) or
-                      not all((isinstance(key, str) and isinstance(value, float)
-                               for i in indexes for key, value in i.items())) or
-                      not query or not isinstance(query, str) or
-                      not stopwords or not isinstance(stopwords, list) or
-                      not all(isinstance(i, str) for i in stopwords))
+    is_not_correct = (not indexes or
+                      not isinstance(indexes, list) or
+                      not all(isinstance(index, dict) for index in indexes) or
+
+                      not isinstance(stopwords, list))
     if is_not_correct:
         return None
 
@@ -289,22 +304,30 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not vocab or not isinstance(vocab, list) or
-                      not all(isinstance(i, str) for i in vocab) or
-                      not document or not isinstance(document, list) or
-                      not all(isinstance(i, str) for i in document) or
-                      document is None or
-                      not idf_document or not isinstance(idf_document, dict) or
-                      not all((isinstance(key, str) and isinstance(value, float)
-                               for key, value in idf_document.items())) or
-                      all(isinstance(i, dict) for i in idf_document.values()) or
-                      idf_document is None or
-                      not alpha or not isinstance(alpha, float) or
-                      not k1 or not isinstance(k1, float) or
-                      not b or not isinstance(b, float) or
-                      not avg_doc_len or not isinstance(avg_doc_len, float) or
-                      not doc_len or avg_doc_len is None or not isinstance(doc_len, int) or
-                      isinstance(doc_len, bool) or doc_len < 0 or doc_len is None)
+    is_not_correct = (not vocab or
+                      not isinstance(vocab, list) or
+                      not all(isinstance(term, str) for term in vocab) or
+
+                      not document or
+                      not isinstance(document, list) or
+                      not all(isinstance(term, str) for term in document) or
+
+                      not idf_document or
+                      not isinstance(idf_document, dict) or
+                      not all(isinstance(key, str) and isinstance(value, float)
+                              for key, value in idf_document.items()) or
+
+                      not isinstance(alpha, float) or
+
+                      not isinstance(k1, float) or
+
+                      not isinstance(b, float) or
+
+                      not isinstance(avg_doc_len, float) or
+
+                      not isinstance(doc_len, int) or
+                      isinstance(doc_len, bool) or
+                      doc_len < 0)
     if is_not_correct:
         return None
 
@@ -329,11 +352,11 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
-    is_not_correct = (not index or not isinstance(index, list) or
-                      not all(isinstance(i, dict) for i in index) or
-                      not all((isinstance(key, str) and isinstance(value, float)
-                               for i in index for key, value in i.items())) or
-                      not file_path or not isinstance(file_path, str))
+    is_not_correct = (not index or
+                      not isinstance(index, list) or
+
+                      not file_path or
+                      not isinstance(file_path, str))
     if is_not_correct:
         return None
 
@@ -359,10 +382,11 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     with open(file_path, 'r', encoding='utf-8') as file:
         loaded_index = json.load(file)
-    if (not loaded_index or not isinstance(loaded_index, list) or
-            not all(isinstance(i, dict) for i in loaded_index) or
+    if (not loaded_index or
+            not isinstance(loaded_index, list) or
+            not all(isinstance(index_dict, dict) for index_dict in loaded_index) or
             not all((isinstance(key, str) and isinstance(value, float)
-                     for i in loaded_index for key, value in i.items()))):
+                     for index_dict in loaded_index for key, value in index_dict.items()))):
         return None
     return loaded_index
 
@@ -380,9 +404,11 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    is_not_correct = (not rank or not isinstance(rank, list) or
+    is_not_correct = (not isinstance(rank, list) or
                       not all(isinstance(i, int) for i in rank) or
-                      not golden_rank or not isinstance(golden_rank, list) or
+
+                      not golden_rank or
+                      not isinstance(golden_rank, list) or
                       not all(isinstance(i, int) for i in golden_rank) or
                       not len(rank) == len(golden_rank))
     if is_not_correct:

@@ -73,7 +73,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if is_not_correct:
         return None
 
-    return list(sum(documents, []))
+    vocab = set(sum(documents, []))
+    return list(vocab)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

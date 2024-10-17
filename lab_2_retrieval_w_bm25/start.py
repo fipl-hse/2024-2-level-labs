@@ -51,19 +51,19 @@ def main() -> None:
     if idf_dict is None:
         return None
 
-    for document in clear_documents:
-        if document is None:
+    for clear_document in clear_documents:
+        if clear_document is None:
             return None
-        doc_len = len(document)
-        tf_dict = m.calculate_tf(vocab, document)
+        doc_len = len(clear_document)
+        tf_dict = m.calculate_tf(vocab, clear_document)
         if tf_dict is not None:
             tf_idf = m.calculate_tf_idf(tf_dict, idf_dict)
             if tf_idf is not None:
                 tf_idf_list.append(tf_idf)
-        bm25 = m.calculate_bm25(vocab, document, idf_dict, k1, b, avg_doc_len, doc_len)
+        bm25 = m.calculate_bm25(vocab, clear_document, idf_dict, k1, b, avg_doc_len, doc_len)
         if bm25 is not None:
             bm25_list.append(bm25)
-        optimized_bm25 = m.calculate_bm25_with_cutoff(vocab, document, idf_dict,
+        optimized_bm25 = m.calculate_bm25_with_cutoff(vocab, clear_document, idf_dict,
                                                       alpha, k1, b, avg_doc_len, doc_len)
         if optimized_bm25 is not None:
             optimized_bm25_list.append(optimized_bm25)

@@ -215,6 +215,7 @@ def calculate_bm25(
                       not isinstance(b, float) or
 
                       not isinstance(avg_doc_len, float) or
+                      isinstance(avg_doc_len, bool) or
                       avg_doc_len is None or
 
                       not isinstance(doc_len, int) or
@@ -325,6 +326,7 @@ def calculate_bm25_with_cutoff(
                       not isinstance(b, float) or
 
                       not isinstance(avg_doc_len, float) or
+                      isinstance(avg_doc_len, bool) or
                       avg_doc_len is None or
 
                       not isinstance(doc_len, int) or

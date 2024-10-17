@@ -26,11 +26,10 @@ def tokenize(text: str) -> list[str] | None:
     for symbol in text:
         if symbol.isalpha() or symbol == " ":
             continue
-        text = text.replace(f"{symbol}", " ")
+        text = text.replace(symbol, " ")
 
-    new_text = text.split(" ")
     result = []
-    for word in new_text:
+    for word in text.split(" "):
         if not word.isalpha():
             continue
         result.append(word.lower())
@@ -154,10 +153,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     idf_dict = {}
 
     for token in vocab:
-        token_count = 0
-        for document in documents:
-            if token in document:
-                token_count += 1
+        token_count = sum(1 for document in documents if token in document)
 
         idf = math.log((len(documents) - token_count + 0.5) / (token_count + 0.5))
         idf_dict[token] = idf

@@ -58,7 +58,7 @@ def main() -> None:
     avg_doc_len = total_number_words / len(documents)
     if idf is not None:
         for tokenized_doc in tokenized_documents:
-            if isinstance(tokenized_doc, list):
+            if isinstance(tokenized_doc, list) and vocab is not None:
                 tf = calculate_tf(vocab, tokenized_doc)
                 doc_len = len(tokenized_doc)
                 if tf is not None:

@@ -2,7 +2,6 @@
 Check flake8 to check the style and quality of Python code.
 """
 # pylint: disable=duplicate-code
-import subprocess
 from os import listdir
 from pathlib import Path
 
@@ -13,7 +12,7 @@ from config.project_config import ProjectConfig
 
 
 @handles_console_error()
-def check_flake8_on_paths(paths: list[Path]) -> subprocess.CompletedProcess:
+def check_flake8_on_paths(paths: list[Path]) -> tuple[str, str, int]:
     """
     Run flake8 checks for the project.
 
@@ -21,7 +20,7 @@ def check_flake8_on_paths(paths: list[Path]) -> subprocess.CompletedProcess:
         paths (list[Path]): Paths to the projects.
 
     Returns:
-        subprocess.CompletedProcess: Program execution values.
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     flake_args = [
         "-m",
@@ -29,7 +28,7 @@ def check_flake8_on_paths(paths: list[Path]) -> subprocess.CompletedProcess:
         *map(str, filter(lambda x: x.exists(), paths))
     ]
 
-    return _run_console_tool(str(choose_python_exe()), flake_args, debug=True)
+    return _run_console_tool(str(choose_python_exe()), flake_args, debug=True, cwd=PROJECT_ROOT)
 
 
 def main() -> None:

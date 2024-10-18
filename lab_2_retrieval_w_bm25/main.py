@@ -25,18 +25,18 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     tokens = []
+    text = text.lower()
     for word in text.split():
         token = []
         for symbol in word:
             if symbol.isalpha():
-                token.append(symbol.lower())
+                token.append(symbol)
             else:
                 if token:
                     tokens.append("".join(token))
                 token = []
         if token:
             tokens.append("".join(token))
-
     return tokens
 
 
@@ -58,11 +58,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         isinstance(word, str) for word in stopwords) and tokens and stopwords
     if not right_input:
         return None
-    tokenize_doc = []
-    for word in tokens:
-        if word not in stopwords:
-            tokenize_doc.append(word)
-    return tokenize_doc
+    return list(filter(lambda word: word not in stopwords, tokens))
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -401,7 +397,7 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
             not all(isinstance(indices, int) for indices in rank) or \
             not all(isinstance(golden_indices, int) for golden_indices in golden_rank):
         return None
-    if rank == [] or golden_rank == [] or len(rank) != len(golden_rank):
+    if not rank or not golden_rank or len(rank) != len(golden_rank):
         return None
 
     len_rank = len(rank)

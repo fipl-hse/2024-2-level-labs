@@ -1,7 +1,6 @@
 """
 Runner for generating and auto-formatting stubs.
 """
-import subprocess
 import sys
 from pathlib import Path
 
@@ -9,7 +8,11 @@ from config.cli_unifier import _run_console_tool, choose_python_exe, handles_con
 from config.generate_stubs.generator import ArgumentParser, NoDocStringForAMethodError
 
 
-def remove_implementation(source_code_path: Path, res_stub_path: Path) -> None:
+@handles_console_error()
+def remove_implementation(
+        source_code_path: Path,
+        res_stub_path: Path
+) -> None:
     """
     Wrapper for implementation removal from a listing.
 
@@ -25,14 +28,11 @@ def remove_implementation(source_code_path: Path, res_stub_path: Path) -> None:
         '--target_code_path',
         str(res_stub_path)
     ]
-    res_process = _run_console_tool(str(choose_python_exe()), args, debug=False)
-    print(res_process.stdout.decode('utf-8'))
-    if res_process.returncode != 0:
-        raise NoDocStringForAMethodError(res_process.stderr.decode('utf-8'))
+    _run_console_tool(str(choose_python_exe()), args, debug=False)
 
 
 @handles_console_error()
-def format_stub_file(res_stub_path: Path) -> subprocess.CompletedProcess:
+def format_stub_file(res_stub_path: Path) -> tuple[str, str, int]:
     """
     Autoformat resulting stub.
 
@@ -40,7 +40,7 @@ def format_stub_file(res_stub_path: Path) -> subprocess.CompletedProcess:
         res_stub_path (Path): Path to resulting path.
 
     Returns:
-        subprocess.CompletedProcess: Program execution values.
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     args = [
         '-m',
@@ -54,7 +54,7 @@ def format_stub_file(res_stub_path: Path) -> subprocess.CompletedProcess:
 
 
 @handles_console_error()
-def sort_stub_imports(res_stub_path: Path) -> subprocess.CompletedProcess:
+def sort_stub_imports(res_stub_path: Path) -> tuple[str, str, int]:
     """
     Autoformat resulting stub.
 
@@ -62,7 +62,7 @@ def sort_stub_imports(res_stub_path: Path) -> subprocess.CompletedProcess:
         res_stub_path (Path): Path to resulting stub.
 
     Returns:
-        subprocess.CompletedProcess: Program execution values.
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     args = [
         str(res_stub_path)

@@ -5,6 +5,9 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
+import math
+import re
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -18,6 +21,9 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    return re.findall(r'[a-zа-яё]+', text.lower())
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -33,6 +39,12 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(tokens, list) and
+            all(isinstance(token, str) for token in tokens)
+            and isinstance(stopwords, list) and tokens and stopwords and
+            all(isinstance(token, str) for token in stopwords)):
+        return None
+    return [word for word in tokens if word not in stopwords]
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -47,6 +59,21 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(documents, list) or
+            not all(isinstance(document, list) for document in documents)):
+        return None
+    for document in documents:
+        for token in document:
+            if not isinstance(token, str):
+                return None
+    vocabulary = []
+    for document in documents:
+        for token in document:
+            if token not in vocabulary:
+                vocabulary.append(token)
+    if not vocabulary:
+        return None
+    return vocabulary
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -62,6 +89,14 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(vocab, list) and all(isinstance(token, str) for token in vocab)
+            and isinstance(document_tokens, list) and vocab and document_tokens
+            and all(isinstance(token, str) for token in document_tokens)):
+        return None
+    tf = {}
+    for word in set(vocab) | set(document_tokens):
+        tf[word] = document_tokens.count(word) / len(document_tokens)
+    return tf
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -77,6 +112,24 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(vocab, list) and all(isinstance(token, str) for token in vocab)
+            and isinstance(documents, list) and
+            all(isinstance(document, list) for document in documents)):
+        return None
+    for document in documents:
+        for token in document:
+            if not isinstance(token, str):
+                return None
+    if not (vocab and documents):
+        return None
+    idf = {}
+    for word in vocab:
+        count = 0
+        for document in documents:
+            if word in document:
+                count += 1
+        idf[word] = math.log((len(documents) - count + 0.5) / (count + 0.5))
+    return idf
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -92,6 +145,18 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(tf, dict) and isinstance(idf, dict)):
+        return None
+    for key, value in set(tf.items()) | set(idf.items()):
+        if not (isinstance(key, str) and isinstance(value, float)):
+            return None
+    tf_idf = {}
+    for word in tf:
+        if word in idf:
+            tf_idf[word] = float(tf[word]) * float(idf[word])
+    if not tf_idf:
+        return None
+    return tf_idf
 
 
 def calculate_bm25(
@@ -120,6 +185,24 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab)
+            or not isinstance(document, list) or not all(isinstance(symbol, str) for symbol in document)
+            or not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float)
+            or not isinstance(doc_len, int) or not isinstance(idf_document, dict) or isinstance(doc_len, bool)):
+        return None
+    if not all((isinstance(key, str) and isinstance(value, float) for key, value in
+                idf_document.items())):
+        return None
+    if not vocab or not document or not idf_document:
+        return None
+    bm25 = {}
+    for word in set(vocab) | set(document):
+        if word in idf_document:
+            bm25[word] = (idf_document[word] * document.count(word) * (k1 + 1) /
+                          (document.count(word) + k1 * (1 - b + b * doc_len / avg_doc_len)))
+        else:
+            bm25[word] = 0.0
+    return bm25
 
 
 def rank_documents(
@@ -138,6 +221,23 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not stopwords or not indexes or not query or not isinstance(indexes, list)
+        or not all(isinstance(index, dict) for index in indexes)
+        or not isinstance(word, str) for word in stopwords
+        or not isinstance(query, str) or not isinstance(stopwords, list)):
+        return None
+    if not all(isinstance(key, str) or isinstance(value, float) for key, value
+               in (dictionary.items() for dictionary in indexes)):
+        new_query = remove_stopwords(tokenize(query), stopwords)
+        ranked_documents = []
+        for index, text in enumerate(indexes):
+            score = 0.0
+            for word in new_query:
+                if word in text:
+                    score += text.get(word)
+                ranked_documents.append((index, score))
+            ranked_documents.sort(key=lambda x: x[1], reverse=True)
+        return ranked_documents
 
 
 def calculate_bm25_with_cutoff(

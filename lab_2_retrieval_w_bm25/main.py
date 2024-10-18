@@ -1,3 +1,5 @@
+import re
+
 """
 Lab 2.
 
@@ -18,6 +20,9 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    return re.findall(r'\b[^\d\W]+\b', text.lower())
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -33,6 +38,14 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tokens, list) or not isinstance(stopwords, list):
+        return None
+    if not tokens or any(not isinstance(token, str) for token in tokens):
+        return None
+    if not stopwords or any(not isinstance(stopword, str) for stopword in stopwords):
+        return None
+    cleaned_tokens = [token for token in tokens if token not in stopwords]
+    return cleaned_tokens if cleaned_tokens else None
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -47,6 +60,17 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents):
+        return None
+
+    unique_tokens = set()
+
+    for document in documents:
+        if any(not isinstance(token, str) for token in document):
+            return None
+        unique_tokens.update(document)
+
+    return sorted(unique_tokens)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -62,7 +86,20 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(document_tokens, list):
+        return None
 
+    token_count = {token: 0 for token in vocab}
+
+    for token in document_tokens:
+        if token in token_count:
+            token_count[token] += 1
+
+    total_tokens = len(document_tokens)
+    if total_tokens == 0:
+        return None
+
+    return {token: count / total_tokens for token, count in token_count.items()}
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """

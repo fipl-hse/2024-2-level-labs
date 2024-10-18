@@ -196,10 +196,23 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(document, list) or not isinstance(idf_document, dict):
+        return None
+    if not all(isinstance(voc, str) for voc in vocab) or not all(isinstance(doc, str)for doc in document):
+        return None
+    if not all(isinstance(idf_doc, str)for idf_doc in idf_document)\
+            or not all(isinstance(idf_document[idf_doc], float) for idf_doc in idf_document):
+        return None
+    if not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float) \
+            or not isinstance(doc_len, int):
+        return None
     bm_dict = {}
-    for word in vocab:
+    for word in set(vocab).union(set(document)):
         nt = document.count(word)
-        bm_dict[vocab] = sum(idf_document[word] * (nt * (k1+1)) / (nt + k1 * (1 - b + b * (doc_len / avg_doc_len))))
+        if word in document:
+            bm_dict[word] = idf_document[word] * (nt * (k1+1)) / (nt + k1 * (1 - b + b * (doc_len / avg_doc_len)))
+        else:
+            bm_dict[word] = 0
     return bm_dict
 
 
@@ -219,6 +232,27 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(indexes,list) or not all(isinstance(index, dict) for index in indexes):
+        return None
+    for index in indexes:
+        if not all(isinstance(key,str)for key in index) or not all(isinstance(value,float) for value in index.values()):
+            return None
+    if not query or not isinstance(query,str):
+        return None
+    if not isinstance(stopwords,list) or not all(isinstance(word, str) for word in stopwords):
+        return None
+    tokenized_query = tokenize(query)
+    preprocessed_query = remove_stopwords(tokenized_query,stopwords)
+    rank = []
+    doc_index = 0
+    for document in indexes:
+        doc_index += 1
+        summa = 0
+        for token in preprocessed_query:
+            summa += document[token]
+        rank.append((doc_index, summa))
+    rank = sorted(rank, key=lambda r: r[1], reverse=True)
+    return rank
 
 
 def calculate_bm25_with_cutoff(

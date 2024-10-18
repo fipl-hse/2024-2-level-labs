@@ -148,5 +148,4 @@ build
 out
 
 # website
-config/website/test_sphinx_project/_build
 lab_2_retrieval_w_bm25/assets/metrics.json

@@ -47,12 +47,12 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
+    if not tokens or not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
         return None
     if (not stopwords or not isinstance(stopwords, list) or
             not all(isinstance(stopword, str) for stopword in stopwords)):
         return None
-    return [token for token in tokens if token not in stopwords] or None
+    return list(filter(lambda w: w not in stopwords, tokens))
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

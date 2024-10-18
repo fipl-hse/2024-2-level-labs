@@ -84,8 +84,6 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     else:
         return None
 
-    # remove_stopwords(['there', 'was', 'a', 'boy', 'named, 'henry'], ['was', 'named'])
-    # ---> ['there', 'a', 'boy', 'henry']
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -100,6 +98,23 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+
+    if not isinstance(documents, list):
+        return None
+
+    unique_words = []
+
+    for doc in documents:
+        if not isinstance(doc, list):
+            return None
+        for token in doc:
+            if not isinstance(token, str):
+                return None
+            if token not in unique_words:
+                unique_words.append(token)
+
+    if unique_words:
+        return unique_words
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

@@ -53,11 +53,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
             not all(isinstance(stopword, str) for stopword in stopwords):
         return None
 
-    words_without_sw = []
-
-    for token in tokens:
-        if token not in stopwords:
-            words_without_sw.append(token)
+    words_without_sw = [token for token in tokens if token not in stopwords]
 
     if not words_without_sw:
         return None
@@ -81,12 +77,12 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     unique_words = []
 
-    for i in documents:
-        if not all(isinstance(token, str) for token in i):
+    for doc in documents:
+        if not all(isinstance(token, str) for token in doc):
             return None
-        for j in i:
-            if j not in unique_words:
-                unique_words.append(j)
+        for word in doc:
+            if word not in unique_words:
+                unique_words.append(word)
 
     if not unique_words:
         return None

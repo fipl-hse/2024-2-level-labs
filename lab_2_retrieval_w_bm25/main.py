@@ -404,6 +404,6 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     if rank == [] or golden_rank == [] or len(rank) != len(golden_rank):
         return None
 
-    n = len(rank)
-    return 1 - (6 * sum((rank.index(golden_rank[i]) - i) ** 2 for i in range(n)
-                        if golden_rank[i] in rank) / (n * (n * n - 1)))
+    len_rank = len(rank)
+    return 1 - (6 * sum((rank.index(golden_rank[i]) - i) ** 2 for i in range(len_rank)
+                        if golden_rank[i] in rank) / (len_rank * (len_rank * len_rank - 1)))

@@ -18,6 +18,33 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    # divide by spaces - ['the', 'first%', 'sentence><.', 'the', 'sec&*ond', 'sent@ence', '#.']
+
+    text = text.lower()
+    text_by_space = text.split(' ')
+
+    separ_text = []
+    for word in text_by_space:
+        for i, token in enumerate(word):
+            if not token.isalpha() and word[:i] and word[i + 1:]:
+                separ_text.extend([word[:i], word[i + 1:]])
+                break
+        else:
+            separ_text.append(word)
+
+    clean_text = []
+    for word in separ_text:
+        clean_word = ''
+        for token in word:
+            if not token.isalpha():
+                continue
+            clean_word += token
+        if clean_word:
+            clean_text.append(clean_word)
+
+    return clean_text
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -33,6 +60,30 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    clean_tokens = []
+
+    if not isinstance(tokens, list):
+        return None
+
+    if not isinstance(stopwords, list) or not stopwords:
+        return None
+
+    for word in stopwords:
+        if not isinstance(word, str):
+            return None
+
+    for token in tokens:
+        if not isinstance(token, str):
+            clean_tokens = None
+            break
+        elif token in stopwords:
+            continue
+        clean_tokens.append(token)
+    if clean_tokens:
+        return clean_tokens
+    else:
+        return None
+
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -47,6 +98,23 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+
+    if not isinstance(documents, list):
+        return None
+
+    unique_words = []
+
+    for doc in documents:
+        if not isinstance(doc, list):
+            return None
+        for token in doc:
+            if not isinstance(token, str):
+                return None
+            if token not in unique_words:
+                unique_words.append(token)
+
+    if unique_words:
+        return unique_words
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

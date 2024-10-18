@@ -2,7 +2,6 @@
 Check doc8 for style checking of rst files.
 """
 # pylint: disable=duplicate-code
-import subprocess
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
@@ -11,7 +10,7 @@ from config.project_config import ProjectConfig
 
 
 @handles_console_error()
-def check_doc8_on_paths(paths: list[Path], path_to_config: Path) -> subprocess.CompletedProcess:
+def check_doc8_on_paths(paths: list[Path], path_to_config: Path) -> tuple[str, str, int]:
     """
     Run doc8 checks for the project.
 
@@ -20,7 +19,7 @@ def check_doc8_on_paths(paths: list[Path], path_to_config: Path) -> subprocess.C
         path_to_config (Path): Path to the config.
 
     Returns:
-        subprocess.CompletedProcess: Program execution values.
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     doc8_args = [
         "-m",

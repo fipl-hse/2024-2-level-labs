@@ -26,7 +26,6 @@ def get_paths() -> list:
         'build',
         'russian-syntagrus-ud-2.0-170801.udpipe',
         'tmp',
-        '_build',
         'intersphinx',
         'test_tmp',
         'dist'

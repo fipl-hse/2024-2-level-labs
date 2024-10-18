@@ -1,7 +1,6 @@
 """
 Check docstrings for conformance to the Google-style-docstrings.
 """
-import subprocess
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
@@ -25,8 +24,7 @@ def get_files() -> list:
     ]
 
 @handles_console_error()
-def check_with_pydoctest(path_to_file: Path, path_to_config: Path) \
-        -> subprocess.CompletedProcess:
+def check_with_pydoctest(path_to_file: Path, path_to_config: Path) -> tuple[str, str, int]:
     """
     Check docstrings in file with pydoctest module.
 
@@ -35,7 +33,7 @@ def check_with_pydoctest(path_to_file: Path, path_to_config: Path) \
         path_to_config (Path): Path to pydoctest config
 
     Returns:
-        subprocess.CompletedProcess: Program execution values
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     pydoctest_args = [
         '--config',
@@ -46,7 +44,7 @@ def check_with_pydoctest(path_to_file: Path, path_to_config: Path) \
     return _run_console_tool('pydoctest', pydoctest_args, debug=True)
 
 @handles_console_error()
-def check_with_pydocstyle(path_to_file: Path) -> subprocess.CompletedProcess:
+def check_with_pydocstyle(path_to_file: Path) -> tuple[str, str, int]:
     """
     Check docstrings in file with pydocstyle module.
 
@@ -54,7 +52,7 @@ def check_with_pydocstyle(path_to_file: Path) -> subprocess.CompletedProcess:
         path_to_file (Path): Path to file
 
     Returns:
-        subprocess.CompletedProcess: Program execution values
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     pydocstyle_args = [
         '-m',

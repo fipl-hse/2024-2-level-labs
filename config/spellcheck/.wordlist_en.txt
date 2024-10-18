@@ -90,6 +90,7 @@ andrey
 angle
 anim
 animacy
+ann
 annotation
 anonymous
 another
@@ -542,6 +543,7 @@ est
 established
 estimation
 etc
+euclidean
 evaluation
 even
 eventually
@@ -629,6 +631,7 @@ finds
 finished
 finishes
 first
+fit
 flexible
 float
 focus
@@ -882,8 +885,10 @@ joined
 json
 juice
 just
+k-nearest
 kashchikhin
 kazyulina
+kdtree
 keep
 keeps
 key
@@ -891,7 +896,9 @@ key-value
 keys
 keywords
 klimova
+knearestneighbourretriever
 knn
+knnalgorithm
 know
 known
 knows
@@ -1079,6 +1086,7 @@ necessary
 need
 needed
 needn
+neighbours
 networkx
 new
 newline
@@ -1290,6 +1298,7 @@ previously
 princess
 principle
 print
+priority
 private
 privet
 pro
@@ -1445,6 +1454,7 @@ results
 retrieval
 retrieve
 retrieved
+retriever
 retrieves
 retrieving
 return
@@ -1845,6 +1855,11 @@ varying
 vasilisa
 ve
 vec
+vectorization
+vectorize
+vectorized
+vectorizer
+vectors
 venv
 verb
 verify

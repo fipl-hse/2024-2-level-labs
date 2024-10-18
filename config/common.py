@@ -7,20 +7,6 @@ from config.collect_coverage.run_coverage import get_target_score
 from config.constants import PROJECT_ROOT
 
 
-def check_result(return_code: int) -> None:
-    """
-    Check result and exit if failed.
-
-    Args:
-        return_code (int): Return code of check
-    """
-    if return_code != 0:
-        print("Check failed.")
-        sys.exit(1)
-    else:
-        print("Check passed.")
-
-
 def check_skip(pr_name: str, lab_path: str) -> None:
     """
     Exit if skip conditions are met.

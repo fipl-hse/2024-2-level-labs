@@ -146,6 +146,9 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     for word in tokens:
         if not isinstance(word, str):
             return None
+        if ((len(documents) - tokens.count(word) + 0.5) <= 0
+                or (tokens.count(word) + 0.5) <= 0):
+            return None
         idf_word = math.log((len(documents) - tokens.count(word) + 0.5) /
                             (tokens.count(word) + 0.5))
         idf.update({word: round(idf_word, 4)})

@@ -3,7 +3,6 @@ Check lint for code style in Python code.
 """
 # pylint: disable=duplicate-code
 import argparse
-import subprocess
 from os import listdir
 from pathlib import Path
 
@@ -13,9 +12,12 @@ from config.lab_settings import LabSettings
 from config.project_config import ProjectConfig
 
 
-def check_lint_on_paths(paths: list[Path], path_to_config: Path,
-                        exit_zero: bool = False,
-                        ignore_tests: bool = False) -> subprocess.CompletedProcess:
+@handles_console_error()
+def check_lint_on_paths(
+        paths: list[Path], path_to_config: Path,
+        exit_zero: bool = False,
+        ignore_tests: bool = False
+) -> tuple[str, str, int]:
     """
     Run lint checks for the project.
 
@@ -26,7 +28,7 @@ def check_lint_on_paths(paths: list[Path], path_to_config: Path,
         ignore_tests (bool): Ignore lint argument.
 
     Returns:
-        subprocess.CompletedProcess: Program execution values.
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     lint_args = [
         "-m",
@@ -45,22 +47,22 @@ def check_lint_on_paths(paths: list[Path], path_to_config: Path,
 
 
 @handles_console_error()
-def check_lint_level(lint_output: bytes, target_score: int) -> subprocess.CompletedProcess:
+def check_lint_level(lint_output: str, target_score: int) -> tuple[str, str, int]:
     """
     Run lint level check for the project.
 
     Args:
-        lint_output (bytes): Pylint check output.
+        lint_output (str): Pylint check output.
         target_score (int): Target score.
 
     Returns:
-        subprocess.CompletedProcess: Program execution values.
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     lint_level_args = [
         "-m",
         "config.static_checks.lint_level",
         "--lint-output",
-        str(lint_output),
+        lint_output,
         "--target-score",
         str(target_score)
     ]
@@ -92,24 +94,24 @@ def main() -> None:
     pyproject_path = PROJECT_ROOT / "pyproject.toml"
 
     print("Running lint on config, seminars, admin_utils")
-    completed_process = check_lint_on_paths(
+    stdout, _, _ = check_lint_on_paths(
         [
             PROJECT_ROOT / "config",
             PROJECT_ROOT / "seminars",
             PROJECT_ROOT / "admin_utils"
         ],
-        pyproject_path, True)
-    check_lint_level(completed_process.stdout.decode("utf-8"), 10)
+        pyproject_path, exit_zero=True)
+    check_lint_level(stdout, 10)
 
     if (PROJECT_ROOT / "core_utils").exists():
         print("core_utils exist")
         print("Running lint on core_utils")
-        completed_process = check_lint_on_paths(
+        stdout, _, _ = check_lint_on_paths(
             [
                 PROJECT_ROOT / "core_utils"
             ],
-            pyproject_path)
-        check_lint_level(completed_process.stdout.decode("utf-8"), 10)
+            pyproject_path, exit_zero=True)
+        check_lint_level(stdout, 10)
 
     for lab_name in labs_list:
         lab_path = PROJECT_ROOT / lab_name
@@ -121,13 +123,12 @@ def main() -> None:
                 continue
 
             print(f"Running lint for lab {lab_path}")
-            completed_process = check_lint_on_paths(
+            stdout, _, _ = check_lint_on_paths(
                 [
                     lab_path
                 ],
-                pyproject_path, ignore_tests=repository_type == "public")
-            check_lint_level(completed_process.stdout.decode("utf-8"),
-                             target_score)
+                pyproject_path, ignore_tests=repository_type == "public", exit_zero=True)
+            check_lint_level(stdout, target_score)
 
 
 if __name__ == "__main__":

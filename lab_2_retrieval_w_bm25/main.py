@@ -68,7 +68,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
     if not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents):
         return None
-    
+
     voc_of_un_words = set()
     for doc in documents:
         voc_of_un_words.update(doc)

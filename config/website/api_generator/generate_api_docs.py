@@ -1,7 +1,6 @@
 """
 Generator for API docs for Sphinx.
 """
-import subprocess
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, handles_console_error
@@ -10,7 +9,7 @@ from config.project_config import ProjectConfig
 
 
 @handles_console_error()
-def run_sphinx_apidoc(args: list[str]) -> subprocess.CompletedProcess:
+def run_sphinx_apidoc(args: list[str]) -> tuple[str, str, int]:
     """
     Run sphinx-apidoc with the specified arguments.
 
@@ -18,7 +17,7 @@ def run_sphinx_apidoc(args: list[str]) -> subprocess.CompletedProcess:
         args (list[str]): Arguments for sphinx-apidoc.
 
     Returns:
-        subprocess.CompletedProcess: Program execution values.
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     return _run_console_tool('sphinx-apidoc', args, debug=False)
 

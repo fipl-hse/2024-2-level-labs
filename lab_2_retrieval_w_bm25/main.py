@@ -29,7 +29,6 @@ def tokenize(text: str) -> list[str] | None:
         tokenized_text.append(word.lower())
     return tokenized_text
 
-
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
     Remove stopwords from the list of tokens.
@@ -67,7 +66,13 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-
+    if not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents):
+        return None
+    
+    voc_of_un_words = set()
+    for doc in documents:
+        voc_of_un_words.update(doc)
+    return list(voc_of_un_words)
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """

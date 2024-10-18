@@ -61,8 +61,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if len(tokens) == 0 or len(stopwords) == 0:
         return None
 
-    result = [token for token in tokens if token not in stopwords]
-    return result
+    return list(filter(lambda x: x not in stopwords, tokens))
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

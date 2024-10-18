@@ -4,7 +4,6 @@ Runner for collecting coverage.
 
 import json
 import pathlib
-import subprocess
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
@@ -54,7 +53,7 @@ def extract_percentage_from_report(report_path: Path) -> int:
 
 @handles_console_error()
 def run_coverage_subprocess(lab_path: pathlib.Path, python_exe_path: pathlib.Path,
-                            mark_label: str) -> subprocess.CompletedProcess:
+                            mark_label: str) -> tuple[str, str, int]:
     """
     Entrypoint for a single lab coverage collection.
 
@@ -64,7 +63,7 @@ def run_coverage_subprocess(lab_path: pathlib.Path, python_exe_path: pathlib.Pat
         mark_label (str): Target score label
 
     Returns:
-        subprocess.CompletedProcess: Coverage process result
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     args = [
         '-m', 'coverage', 'run',
@@ -79,8 +78,9 @@ def run_coverage_subprocess(lab_path: pathlib.Path, python_exe_path: pathlib.Pat
                              cwd=str(lab_path.parent))
 
 
+@handles_console_error()
 def run_coverage_collection(lab_path: Path, artifacts_path: Path,
-                            check_target_score: bool = True) -> int:
+                            check_target_score: bool = True) -> tuple[str, str, int]:
     """
     Entrypoint for a single lab coverage collection.
 
@@ -90,7 +90,7 @@ def run_coverage_collection(lab_path: Path, artifacts_path: Path,
         check_target_score (bool): Target score check
 
     Returns:
-        int: Coverage percentage from report
+        tuple[str, str, int]: stdout, stderr, return code
     """
     print(f'Processing {lab_path} ...')
 
@@ -107,8 +107,6 @@ def run_coverage_collection(lab_path: Path, artifacts_path: Path,
         '-m', 'coverage', 'json',
         '-o', str(report_path)
     ]
-    _run_console_tool(str(python_exe_path), args,
+    return _run_console_tool(str(python_exe_path), args,
                       debug=True,
                       cwd=str(lab_path.parent))
-
-    return extract_percentage_from_report(report_path)

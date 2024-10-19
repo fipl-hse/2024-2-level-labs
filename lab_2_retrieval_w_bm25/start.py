@@ -3,8 +3,7 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-from lab_2_retrieval_w_bm25.main import (remove_stopwords, tokenize,
-                                         build_vocabulary)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, remove_stopwords, tokenize)
 
 
 def main() -> None:

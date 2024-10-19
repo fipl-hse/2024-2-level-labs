@@ -79,7 +79,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         if not all(isinstance(token, str) for token in doc):
             return None
         vocabulary.update(doc)
-    return vocabulary
+    return list(vocabulary)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

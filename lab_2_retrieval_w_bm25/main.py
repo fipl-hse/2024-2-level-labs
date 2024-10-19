@@ -3,11 +3,9 @@ Lab 2.
 
 Text retrieval with BM25
 """
-
-import math
-
 # pylint:disable=too-many-arguments, unused-argument
 
+import math
 
 def tokenize(text: str) -> list[str] | None:
     """

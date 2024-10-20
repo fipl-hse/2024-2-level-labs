@@ -3,8 +3,11 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
-                                         calculate_idf, calculate_tf, calculate_tf_idf,
-                                         rank_documents, remove_stopwords, tokenize)
+                                         calculate_bm25_with_cutoff, calculate_idf,
+                                         calculate_spearman, calculate_tf,
+                                         calculate_tf_idf, load_index,
+                                         rank_documents, remove_stopwords, save_index,
+                                         tokenize)
 
 def main() -> None:
     """
@@ -26,6 +29,8 @@ def main() -> None:
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
+
+    query = "A story about a wizard boy in a tower!"
 
     result = None
     tokenized_documents = []
@@ -72,10 +77,26 @@ def main() -> None:
         bm25 = calculate_bm25(vocab, doc, idf, 1.5, 0.75, avg_len_doc, doc_len)
         list_for_bm25.append(bm25)
 
-    rank = rank_documents(list_for_tf_idf, "A story about a wizard boy in a tower!", stopwords)
-    rank = rank_documents(list_for_bm25, "A story about a wizard boy in a tower!", stopwords)
+    list_for_bm25_without_cutoff = []
+    for doc_bm25 in tokenized_documents_without_stopwords:
+        doc_len = len(doc_bm25)
+        if idf is None:
+            return None
+        bm25_score = calculate_bm25_with_cutoff(vocab, doc_bm25, idf,
+                                                0.2, 1.5, 0.75, avg_len_doc, doc_len)
+        list_for_bm25_without_cutoff.append(bm25_score)
 
-    result = rank
+    rank = rank_documents(list_for_tf_idf, query, stopwords)
+    rank = rank_documents(list_for_bm25, query, stopwords)
+
+    save_index(list_for_bm25_without_cutoff, 'assets/metrics.json')
+    load_docs = load_index('assets/metrics.json')
+    if load_docs is None:
+        return None
+    cutoff_tuples = rank_documents(load_docs, query, stopwords)
+    if cutoff_tuples is None:
+        return None
+
 
     assert result, "Result is None"
 

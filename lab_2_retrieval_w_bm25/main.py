@@ -6,6 +6,7 @@ Text retrieval with BM25
 # pylint:disable=too-many-arguments, unused-argument
 import re
 import math
+import json
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -206,10 +207,9 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not vocab or not document or not idf_document:
-        return None
-    if (not isinstance(vocab, list) or not isinstance(document, list) or
-            not isinstance(idf_document, dict)):
+    if ((not isinstance(vocab, list) or not isinstance(document, list) or
+            not isinstance(idf_document, dict)) or
+            not vocab or not document or not idf_document):
         return None
     if ((not all(isinstance(value, str) for value in vocab)) or
             (not all(isinstance(value, str) for value in document)) or
@@ -217,8 +217,8 @@ def calculate_bm25(
                      key, value in idf_document.items()))):
         return None
     if ((not isinstance(k1, float)) or (not isinstance(b, float)) or
-            (not isinstance(avg_doc_len, float)) or (not isinstance(doc_len, int)) or
-            (avg_doc_len is None) or (doc_len is None)):
+            ((not isinstance(avg_doc_len, float)) or (not isinstance(doc_len, int)) or
+            (isinstance(doc_len, bool)))):
         return None
     bm25 = {}
 
@@ -313,6 +313,34 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not vocab or not document or not idf_document:
+        return None
+    if (not isinstance(vocab, list) or not isinstance(document, list) or
+            not isinstance(idf_document, dict)):
+        return None
+    if ((not all(isinstance(value, str) for value in vocab)) or
+            (not all(isinstance(value, str) for value in document)) or
+            (not all(isinstance(key, str) and isinstance(value, float) for
+                     key, value in idf_document.items()))):
+        return None
+    if ((not isinstance(k1, float)) or (not isinstance(b, float)) or
+            (not isinstance(alpha, float))):
+        return None
+    if ((not isinstance(avg_doc_len, float)) or (not isinstance(doc_len, int)) or
+            (isinstance(doc_len, bool))):
+        return None
+    bm25 = {}
+    for word_in_idf, score in idf_document.items():
+        if word_in_idf not in vocab:
+            return None
+        if word_in_idf not in bm25 and score > alpha:
+            bm25[word_in_idf] = 0.0
+        if score > alpha:
+            bm25[word_in_idf] = (score * document.count(word_in_idf) * (k1 + 1) /
+                                 (document.count(word_in_idf) + k1 * (1 - b + b * doc_len / avg_doc_len)))
+    if bm25 is None:
+        return None
+    return bm25
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
@@ -323,6 +351,15 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if (not isinstance(index, list) or (not all(isinstance(item, dict)
+                                                and all(isinstance(k, str) and
+                                                        isinstance(v, float) for k, v in item.items())
+                                                for item in index) or (not isinstance(file_path, str)))):
+        return None
+    for dictionary in index:
+        with open(file_path, "w") as write_file:
+            json.dump(dictionary, write_file, indent=4)
+        return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -337,6 +374,13 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(file_path, str):
+        return None
+    with open(file_path, 'r', encoding='utf-8') as file:
+        file_for_query = json.load(file)
+    if not isinstance(file_for_query, dict):
+        return None
+    return file_for_query if isinstance(file_for_query, list) else None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -352,3 +396,4 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+

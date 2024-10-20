@@ -5,7 +5,7 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
-import math
+import math, json
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -344,6 +344,41 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(vocab, list)
+            or not all(isinstance(word_in_vocab, str) for word_in_vocab in vocab)
+            or not isinstance(document, list)
+            or not all(isinstance(el, str) for el in document)
+            or not vocab):
+        return None
+    if (not isinstance(idf_document, dict)
+            or not all(isinstance(key_in_idf_dict, str)
+                       for key_in_idf_dict in idf_document.keys())
+            or not all(isinstance(value_in_idf_dict, float)
+                       for value_in_idf_dict in idf_document.values())
+            or not idf_document
+            or not document):
+        return None
+    if (not isinstance(k1, float) or not isinstance(b, float)
+            or not isinstance(alpha, float)
+            or not isinstance(avg_doc_len, float)
+            or not isinstance(doc_len, int)
+            or isinstance(doc_len, bool)):
+        return None
+
+    dict_bm25_with_cutoff = {}
+    for word_from_doc in document:
+        dict_bm25_with_cutoff[word_from_doc] = 0.0
+
+    for word_from_idf in idf_document.keys():
+        if word_from_idf not in vocab:
+            return None
+        if word_from_idf not in dict_bm25_with_cutoff:
+            dict_bm25_with_cutoff[word_from_idf] = 0.0
+        freq = document.count(word_from_idf)
+        bm25_with_cutoff_figure = idf_document[word_from_idf] * ((freq*(k1+1)) / (freq+k1*(1-b+b*(doc_len/avg_doc_len))))
+        dict_bm25_with_cutoff[word_from_idf] = bm25_with_cutoff_figure
+
+    return dict_bm25_with_cutoff
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
@@ -354,6 +389,20 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if (not isinstance(index, list)
+        or not all(isinstance(every_dict_in_index, dict)
+                   for every_dict_in_index in index)
+        or not isinstance(file_path, str)):
+        return None
+    for every_dict_in_index in index:
+        for key_in_every_dict_in_index in every_dict_in_index.keys():
+            if not isinstance(key_in_every_dict_in_index, str):
+                return None
+        for value_in_every_dict_in_index in every_dict_in_index.values():
+            if not isinstance(value_in_every_dict_in_index, float):
+                return None
+
+    json.dump(index, file_path)
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -368,6 +417,9 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(file_path, str):
+        return None
+    json.load(file_path)
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -383,3 +435,16 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if (len(rank) != len(golden_rank)
+            or not isinstance(rank, list)
+            or not all(isinstance(el, int) for el in rank)
+            or not isinstance(golden_rank, list)
+            or not all(isinstance(g_el, int) for g_el in golden_rank)):
+        return None
+
+    sum_of_squared_differences = 0
+    for rank_int, golden_rank_int in zip(rank, golden_rank):
+        sum_of_squared_differences += (rank_int - golden_rank_int)**2
+    spearman_k = 1 - (6 * sum_of_squared_differences) / (len(rank) * (len(rank)**2 - 1))
+
+    return spearman_k

@@ -365,6 +365,23 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(vocab, list) and all(isinstance(elem, str) for elem in vocab) and vocab):
+        return None
+    if (not (isinstance(document, list) and all(isinstance(elem, str) for elem in document)
+             and document)):
+        return None
+
+    if (not isinstance(idf_document, dict) or
+            not all(isinstance(key, str) and isinstance(value, float)
+                    for key, value in idf_document.items()) or not idf_document):
+        return None
+
+    if not (isinstance(k1, float) and isinstance(b, float) and isinstance(alpha, float)):
+        return None
+
+    if not (isinstance(avg_doc_len, float)) or avg_doc_len is None or \
+            not (isinstance(doc_len, int)) or doc_len is None or isinstance(doc_len, bool):
+        return None
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:

@@ -35,7 +35,7 @@ def main() -> None:
     result = None
     tokenized_documents = []
     for document in documents:
-        tokens: list[str] = tokenize(document)
+        tokens: list[str] = tokenize(document) or []
         tokenized_documents.append(tokens)
 
     tokenized_documents_without_stopwords = []
@@ -43,48 +43,41 @@ def main() -> None:
         stopwords = file.read().split("\n")
         for tokenized_doc in tokenized_documents:
             without_stopwords = remove_stopwords(tokenized_doc, stopwords)
-            if not without_stopwords:
-                return None
-            tokenized_documents_without_stopwords.append(without_stopwords)
+            if without_stopwords:
+                tokenized_documents_without_stopwords.append(without_stopwords)
 
     vocab = build_vocabulary(tokenized_documents)
     if not vocab:
-        return None
+        return
 
     list_for_tf_idf = []
     for tokenized_doc_without in tokenized_documents_without_stopwords:
         tf = calculate_tf(vocab, tokenized_doc_without)
-        idf = calculate_idf(vocab, tokenized_documents_without_stopwords)
-        if ((not calculate_tf(vocab, tokenized_doc_without) or
-                not calculate_idf(vocab, tokenized_documents_without_stopwords)) or
-                not isinstance(tf, dict) or not isinstance(idf, dict)):
-            return None
-        tf_idf = calculate_tf_idf(tf, idf)
-        if not tf_idf:
-            return None
-        list_for_tf_idf.append(tf_idf)
+        idf_check = calculate_idf(vocab, tokenized_documents_without_stopwords)
+        idf: dict[str, float] = idf_check if idf_check is not None else {}
+        if tf and idf and isinstance(tf, dict) and isinstance(idf, dict):
+            tf_idf = calculate_tf_idf(tf, idf)
+            if tf_idf:
+                list_for_tf_idf.append(tf_idf)
 
-    avg_len = []
-    for doc in tokenized_documents_without_stopwords:
-        avg_len.append(len(doc))
-    avg_len_doc = sum(avg_len) / len(tokenized_documents_without_stopwords)
+    avg_len = [len(doc) for doc in tokenized_documents_without_stopwords]
+    avg_len_doc = sum(avg_len) / len(tokenized_documents_without_stopwords) \
+        if avg_len else 0
 
     list_for_bm25 = []
     for doc in tokenized_documents_without_stopwords:
         doc_len = len(doc)
-        if idf is None:
-            return None
         bm25 = calculate_bm25(vocab, doc, idf, 1.5, 0.75, avg_len_doc, doc_len)
-        list_for_bm25.append(bm25)
+        if bm25 is not None:
+            list_for_bm25.append(bm25)
 
     list_for_bm25_without_cutoff = []
     for doc_bm25 in tokenized_documents_without_stopwords:
         doc_len = len(doc_bm25)
-        if idf is None:
-            return None
         bm25_score = calculate_bm25_with_cutoff(vocab, doc_bm25, idf,
                                                 0.2, 1.5, 0.75, avg_len_doc, doc_len)
-        list_for_bm25_without_cutoff.append(bm25_score)
+        if bm25_score is not None:
+            list_for_bm25_without_cutoff.append(bm25_score)
 
     rank = rank_documents(list_for_tf_idf, query, stopwords)
     rank = rank_documents(list_for_bm25, query, stopwords)
@@ -94,12 +87,9 @@ def main() -> None:
     if load_docs is None:
         return None
     cutoff_tuples = rank_documents(load_docs, query, stopwords)
-    if cutoff_tuples is None:
-        return None
-
+    result = cutoff_tuples
 
     assert result, "Result is None"
-
 
 
 if __name__ == "__main__":

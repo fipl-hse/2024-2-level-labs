@@ -80,11 +80,11 @@ def main() -> None:
                 break
             list_of_dict_with_bm25.append(bm_25)
 
-    '''rank_result = rank_documents(list_of_tf_idf_dict,
+    rank_result = rank_documents(list_of_tf_idf_dict,
                                  'A story about a wizard boy in a tower!', stopwords)
     rank_result = rank_documents(list_of_dict_with_bm25,
-                                 'A story about a wizard boy in a tower!', stopwords)'''
-    #РЕАЛИЗАЦИЯ НА 10: ШАГ НОМЕР 9
+                                 'A story about a wizard boy in a tower!', stopwords)
+
     list_of_dict_bm25_with_cutoff = []
     for doc in tok_doc_without_stopwords:
         doc_len = len(doc)
@@ -103,10 +103,10 @@ def main() -> None:
                                                    'Which fairy tale has Fairy Queen?', stopwords)
     r_docs_result_with_bm25 = []
     for index_in_tuple in tuples_r_docs_result_with_bm25:
-        r_docs_result_with_bm25.append(index_in_tuple[0]) #создаю список из индексов от бм25 по порядку
+        r_docs_result_with_bm25.append(index_in_tuple[0])
     r_docs_result_with_bm25cutoff = []
     for index_in_tuple in tuples_r_docs_result_with_bm25cutoff:
-        r_docs_result_with_bm25cutoff.append(index_in_tuple[0]) #создаю список из индексов от модифицированной бм25 по порядку
+        r_docs_result_with_bm25cutoff.append(index_in_tuple[0])
 
     calculate_spearman(r_docs_result_with_bm25, r_docs_result_with_bm25cutoff)
 

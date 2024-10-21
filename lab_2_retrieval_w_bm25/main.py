@@ -353,14 +353,14 @@ def calculate_bm25_with_cutoff(
         return None
     if (not isinstance(idf_document, dict)
             or not idf_document
+            or not isinstance(alpha, float)
+            or not isinstance(avg_doc_len, float)
             or not document):
         return None
     for key, value in idf_document.items():
         if not isinstance(key, str) or not isinstance(value, float):
             return None
     if (not isinstance(k1, float) or not isinstance(b, float)
-            or not isinstance(alpha, float)
-            or not isinstance(avg_doc_len, float)
             or not isinstance(doc_len, int)
             or doc_len < 0
             or isinstance(doc_len, bool)):
@@ -378,7 +378,8 @@ def calculate_bm25_with_cutoff(
             return None
         if idf_document.get(word_from_vocab) < alpha:
             continue
-        bm25_with_cutoff_figure = idf_document[word_from_vocab] * ((freq*(k1+1)) / (freq+k1*(1-b+b*(doc_len/avg_doc_len))))
+        bm25_with_cutoff_figure = (idf_document[word_from_vocab]
+                                   * ((freq*(k1+1)) / (freq+k1*(1-b+b*(doc_len/avg_doc_len)))))
         dict_bm25_with_cutoff[word_from_vocab] = bm25_with_cutoff_figure
 
     return dict_bm25_with_cutoff
@@ -397,18 +398,18 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         or not all(isinstance(every_dict_in_index, dict)
         for every_dict_in_index in index)
             or not isinstance(file_path, str)):
-        return None
+        return
     for every_dict_in_index in index:
         if not every_dict_in_index:
-            return None
+            return
         for key_in_every_dict_in_index in every_dict_in_index.keys():
             if not isinstance(key_in_every_dict_in_index, str):
-                return None
+                return
         for value_in_every_dict_in_index in every_dict_in_index.values():
             if not isinstance(value_in_every_dict_in_index, float):
-                return None
+                return
     if not isinstance(file_path, str) or not file_path:
-        return None
+        return
 
     with open(file_path, 'w', encoding="utf-8") as file:
         json.dump(index, file)
@@ -450,8 +451,9 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     if (not isinstance(rank, list)
             or not all(isinstance(el, int) for el in rank)
             or not isinstance(golden_rank, list)
-            or not all(isinstance(g_el, int) for g_el in golden_rank)
-            or len(rank) != len(golden_rank)
+            or not all(isinstance(g_el, int) for g_el in golden_rank)):
+        return None
+    if (len(rank) != len(golden_rank)
             or len(rank) == len(golden_rank) == 0):
         return None
 

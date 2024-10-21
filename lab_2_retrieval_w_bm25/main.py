@@ -5,9 +5,8 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
-import math, json
-
-from sphinx.addnodes import index
+import math
+import json
 
 
 def tokenize(text: str) -> list[str] | None:

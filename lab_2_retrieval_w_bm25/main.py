@@ -66,11 +66,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         for token in document:
             if not isinstance(token, str):
                 return None
-    vocabulary = []
-    for document in documents:
-        for token in document:
-            if token not in vocabulary:
-                vocabulary.append(token)
+    vocabulary = [token for document in documents for token in document]
     if not vocabulary:
         return None
     return vocabulary
@@ -150,10 +146,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     for key, value in set(tf.items()) | set(idf.items()):
         if not (isinstance(key, str) and isinstance(value, float)):
             return None
-    tf_idf = {}
-    for word in tf:
-        if word in idf:
-            tf_idf[word] = float(tf[word]) * float(idf[word])
+    tf_idf = {word: float(tf[word]) * float(idf[word]) for word in tf if word in idf}
     if not tf_idf:
         return None
     return tf_idf
@@ -186,9 +179,11 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
     if (not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab)
-            or not isinstance(document, list) or not all(isinstance(symbol, str) for symbol in document)
-            or not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float)
-            or not isinstance(doc_len, int) or not isinstance(idf_document, dict) or isinstance(doc_len, bool)):
+            or not isinstance(document, list) or not
+            all(isinstance(symbol, str) for symbol in document) or not isinstance(k1, float)
+            or not isinstance(b, float) or not isinstance(avg_doc_len, float)
+            or not isinstance(doc_len, int) or not isinstance(idf_document, dict)
+            or isinstance(doc_len, bool)):
         return None
     if not all((isinstance(key, str) and isinstance(value, float) for key, value in
                 idf_document.items())):

@@ -199,7 +199,8 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
     if (not isinstance(doc_len, int) or not isinstance(avg_doc_len, float)
-            or not isinstance(k1, float) or not isinstance(b, float)):
+            or not isinstance(k1, float) or not isinstance(b, float)
+            or isinstance(doc_len, bool)):
         return None
     if not vocab or not document or not idf_document:
         return None
@@ -210,18 +211,13 @@ def calculate_bm25(
             or not all(isinstance(word, str) for word in document)
             or not all(isinstance(k, str) and isinstance(v, float) for k, v in idf_document.items())):
         return None
+    bm25 = {}
     for word in document:
         if word not in vocab:
-            vocab.append(word)
-    '''for word in document:
-        if word not in idf_document:
-            idf_document[word] = 0'''
-    n_t = {}
-    for word in vocab:
-        n_t[word] = document.count(word)
-    bm25 = {}
+            bm25[word] = 0.0
     for token, idf in idf_document.items():
-        bm25[token] = idf * ((n_t[token] * (k1 + 1))/(n_t[token] + k1 * (1 + b - b * (doc_len/avg_doc_len))))
+        n_t = document.count(token)
+        bm25[token] = idf * ((n_t * (k1 + 1))/(n_t + k1 * (1 - b + b * (doc_len/avg_doc_len))))
     return bm25
 
 

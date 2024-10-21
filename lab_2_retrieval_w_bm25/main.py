@@ -134,7 +134,9 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     """
     if not vocab or not isinstance(vocab, list) or \
             not all(isinstance(el, str) for el in vocab) \
-            or not documents or not isinstance(documents, list) or not \
+            or not documents:
+        return None
+    if not isinstance(documents, list) or not \
             all(isinstance(a, list) for a in documents):
         return None
     ttl = len(documents)
@@ -166,8 +168,9 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     In case of corrupt input arguments, None is returned.
     """
     if not tf or not idf or not isinstance(tf, dict) or \
-            not isinstance(idf, dict) or not all(isinstance(el, str)
-                                                 for el in tf.keys()) \
+            not isinstance(idf, dict):
+        return None
+    if not all(isinstance(el, str) for el in tf.keys()) \
             or not all(isinstance(score, float) for score in tf.values()) or \
             not all(isinstance(el, str) for el in idf.keys()) or \
             not all(isinstance(score, float) for score in idf.values()):
@@ -246,9 +249,11 @@ def rank_documents(
     """
     if not isinstance(indexes, list) or \
             not isinstance(query, str) or \
-            not isinstance(stopwords, list) or not query or not stopwords \
-            or not all(isinstance(word, str) for word in stopwords) or \
-            not indexes or not \
+            not isinstance(stopwords, list) or not query:
+        return None
+    if not stopwords or not \
+            all(isinstance(word, str) for word in stopwords) \
+            or not indexes or not \
             all(isinstance(index, dict) for index in indexes):
         return None
     for doc in indexes:

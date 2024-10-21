@@ -5,7 +5,9 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
-import math
+import math, json
+
+from sphinx.addnodes import index
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -306,6 +308,37 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(vocab, list) and
+            len(vocab) > 0 and
+            isinstance(document, list) and
+            len(document) > 0 and
+            isinstance(idf_document, dict) and
+            len(idf_document) > 0):
+        return None
+    if not (isinstance(k1, float) and
+            isinstance(b, float) and
+            isinstance(avg_doc_len, float) and
+            avg_doc_len > 0 and
+            isinstance(doc_len, int) and
+            doc_len is not True):
+        return None
+    if not (all(isinstance(word, str) for word in vocab) and
+            all(isinstance(word, str) for word in document) and
+            all(isinstance(key, str) and
+                isinstance(idf_document[key], float) for key in idf_document) and
+            isinstance(alpha, float)):
+        return None
+
+    result_dict = {}
+    for word in idf_document:
+        if idf_document[word] >= alpha:
+            amount = document.count(word)
+            value = (idf_document[word] *
+                     (amount * (k1 + 1)) /
+                     (amount + k1 * (1 - b + b * doc_len / avg_doc_len)))
+            result_dict[word] = value
+
+    return result_dict
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
@@ -316,6 +349,10 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if (isinstance(index, list) and all(isinstance(doc, dict) for doc in index) and
+        len(index) > 0 and isinstance(file_path, str) and len(file_path) > 0):
+        with open(file_path, "w", encoding="utf-8") as write_file:
+            json.dump(index, write_file, indent="\t")
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -330,6 +367,12 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if isinstance(file_path, str) and len(file_path) > 0:
+        with open(file_path, "r", encoding="utf-8") as read_file:
+            val = json.load(read_file)
+            if isinstance(val, list):
+                return val
+    return None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -345,3 +388,20 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(rank, list) and isinstance(golden_rank, list) and
+            all(isinstance(value, int) for value in rank) and
+            all(isinstance(gold_val, int) for gold_val in golden_rank)):
+        return None
+
+    if not (len(rank) == len(golden_rank) and len(rank) > 0):
+        return None
+
+    if not all(val in golden_rank for val in rank):
+        return 0.0
+
+    diffs_sum = 0
+    pairs = len(rank)
+    for rank_index, rank_value in enumerate(rank):
+        golden_index = golden_rank.index(rank_value)
+        diffs_sum += (rank_index - golden_index)**2
+    return 1 - 6 * diffs_sum / (pairs * (pairs**2 - 1))

@@ -5,7 +5,8 @@ Laboratory Work #2 starter
 
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
                                          calculate_tf, calculate_tf_idf, rank_documents,
-                                         remove_stopwords, tokenize)
+                                         remove_stopwords, tokenize, save_index,
+                                         load_index, calculate_bm25_with_cutoff, calculate_spearman)
 
 
 def main() -> None:
@@ -55,6 +56,7 @@ def main() -> None:
             avg_len /= len(prep_documents)
             tf_idfs = []
             bm25s = []
+            cut_bm25s = []
             for prep_doc in prep_documents:
                 tf = calculate_tf(vocab, prep_doc)
                 if isinstance(tf, dict):
@@ -65,14 +67,38 @@ def main() -> None:
                     vocab, prep_doc, idf, avg_doc_len=avg_len, doc_len=len(prep_doc))
                 if isinstance(bm25, dict):
                     bm25s.append(bm25)
+                cut_bm25 = calculate_bm25_with_cutoff(
+                    vocab, prep_doc, idf, 0.2, avg_doc_len=avg_len, doc_len=len(prep_doc))
+                if isinstance(cut_bm25, dict):
+                    cut_bm25s.append(cut_bm25)
 
-            if len(tf_idfs) == len(prep_documents) and len(bm25s) == len(prep_documents):
-                result = rank_documents(
+            if (len(tf_idfs) == len(prep_documents) and
+                len(bm25s) == len(prep_documents) and
+                len(cut_bm25s) == len(prep_documents)):
+                rank_tf_idf = rank_documents(
                     tf_idfs, 'Which fairy tale has Fairy Queen?', stopwords)
-                print(result)
-                result = rank_documents(
-                    bm25s, 'Which fairy tale has Fairy Queen?', stopwords)
-                print(result)
+                save_index(bm25s, "assets/metrics.json")
+                loaded_bm25s = load_index("assets/metrics.json")
+                rank_bm25 = rank_documents(
+                    loaded_bm25s,
+                    'Which fairy tale has Fairy Queen?',
+                    stopwords) if isinstance(loaded_bm25s, list) else None
+                rank_bm25_cutoff = rank_documents(
+                    cut_bm25s, 'Which fairy tale has Fairy Queen?', stopwords)
+
+                if (isinstance(rank_tf_idf, list) and
+                    isinstance(rank_bm25, list) and
+                    isinstance(rank_bm25_cutoff, list)):
+                    list_tf_idf = [pair[0] for pair in rank_tf_idf]
+                    list_bm25 = [pair[0] for pair in rank_bm25]
+                    list_bm25_cutoff = [pair[0] for pair in rank_bm25_cutoff]
+                    result = [
+                        calculate_spearman(list_tf_idf, [1, 7, 5, 0, 9, 2, 3, 4, 6, 8]),
+                        calculate_spearman(list_bm25, [1, 7, 5, 0, 9, 2, 3, 4, 6, 8]),
+                        calculate_spearman(list_bm25_cutoff, [1, 7, 5, 0, 9, 2, 3, 4, 6, 8])
+                    ]
+
+    print(result)
     assert result, "Result is None"
 
 

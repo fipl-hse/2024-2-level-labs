@@ -133,8 +133,8 @@ def main() -> None:
                                         'Which fairy tale has Fairy Queen?', stopwords)
 
     tf_idf_ranks_only = [item[0] for item in tf_idf_ranked]
-    bm25_cutoff_ranks_only = [item[0] for item in bm25_cutoff_ranked]
     bm25_ranks_only = [item[0] for item in bm25_ranked]
+    bm25_cutoff_ranks_only = [item[0] for item in bm25_cutoff_ranked]
 
     spearman_tf_idf_bm25 = calculate_spearman(tf_idf_ranks_only, bm25_ranks_only)
     spearman_tf_idf_bm25_cutoff = calculate_spearman(tf_idf_ranks_only, bm25_cutoff_ranks_only)

@@ -5,7 +5,8 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
-import math, json
+import json
+import math
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -409,7 +410,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
     if not isinstance(file_path, str) or not file_path:
         return None
 
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding="utf-8") as file:
         json.dump(index, file)
 
 
@@ -427,7 +428,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
     """
     if not isinstance(file_path, str) or not file_path:
         return None
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8") as file:
         load_index_file = json.load(file)
 
     return load_index_file
@@ -455,19 +456,8 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
         return None
 
     sum_of_squared_differences = 0
-    for rank_int, golden_rank_int in zip(rank, golden_rank):
-        if rank_int == golden_rank_int:
-            mean_rank = sum(rank) / len(rank)
-            mean_golden_rank = sum(golden_rank) / len(golden_rank)
+    for rank_int in rank:
+        if rank_int in golden_rank:
+            sum_of_squared_differences += (golden_rank.index(rank_int) - rank.index(rank_int))**2
 
-            numerator = sum((rank[i] - mean_rank) * (golden_rank[i] - mean_golden_rank) for i in range(len(rank)-1))
-            denominator_rank = sum((rank[i] - mean_rank) ** 2 for i in range(len(rank)-1))
-            denominator_golden_rank = sum((golden_rank[i] - mean_golden_rank) ** 2 for i in range(len(rank)-1))
-
-            spearman = numerator / math.sqrt(denominator_rank*denominator_golden_rank)
-            return spearman
-
-        sum_of_squared_differences += (golden_rank_int - rank_int)**2
-    spearman_k = 1 - (6 * sum_of_squared_differences) / (len(rank) * (len(rank)**2 - 1))
-
-    return spearman_k
+    return 1 - (6 * sum_of_squared_differences) / (len(rank) * (len(rank)**2 - 1))

@@ -430,7 +430,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
     with open(file_path, 'r', encoding="utf-8") as file:
         load_index_file = json.load(file)
 
-    if load_index_file is not None:
+    if load_index_file is not any:
         return load_index_file
     return None
 

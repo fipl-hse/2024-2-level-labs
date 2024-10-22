@@ -431,8 +431,8 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
         load_index_file = json.load(file)
 
     if not load_index_file:
-        return None
-    return load_index_file
+        return load_index_file
+    return None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:

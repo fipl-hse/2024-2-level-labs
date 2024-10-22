@@ -72,12 +72,10 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if not all(isinstance(item, list) and all(isinstance(elem, str)
                                               for elem in item) for item in documents):
         return None
-    main_list = []
+    main_list = set()
     for words in documents:
-        for word in words:
-            if word not in main_list:
-                main_list.append(word)
-    return main_list
+        main_list.update(words)
+    return list(main_list)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -315,7 +313,8 @@ def calculate_bm25_with_cutoff(
     # if not vocab or not document or not idf_document:
     #     return None
     if ((not isinstance(vocab, list)) or
-            (not isinstance(document, list)) or (not isinstance(idf_document, dict))):
+            (not isinstance(document, list)) or (not isinstance(idf_document, dict)) or
+            not vocab or not document):
         return None
     if ((not all(isinstance(value, str) for value in vocab)) or
             (not all(isinstance(value, str) for value in document)) or
@@ -323,10 +322,11 @@ def calculate_bm25_with_cutoff(
                      key, value in idf_document.items()))):
         return None
     if ((not isinstance(k1, float)) or
-            (not isinstance(b, float)) or (not isinstance(alpha, float))):
+            (not isinstance(b, float)) or (not isinstance(alpha, float)) or
+            not isinstance(avg_doc_len, float) or not idf_document):
         return None
-    if ((not isinstance(avg_doc_len, float)) or
-            (not isinstance(doc_len, int)) or (isinstance(doc_len, bool))):
+    if (not isinstance(doc_len, int) or isinstance(doc_len, bool)
+            or doc_len < 0):
         return None
     bm25 = {}
     for word_in_idf, score in idf_document.items():
@@ -354,10 +354,11 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
                 isinstance(v, float) for k, v in item.items())
                 for item in index) or (not isinstance(file_path, str)))):
         return None
-    for dictionary in index:
-        with open(file_path, "w", encoding='utf-8') as write_file:
-            json.dump(dictionary, write_file, indent=4)
+    if not index or not file_path:
         return None
+    with open(file_path, "w", encoding='utf-8') as write_file:
+        json.dump(index, write_file, indent=4)
+    return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -372,13 +373,13 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(file_path, str):
+    if not isinstance(file_path, str) or not file_path:
         return None
     with open(file_path, 'r', encoding='utf-8') as file:
-        file_for_query = json.load(file)
-    if not isinstance(file_for_query, dict):
+        file_for_query: list[dict[str, float]] = json.load(file)
+    if not isinstance(file_for_query, list):
         return None
-    return file_for_query if isinstance(file_for_query, list) else None
+    return file_for_query
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -394,3 +395,18 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not rank or not golden_rank or not isinstance(rank, list)
+            or not isinstance(golden_rank, list)):
+        return None
+    if (not all(isinstance(i, int) for i in rank) or
+            not all(isinstance(k, int) for k in golden_rank)):
+        return None
+    if len(rank) != len(golden_rank):
+        return None
+    length = len(rank)
+    differences = 0
+
+    for ind in rank:
+        if ind in golden_rank:
+            differences += (rank.index(ind) - golden_rank.index(ind)) ** 2
+    return 1 - (6 * differences) / (length * (length ** 2 - 1))

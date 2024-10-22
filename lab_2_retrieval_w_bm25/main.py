@@ -431,10 +431,16 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
         load_index_file = json.load(file)
 
     if (load_index_file is not None
-        and isinstance(load_index_file, dict)
-        and load_index_file or isinstance(load_index_file, list)
-            and load_index_file):
-        return load_index_file
+        and isinstance(load_index_file, list)
+        and all(isinstance(dict_in_load_index_file, dict)
+        for dict_in_load_index_file in load_index_file)):
+        for dict_in_load_index_file in load_index_file:
+            for keys, values in dict_in_load_index_file.items():
+                if not isinstance(keys, str):
+                    return None
+                if not isinstance(values, float):
+                    return None
+            return load_index_file
     return None
 
 

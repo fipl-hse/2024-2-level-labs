@@ -22,7 +22,8 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    return re.sub(r'[^\s\w]+|\d+', r' ', text.lower()).split()
+    clean_text = re.sub(r'[^\s\w]+|\d+', r' ', text.lower())
+    return clean_text.split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -190,9 +191,9 @@ def calculate_bm25(
         return None
     vocab.extend([term for term in document if term not in vocab])
     idf_document.update({term: 0.0 for term in vocab if term not in idf_document})
-    return {term: (idf_document[term] * ((document.count(term) * (k1 + 1))
-                                         / (document.count(term)
-                                            + k1 * (1 - b + b * (doc_len / avg_doc_len)))))
+    immutable = k1 * (1 - b + b * (doc_len / avg_doc_len))
+    return {term: (idf_document[term] *
+                   ((document.count(term) * (k1 + 1)) / (document.count(term) + immutable)))
             for term in vocab}
 
 
@@ -225,14 +226,14 @@ def rank_documents(
     if not clean_query:
         return None
     index_score_list = []
-    for index in indexes:
+    for index, value in enumerate(indexes):
         metric_score = 0.0
-        index.update({term: 0.0 for term in clean_query if term not in index})
+        value.update({term: 0.0 for term in clean_query if term not in value})
         for term in clean_query:
-            metric_score += index[term]
-        index_score = (indexes.index(index), metric_score)
+            metric_score += value[term]
+        index_score = (index, metric_score)
         index_score_list.append(index_score)
-    return sorted(index_score_list, key=lambda tple: tple[-1], reverse=True)
+    return sorted(index_score_list, key=lambda x: x[-1], reverse=True)
 
 
 def calculate_bm25_with_cutoff(

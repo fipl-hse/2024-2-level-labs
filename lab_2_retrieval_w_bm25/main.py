@@ -431,7 +431,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
         load_index_file = json.load(file)
 
     if load_index_file is any:
-        return None
+        return
     return load_index_file
 
 

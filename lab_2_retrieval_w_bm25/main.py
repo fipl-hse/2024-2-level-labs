@@ -376,10 +376,9 @@ def calculate_bm25_with_cutoff(
         freq = document.count(word_from_vocab)
         if not isinstance(idf_document.get(word_from_vocab), float):
             return None
-        if alpha is None or idf_document.get(word_from_vocab) is None:
-            return None
-        if idf_document.get(word_from_vocab) < alpha:
-            continue
+        if alpha is not None or idf_document.get(word_from_vocab) is not None:
+            if idf_document.get(word_from_vocab) < alpha:
+                continue
         bm25_with_cutoff_figure = (idf_document[word_from_vocab]
                                    * ((freq*(k1+1)) / (freq+k1*(1-b+b*(doc_len/avg_doc_len)))))
         dict_bm25_with_cutoff[word_from_vocab] = bm25_with_cutoff_figure

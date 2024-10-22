@@ -354,7 +354,6 @@ def calculate_bm25_with_cutoff(
     if (not isinstance(idf_document, dict)
             or not idf_document
             or not isinstance(alpha, float)
-            or isinstance(alpha, bool)
             or not isinstance(avg_doc_len, float)
             or not document):
         return None
@@ -376,6 +375,8 @@ def calculate_bm25_with_cutoff(
     for word_from_vocab in vocab:
         freq = document.count(word_from_vocab)
         if not isinstance(idf_document.get(word_from_vocab), float):
+            return None
+        if alpha is None or idf_document.get(word_from_vocab) is None:
             return None
         if idf_document.get(word_from_vocab) < alpha:
             continue
@@ -433,6 +434,8 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
     with open(file_path, 'r', encoding="utf-8") as file:
         load_index_file = json.load(file)
 
+    if not load_index_file:
+        return None
     return load_index_file
 
 

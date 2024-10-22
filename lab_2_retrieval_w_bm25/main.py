@@ -20,7 +20,7 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(text, str) or text is None or isinstance(text, (bool, int, float)):
+    if not isinstance(text, str):
         return None
     list_of_tokens = []
     for unit in text:
@@ -52,10 +52,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if (tokens is None or stopwords is None
-            or isinstance(tokens, (bool, int, float))
-            or isinstance(stopwords, (bool, int, float))
-            or len(tokens) == 0 or len(stopwords) == 0
+    if (not tokens or not stopwords
+            or not isinstance(tokens, list) or not isinstance(stopwords, list)
             or not all(isinstance(token, str) for token in tokens)
             or not all(isinstance(word, str) for word in stopwords)):
         return None

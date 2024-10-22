@@ -374,9 +374,8 @@ def calculate_bm25_with_cutoff(
 
     for word_from_vocab in vocab:
         freq = document.count(word_from_vocab)
-        x = idf_document.get(word_from_vocab)
-        if x is None:
-            x = 0.0
+        if idf_document.get(word_from_vocab) is None:
+            idf_document.get(word_from_vocab) == 0.0
         if idf_document.get(word_from_vocab) < alpha:
             continue
         bm25_with_cutoff_figure = (idf_document[word_from_vocab]

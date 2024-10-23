@@ -24,13 +24,11 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    only_letters_text = ''
     for letter in text.lower():
-        if letter.isalpha() or letter == ' ':
-            only_letters_text += letter
-        else:
-            only_letters_text += ' '
-    tokenized_text = only_letters_text.split()
+        if not letter.isalpha() and letter != ' ':
+            text = text.lower().replace(letter, ' ')
+    tokenized_text = text.lower().split()
+
     if not all(isinstance(symbol, str) for symbol in tokenized_text):
         return None
     return tokenized_text
@@ -433,7 +431,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
     if (load_index_file is not None
         and isinstance(load_index_file, list)
         and all(isinstance(dict_in_load_index_file, dict)
-        for dict_in_load_index_file in load_index_file)):
+                for dict_in_load_index_file in load_index_file)):
         for dict_in_load_index_file in load_index_file:
             for keys, values in dict_in_load_index_file.items():
                 if not isinstance(keys, str):

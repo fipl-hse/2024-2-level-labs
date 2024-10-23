@@ -25,10 +25,11 @@ def tokenize(text: str) -> list[str] | None:
         return None
 
     for symbol in text:
-        if not (symbol.isalpha() or
-                symbol == " " or
-                symbol == "\n"):
-            text = text.replace(symbol, " ")
+        if (symbol.isalpha() or
+            symbol == " " or
+            symbol == "\n"):
+            continue
+        text = text.replace(symbol, " ")
 
     return text.lower().split()
 
@@ -133,7 +134,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             len(documents) > 0 and
             all(isinstance(doc, list) for doc in documents)):
         return None
-
     for doc in documents:
         if not all(isinstance(word, str) for word in doc):
             return None
@@ -161,10 +161,12 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     """
     if not (isinstance(tf, dict) and
             len(tf) > 0 and
-            all(isinstance(key, str) and isinstance(tf[key], float) for key in tf) and
+            all(isinstance(tf_key, str) and
+                isinstance(tf[tf_key], float) for tf_key in tf) and
             isinstance(idf, dict) and
             len(idf) > 0 and
-            all(isinstance(key, str) and isinstance(idf[key], float) for key in idf)):
+            all(isinstance(idf_key, str) and
+                isinstance(idf[idf_key], float) for idf_key in idf)):
         return None
 
     tf_idf = {}
@@ -217,10 +219,10 @@ def calculate_bm25(
             isinstance(doc_len, int) and
             doc_len is not True):
         return None
-    if not (all(isinstance(word, str) for word in vocab) and
-            all(isinstance(word, str) for word in document) and
-            all(isinstance(key, str) and
-                isinstance(idf_document[key], float) for key in idf_document)):
+    if not (all(isinstance(voc_word, str) for voc_word in vocab) and
+            all(isinstance(doc_word, str) for doc_word in document) and
+            all(isinstance(idf_key, str) and
+                isinstance(idf_document[idf_key], float) for idf_key in idf_document)):
         return None
 
     result_dict = {}
@@ -253,12 +255,14 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
     if not (isinstance(indexes, list) and
-            all(isinstance(index, dict) for index in indexes) and
+            len(indexes) > 0 and
             isinstance(query, str) and
+            len(query) > 0 and
             isinstance(stopwords, list) and
-            all(isinstance(word, str) for word in stopwords)):
+            len(stopwords) > 0):
         return None
-    if not (len(indexes) > 0 and len(stopwords) > 0 and len(query) > 0):
+    if not (all(isinstance(index, dict) for index in indexes) and
+            all(isinstance(word, str) for word in stopwords)):
         return None
 
     tokenized_query = tokenize(query)
@@ -270,10 +274,7 @@ def rank_documents(
 
     doc_sums = []
     for doc_num, doc in enumerate(indexes):
-        values_sum = 0.0
-        for token in query_to_compare:
-            if token in doc:
-                values_sum += doc[token]
+        values_sum = sum(doc[token] for token in query_to_compare if token in doc)
         doc_sums.append((doc_num, values_sum))
     doc_sums.sort(reverse=True, key=lambda a: a[1])
     return doc_sums
@@ -321,10 +322,10 @@ def calculate_bm25_with_cutoff(
             isinstance(doc_len, int) and
             doc_len is not True):
         return None
-    if not (all(isinstance(word, str) for word in vocab) and
-            all(isinstance(word, str) for word in document) and
-            all(isinstance(key, str) and
-                isinstance(idf_document[key], float) for key in idf_document) and
+    if not (all(isinstance(voc_word, str) for voc_word in vocab) and
+            all(isinstance(doc_word, str) for doc_word in document) and
+            all(isinstance(idf_key, str) and
+                isinstance(idf_document[idf_key], float) for idf_key in idf_document) and
             isinstance(alpha, float)):
         return None
 
@@ -348,10 +349,15 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
-    if (isinstance(index, list) and all(isinstance(doc, dict) for doc in index) and
-        len(index) > 0 and isinstance(file_path, str) and len(file_path) > 0):
-        with open(file_path, "w", encoding="utf-8") as write_file:
-            json.dump(index, write_file, indent="\t")
+    if not (isinstance(index, list) and
+            len(index) > 0 and
+            all(isinstance(doc, dict) for doc in index) and
+            isinstance(file_path, str) and
+            len(file_path) > 0):
+        return None
+
+    with open(file_path, "w", encoding="utf-8") as write_file:
+        json.dump(index, write_file, indent="\t")
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -366,12 +372,14 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if isinstance(file_path, str) and len(file_path) > 0:
-        with open(file_path, "r", encoding="utf-8") as read_file:
-            val = json.load(read_file)
-            if isinstance(val, list):
-                return val
-    return None
+    if not (isinstance(file_path, str) and
+            len(file_path) > 0):
+        return None
+
+    with open(file_path, "r", encoding="utf-8") as read_file:
+        val = json.load(read_file)
+        if isinstance(val, list):
+            return val
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -387,12 +395,13 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not (isinstance(rank, list) and isinstance(golden_rank, list) and
-            all(isinstance(value, int) for value in rank) and
-            all(isinstance(gold_val, int) for gold_val in golden_rank)):
+    if not (isinstance(rank, list) and
+            len(rank) > 0 and
+            isinstance(golden_rank, list) and
+            len(rank) == len(golden_rank)):
         return None
-
-    if not (len(rank) == len(golden_rank) and len(rank) > 0):
+    if not (all(isinstance(value, int) for value in rank) and
+            all(isinstance(gold_val, int) for gold_val in golden_rank)):
         return None
 
     if not all(val in golden_rank for val in rank):

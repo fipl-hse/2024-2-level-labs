@@ -219,16 +219,12 @@ def calculate_bm25(
             ((not isinstance(avg_doc_len, float)) or (not isinstance(doc_len, int)) or
             (isinstance(doc_len, bool)))):
         return None
-    bm25 = {}
 
-    for word_in_doc in document:
-        bm25[word_in_doc] = 0.0
+    bm25 = dict.fromkeys(document, 0.0)
 
     for word_in_idf in idf_document.keys():
         if word_in_idf not in vocab:
             return None
-        if word_in_idf not in bm25:
-            bm25[word_in_idf] = 0.0
         bm25[word_in_idf] = (idf_document[word_in_idf] * document.count(word_in_idf) *
                                            (k1 + 1) / (document.count(word_in_idf) + k1 *
                                                        (1 - b + b * doc_len / avg_doc_len)))
@@ -268,11 +264,11 @@ def rank_documents(
         return None
 
     list_with_index = []
-    for index_from_indexes, metrica in enumerate(indexes):
+    for index_from_indexes, value in enumerate(indexes):
         value_of_whole_document = 0.0
         for word in without_stopwords:
-            if word in metrica:
-                value_of_whole_document += metrica[word]
+            if word in value:
+                value_of_whole_document += value[word]
         tuple_of_metrica = (index_from_indexes, value_of_whole_document)
         list_with_index.append(tuple_of_metrica)
 
@@ -310,8 +306,6 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
-    # if not vocab or not document or not idf_document:
-    #     return None
     if ((not isinstance(vocab, list)) or
             (not isinstance(document, list)) or (not isinstance(idf_document, dict)) or
             not vocab or not document):
@@ -404,9 +398,7 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     if len(rank) != len(golden_rank):
         return None
     length = len(rank)
-    differences = 0
-
-    for ind in rank:
-        if ind in golden_rank:
-            differences += (rank.index(ind) - golden_rank.index(ind)) ** 2
+    golden_rank_index = {value: index for index, value in enumerate(golden_rank)}
+    differences = sum((i - golden_rank_index[rank[i]]) ** 2 for
+                      i in range(length) if rank[i] in golden_rank_index)
     return 1 - (6 * differences) / (length * (length ** 2 - 1))

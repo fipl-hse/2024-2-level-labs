@@ -9,6 +9,7 @@ from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
                                          rank_documents, remove_stopwords, save_index,
                                          tokenize)
 
+
 def main() -> None:
     """
     Launches an implementation
@@ -32,11 +33,12 @@ def main() -> None:
 
     query = "A story about a wizard boy in a tower!"
 
-    result = None
     tokenized_documents = []
     for document in documents:
         tokens: list[str] = tokenize(document) or []
         tokenized_documents.append(tokens)
+
+    print(tokenized_documents)
 
     tokenized_documents_without_stopwords = []
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
@@ -45,6 +47,8 @@ def main() -> None:
             without_stopwords = remove_stopwords(tokenized_doc, stopwords)
             if without_stopwords:
                 tokenized_documents_without_stopwords.append(without_stopwords)
+
+    print(tokenized_documents_without_stopwords)
 
     vocab = build_vocabulary(tokenized_documents)
     if not vocab:
@@ -60,6 +64,8 @@ def main() -> None:
             if tf_idf:
                 list_for_tf_idf.append(tf_idf)
 
+    print(list_for_tf_idf)
+
     avg_len = [len(doc) for doc in tokenized_documents_without_stopwords]
     avg_len_doc = sum(avg_len) / len(tokenized_documents_without_stopwords) \
         if avg_len else 0
@@ -71,6 +77,8 @@ def main() -> None:
         if bm25 is not None:
             list_for_bm25.append(bm25)
 
+    print(list_for_bm25)
+
     list_for_bm25_without_cutoff = []
     for doc_bm25 in tokenized_documents_without_stopwords:
         doc_len = len(doc_bm25)
@@ -79,15 +87,30 @@ def main() -> None:
         if bm25_score is not None:
             list_for_bm25_without_cutoff.append(bm25_score)
 
-    rank = rank_documents(list_for_tf_idf, query, stopwords)
-    rank = rank_documents(list_for_bm25, query, stopwords)
+    print(list_for_bm25_without_cutoff)
 
     save_index(list_for_bm25_without_cutoff, 'assets/metrics.json')
     load_docs = load_index('assets/metrics.json')
     if load_docs is None:
-        return None
+        return
+
+    rank_for_tf_idf = rank_documents(list_for_tf_idf, query, stopwords)
+    rank_for_bm = rank_documents(list_for_bm25, query, stopwords)
     cutoff_tuples = rank_documents(load_docs, query, stopwords)
-    result = cutoff_tuples
+
+    list_with_rank_bm_without = []
+    for document in cutoff_tuples:
+        list_with_rank_bm_without.append(document[0])
+
+    rank_tf_idf = [number[0] for number in rank_for_tf_idf]
+    rank_bm = [number[0] for number in rank_for_bm]
+    rank_bm_without = [number[0] for number in cutoff_tuples]
+
+    result_tf = calculate_spearman(rank_tf_idf, rank_bm_without)
+    result_bm = calculate_spearman(rank_bm, rank_bm_without)
+    print(result_tf, result_bm)
+
+    result = result_bm
 
     assert result, "Result is None"
 

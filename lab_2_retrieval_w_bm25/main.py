@@ -264,11 +264,11 @@ def rank_documents(
         return None
 
     list_with_index = []
-    for index_from_indexes, value in enumerate(indexes):
+    for index_from_indexes, metrica in enumerate(indexes):
         value_of_whole_document = 0.0
         for word in without_stopwords:
-            if word in value:
-                value_of_whole_document += value[word]
+            if word in metrica:
+                value_of_whole_document += metrica[word]
         tuple_of_metrica = (index_from_indexes, value_of_whole_document)
         list_with_index.append(tuple_of_metrica)
 

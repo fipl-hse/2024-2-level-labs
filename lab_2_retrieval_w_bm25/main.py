@@ -358,6 +358,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
 
     with open(file_path, "w", encoding="utf-8") as write_file:
         json.dump(index, write_file, indent="\t")
+    return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -380,6 +381,7 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
         val = json.load(read_file)
         if isinstance(val, list):
             return val
+    return None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:

@@ -4,9 +4,8 @@ Laboratory Work #2 starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
                                          calculate_bm25_with_cutoff, calculate_idf,
-                                         calculate_spearman, calculate_tf,
-                                         calculate_tf_idf, load_index,
-                                         rank_documents, remove_stopwords, save_index,
+                                         calculate_spearman, calculate_tf, calculate_tf_idf,
+                                         load_index, rank_documents, remove_stopwords, save_index,
                                          tokenize)
 
 
@@ -38,8 +37,6 @@ def main() -> None:
         tokens: list[str] = tokenize(document) or []
         tokenized_documents.append(tokens)
 
-    print(tokenized_documents)
-
     tokenized_documents_without_stopwords = []
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
@@ -48,9 +45,7 @@ def main() -> None:
             if without_stopwords:
                 tokenized_documents_without_stopwords.append(without_stopwords)
 
-    print(tokenized_documents_without_stopwords)
-
-    vocab = build_vocabulary(tokenized_documents)
+    vocab = build_vocabulary(tokenized_documents_without_stopwords)
     if not vocab:
         return
 
@@ -98,16 +93,13 @@ def main() -> None:
     rank_for_bm = rank_documents(list_for_bm25, query, stopwords)
     cutoff_tuples = rank_documents(load_docs, query, stopwords)
 
-    list_with_rank_bm_without = []
-    for document in cutoff_tuples:
-        list_with_rank_bm_without.append(document[0])
-
     rank_tf_idf = [number[0] for number in rank_for_tf_idf]
     rank_bm = [number[0] for number in rank_for_bm]
     rank_bm_without = [number[0] for number in cutoff_tuples]
 
     result_tf = calculate_spearman(rank_tf_idf, rank_bm_without)
     result_bm = calculate_spearman(rank_bm, rank_bm_without)
+    print(rank_bm_without)
     print(result_tf, result_bm)
 
     result = result_bm

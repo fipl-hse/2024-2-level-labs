@@ -241,6 +241,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     if map_scores:
         return map_scores
+
     return None
 
 

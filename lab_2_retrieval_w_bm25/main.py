@@ -52,9 +52,11 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     In case of corrupt input arguments, None is returned.
     """
 
-    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or not tokens:
+    if not isinstance(tokens, list) or not all(isinstance(token, str)
+                                               for token in tokens) or not tokens:
         return None
-    if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords) or not stopwords:
+    if not isinstance(stopwords, list) or not all(isinstance(word, str)
+                                                  for word in stopwords) or not stopwords:
         return None
     return [token for token in tokens if token not in stopwords]
 
@@ -112,7 +114,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         if word in tf_dict:
             tf_dict[word] += 1
     doc_length = len(document_tokens)
-    return {word: (count / doc_length) if doc_length > 0 else 0.0 for word, count in tf_dict.items()}
+    return {word: (count / doc_length) if doc_length > 0 else 0.0 for
+            word, count in tf_dict.items()}
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -135,7 +138,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         return None
     if not all(isinstance(word, str) for word in vocab):
         return None
-    if not all(isinstance(doc, list) and all(isinstance(token, str) for token in doc) for doc in documents):
+    if not all(isinstance(doc, list) and
+               all(isinstance(token, str) for token in doc) for doc in documents):
         return None
     length = len(documents)
     idf_dict = {}
@@ -205,13 +209,19 @@ def calculate_bm25(
 
     if not vocab or not document or not idf_document:
         return None
-    if not isinstance(vocab, list) or not isinstance(document, list) or not isinstance(idf_document, dict):
+    if (not isinstance(vocab, list) or not isinstance(document, list) or
+            not isinstance(idf_document, dict)):
         return None
-    if ((not all(isinstance(value, str) for value in vocab)) or (not all(isinstance(value, str) for value in document))
-            or (not all(isinstance(key, str) and isinstance(value, float) for key, value in idf_document.items()))):
+    if ((not all(isinstance(value, str) for value in vocab)) or
+            (not all(isinstance(value, str) for value in document))
+            or (not all(isinstance(key, str) and isinstance(value, float) for
+                        key, value in idf_document.items()))):
         return None
     if ((not isinstance(k1, float)) or (not isinstance(b, float))
-            or ((not isinstance(avg_doc_len, float)) or (not isinstance(doc_len, int)) or (isinstance(doc_len, bool)))):
+            or ((not isinstance(avg_doc_len, float)) or
+                (not isinstance(doc_len, int)) or (isinstance(doc_len, bool)))):
+        return None
+    if avg_doc_len == 0:
         return None
     bm25 = {}
     tokens = [vocab, document]
@@ -221,8 +231,11 @@ def calculate_bm25(
             bm25[token] = 0.0
         else:
             token_count = document.count(token)
-            bm25[token] = (idf_document[token] * (token_count * (k1 + 1)) / token_count + k1 *
-                           (1 - b + b * (doc_len / avg_doc_len)))
+            denominator = token_count + k1 * (1 - b + b * (doc_len / avg_doc_len))
+            if denominator == 0:
+                bm25[token] = 0.0
+            else:
+                bm25[token] = idf_document[token] * (token_count * (k1 + 1)) / denominator
     return bm25
 
 

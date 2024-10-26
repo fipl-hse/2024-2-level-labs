@@ -20,31 +20,25 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    # divide by spaces - ['the', 'first%', 'sentence><.', 'the', 'sec&*ond', 'sent@ence', '#.']
 
     text = text.lower()
-    text_by_space = text.split(' ')
 
-    separ_text = []
-    for word in text_by_space:
-        for i, token in enumerate(word):
-            if not token.isalpha() and word[:i] and word[i + 1:]:
-                separ_text.extend([word[:i], word[i + 1:]])
-                break
-        else:
-            separ_text.append(word)
+    only_not_letters = 0
 
-    clean_text = []
-    for word in separ_text:
-        clean_word = ''
-        for token in word:
-            if not token.isalpha():
-                continue
-            clean_word += token
-        if clean_word:
-            clean_text.append(clean_word)
+    for i, symb in enumerate(text):
+        if not symb.isalpha() and symb != ' ':
+            text = text.replace(symb, ' ')
+    text = text.replace('   ', ' ')
+    text = text.replace('  ', ' ')
 
-    return clean_text
+    text = text.strip()
+
+    tokens = text.split(' ')
+
+    if tokens == ['']:
+        tokens = []
+
+    return tokens
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -81,8 +75,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         clean_tokens.append(token)
     if clean_tokens:
         return clean_tokens
-    else:
-        return None
+    return None
 
 
 
@@ -115,7 +108,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     if unique_words:
         return unique_words
-
+    return None
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """
@@ -131,6 +124,32 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     In case of corrupt input arguments, None is returned.
     """
 
+    if not isinstance(vocab, list) or not isinstance(document_tokens, list):
+        return None
+
+    if len(vocab) == 0 or len(document_tokens) == 0:
+        return None
+
+
+    frequency = {}
+
+    for voc in vocab:
+        if not isinstance(voc, str):
+            return None
+        frequency[voc] = 0.0
+        if voc in document_tokens:
+            frequency[voc] = document_tokens.count(voc) / len(document_tokens)
+
+    for token in document_tokens:
+        if not isinstance(token, str):
+            return None
+        if token not in frequency.keys():
+            frequency[token] = document_tokens.count(token) / len(document_tokens)
+
+
+    if frequency:
+        return frequency
+    return None
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """
@@ -145,6 +164,38 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(documents, list):
+        return None
+
+    for doc in documents:
+        if not isinstance(doc, list):
+            return None
+        for token in doc:
+            if not isinstance(token, str):
+                return None
+
+    from math import log
+
+    n = len(documents)
+    if n == 0:
+        return None
+    map_IDF_scores = {}
+
+    for voc in vocab:
+        if not isinstance(voc, str):
+            return None
+
+        amount = 0
+        for doc in documents:
+            if voc in doc:
+                amount += 1
+
+        IDF = log((n - amount + 0.5) / (amount + 0.5))
+        map_IDF_scores[voc] = IDF
+
+    if map_IDF_scores:
+        return map_IDF_scores
+    return None
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -160,6 +211,37 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tf, dict) or not isinstance(idf, dict):
+        return None
+
+    for t_k in tf.keys():
+        if not isinstance(t_k, str):
+            return None
+
+    for i_k in idf.keys():
+        if not isinstance(i_k, str):
+            return None
+
+    for t_v in tf.values():
+        if not isinstance(t_v, float):
+            return None
+
+    for i_v in idf.values():
+        if not isinstance(i_v, float):
+            return None
+
+    if not idf or not tf:
+        return None
+
+    map_scores = {}
+
+    for t in tf.keys():
+        score = tf[t] * idf[t]
+        map_scores[t] = score
+
+    if map_scores:
+        return map_scores
+    return None
 
 
 def calculate_bm25(

@@ -69,7 +69,7 @@ def main() -> None:
 
     query = "Which fairy tale has Fairy Queen?"
     tokenized_query = tokenize(query)
-    cleared_query = remove_stopwords(tokenized_query, stopwords)
+    cleared_query = remove_stopwords(tokenized_query, stopwords) if tokenized_query else []
     cleared_query_str = " ".join(cleared_query) if cleared_query else ""
 
     tf_idf_ranking = rank_documents(tf_idf_doc, cleared_query_str, stopwords)

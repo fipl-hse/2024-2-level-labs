@@ -3,6 +3,8 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
+from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords, build_vocabulary,
+                                         calculate_tf, calculate_idf, calculate_tf_idf)
 
 def main() -> None:
     """
@@ -26,7 +28,27 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = None
+
+
+    # for grade 6:
+
+    # metrics_dict = list[dict[str:bool]]
+    # metrics_dict = [{word1: TF-IDF1, word2: TF-IDF2...}, ...]
+    metrics = []
+
+    for doc in documents:
+        tokenized_text = tokenize(doc)
+        clean_text = remove_stopwords(tokenized_text, stopwords)
+        vocab = build_vocabulary(clean_text)
+        tf_metric = calculate_tf(vocab, clean_text)
+        idf_metric = calculate_idf(vocab, clean_text)
+        tf_idf_metric = calculate_tf_idf(tf_metric, idf_metric)
+        metrics.append(tf_idf_metric)
+
+
+    print(metrics)
+
+    result = metrics
     assert result, "Result is None"
 
 

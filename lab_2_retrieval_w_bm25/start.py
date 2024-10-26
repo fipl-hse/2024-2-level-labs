@@ -2,7 +2,7 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from main import tokenize, remove_stopwords, build_vocabulary,calculate_tf, calculate_idf,calculate_tf_idf, calculate_bm25, \
+from lab_2_retrieval_w_bm25.main import tokenize, remove_stopwords, build_vocabulary,calculate_tf, calculate_idf,calculate_tf_idf, calculate_bm25, \
     rank_documents
 
 
@@ -29,26 +29,36 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
     av_doc_len = sum(len(document) for document in documents) / len(documents)
-    for i in range(len(documents)):
-        documents[i]=tokenize(documents[i])
-        documents[i]=remove_stopwords(documents[i],stopwords)
-    vocabulary = build_vocabulary(documents)
+    preprocessed_documents = []
+    for doc in documents:
+        tokenized_doc = tokenize(doc)
+        if not isinstance(tokenized_doc, list):
+            return None
+        preprocessed_doc = remove_stopwords(tokenized_doc, stopwords)
+        if not isinstance(preprocessed_doc, list):
+            return None
+        preprocessed_documents.append(preprocessed_doc)
+    vocabulary = build_vocabulary(preprocessed_documents)
     tf = []
-    for document in documents:
-        tf_doc = calculate_tf(vocabulary,document)
+    for document in preprocessed_documents:
+        tf_doc = calculate_tf(vocabulary, document)
+        if not isinstance(tf_doc, list):
+            return None
         tf.append(tf_doc)
     tf_idf = []
-    idf = calculate_idf(vocabulary, documents)
+    idf = calculate_idf(vocabulary, preprocessed_documents)
+    if not isinstance(idf, list):
+        return None
     for tf_document in tf:
-        tf_idf_doc = calculate_tf_idf(tf_document,idf)
+        tf_idf_doc = calculate_tf_idf(tf_document, idf)
         tf_idf.append(tf_idf_doc)
     bm25 = []
-    for document in documents:
+    for document in preprocessed_documents:
         bm25_doc = calculate_bm25(vocabulary,document,idf,1.5,0.75,av_doc_len,len(document))
         bm25.append(bm25_doc)
     quary = 'Which fairy tale has Fairy Queen?'
-    ranked_tf_idf = rank_documents(tf_idf, quary,stopwords)
-    ranked_bm25 = rank_documents(bm25,quary,stopwords)
+    ranked_tf_idf = rank_documents(tf_idf, quary, stopwords)
+    ranked_bm25 = rank_documents(bm25, quary, stopwords)
     print(ranked_tf_idf)
     print(ranked_bm25)
 

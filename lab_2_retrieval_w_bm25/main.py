@@ -204,15 +204,17 @@ def calculate_bm25(
             or not all(isinstance(idf_document[idf_doc], float) for idf_doc in idf_document):
         return None
     if not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float) \
-            or not isinstance(doc_len, int):
+            or not isinstance(doc_len, int) or isinstance(doc_len, bool):
+        return None
+    if not vocab or not document or not idf_document:
         return None
     bm_dict = {}
     for word in set(vocab).union(set(document)):
         nt = document.count(word)
-        if word in document:
+        if word in document and word in idf_document:
             bm_dict[word] = idf_document[word] * (nt * (k1+1)) / (nt + k1 * (1 - b + b * (doc_len / avg_doc_len)))
         else:
-            bm_dict[word] = 0
+            bm_dict[word] = 0.0
     return bm_dict
 
 
@@ -232,27 +234,34 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(indexes,list) or not all(isinstance(index, dict) for index in indexes):
+    if not isinstance(indexes, list) or not all(isinstance(index, dict) for index in indexes):
         return None
     for index in indexes:
-        if not all(isinstance(key,str)for key in index) or not all(isinstance(value,float) for value in index.values()):
+        if not all(isinstance(key, str)for key in index) or not all(isinstance(value, float) for value in index.values()):
             return None
-    if not query or not isinstance(query,str):
+    if not query or not isinstance(query, str):
         return None
-    if not isinstance(stopwords,list) or not all(isinstance(word, str) for word in stopwords):
+    if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords):
+        return None
+    if not indexes:
         return None
     tokenized_query = tokenize(query)
-    preprocessed_query = remove_stopwords(tokenized_query,stopwords)
+    if not tokenized_query:
+        return None
+    preprocessed_query = remove_stopwords(tokenized_query, stopwords)
+    if not preprocessed_query:
+        return None
     rank = []
     doc_index = 0
     for document in indexes:
-        doc_index += 1
-        summa = 0
+        summa = 0.0
         for token in preprocessed_query:
-            summa += document[token]
+            if token in document:
+                summa += document[token]
         rank.append((doc_index, summa))
-    rank = sorted(rank, key=lambda r: r[1], reverse=True)
-    return rank
+        doc_index += 1
+    return sorted(rank, key=lambda r: r[1], reverse=True)
+
 
 
 def calculate_bm25_with_cutoff(

@@ -59,7 +59,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if not isinstance(tokens, list):
         return None
 
-    if not isinstance(stopwords, list) or not stopwords:
+    if any((not isinstance(stopwords, list), not stopwords)):
         return None
 
     for word in stopwords:
@@ -124,7 +124,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     In case of corrupt input arguments, None is returned.
     """
 
-    if not isinstance(vocab, list) or not isinstance(document_tokens, list):
+    if any((not isinstance(vocab, list), not isinstance(document_tokens, list))):
         return None
 
     if len(vocab) == 0 or len(document_tokens) == 0:
@@ -164,7 +164,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not isinstance(documents, list):
+    if any((not isinstance(vocab, list), not isinstance(documents, list))):
         return None
 
     for doc in documents:
@@ -211,7 +211,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tf, dict) or not isinstance(idf, dict):
+    if any((not isinstance(tf, dict), not isinstance(idf, dict))):
         return None
 
     for t_k in tf.keys():

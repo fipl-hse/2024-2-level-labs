@@ -37,13 +37,13 @@ def main() -> None:
     cleared_documents = []
     for document in documents:
         tokenized_doc = tokenize(document)
-        if tokenized_doc is not None:
+        if tokenized_doc:
             tokenized_documents.append(tokenized_doc)
             cleared_documents.append(remove_stopwords(tokenized_doc, stopwords))
 
     vocabulary = build_vocabulary(tokenized_documents)
     if not vocabulary:
-        return None
+        return
 
     tf_idf_doc = []
     idf_check = calculate_idf(vocabulary, cleared_documents)

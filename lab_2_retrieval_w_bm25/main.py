@@ -224,8 +224,6 @@ def calculate_bm25(
     if avg_doc_len == 0:
         return None
     bm25 = {}
-    tokens = [vocab, document]
-    vocab = build_vocabulary(tokens)
     for token in vocab:
         if token not in idf_document:
             bm25[token] = 0.0

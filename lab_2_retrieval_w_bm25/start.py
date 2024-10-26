@@ -37,9 +37,11 @@ def main() -> None:
     cleared_documents = []
     for document in documents:
         tokenized_doc = tokenize(document)
-        if tokenized_doc:
+        if tokenized_doc is not None:
             tokenized_documents.append(tokenized_doc)
-            cleared_documents.append(remove_stopwords(tokenized_doc, stopwords))
+            cleared_doc = remove_stopwords(tokenized_doc, stopwords)
+            if cleared_doc:
+                cleared_documents.append(cleared_doc)
 
     vocabulary = build_vocabulary(tokenized_documents)
     if not vocabulary:
@@ -49,19 +51,21 @@ def main() -> None:
     idf_check = calculate_idf(vocabulary, cleared_documents)
     idf = idf_check if idf_check is not None else {}
     for cleared_doc in cleared_documents:
-        tf = calculate_tf(vocabulary, cleared_doc)
-        if tf and isinstance(tf, dict):
-            tf_idf = calculate_tf_idf(tf, idf)
-            if tf_idf:
-                tf_idf_doc.append(tf_idf)
+        if cleared_doc:
+            tf = calculate_tf(vocabulary, cleared_doc)
+            if tf and isinstance(tf, dict):
+                tf_idf = calculate_tf_idf(tf, idf)
+                if tf_idf:
+                    tf_idf_doc.append(tf_idf)
 
     avg_len_doc = sum(len(doc) for doc in cleared_documents) / len(cleared_documents)
     bm25_doc = []
     for cleared_doc in cleared_documents:
-        doc_len = len(cleared_doc)
-        bm25 = calculate_bm25(vocabulary, cleared_doc, idf, 1.5, 0.75, avg_len_doc, doc_len)
-        if bm25 is not None:
-            bm25_doc.append(bm25)
+        if cleared_doc:
+            doc_len = len(cleared_doc)
+            bm25 = calculate_bm25(vocabulary, cleared_doc, idf, 1.5, 0.75, avg_len_doc, doc_len)
+            if bm25 is not None:
+                bm25_doc.append(bm25)
 
     query = "Which fairy tale has Fairy Queen?"
     tokenized_query = tokenize(query)

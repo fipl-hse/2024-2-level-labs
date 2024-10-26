@@ -3,7 +3,9 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-from lab_2_retrieval_w_bm25.main import build_vocabulary, remove_stopwords, tokenize
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
+                                         calculate_idf, calculate_tf,
+                                         calculate_tf_idf, rank_documents, remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -37,9 +39,13 @@ def main() -> None:
         tokenized_documents.append(tokenize(document))
         cleared_documents.append(remove_stopwords(tokenize(document), stopwords))
 
+    query = "A story about a wizard boy in a tower!"
+
     vocabulary = build_vocabulary(tokenized_documents)
     if not vocabulary:
         return None
+
+
 
     print(tokenized_documents[0])
     print(cleared_documents[0])

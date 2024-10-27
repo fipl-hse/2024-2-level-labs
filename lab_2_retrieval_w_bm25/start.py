@@ -7,6 +7,7 @@ from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calcul
 
 
 
+
 def main() -> None:
     """
     Launches an implementation

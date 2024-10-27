@@ -18,13 +18,18 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    import string
     if not isinstance(text, str):
         return None
     my_text = text.lower()
     my_text.split()
-    words = [w.strip(string.punctuation) for w in my_text.split()]
-    return words
+    tokenized_text = []
+    for token in my_text.split():
+        if token.isalpha():
+            tokenized_text.append(token)
+    return tokenized_text
+
+
+
 
 
 

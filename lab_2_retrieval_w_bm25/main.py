@@ -365,23 +365,48 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not (isinstance(vocab, list) and all(isinstance(elem, str) for elem in vocab) and vocab):
+    if not (isinstance(vocab, list)
+            and all(isinstance(word_in_vocab, str) for word_in_vocab in vocab)
+            and isinstance(document, list)
+            and all(isinstance(elem, str) for elem in document)
+            and vocab):
         return None
-    if (not (isinstance(document, list) and all(isinstance(elem, str) for elem in document)
-             and document)):
+    if not (isinstance(idf_document, dict)
+            and idf_document
+            and isinstance(alpha, float)
+            and isinstance(avg_doc_len, float)
+            and document):
+        return None
+    for key, value in idf_document.items():
+        if not isinstance(key, str) or not isinstance(value, float):
+            return None
+    if (not isinstance(k1, float) or not isinstance(b, float)
+            or not isinstance(doc_len, int)
+            or doc_len < 0
+            or isinstance(doc_len, bool)):
         return None
 
-    if (not isinstance(idf_document, dict) or
-            not all(isinstance(key, str) and isinstance(value, float)
-                    for key, value in idf_document.items()) or not idf_document):
+    bm25_with_cutoff_dict = {}
+
+    for word_from_doc in document:
+        if word_from_doc not in vocab:
+            vocab.append(word_from_doc)
+            idf_document[word_from_doc] = 0.0
+
+    for elem in idf_document:
+        if idf_document.get(elem, 0.0) < alpha:
+            continue
+        frequency = document.count(elem)
+        bm25_score = (idf_document[elem] *
+                      ((frequency * (k1 + 1)) / (frequency + k1 * (
+                              1 - b + b * (doc_len / avg_doc_len)
+                      ))))
+        bm25_with_cutoff_dict[elem] = bm25_score
+
+    if not bm25_with_cutoff_dict:
         return None
 
-    if not (isinstance(k1, float) and isinstance(b, float) and isinstance(alpha, float)):
-        return None
-
-    if not (isinstance(avg_doc_len, float)) or avg_doc_len is None or \
-            not (isinstance(doc_len, int)) or doc_len is None or isinstance(doc_len, bool):
-        return None
+    return bm25_with_cutoff_dict
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
@@ -392,6 +417,13 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if not isinstance(file_path, str):
+        return None
+    if not (isinstance(index, list) and
+            all(isinstance(elem, dict) and
+            all(isinstance(key, str) and isinstance(value, float) for key, value in elem.items()) for elem in index)
+            and index):
+        return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -406,6 +438,8 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(file_path, str):
+        return None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -421,3 +455,8 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(rank, list) and all(isinstance(elem, str) for elem in rank) and rank):
+        return None
+    if not (isinstance(golden_rank, list) and
+            all(isinstance(elem, str) for elem in golden_rank) and golden_rank):
+        return None

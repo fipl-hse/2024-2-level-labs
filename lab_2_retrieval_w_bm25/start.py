@@ -45,8 +45,7 @@ def main() -> None:
     tf = []
     for document in preprocessed_documents:
         if not isinstance(document, str):
-            result = None
-            assert result, "Result is None"
+            return None
         tf_doc = calculate_tf(vocabulary, document)
         if not isinstance(tf_doc, list):
             result = None
@@ -75,6 +74,7 @@ def main() -> None:
 
     result = 1
     assert result, "Result is None"
+    return None
 
 
 if __name__ == "__main__":

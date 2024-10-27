@@ -31,7 +31,7 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-    '''получение списка списков уникальных слов'''
+    #получение списка списков уникальных слов
     doc_tokens = []
     for text in documents:
         tokens = tokenize(text)
@@ -42,7 +42,7 @@ def main() -> None:
             return None
         doc_tokens.append(new_tokens)
 
-    '''подсчёт tf_idf'''
+    #подсчёт tf_idf
     tf_idf = []
     vocab = build_vocabulary(doc_tokens)
     if not isinstance(vocab, list):
@@ -59,7 +59,7 @@ def main() -> None:
             return None
         tf_idf.append(dict_tf_idf)
 
-    '''получение списка словарей bm25'''
+    #получение списка словарей bm25
     length_all = 0.0
     for lst in doc_tokens:
         length_all += len(lst)
@@ -73,7 +73,7 @@ def main() -> None:
             return None
         bm25.append(index)
 
-    '''получение списка словарей bm25_cutoff'''
+    #получение списка словарей bm25_cutoff
     bm25_cut = []
     for lst in doc_tokens:
         index = calculate_bm25_with_cutoff(vocab, lst, idf, 0.2,
@@ -83,7 +83,7 @@ def main() -> None:
             return None
         bm25_cut.append(index)
 
-    '''получение ранжированных списков'''
+    #получение ранжированных списков
     list_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
     list_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
     list_bm25_cut = rank_documents(bm25_cut, 'Which fairy tale has Fairy Queen?', stopwords)
@@ -100,12 +100,12 @@ def main() -> None:
     for box in list_tf_idf:
         rank_bm25_cut.append(box[0])
 
-    '''подсчёт коэффициентов Спирмена'''
+    #подсчёт коэффициентов Спирмена
     golden_rank = [1, 7, 5, 0, 9, 2, 3, 4, 6, 8]
     spear_tf_idf = calculate_spearman(rank_tf_idf, golden_rank)
     spear_bm25 = calculate_spearman(rank_bm25, golden_rank)
     spear_bm25_cut = calculate_spearman(rank_bm25_cut, golden_rank)
-    result = f'spear_tf_idf: {spear_tf_idf}, spear_bm25: {spear_bm25}, spear_bm25_cut: {spear_bm25_cut}'
+    result = f'sp_tf_idf: {spear_tf_idf}, sp_bm25: {spear_bm25}, sp_bm25_cut: {spear_bm25_cut}'
     print(result)
     assert result, "Result is None"
 

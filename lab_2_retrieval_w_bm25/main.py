@@ -346,9 +346,9 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         return None
     if '.' not in file_path:
         return None
-    out_file = open(file_path, "w")
-    json.dump(index, out_file)
-    out_file.close()
+    with open(file_path, "w", encoding = 'utf-8') as out_file:
+        json.dump(index, out_file)
+    return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -365,9 +365,8 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
     """
     if not isinstance(file_path, str) or not file_path:
         return None
-    load_file = open(file_path, 'r')
-    indexes = json.load(load_file)
-    load_file.close()
+    with open(file_path, 'r', encoding = 'utf-8') as load_file:
+        indexes = json.load(load_file)
     if not isinstance(indexes, list):
         return None
     return indexes

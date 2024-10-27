@@ -26,8 +26,7 @@ def tokenize(text: str) -> list[str] | None:
         for letter in word:
             if not letter.isalpha():
                 continue
-            else:
-                norm_word.append(letter)
+            norm_word.append(letter)
         if norm_word:
             token_list.append(''.join(norm_word))
     return token_list
@@ -57,10 +56,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if not stopwords or not isinstance(stopwords, list) or not\
         all(isinstance(stopword, str) for stopword in stopwords):
         return None
-    for token in tokens:
-        if token in stopwords:
-            tokens.remove(token)
-    return tokens
+    return [var for var in tokens if var not in stopwords]
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -82,9 +78,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     for document in documents:
         if not all(isinstance(token,str) for token in document):
             return None
-        for word in document:
-            if not word in vocabulary:
-                vocabulary.append(word)
+        vocabulary += (word for word in document if word not in vocabulary)
     return vocabulary
 
 

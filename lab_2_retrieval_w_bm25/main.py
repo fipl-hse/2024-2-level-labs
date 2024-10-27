@@ -18,6 +18,15 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    my_text = text.lower()
+    my_text.split()
+    import string
+    words = [w.strip(string.punctuation) for w in my_text.split()]
+    print(words)
+
+
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -33,6 +42,14 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+    for word in text:
+        if word in stopwords.txt:
+            clear_words = text.remove(word)
+    print(clear_words)
+
+
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

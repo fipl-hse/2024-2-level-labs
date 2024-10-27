@@ -187,7 +187,25 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab)
+            or not isinstance(document, list) or not
+            all(isinstance(word, str) for word in document) or not isinstance(k1, float)
+            or not isinstance(b, float) or not isinstance(avg_doc_len, float)
+            or not isinstance(doc_len, int) or not isinstance(idf_document, dict)
+            or isinstance(doc_len, bool)):
+        return None
+    if not all((isinstance(key, str) and isinstance(value, float) for key, value in
+                idf_document.items())):
+        return None
 
+    bm25 = {}
+    for word in set(idf_document) | set(document):
+        if word not in idf_document:
+            bm25[word] = 0.0
+        else:
+            bm25[word] = (idf_document[word] * document.count(word) * (k1 + 1) /
+                              (document.count(word) + k1 * (1 - b + b * doc_len / avg_doc_len)))
+    return bm25
 
 def rank_documents(
     indexes: list[dict[str, float]], query: str, stopwords: list[str]
@@ -205,6 +223,26 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(indexes,list) or not isinstance(query, str) or\
+        not isinstance(stopwords,list):
+        return None
+    if not all(isinstance(index,dict) for index in indexes) or\
+        not all(isinstance(stopword,str) for stopword in stopwords):
+        return None
+    tokenized_query = tokenize(query)
+    if not tokenized_query:
+        return None
+    clean_query = remove_stopwords(tokenized_query, stopwords)
+    if not clean_query:
+        return None
+    results = []
+    for num,document in enumerate(indexes):
+        token_values_sum = sum(document[token] for token in clean_query if token
+                               in document)
+        results.append((num),(token_values_sum))
+    results.sort(key=lambda x: x[-1], reverse=True)
+    return results
+
 
 
 def calculate_bm25_with_cutoff(

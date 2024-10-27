@@ -201,12 +201,15 @@ def calculate_bm25(
             or not isinstance(idf_document, dict) or not vocab or not document or not idf_document:
         return None
     if not all(isinstance(voc, str) for voc in vocab) \
-            or not all(isinstance(doc, str)for doc in document) \
-            or not all(isinstance(idf_doc, str) for idf_doc in idf_document) \
+            or not all(isinstance(doc, str)for doc in document):
+        return None
+    if not all(isinstance(idf_doc, str)for idf_doc in idf_document)\
             or not all(isinstance(idf_document[idf_doc], float) for idf_doc in idf_document):
         return None
     if not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float) \
             or not isinstance(doc_len, int) or isinstance(doc_len, bool):
+        return None
+    if not vocab or not document or not idf_document:
         return None
     bm_dict = {}
     for word in set(vocab).union(set(document)):
@@ -241,11 +244,8 @@ def rank_documents(
         if not all(isinstance(key, str)for key in index)\
                 or not all(isinstance(value, float) for value in index.values()):
             return None
-    if not query or not isinstance(query, str):
-        return None
-    if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords):
-        return None
-    if not indexes:
+    if not query or not isinstance(query, str) or not indexes or not isinstance(stopwords, list)\
+            or not all(isinstance(word, str) for word in stopwords):
         return None
     tokenized_query = tokenize(query)
     if not tokenized_query:

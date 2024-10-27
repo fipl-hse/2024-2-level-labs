@@ -44,9 +44,9 @@ def main() -> None:
     idf = calculate_idf(vocab, docs_tokens)
 
     for doc_tf in doc_tfs:
-        tf_idf = calculate_tf_idf(doc_tf, idf)
-        print(tf_idf)
-        assert tf_idf, "Result is None"
+        result = calculate_tf_idf(doc_tf, idf)
+        print(result)
+        assert result, "Result is None"
 
 if __name__ == "__main__":
     main()

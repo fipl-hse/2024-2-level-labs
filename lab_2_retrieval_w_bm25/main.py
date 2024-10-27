@@ -7,6 +7,7 @@ Text retrieval with BM25
 
 import math
 
+
 def tokenize(text: str) -> list[str] | None:
     """
     Tokenize the input text into lowercase words without punctuation, digits and other symbols.

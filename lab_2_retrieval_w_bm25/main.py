@@ -77,15 +77,11 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
     if not isinstance(documents, list) or len(documents) == 0:
         return None
-    all_tokens = []
-    for tokens in documents:
-        if not isinstance(tokens, list):
-            return None
-        for elem in tokens:
-            if not isinstance(elem, str):
-                return None
-        all_tokens.extend(tokens)
-    return list(set(all_tokens))
+    if (not all(isinstance(doc, list) for doc in documents)
+            or not all(isinstance(token, str) for doc in documents for token in doc)):
+        return None
+    all_tokens = [token for doc in documents for token in doc]
+    return all_tokens
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -101,15 +97,13 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not isinstance(document_tokens, list)\
-            or len(vocab) == 0 or len(document_tokens) == 0:
+    if (not isinstance(vocab, list) or not all(isinstance(token, str)for token in vocab)
+            or not vocab):
         return None
-    for word in vocab:
-        if not isinstance(word, str):
-            return None
+    if (not isinstance(document_tokens, list)
+            or not all(isinstance(token, str)for token in document_tokens) or not document_tokens):
+        return None
     for word in document_tokens:
-        if not isinstance(word, str):
-            return None
         if word not in vocab:
             vocab.append(word)
     return {word: document_tokens.count(word)/len(document_tokens) for word in set(vocab)}
@@ -128,30 +122,22 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not isinstance(documents, list)\
-            or len(vocab) == 0 or len(documents) == 0:
+    if (not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)
+            or not vocab):
         return None
-    for word in vocab:
-        if not isinstance(word, str):
-            return None
+    if (not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents)
+            or not documents):
+        return None
+    if not all(isinstance(word, str) for doc in documents for word in doc):
+        return None
     idf = {}
-    tokens = []
-    for doc in documents:
-        if not isinstance(doc, list):
-            return None
-        for word in doc:
-            if doc.count(word) > 1:
-                doc.remove(word)
-        tokens.extend(doc)
-    for word in tokens:
-        if not isinstance(word, str):
-            return None
-        if ((len(documents) - tokens.count(word) + 0.5) <= 0
-                or (tokens.count(word) + 0.5) <= 0):
-            return None
-        idf_word = math.log((len(documents) - tokens.count(word) + 0.5) /
-                            (tokens.count(word) + 0.5))
-        idf.update({word: round(idf_word, 4)})
+    for word in vocab:
+        num = 0
+        for doc in documents:
+            if word in doc:
+                num += 1
+        idf[word] = math.log((len(documents) - num + 0.5) /
+                             (num + 0.5))
     return idf
 
 
@@ -168,18 +154,19 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tf, dict) or not isinstance(idf, dict):
+    if (not isinstance(idf, dict) or not idf
+            or not all(isinstance(word, str) for word in idf.keys())
+            or not all(isinstance(value, float) for value in idf.values())):
         return None
-    if len(tf) == 0 or len(idf) == 0:
+    if (not isinstance(tf, dict) or not tf
+            or not all(isinstance(word, str) for word in tf.keys())
+            or not all(isinstance(value, float) for value in tf.values())):
         return None
     tf_idf = {}
     for word, value in tf.items():
-        value_idf = idf.get(word)
-        if (not isinstance(word, str) or not isinstance(value, float)
-                or not isinstance(value_idf, float)):
-            return None
-        tf_idf_word = value * value_idf
-        tf_idf.update({word: tf_idf_word})
+        if word not in idf:
+            idf[word] = 0.0
+        tf_idf[word] = value * idf[word]
     return tf_idf
 
 
@@ -256,6 +243,10 @@ def rank_documents(
     if (not isinstance(indexes, list) or len(indexes) == 0 or not isinstance(indexes[0], dict)
             or not isinstance(query, str) or not isinstance(stopwords, list)):
         return None
+    if (not all(isinstance(story, dict) for story in indexes)
+            or not all(isinstance(word, str) for story in indexes for word in story.keys())
+            or not all(isinstance(num, float) for story in indexes for num in story.values())):
+        return None
     tokens = tokenize(query)
     if not isinstance(tokens, list):
         return None
@@ -264,14 +255,8 @@ def rank_documents(
         return None
     result = []
     for index, story in enumerate(indexes):
-        value = 0.0
-        for word in correct_query:
-            if word not in story.keys():
-                continue
-            num = story.get(word)
-            if not isinstance(num, float):
-                return None
-            value += num
+        value = sum(story[word] if word in story else 0
+                    for word in correct_query)
         result.append((index, value))
     result.sort(key=lambda x: x[1], reverse=True)
     return result

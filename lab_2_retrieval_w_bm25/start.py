@@ -3,9 +3,12 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable,
 # too-many-branches, too-many-statements, duplicate-code
-from main import (build_vocabulary, calculate_tf_idf, remove_stopwords, tokenize,
-                  calculate_bm25, calculate_bm25_with_cutoff, calculate_idf, calculate_spearman,
-                  calculate_tf, load_index, rank_documents, save_index)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_tf_idf,
+                                         remove_stopwords, tokenize,
+                                         calculate_bm25, calculate_bm25_with_cutoff,
+                                         calculate_idf, calculate_spearman,
+                                         calculate_tf, load_index,
+                                         rank_documents, save_index)
 
 
 def main() -> None:
@@ -30,20 +33,46 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    clear_tokens = [remove_stopwords(tokenize(doc), stopwords) for doc in documents]
+    tokens = []
+    clear_tokens = []
+    for doc in documents:
+        tok_doc = tokenize(doc)
+        tokens.append(tok_doc)
+        if not isinstance(tok_doc, list):
+            return None
+        clear_tok_doc = remove_stopwords(tok_doc, stopwords)
+        if not isinstance(clear_tok_doc, list):
+            return None
+        clear_tokens.append(clear_tok_doc)
     unique_tokens = build_vocabulary(clear_tokens)
+    if not isinstance(unique_tokens, list):
+        return None
     idf = calculate_idf(unique_tokens, clear_tokens)
     metrics_tf_idf = []
     metrics_bm_25 = []
     bm_25_advanced = []
     adv_len = sum(len(tokens) for tokens in clear_tokens)/len(clear_tokens)
-    for tokens in clear_tokens:
-        tf = calculate_tf(unique_tokens, tokens)
-        metrics_tf_idf.append(calculate_tf_idf(tf, idf))
-        metrics_bm_25.append(calculate_bm25(unique_tokens, tokens, idf,
-                                            1.5, 0.75, adv_len, len(tokens)))
-        bm_25_advanced.append(calculate_bm25_with_cutoff(unique_tokens, tokens, idf,
-                              0.2, 1.5, 0.75, adv_len, len(tokens)))
+    for tok in tokens:
+        if not isinstance(tok, list):
+            return None
+        tf = calculate_tf(unique_tokens, tok)
+        if not isinstance(tf, dict) or not isinstance(idf, dict):
+            return None
+        tf_idf = calculate_tf_idf(tf, idf)
+        if not isinstance(tf_idf, dict):
+            return None
+        metrics_tf_idf.append(tf_idf)
+        bm_25 = calculate_bm25(unique_tokens, tok, idf,
+                               1.5, 0.75, adv_len, len(tok))
+        if not isinstance(bm_25, dict):
+            return None
+        metrics_bm_25.append(bm_25)
+        bm_25_adv = calculate_bm25_with_cutoff(unique_tokens, tok, idf,
+                                               0.2, 1.5, 0.75,
+                                               adv_len, len(tok))
+        if not isinstance(bm_25_adv, dict):
+            return None
+        bm_25_advanced.append(bm_25_adv)
     rank_tf_idf = rank_documents(metrics_tf_idf,
                                  'Which fairy tale has Fairy Queen?',
                                  stopwords)
@@ -51,14 +80,22 @@ def main() -> None:
                                 'Which fairy tale has Fairy Queen?',
                                 stopwords)
     save_index(bm_25_advanced, "assets/metrics.json")
-    rank_from_json = rank_documents(load_index("assets/metrics.json"),
+    loaded = load_index("assets/metrics.json")
+    if not isinstance(loaded, list):
+        return None
+    rank_from_json = rank_documents(loaded,
                                     'Which fairy tale has Fairy Queen?',
                                     stopwords)
-    spearman_tf_idf = calculate_spearman([num[-1] for num in rank_tf_idf],
-                                         [golden[-1] for golden in rank_from_json])
-    print(spearman_tf_idf)
-
-    result = None
+    spearman_tf_idf = calculate_spearman([num[0] for num in rank_tf_idf],
+                                         [golden[0] for golden in rank_from_json])
+    spearman_bm_25 = calculate_spearman([num[0] for num in rank_bm_25],
+                                        [golden[0] for golden in rank_from_json])
+    spearman_bm_25_adv = calculate_spearman([num[0] for num in rank_from_json],
+                                            [golden[0] for golden in rank_from_json])
+    print(f'golden rank: {[golden[0] for golden in rank_from_json]}')
+    print(f'Spearman tf_idf: {spearman_tf_idf}')
+    print(f'Spearman BM25: {spearman_bm_25}')
+    print(f'Spearman BM25 with cutoff: {spearman_bm_25_adv}')
     return None
     # assert result, "Result is None"
 

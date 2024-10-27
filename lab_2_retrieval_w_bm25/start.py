@@ -2,8 +2,8 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import tokenize, remove_stopwords, build_vocabulary,calculate_tf, calculate_idf,calculate_tf_idf, calculate_bm25, \
-    rank_documents
+from lab_2_retrieval_w_bm25.main import tokenize, remove_stopwords, build_vocabulary, calculate_tf, \
+    calculate_idf, calculate_tf_idf, calculate_bm25, rank_documents
 
 
 def main() -> None:
@@ -41,11 +41,15 @@ def main() -> None:
     vocabulary = build_vocabulary(preprocessed_documents)
     tf = []
     for document in preprocessed_documents:
+        if not isinstance(document, str):
+            return None
         tf_doc = calculate_tf(vocabulary, document)
         if not isinstance(tf_doc, list):
             return None
         tf.append(tf_doc)
     tf_idf = []
+    if not isinstance(vocabulary, list):
+        return None
     idf = calculate_idf(vocabulary, preprocessed_documents)
     if not isinstance(idf, list):
         return None

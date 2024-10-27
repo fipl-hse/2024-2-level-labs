@@ -81,6 +81,7 @@ class Animal:
         """
         print(f"Hello! My name is {self.name}!")
 
+
     # instance method
     # def bad_practice_to_add_attribute_not_in_init(self):
     #     """

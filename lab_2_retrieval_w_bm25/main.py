@@ -5,6 +5,7 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 from math import log
+import json
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -368,14 +369,10 @@ def calculate_bm25_with_cutoff(
     if not (isinstance(vocab, list)
             and all(isinstance(word_in_vocab, str) for word_in_vocab in vocab)
             and isinstance(document, list)
-            and all(isinstance(elem, str) for elem in document)
-            and vocab):
+            and all(isinstance(elem, str) for elem in document) and vocab):
         return None
-    if not (isinstance(idf_document, dict)
-            and idf_document
-            and isinstance(alpha, float)
-            and isinstance(avg_doc_len, float)
-            and document):
+    if not (isinstance(idf_document, dict) and idf_document and isinstance(alpha, float)
+            and isinstance(avg_doc_len, float) and document):
         return None
     for key, value in idf_document.items():
         if not isinstance(key, str) or not isinstance(value, float):
@@ -417,13 +414,17 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
-    if not isinstance(file_path, str):
-        return None
+    if not isinstance(file_path, str) or not file_path:
+        return
     if not (isinstance(index, list) and
             all(isinstance(elem, dict) and
-            all(isinstance(key, str) and isinstance(value, float) for key, value in elem.items()) for elem in index)
+                all(isinstance(key, str) and isinstance(value, float)
+                    for key, value in elem.items()) for elem in index)
             and index):
-        return None
+        return
+
+    with open(file_path, 'w', encoding="utf-8") as file:
+        json.dump(index, file)
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -438,8 +439,19 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(file_path, str):
+    if not isinstance(file_path, str) or not file_path:
         return None
+
+    with open(file_path, 'r', encoding="utf-8") as file:
+        loaded_file = json.load(file)
+
+    if (isinstance(loaded_file, list) and
+            all(isinstance(dictionary, dict) and
+                all(isinstance(key, str) and isinstance(value, float) for key, value in dictionary.items())
+                for dictionary in loaded_file)):
+        return loaded_file
+
+    return None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:

@@ -2,9 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
+
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
                                          calculate_tf_idf, remove_stopwords, tokenize)
-
 
 
 def main() -> None:
@@ -35,24 +35,21 @@ def main() -> None:
     for doc in documents:
         tokenized_doc = tokenize(doc)
         tokenized_docs.append(tokenized_doc)
-    #print(tokenized_docs)
+    # print(tokenized_docs)
     meaningful_docs = []
     for doc in tokenized_docs:
         meaningful_doc = remove_stopwords(doc, stopwords)
         meaningful_docs.append(meaningful_doc)
-    #print(meaningful_docs)
+    # print(meaningful_docs)
     vocab = build_vocabulary(meaningful_docs)
-    #print (vocab)
+    # print (vocab)
     tf_values_lst = []
     for doc in meaningful_docs:
         tf_doc = calculate_tf(vocab, doc)
         tf_values_lst.append(tf_doc)
-    #print(tf_values_lst)
+    # print(tf_values_lst)
     for doc in tf_values_lst:
         print(calculate_tf_idf(doc, calculate_idf(vocab, meaningful_docs)))
-
-
-
 
 
 if __name__ == "__main__":

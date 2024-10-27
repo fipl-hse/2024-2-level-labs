@@ -2,8 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -28,16 +29,25 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    voc = []
-    tokens = []
+    clear_texts = []
     for text in documents:
-        tokens.append(tokenize(text))
-        voc.append(remove_stopwords(tokenize(text), stopwords))
-    a = build_vocabulary(voc)
-    # print(a)
-    tf = calculate_tf(a, remove_stopwords(tokenize(documents[1]), stopwords))
-    idf = calculate_idf(a, tokens)
-    result = calculate_tf_idf(tf, idf)
+        tokenized_text = tokenize(text)
+        without_stopwords = remove_stopwords(tokenized_text, stopwords)
+        clear_texts.append(without_stopwords)
+    vocabulary = build_vocabulary(clear_texts)
+    tf_idf = []
+    bm25 = []
+    idf = calculate_idf(vocabulary, clear_texts)
+    avgdl = sum(len(doc) for doc in documents) / len(documents)
+    for text in clear_texts:
+        tf = calculate_tf(vocabulary, text)
+        tf_idf_text = calculate_tf_idf(tf, idf)
+        tf_idf.append(tf_idf_text)
+        bm25_text = calculate_bm25(vocabulary, text, idf, 1.5, 0.75, avgdl, len(text))
+        bm25.append(bm25_text)
+    rank_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
+    rank_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
+    result = rank_tf_idf, rank_bm25
     print(result)
     assert result, "Result is None"
 

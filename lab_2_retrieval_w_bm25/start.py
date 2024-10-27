@@ -5,7 +5,6 @@ Laboratory Work #2 starter
 
 from main import (tokenize, remove_stopwords, build_vocabulary, calculate_tf, calculate_idf, calculate_tf_idf)
 
-
 def main() -> None:
     """
     Launches an implementation

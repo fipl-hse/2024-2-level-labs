@@ -204,9 +204,9 @@ def calculate_bm25(
         return None
     if (not isinstance(vocab, list) or not isinstance(document, list)
             or not isinstance(idf_document, dict)
-            or not vocab or not document or not idf_document):
+            or not document or not idf_document):
         return None
-    if (not all(isinstance(word, str) for word in vocab)
+    if (not all(isinstance(word, str) for word in vocab) or not vocab
             or not all(isinstance(word, str) for word in document)
             or not all(isinstance(k, str)
                        and isinstance(v, float) for k, v in idf_document.items())):

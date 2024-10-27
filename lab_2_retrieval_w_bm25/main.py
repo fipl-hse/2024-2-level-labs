@@ -144,9 +144,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     """
     if not isinstance(tf, dict) or not isinstance(idf, dict) or not all(isinstance(key, str) for key in tf) or not all(isinstance(key, str) for key in idf) or not all(isinstance(value, float) for value in tf.values()) or not all(isinstance(value, float) for value in idf.values()) or not tf or not idf:
         return None
-    tf_idf_result = {}
-    for word in tf:
-        tf_idf_result[word] = tf[word] * idf[word]
+    tf_idf_result = {word: tf[word] * idf[word] for word in tf}
     return tf_idf_result
 
 

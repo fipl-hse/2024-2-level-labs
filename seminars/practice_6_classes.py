@@ -175,26 +175,34 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 1
 # easy level
-# class ...:
+#class DeadLine:
 #
-#     def __init__(...):
-#         ...
-
+#     def __init__(self, phrase):
+#         self.no_phrase = phrase
+#     def print_phrase(self):
+#         print(phrase)
 # fill the gaps so that the next line prints: "Oh, no! It is another deadline!"
-# deadline = Deadline()
+#particular_phrase = "Oh, no! It is another deadline!"
+#deadline = DeadLine(particular_phrase)
+#deadline.print_phrase()
 
 
 #  Task 2
 # easy level
-# class ...:
-#
-#     def ...:
-#         ...
+#class Stident:
+
+#     def __init__(self, name, year):
+#         self.name = name
+#         self.year = year
+
+# def say_hello(self):
+#         print("Hello! my name is {self.name}, I'm in {self.year}")
 
 # fill the gaps so that the next lines print the corresponding messages
-# student1 = Student('Marina', 1)  # Hello! My name is Marina, I'm in year 1
-# student2 = Student('Nastya', 2)  # Hello! My name is Nastya, I'm in year 2
-
+#student1 = Student('Marina', 1)  # Hello! My name is Marina, I'm in year 1
+#student1.say_hello()
+#student2 = Student('Nastya', 2)  # Hello! My name is Nastya, I'm in year 2
+#student2.say_hello()
 
 # Task 3
 # easy level
@@ -215,21 +223,29 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 
 # Task 4
 # medium level
-# class Student:
+class Student:
 #     """
 #     If I have less than three deadlines, my mood is Good!
 #     If I have from 3 to 5 deadlines, my mood is So-so...
 #     If I have more than 5 deadlines, my mood is Bad!!!
 #     """
-
-
+    def __init__(self, deadlines_count: int):
+        self.deadlines = deadlines_count
+    def mood(self):
+        if self.deadlines < 3:
+            mood = 'Good'
+        elif 3<= self.deadlines <= 5:
+            mood = 'So-so'
+        else:
+            mood = 'Bad'
+        return mood
 # implement a class so that the following code works
-# student = Student(2)
-# print(student.mood())  # Good
-# student.deadlines = 4
-# print(student.mood())  # So-so
-# student.deadlines = 1000
-# print(student.mood())  # Bad
+student = Student(2)
+print(student.mood())  # Good
+student.deadlines = 4
+print(student.mood())  # So-so
+student.deadlines = 1000
+print(student.mood())  # Bad
 
 # Task 5
 # medium level
@@ -259,7 +275,27 @@ print('*' * 15 + ' TASKS ' + '*' * 15)
 # What methods should be present? What attributes should be added?
 # Create such a class and demonstrate its instantiating for at least two different subjects.
 
-# class ???:
+class Discipline :
 #     """
 #     A class to represent a learning discipline studied in HSE
 #     """
+    def __init__(self, name_subject, name_teacher, credits, hour, tasks):
+        self.name_subject = name_subject
+        self.name_teacher = name_teacher
+        self.credits = credits
+        self.hour = hour
+        self.tasks = tasks
+
+    def introduce(self):
+        print(f'your new discipline is {self.name_subject}, teacher is {self.name_teacher}. Additional info: credits = {self.credits}, hours = {self.hour}, tasks = {self.tasks}' )
+
+    def get_task(self):
+        for task in self.tasks:
+            print(task)
+
+    def get_best_stud(self):
+        sorted = self.stud_grades
+
+vvl = Discipline ('Введение в лингвистику', 'Маргарита Андреевна', '100', '1000', ['реферирование', 'самостоятельная 1', 'самостоятельная 2', 'экзамен'])
+vvl.introduce()
+vvl.get_task()

@@ -5,7 +5,8 @@ Laboratory Work #2 starter
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
                                          calculate_bm25_with_cutoff, calculate_idf,
                                          calculate_spearman, calculate_tf, calculate_tf_idf,
-                                         rank_documents, remove_stopwords, tokenize)
+                                         load_index, rank_documents, remove_stopwords, save_index,
+                                         tokenize)
 
 
 def main() -> None:
@@ -82,6 +83,10 @@ def main() -> None:
         if not isinstance(index, dict):
             return None
         bm25_cut.append(index)
+
+    #пример сохранения и загрузки в файл
+    save_index(bm25_cut, 'assets/metrics.json')
+    load_index('assets/metrics.json')
 
     #получение ранжированных списков
     list_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)

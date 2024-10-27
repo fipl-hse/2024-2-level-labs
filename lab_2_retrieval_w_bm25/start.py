@@ -5,7 +5,6 @@ Laboratory Work #2 starter
 from lab_2_retrieval_w_bm25.main import tokenize
 
 
-
 def main() -> None:
     """
     Launches an implementation

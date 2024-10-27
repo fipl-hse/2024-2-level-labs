@@ -2,9 +2,10 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
-                                         calculate_tf, calculate_tf_idf, rank_documents,
-                                         remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
+                                         calculate_bm25_with_cutoff, calculate_idf,
+                                         calculate_spearman, calculate_tf, calculate_tf_idf,
+                                         rank_documents, remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -29,6 +30,8 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
+
+    '''получение списка списков уникальных слов'''
     doc_tokens = []
     for text in documents:
         tokens = tokenize(text)
@@ -38,6 +41,8 @@ def main() -> None:
         if not isinstance(new_tokens,list):
             return None
         doc_tokens.append(new_tokens)
+
+    '''подсчёт tf_idf'''
     tf_idf = []
     vocab = build_vocabulary(doc_tokens)
     if not isinstance(vocab, list):
@@ -49,20 +54,58 @@ def main() -> None:
         tf = calculate_tf(vocab, lst)
         if not isinstance(tf, dict):
             return None
-        tf_idf.append(calculate_tf_idf(tf, idf))
+        dict_tf_idf = calculate_tf_idf(tf, idf)
+        if not isinstance(dict_tf_idf, dict):
+            return None
+        tf_idf.append(dict_tf_idf)
+
+    '''получение списка словарей bm25'''
     length_all = 0.0
     for lst in doc_tokens:
         length_all += len(lst)
     avg_doc_len = length_all/len(doc_tokens)
-    indexes = []
+    bm25 = []
     for lst in doc_tokens:
         index = calculate_bm25(vocab, lst, idf,
                                1.5, 0.75,
                                avg_doc_len, len(doc_tokens))
         if not isinstance(index, dict):
             return None
-        indexes.append(index)
-    result = rank_documents(indexes, 'Which fairy tale has Fairy Queen?', stopwords)
+        bm25.append(index)
+
+    '''получение списка словарей bm25_cutoff'''
+    bm25_cut = []
+    for lst in doc_tokens:
+        index = calculate_bm25_with_cutoff(vocab, lst, idf, 0.2,
+                               1.5, 0.75,
+                               avg_doc_len, len(doc_tokens))
+        if not isinstance(index, dict):
+            return None
+        bm25_cut.append(index)
+
+    '''получение ранжированных списков'''
+    list_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
+    list_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
+    list_bm25_cut = rank_documents(bm25_cut, 'Which fairy tale has Fairy Queen?', stopwords)
+    if not isinstance(list_tf_idf, list) or not isinstance(list_bm25, list)\
+        or not isinstance(list_bm25_cut, list):
+        return None
+    rank_tf_idf = []
+    rank_bm25 = []
+    rank_bm25_cut = []
+    for box in list_tf_idf:
+        rank_tf_idf.append(box[0])
+    for box in list_bm25:
+        rank_bm25.append(box[0])
+    for box in list_tf_idf:
+        rank_bm25_cut.append(box[0])
+
+    '''подсчёт коэффициентов Спирмена'''
+    golden_rank = [1, 7, 5, 0, 9, 2, 3, 4, 6, 8]
+    spear_tf_idf = calculate_spearman(rank_tf_idf, golden_rank)
+    spear_bm25 = calculate_spearman(rank_bm25, golden_rank)
+    spear_bm25_cut = calculate_spearman(rank_bm25_cut, golden_rank)
+    result = f'spear_tf_idf: {spear_tf_idf}, spear_bm25: {spear_bm25}, spear_bm25_cut: {spear_bm25_cut}'
     print(result)
     assert result, "Result is None"
 

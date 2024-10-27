@@ -3,6 +3,7 @@ Lab 2.
 
 Text retrieval with BM25
 """
+import json
 ## pylint:disable=too-many-arguments, unused-argument
 from math import log
 
@@ -22,16 +23,16 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     new_text = ''
-    for i in text.lower():
-        if i.isalpha() is True:
-            new_text += i
+    for character in text.lower():
+        if character.isalpha() is True:
+            new_text += character
             continue
         new_text += ' '
     for_tokens = new_text.split(' ')
     tokens = []
-    for i in for_tokens:
-        if i.isalpha() is True:
-            tokens.append(i)
+    for token in for_tokens:
+        if token.isalpha() is True:
+            tokens.append(token)
     return tokens
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -77,13 +78,13 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if not isinstance(documents, list) or not documents:
         return None
     uni_words = set()
-    for i in documents:
-        if not isinstance(i, list):
+    for tokens in documents:
+        if not isinstance(tokens, list):
             return None
-        for smth in i:
+        for smth in tokens:
             if not isinstance(smth, str):
                 return None
-        uni_words.update(i)
+        uni_words.update(tokens)
     return list(uni_words)
 
 
@@ -104,16 +105,17 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             or not vocab or not document_tokens:
         return None
     tf = {}
+    length = len(document_tokens)
     for token in document_tokens:
         if not isinstance(token, str):
             return None
         if token not in vocab:
-            tf[token] = document_tokens.count(token)/len(document_tokens)
+            tf[token] = document_tokens.count(token)/length
     for word in vocab:
         if not isinstance(word, str):
             return None
         if word in document_tokens and word not in tf:
-            tf[word] = document_tokens.count(word)/len(document_tokens)
+            tf[word] = document_tokens.count(word)/length
             continue
         tf[word] = 0.0
     return tf
@@ -301,6 +303,35 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(document, list)\
+        or not isinstance(idf_document, dict) or not isinstance(k1, float)\
+        or not isinstance(b, float):
+        return None
+    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)\
+            or not vocab or not document or doc_len is True:
+        return None
+    for elem in vocab:
+        if not isinstance(elem, str) or not idf_document:
+            return None
+    for elem in document:
+        if not isinstance(elem, str) or doc_len < 0:
+            return None
+    for key, value in idf_document.items():
+        if not isinstance(key, str) or not isinstance(value, float)\
+                or not isinstance(alpha, float):
+            return None
+    cut_idf = {}
+    for key, value in idf_document.items():
+        if value < alpha:
+            continue
+        cut_idf[key] = value
+    bm25_cut = {}
+    for key in vocab:
+        if key not in cut_idf:
+            continue
+        bm25_cut[key] = (cut_idf[key]*(document.count(key)*(k1+1))/
+                     (document.count(key)+k1*(1-b+b*(doc_len/avg_doc_len))))
+    return bm25_cut
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
@@ -311,6 +342,13 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if not isinstance(index, list) or not isinstance(file_path, str) or not file_path:
+        return None
+    if '.' not in file_path:
+        return None
+    out_file = open(file_path, "w")
+    json.dump(index, out_file)
+    out_file.close()
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -325,7 +363,14 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-
+    if not isinstance(file_path, str) or not file_path:
+        return None
+    load_file = open(file_path, 'r')
+    indexes = json.load(load_file)
+    load_file.close()
+    if not isinstance(indexes, list):
+        return None
+    return indexes
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     """
@@ -340,3 +385,15 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(rank, list) or not isinstance(golden_rank, list)\
+            or len(rank) != len(golden_rank) or not rank or not golden_rank:
+        return None
+    n = len(rank)
+    sum_square = 0
+    for index, value in enumerate(rank):
+        if not isinstance(value, int):
+            return None
+        if value not in golden_rank:
+            return 0.0
+        sum_square += (index - golden_rank.index(value)) ** 2
+    return 1 - (6*sum_square)/(n * (n ** 2 - 1))

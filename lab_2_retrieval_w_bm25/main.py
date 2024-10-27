@@ -299,13 +299,21 @@ def rank_documents(
         return None
     l_of_tuples_dict_plus_its_relevance = []
 
-    for dict_index, dict_at_the_index in enumerate(indexes):
+    '''    for dict_index, dict_at_the_index in enumerate(indexes):
         relevance_of_the_particular_doc = 0.0
         for word in tokenized_query_without_stopwords:
             if word in dict_at_the_index:
                 relevance_of_the_particular_doc += dict_at_the_index[word]
         l_of_tuples_dict_plus_its_relevance.append((dict_index,
-            relevance_of_the_particular_doc))
+            relevance_of_the_particular_doc))'''
+
+    for dict_index, dict_at_the_index in enumerate(indexes):
+        relevance_of_the_particular_doc = []
+        for word in tokenized_query_without_stopwords:
+            if word in dict_at_the_index:
+                relevance_of_the_particular_doc.append(dict_at_the_index[word])
+        l_of_tuples_dict_plus_its_relevance.append((dict_index,
+                                                    sum(relevance_of_the_particular_doc)))
 
     l_of_tuples_dict_plus_its_relevance = sorted(l_of_tuples_dict_plus_its_relevance,
                                                  key=lambda x: x[1], reverse=True)

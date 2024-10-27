@@ -3,6 +3,9 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
+from main import tokenize, remove_stopwords, build_vocabulary, calculate_tf, calculate_idf, calculate_tf_idf
+
+
 
 def main() -> None:
     """
@@ -26,9 +29,25 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = None
-    assert result, "Result is None"
+
+    docs_tokens = []
+    for document in documents:
+        tokens = tokenize(document)
+        result = remove_stopwords(tokens, stopwords)
+        docs_tokens.append(result)
+
+    vocab = build_vocabulary(docs_tokens)
+    doc_tfs = []
+    for doc_tokens in docs_tokens:
+        doc_tfs.append(calculate_tf(vocab, doc_tokens))
+
+    idf = calculate_idf(vocab, docs_tokens)
+
+    for doc_tf in doc_tfs:
+        tf_idf = calculate_tf_idf(doc_tf, idf)
+        print(tf_idf)
 
 
 if __name__ == "__main__":
     main()
+

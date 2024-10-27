@@ -4,8 +4,9 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-from math import log
 import json
+from math import log
+
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -447,7 +448,8 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     if (isinstance(loaded_file, list) and
             all(isinstance(dictionary, dict) and
-                all(isinstance(key, str) and isinstance(value, float) for key, value in dictionary.items())
+                all(isinstance(key, str) and
+                    isinstance(value, float) for key, value in dictionary.items())
                 for dictionary in loaded_file)):
         return loaded_file
 

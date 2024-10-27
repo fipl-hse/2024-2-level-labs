@@ -75,7 +75,6 @@ def main() -> None:
 
     result = 1
     assert result, "Result is None"
-    return None
 
 
 if __name__ == "__main__":

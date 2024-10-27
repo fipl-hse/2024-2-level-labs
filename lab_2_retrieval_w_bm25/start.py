@@ -1,9 +1,10 @@
 """
 Laboratory Work #2 starter
 """
-# pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
+                                         calculate_tf_idf, remove_stopwords, tokenize)
 
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf, calculate_tf_idf, remove_stopwords, tokenize)
+# pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
 
 def main() -> None:

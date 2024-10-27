@@ -20,8 +20,10 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text_only_words = re.sub('["|.|?|!|,|1|2|3|4|5|6|7|8|9|0|:|(|)]','',text.lower())
-    return text_only_words.split()
+    for symbol in text:
+        if not symbol.isalpha() and not symbol in ['-', ' ']:
+            text = text.replace(symbol, ' ')
+    return text.lower().split()
 
 
 
@@ -40,13 +42,13 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     """
     if not isinstance(tokens, list) or not isinstance(stopwords, list):
         return None
-    if not all(isinstance(stopword, str) for stopword in stopwords):
+    if not all(isinstance(stopword, str) for stopword in stopwords)\
+            or not all(isinstance(token, str) for token in tokens):
         return None
     removed_stopwords = []
     for token in tokens:
-        if token in stopwords:
-            continue
-        removed_stopwords.append(token)
+        if token not in stopwords:
+            removed_stopwords.append(token)
     return removed_stopwords
 
 

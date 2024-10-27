@@ -468,8 +468,20 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not (isinstance(rank, list) and all(isinstance(elem, str) for elem in rank) and rank):
+    if not (isinstance(rank, list) and all(isinstance(elem, int) for elem in rank) and rank):
         return None
     if not (isinstance(golden_rank, list) and
-            all(isinstance(elem, str) for elem in golden_rank) and golden_rank):
+            all(isinstance(elem, int) for elem in golden_rank) and golden_rank):
         return None
+    if len(rank) != len(golden_rank) or len(rank) == len(golden_rank) == 0:
+        return None
+
+    rank_dict = {value: i for i, value in enumerate(rank)}
+    golden_rank_dict= {value: i for i, value in enumerate(golden_rank)}
+
+    result = 0
+    for elem in golden_rank_dict:
+        if elem in rank:
+            result += (rank_dict[elem] - golden_rank_dict[elem]) ** 2
+
+    return 1 - (6 * result) / (len(rank) * (len(rank) ** 2 - 1))

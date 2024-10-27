@@ -198,10 +198,10 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
     if not isinstance(vocab, list) or not isinstance(document, list) \
-            or not isinstance(idf_document, dict) or not vocab or not document or not idf_document:
+            or not isinstance(idf_document, dict) or not vocab or not document:
         return None
     if not all(isinstance(voc, str) for voc in vocab) \
-            or not all(isinstance(doc, str)for doc in document):
+            or not all(isinstance(doc, str)for doc in document) or not idf_document:
         return None
     if not all(isinstance(idf_doc, str)for idf_doc in idf_document)\
             or not all(isinstance(idf_document[idf_doc], float) for idf_doc in idf_document):

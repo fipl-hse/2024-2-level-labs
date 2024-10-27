@@ -2,9 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import tokenize, remove_stopwords,\
-    build_vocabulary, calculate_tf, calculate_idf, calculate_tf_idf,\
-    calculate_bm25, rank_documents
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -34,26 +34,32 @@ def main() -> None:
     for doc in documents:
         tokenized_doc = tokenize(doc)
         if not isinstance(tokenized_doc, list):
-            return None
+            result = None
+            assert result, "Result is None"
         preprocessed_doc = remove_stopwords(tokenized_doc, stopwords)
         if not isinstance(preprocessed_doc, list):
-            return None
+            result = None
+            assert result, "Result is None"
         preprocessed_documents.append(preprocessed_doc)
     vocabulary = build_vocabulary(preprocessed_documents)
     tf = []
     for document in preprocessed_documents:
         if not isinstance(document, str):
-            return None
+            result = None
+            assert result, "Result is None"
         tf_doc = calculate_tf(vocabulary, document)
         if not isinstance(tf_doc, list):
-            return None
+            result = None
+            assert result, "Result is None"
         tf.append(tf_doc)
     tf_idf = []
     if not isinstance(vocabulary, list):
-        return None
+        result = None
+        assert result, "Result is None"
     idf = calculate_idf(vocabulary, preprocessed_documents)
     if not isinstance(idf, list):
-        return None
+        result = None
+        assert result, "Result is None"
     for tf_document in tf:
         tf_idf_doc = calculate_tf_idf(tf_document, idf)
         tf_idf.append(tf_idf_doc)

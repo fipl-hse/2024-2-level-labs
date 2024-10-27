@@ -8,7 +8,6 @@ import json
 from math import log
 
 
-
 def tokenize(text: str) -> list[str] | None:
     """
     Tokenize the input text into lowercase words without punctuation, digits and other symbols.

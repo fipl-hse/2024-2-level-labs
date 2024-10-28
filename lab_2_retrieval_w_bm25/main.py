@@ -216,23 +216,27 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not stopwords or not indexes or not query or not isinstance(indexes, list)
-        or not all(isinstance(index, dict) for index in indexes)
-        or not isinstance(word, str) for word in stopwords
-        or not isinstance(query, str) or not isinstance(stopwords, list)):
+    if (not isinstance(indexes, list) or not isinstance(query, str)
+            or not isinstance(stopwords, list) or
+            not all(isinstance(ind, dict) for ind in indexes)):
         return None
-    if not all(isinstance(key, str) or isinstance(value, float) for key, value
-               in (dictionary.items() for dictionary in indexes)):
-        new_query = remove_stopwords(tokenize(query), stopwords)
-        ranked_documents = []
-        for index, text in enumerate(indexes):
-            score = 0.0
-            for word in new_query:
-                if word in text:
-                    score += text.get(word)
-                ranked_documents.append((index, score))
-            ranked_documents.sort(key=lambda x: x[1], reverse=True)
-        return ranked_documents
+    tokenized_query = tokenize(query)
+    if not tokenized_query:
+        return None
+    new_query = remove_stopwords(tokenized_query, stopwords)
+    if not new_query:
+        return None
+    ranked_document = []
+    for index, dictionary in enumerate(indexes):
+        score = 0.0
+        for word in new_query:
+            if word in dictionary:
+                score += dictionary[word]
+        ranked_document.append((index, score))
+    ranked_document.sort(key=lambda x: x[-1], reverse=True)
+    if not ranked_document:
+        return None
+    return ranked_document
 
 
 def calculate_bm25_with_cutoff(

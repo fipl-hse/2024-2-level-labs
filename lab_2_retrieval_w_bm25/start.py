@@ -2,9 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (tokenize, build_vocabulary, calculate_bm25, calculate_idf,
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
                                          calculate_tf, calculate_tf_idf, rank_documents,
-                                         remove_stopwords,)
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -52,14 +52,18 @@ def main() -> None:
     avg_len = word_count / len(documents)
     if idf:
         for doc in tokenized_docs:
-            tf = calculate_tf(vocabulary, doc)
-            doc_len = len(doc)
-            tf_idf = calculate_tf_idf(tf,idf)
-            tf_idf_all.append(tf_idf)
-            print(tf_idf)
-            bm25 = calculate_bm25(vocabulary, doc, idf, 1.5, 0.75, avg_len, doc_len)
-            bm25_all.append(bm25)
-            print(bm25)
+            if isinstance(doc, list):
+                tf = calculate_tf(vocabulary, doc)
+                doc_len = len(doc)
+                if tf:
+                    tf_idf = calculate_tf_idf(tf,idf)
+                    if tf_idf:
+                        tf_idf_all.append(tf_idf)
+                        print(tf_idf)
+                    bm25 = calculate_bm25(vocabulary, doc, idf, 1.5, 0.75, avg_len, doc_len)
+                    if bm25:
+                        bm25_all.append(bm25)
+                        print(bm25)
     print(tf_idf_all)
     print(bm25_all)
 

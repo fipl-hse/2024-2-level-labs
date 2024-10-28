@@ -4,6 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
+import json
 import math
 import re
 
@@ -227,13 +228,12 @@ def rank_documents(
         return None
     index_score_list = []
     for index, value in enumerate(indexes):
-        metric_score = 0.0
         value.update({term: 0.0 for term in clean_query if term not in value})
+        metric_score = 0.0
         for term in clean_query:
             metric_score += value[term]
-        index_score = (index, metric_score)
-        index_score_list.append(index_score)
-    return sorted(index_score_list, key=lambda x: x[-1], reverse=True)
+        index_score_list.append((index, metric_score))
+    return sorted(index_score_list, key=lambda index_score: index_score[-1], reverse=True)
 
 
 def calculate_bm25_with_cutoff(
@@ -274,6 +274,9 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if (not index or not file_path or not isinstance(index, list) or not isinstance(file_path, str)
+            or not all(isinstance(metric, dict) for metric in index)):
+        return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -288,6 +291,13 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not file_path or not isinstance(file_path, str):
+        return None
+    with open(file_path, 'r', encoding='utf-8') as index_file:
+        index = json.load(index_file)
+    if not index:
+        return None
+    return index
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:

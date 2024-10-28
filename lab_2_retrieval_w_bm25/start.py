@@ -33,29 +33,37 @@ def main() -> None:
     clean_documents = []
     for document in documents:
         tokenized_document = tokenize(document)
-        if tokenized_document:
-            clean_document = remove_stopwords(tokenized_document, stopwords)
-            if clean_document:
-                clean_documents.append(clean_document)
+        if not tokenized_document:
+            result = None
+        clean_document = remove_stopwords(tokenized_document, stopwords)
+        if not clean_document:
+            result = None
+        clean_documents.append(clean_document)
     vocab = build_vocabulary(clean_documents)
     if not vocab:
-        idf = calculate_idf(vocab, clean_documents)
+        result = None
+    idf = calculate_idf(vocab, clean_documents)
+    if not idf:
+        result = None
     avg_doc_len = sum(len(document) for document in clean_documents) / len(clean_documents)
     tf_idf_list = []
     bm25_list = []
     for doc in clean_documents:
         tf = calculate_tf(vocab, doc)
-        if tf:
-            tf_idf = calculate_tf_idf(tf, idf)
-            if tf_idf:
-                tf_idf_list.append(tf_idf)
+        if not tf:
+            result = None
+        tf_idf = calculate_tf_idf(tf, idf)
+        if not tf_idf:
+            result = None
+        tf_idf_list.append(tf_idf)
         bm25 = calculate_bm25(vocab, doc, idf, 1.5, 0.75, avg_doc_len, len(doc))
-        if bm25:
-            bm25_list.append(bm25)
+        if not bm25:
+            result = None
+        bm25_list.append(bm25)
     query = "Which fairy tale has Fairy Queen?"
     tfidf_ranking = rank_documents(tf_idf_list, query, stopwords)
     bm25_ranking = rank_documents(bm25_list, query, stopwords)
-    if not tfidf_ranking or not bm25_ranking:
+    if tfidf_ranking and bm25_ranking:
         result = list(zip(tfidf_ranking, bm25_ranking))
     print(result)
     assert result, "Result is None"

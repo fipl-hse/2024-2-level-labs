@@ -56,8 +56,8 @@ def main() -> None:
     rank_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
     rank_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
     result = rank_tf_idf, rank_bm25
-    print(result)
     assert result, "Result is None"
+    return None
 
 
 if __name__ == "__main__":

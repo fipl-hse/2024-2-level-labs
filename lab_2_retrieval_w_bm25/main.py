@@ -179,9 +179,8 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
     if (not isinstance(vocab, list) or not
-            all(isinstance(word, str) for word in vocab)):
-        return None
-    if (not isinstance(document, list) or not
+            all(isinstance(word, str) for word in vocab)
+            or not isinstance(document, list) or not
             all(isinstance(symbol, str) for symbol in document)):
         return None
     if (not isinstance(b, float)

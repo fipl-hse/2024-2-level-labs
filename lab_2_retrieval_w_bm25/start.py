@@ -26,7 +26,7 @@ def main() -> None:
     documents = []
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
-            documents.append(file.read())#список строк,строка=текст
+            documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
     av_doc_len = sum(len(document) for document in documents) / len(documents)
@@ -34,31 +34,26 @@ def main() -> None:
     for doc in documents:
         tokenized_doc = tokenize(doc)
         if not isinstance(tokenized_doc, list):
-            result = None
-            assert result, "Result is None"
+            return
         preprocessed_doc = remove_stopwords(tokenized_doc, stopwords)
         if not isinstance(preprocessed_doc, list):
-            result = None
-            assert result, "Result is None"
+            return
         preprocessed_documents.append(preprocessed_doc)
     vocabulary = build_vocabulary(preprocessed_documents)
     tf = []
     for document in preprocessed_documents:
         if not isinstance(document, str):
-            return None
+            return
         tf_doc = calculate_tf(vocabulary, document)
         if not isinstance(tf_doc, list):
-            result = None
-            assert result, "Result is None"
+            return
         tf.append(tf_doc)
     tf_idf = []
     if not isinstance(vocabulary, list):
-        result = None
-        assert result, "Result is None"
+        return
     idf = calculate_idf(vocabulary, preprocessed_documents)
     if not isinstance(idf, list):
-        result = None
-        assert result, "Result is None"
+        return
     for tf_document in tf:
         tf_idf_doc = calculate_tf_idf(tf_document, idf)
         tf_idf.append(tf_idf_doc)
@@ -66,15 +61,15 @@ def main() -> None:
     for document in preprocessed_documents:
         bm25_doc = calculate_bm25(vocabulary,document,idf,1.5,0.75,av_doc_len,len(document))
         bm25.append(bm25_doc)
-    quary = 'Which fairy tale has Fairy Queen?'
-    ranked_tf_idf = rank_documents(tf_idf, quary, stopwords)
-    ranked_bm25 = rank_documents(bm25, quary, stopwords)
+    query = 'Which fairy tale has Fairy Queen?'
+    ranked_tf_idf = rank_documents(tf_idf, query, stopwords)
+    ranked_bm25 = rank_documents(bm25, query, stopwords)
     print(ranked_tf_idf)
     print(ranked_bm25)
 
-    result = 1
+    result = ranked_bm25
     assert result, "Result is None"
-    return None
+
 
 
 if __name__ == "__main__":

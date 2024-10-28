@@ -30,8 +30,8 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
     clear_texts = []
-    for text in documents:
-        tokenized_text = tokenize(text)
+    for document in documents:
+        tokenized_text = tokenize(document)
         if not isinstance(tokenized_text, list):
             return None
         without_stopwords = remove_stopwords(tokenized_text, stopwords)
@@ -44,14 +44,22 @@ def main() -> None:
     tf_idf = []
     bm25 = []
     idf = calculate_idf(vocabulary, clear_texts)
+    if not isinstance(idf, dict):
+        return None
     avgdl = sum(len(doc) for doc in documents) / len(documents)
     for text in clear_texts:
         if not isinstance(text, list):
             return None
         tf = calculate_tf(vocabulary, text)
+        if not isinstance(tf, dict):
+            return None
         tf_idf_text = calculate_tf_idf(tf, idf)
+        if not isinstance(tf_idf_text, dict):
+            return None
         tf_idf.append(tf_idf_text)
         bm25_text = calculate_bm25(vocabulary, text, idf, 1.5, 0.75, avgdl, len(text))
+        if not isinstance(bm25_text, dict):
+            return None
         bm25.append(bm25_text)
     rank_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
     rank_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)

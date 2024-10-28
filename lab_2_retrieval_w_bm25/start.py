@@ -32,28 +32,28 @@ def main() -> None:
     clear_texts = []
     for document in documents:
         tokenized_text = tokenize(document)
+        if not isinstance(tokenized_text, list):
+            return None
         without_stopwords = remove_stopwords(tokenized_text, stopwords)
-        if not isinstance(tokenized_text, list) or not isinstance(without_stopwords, list):
+        if not isinstance(without_stopwords, list):
             return None
         clear_texts.append(without_stopwords)
     vocabulary = build_vocabulary(clear_texts)
+    if not isinstance(vocabulary, list):
+        return None
     tf_idf = []
     bm25 = []
     idf = calculate_idf(vocabulary, clear_texts)
-    if not isinstance(vocabulary, list) or not isinstance(idf, dict):
-        return None
     avgdl = sum(len(doc) for doc in documents) / len(documents)
     for text in clear_texts:
-        if not isinstance(text, list):
-            return None
         tf = calculate_tf(vocabulary, text)
+        if not isinstance(tf, dict) or not isinstance(idf, dict):
+            return None
         tf_idf_text = calculate_tf_idf(tf, idf)
-        if not isinstance(tf, dict) or not isinstance(tf_idf_text, dict):
+        bm25_text = calculate_bm25(vocabulary, text, idf, 1.5, 0.75, avgdl, len(text))
+        if not isinstance(tf_idf_text, dict) or not isinstance(bm25_text, dict):
             return None
         tf_idf.append(tf_idf_text)
-        bm25_text = calculate_bm25(vocabulary, text, idf, 1.5, 0.75, avgdl, len(text))
-        if not isinstance(bm25_text, dict):
-            return None
         bm25.append(bm25_text)
     rank_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
     rank_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)

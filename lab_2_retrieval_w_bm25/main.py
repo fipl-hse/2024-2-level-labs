@@ -67,6 +67,21 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(documents, list):
+        return None
+
+    for document in documents:
+        for word in document:
+            if document.count(word) > 1:
+                document.remove(word)
+
+    vocabulary = []
+
+    for document in documents:
+        for word in document:
+            vocabulary.append(word)
+
+    return vocabulary
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

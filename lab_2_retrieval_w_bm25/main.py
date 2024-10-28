@@ -52,6 +52,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
+    pass
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

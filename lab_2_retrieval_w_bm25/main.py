@@ -3,8 +3,10 @@ Lab 2.
 
 Text retrieval with BM25
 """
-# pylint:disable=too-many-arguments, unused-argument
+
 from math import log
+
+# pylint:disable=too-many-arguments, unused-argument
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -211,6 +213,7 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+
 
 
 def rank_documents(

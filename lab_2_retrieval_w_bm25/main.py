@@ -28,11 +28,10 @@ def tokenize(text: str) -> list[str] | None:
     for element in text.lower():
         if element.isalpha():
             word.append(element)
-        else:
-            if word:
-                tokenized_list.append(''.join(word))
-                word = []
             continue
+        if word:
+            tokenized_list.append(''.join(word))
+            word = []
 
     if word:
         tokenized_list.append(''.join(word))
@@ -133,9 +132,6 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
                 tf_dict[elem] = 0.0
             tf_dict[word] = document_tokens.count(word) / len(document_tokens)
 
-    if not tf_dict:
-        return None
-
     return tf_dict
 
 
@@ -208,9 +204,6 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     for elem, term_frequency in tf.items():
         if elem in idf:
             tf_idf[elem] = term_frequency * idf[elem]
-
-    if not tf_idf:
-        return None
 
     return tf_idf
 
@@ -399,9 +392,6 @@ def calculate_bm25_with_cutoff(
                               1 - b + b * (doc_len / avg_doc_len)
                       ))))
         bm25_with_cutoff_dict[elem] = bm25_score
-
-    if not bm25_with_cutoff_dict:
-        return None
 
     return bm25_with_cutoff_dict
 

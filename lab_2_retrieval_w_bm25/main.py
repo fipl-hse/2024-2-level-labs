@@ -5,6 +5,8 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
+import string
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -21,10 +23,12 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    punkt = '''",./)'(*&^%$#@!]}{['''
-    translate = ""
-    text = text.maketrans(punkt, translate)
-    text = str(text)
+    # punkt = '''",./)'(*&^%$#@!]}{['''
+    # translate = ""
+    # text = text.maketrans(punkt, translate)
+    for p in string.punctuation:
+        if p in text:
+            text = text.replace(p, '')
     split_text = text.lower().split()
     for i in split_text:
         if not i.isalpha():
@@ -32,7 +36,7 @@ def tokenize(text: str) -> list[str] | None:
     return split_text
 
 
-print(tokenize("The weather is sunny."))
+print(tokenize('The first% sentence><. The sec&*ond sent@ence #.'))
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:

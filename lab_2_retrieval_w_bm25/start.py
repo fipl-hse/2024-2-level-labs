@@ -2,7 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import tokenize
+from lab_2_retrieval_w_bm25.main import (tokenize, build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords,)
 
 
 def main() -> None:
@@ -27,10 +29,47 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    documents_step_1 = []
-    for i in documents:
-        documents_step_1.append(tokenize(i))
-    result = documents_step_1
+
+    tokenized_docs = []
+    word_count = 0
+    for document in documents:
+        tokenized_doc = tokenize(document)
+        if tokenized_doc:
+            word_count += len(tokenized_doc)
+            clean_doc = remove_stopwords(tokenized_doc,stopwords)
+            if clean_doc:
+                tokenized_docs.append(clean_doc)
+                print(clean_doc)
+    print(tokenized_docs)
+
+    vocabulary = build_vocabulary(tokenized_docs)
+    if vocabulary:
+        idf = calculate_idf(vocabulary, tokenized_docs)
+        print(idf)
+
+    tf_idf_all = []
+    bm25_all = []
+    avg_len = word_count / len(documents)
+    if idf:
+        for doc in tokenized_docs:
+            tf = calculate_tf(vocabulary, doc)
+            doc_len = len(doc)
+            tf_idf = calculate_tf_idf(tf,idf)
+            tf_idf_all.append(tf_idf)
+            print(tf_idf)
+            bm25 = calculate_bm25(vocabulary, doc, idf, 1.5, 0.75, avg_len, doc_len)
+            bm25_all.append(bm25)
+            print(bm25)
+    print(tf_idf_all)
+    print(bm25_all)
+
+    print('\n')
+
+    print(rank_documents(tf_idf_all,'Which fairy tale has Fairy Queen?',stopwords))
+    print(rank_documents(bm25_all, 'Which fairy tale has Fairy Queen?', stopwords))
+
+
+    result = '????'
     assert result, "Result is None"
 
 

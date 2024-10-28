@@ -18,6 +18,19 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(text, str):
+        return None
+
+    punkt = '''",./)'(*&^%$#@!]}{['''
+    translate = ""
+    text = text.maketrans(punkt, translate)
+    text = str(text)
+    split_text = text.lower().split()
+    for i in split_text:
+        if not i.isalpha():
+            split_text.remove(i)
+    return split_text
+print(tokenize("The weather is sunny."))
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:

@@ -74,6 +74,7 @@ class RemoveStopwordsTest(unittest.TestCase):
         for bad_input in bad_inputs:
             self.assertEqual(expected, remove_stopwords(bad_input, self.stopwords))
             self.assertEqual(expected, remove_stopwords(['normal', 'document'], bad_input))
+        # print(remove_stopwords(bad_input, self.stopwords))
 
     @pytest.mark.lab_2_retrieval_w_bm25
     @pytest.mark.mark4

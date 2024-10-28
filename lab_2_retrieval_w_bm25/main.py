@@ -4,8 +4,10 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-
 import string
+
+# with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
+    # stopwords = file.read().split("\n")
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -23,20 +25,15 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    # punkt = '''",./)'(*&^%$#@!]}{['''
-    # translate = ""
-    # text = text.maketrans(punkt, translate)
-    for p in string.punctuation:
+    punctuation = '''!'"#$%&()*+,-./:;<=>?@[\]^_`{|}~1234567890'''
+    for p in punctuation:
         if p in text:
-            text = text.replace(p, '')
-    split_text = text.lower().split()
-    for i in split_text:
-        if not i.isalpha():
-            split_text.remove(i)
-    return split_text
-
-
-print(tokenize('The first% sentence><. The sec&*ond sent@ence #.'))
+            text = text.replace(p, ' ')
+    tokens = text.lower().split()
+    # for i in tokens:
+    #     if not i.isalpha():
+    #         tokens.remove(i)
+    return tokens
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -52,7 +49,26 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    pass
+    if (not isinstance(tokens, list)) or (not isinstance(stopwords, list)):
+        return None
+    if (len(tokens) == 0) or (len(stopwords) == 0):
+        return None
+    else:
+        for elem in stopwords:
+            if not isinstance(elem, str):
+                return None
+
+        tokens_cleared = []
+        for elem in tokens:
+            if not isinstance(elem, str):
+                return None
+            if elem not in stopwords:
+                tokens_cleared.append(elem)
+
+        return tokens_cleared
+
+
+# print(remove_stopwords([None, True, 42, 3.14, (), {}, [], [1.7, 'No!']], stopwords))
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

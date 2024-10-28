@@ -3,7 +3,7 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords, build_vocabulary, calculate_tf, calculate_idf)
+from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords, build_vocabulary, calculate_tf, calculate_idf, calculate_tf_idf)
 
 def main() -> None:
     """
@@ -46,6 +46,7 @@ def main() -> None:
         print(calculate_tf(build_vocabulary(clear_tokenized_documents), document))
 
     print(calculate_idf(build_vocabulary(clear_tokenized_documents), clear_tokenized_documents))
+    print(calculate_tf_idf(calculate_tf(build_vocabulary(clear_tokenized_documents), document)), calculate_idf(build_vocabulary(clear_tokenized_documents), clear_tokenized_documents))
     result = None
     assert result, "Result is None"
 

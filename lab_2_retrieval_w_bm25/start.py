@@ -6,7 +6,6 @@ from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calcu
                                          calculate_tf, calculate_tf_idf, rank_documents,
                                          remove_stopwords, tokenize)
 
-
 def main() -> None:
     """
     Launches an implementation
@@ -52,7 +51,7 @@ def main() -> None:
     avg_len = word_count / len(documents)
     if idf:
         for doc in tokenized_docs:
-            if isinstance(doc, list):
+            if isinstance(doc, list) and vocabulary:
                 tf = calculate_tf(vocabulary, doc)
                 doc_len = len(doc)
                 if tf:

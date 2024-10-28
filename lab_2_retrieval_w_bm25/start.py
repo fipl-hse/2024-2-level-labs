@@ -48,12 +48,12 @@ def main() -> None:
     avg_doc_len = total_words / len(tokenized_documents) if tokenized_documents else 0
 
     for tokenized_doc in tokenized_documents:
-        tf = calculate_tf(vocabulary, tokenized_doc)
-        if tf:
-            tf_idf = calculate_tf_idf(tf, idf)
-            if tf_idf:
-                tf_idf_list.append(tf_idf)
-
+        if tokenized_doc:
+            tf = calculate_tf(vocabulary, tokenized_doc)
+            if tf:
+                tf_idf = calculate_tf_idf(tf, idf) if idf else {}
+                if tf_idf:
+                    tf_idf_list.append(tf_idf)
         doc_len = len(tokenized_doc)
         bm25 = calculate_bm25(vocabulary, tokenized_doc, idf, 1.5, 0.75, avg_doc_len, doc_len)
         if bm25:

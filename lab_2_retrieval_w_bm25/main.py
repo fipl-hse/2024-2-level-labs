@@ -5,6 +5,8 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
+import math
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -129,7 +131,21 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(documents, list):
+        return None
 
+    word_number = 0.0
+    idf_vocab = {}
+
+    for word in vocab:
+        for document in documents:
+            if word in document:
+                word_number += 1.0
+                continue
+        idf = math.log((len(documents) - (word_number + 0.5)) / (word_number + 0.5))
+        idf_vocab[word] = idf
+
+    return idf_vocab
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
     """

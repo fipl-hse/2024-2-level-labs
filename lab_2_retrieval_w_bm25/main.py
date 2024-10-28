@@ -160,6 +160,15 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tf, dict) or not isinstance(idf, dict):
+        return None
+
+    tf_idf_vocab = {}
+
+    for word in tf:
+        tf_idf_vocab[word] = tf[word] * idf[word]
+
+    return tf_idf_vocab
 
 
 def calculate_bm25(

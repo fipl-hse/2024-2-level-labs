@@ -47,18 +47,16 @@ def main() -> None:
     bm25_list = []
     avg_doc_len = total_words / len(tokenized_documents) if tokenized_documents else 0
 
-    for tokenized_doc in tokenized_documents:
-        if tokenized_doc:
-            tf = calculate_tf(vocabulary, tokenized_doc)
-            if not isinstance(tf, dict):
-                return
-            tf_idf = calculate_tf_idf(tf, idf) if idf else {}
-            if tf_idf:
-                tf_idf_list.append(tf_idf)
-        doc_len = len(tokenized_doc)
-        bm25 = calculate_bm25(vocabulary, tokenized_doc, idf, 1.5, 0.75, avg_doc_len, doc_len)
-        if bm25:
-            bm25_list.append(bm25)
+    for text in tokenized_documents:
+        tf = calculate_tf(vocabulary, text)
+        if not isinstance(tf, dict) or not isinstance(idf, dict):
+            return None
+        tf_idf_text = calculate_tf_idf(tf, idf)
+        bm25_text = calculate_bm25(vocabulary, text, idf, 1.5, 0.75, avg_doc_len, len(text))
+        if not isinstance(tf_idf_text, dict) or not isinstance(bm25_text, dict):
+            return None
+        tf_idf_list.append(tf_idf_text)
+        bm25_list.append(bm25_text)
 
     print('\nTF-IDF:\n')
     ranked_tf_idf = rank_documents(tf_idf_list, 'Which fairy tale has Fairy Queen?', stopwords)

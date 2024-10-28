@@ -2,9 +2,7 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-
-
-from main import tokenize
+from main import tokenize, remove_stopwords
 
 
 def main() -> None:
@@ -29,7 +27,7 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = tokenize(str(documents))
+    result = remove_stopwords(tokenize(documents))
     assert result, "Result is None"
 
 

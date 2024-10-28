@@ -49,8 +49,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         return None
     if not tokens or not stopwords:
         return None
-    without_stop = [word for word in tokens if word not in stopwords]
-    return without_stop
+    return [word for word in tokens if word not in stopwords]
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -272,9 +271,10 @@ def rank_documents(
         tuple_of_metrica = (index_from_indexes, value_of_whole_document)
         list_with_index.append(tuple_of_metrica)
 
-    pairs = sorted(list_with_index, key=lambda pair: pair[1], reverse=True)
     if not list_with_index:
         return None
+    pairs = sorted(list_with_index, key=lambda pair: pair[1], reverse=True)
+
     return pairs
 
 

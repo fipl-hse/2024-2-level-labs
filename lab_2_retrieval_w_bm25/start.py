@@ -30,14 +30,21 @@ def main() -> None:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
 
-    query = "A story about a wizard boy in a tower!"
+    query = 'Which fairy tale has Fairy Queen?'
 
     tokenized_documents = []
+    tokenized_documents_without_stopwords = []
+    list_for_tf_idf = []
+    list_for_bm25 = []
+    list_for_bm25_without_cutoff = []
+    k1 = 1.5
+    b = 0.75
+    alpha = 0.2
+
     for document in documents:
         tokens: list[str] = tokenize(document) or []
         tokenized_documents.append(tokens)
 
-    tokenized_documents_without_stopwords = []
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
         for tokenized_doc in tokenized_documents:
@@ -48,37 +55,30 @@ def main() -> None:
     vocab = build_vocabulary(tokenized_documents_without_stopwords)
     if not vocab:
         return
+    idf_check = calculate_idf(vocab, tokenized_documents_without_stopwords)
+    idf: dict[str, float] = idf_check if idf_check is not None else {}
 
-    list_for_tf_idf = []
     for tokenized_doc_without in tokenized_documents_without_stopwords:
         tf = calculate_tf(vocab, tokenized_doc_without)
-        idf_check = calculate_idf(vocab, tokenized_documents_without_stopwords)
-        idf: dict[str, float] = idf_check if idf_check is not None else {}
         if tf and idf and isinstance(tf, dict) and isinstance(idf, dict):
             tf_idf = calculate_tf_idf(tf, idf)
             if tf_idf:
                 list_for_tf_idf.append(tf_idf)
 
-    print(list_for_tf_idf)
-
     avg_len = [len(doc) for doc in tokenized_documents_without_stopwords]
     avg_len_doc = sum(avg_len) / len(tokenized_documents_without_stopwords) \
         if avg_len else 0
 
-    list_for_bm25 = []
     for doc in tokenized_documents_without_stopwords:
         doc_len = len(doc)
-        bm25 = calculate_bm25(vocab, doc, idf, 1.5, 0.75, avg_len_doc, doc_len)
+        bm25 = calculate_bm25(vocab, doc, idf, k1, b, avg_len_doc, doc_len)
         if bm25 is not None:
             list_for_bm25.append(bm25)
 
-    print(list_for_bm25)
-
-    list_for_bm25_without_cutoff = []
     for doc_bm25 in tokenized_documents_without_stopwords:
         doc_len = len(doc_bm25)
         bm25_score = calculate_bm25_with_cutoff(vocab, doc_bm25, idf,
-                                                0.2, 1.5, 0.75, avg_len_doc, doc_len)
+                                                alpha, k1, b, avg_len_doc, doc_len)
         if bm25_score is not None:
             list_for_bm25_without_cutoff.append(bm25_score)
 

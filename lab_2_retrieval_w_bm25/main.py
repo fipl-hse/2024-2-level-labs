@@ -189,10 +189,11 @@ def calculate_bm25(
     """
     if (not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab)
             or not isinstance(document, list) or not
-            all(isinstance(word, str) for word in document) or not isinstance(k1, float)
-            or not isinstance(b, float) or not isinstance(avg_doc_len, float)
-            or not isinstance(doc_len, int) or not isinstance(idf_document, dict)
-            or isinstance(doc_len, bool)):
+            all(isinstance(word, str) for word in document) or not isinstance(k1, float)):
+        return None
+    if (not isinstance(b, float) or not isinstance(avg_doc_len, float)
+    or not isinstance(doc_len, int) or not isinstance(idf_document, dict)
+    or isinstance(doc_len, bool)):
         return None
     if not all((isinstance(key, str) and isinstance(value, float) for key, value in
                 idf_document.items())):
@@ -239,7 +240,7 @@ def rank_documents(
     for num,document in enumerate(indexes):
         token_values_sum = sum(document[token] for token in clean_query if token
                                in document)
-        results.append((num),(token_values_sum))
+        results.append((num,token_values_sum))
     results.sort(key=lambda x: x[-1], reverse=True)
     return results
 

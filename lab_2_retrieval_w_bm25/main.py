@@ -102,7 +102,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         tf[word] += document_tokens.count(word) / total_tokens
 
     return tf
-git
+
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """
@@ -131,7 +131,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     idf = {}
     for word in vocab:
         doc_w_words = 0
-        for document in documents:
+        for doc in documents:
             if word in documents:
                 doc_w_words += 1
         idf[word] = math.log((len(documents) - doc_w_words + 0.5) / (doc_w_words + 0.5))

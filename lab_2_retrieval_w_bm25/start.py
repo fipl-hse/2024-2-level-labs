@@ -2,7 +2,7 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-
+from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords)
 
 def main() -> None:
     """
@@ -24,10 +24,23 @@ def main() -> None:
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
+
+    tokenized_documents = []
+
+    for document in documents:
+        tokenized_documents.append(tokenize(document))
+
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
+
+    clear_tokenized_documents = []
+
+    for tokenized_document in tokenized_documents:
+        clear_document = remove_stopwords(tokenized_document, stopwords)
+        clear_tokenized_documents.append(clear_document)
     result = None
     assert result, "Result is None"
+
 
 
 if __name__ == "__main__":

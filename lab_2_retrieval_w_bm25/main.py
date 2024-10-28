@@ -30,6 +30,8 @@ def tokenize(text: str) -> list[str] | None:
         if not i.isalpha():
             split_text.remove(i)
     return split_text
+
+
 print(tokenize("The weather is sunny."))
 
 

@@ -4,7 +4,7 @@ Laboratory Work #2 starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
                                          calculate_tf, calculate_tf_idf, rank_documents,
-                                         remove_stopwords, tokenize)
+                                         remove_stopwords, tokenize, calculate_bm25_with_cutoff, save_index, load_index)
 
 
 def main() -> None:
@@ -53,6 +53,7 @@ def main() -> None:
 
     tf_idf_collection = []
     bm25_collection = []
+    bm25_with_cutoff_collection = []
     no = 0
     idf = calculate_idf(vocab, docs_tokenized)
     for doc in docs_tokenized:
@@ -67,6 +68,10 @@ def main() -> None:
         if not isinstance(bm25, dict):
             return
         bm25_collection.append(bm25)
+        bm25_with_cutoff = calculate_bm25_with_cutoff(vocab, doc, idf, 0.2, 1.5, 0.75, avg_d_l, doc_lengths[no])
+        if not isinstance(bm25_with_cutoff, dict):
+            return
+        bm25_with_cutoff_collection.append(bm25_with_cutoff)
         no += 1
 
     print(f'Demo 2: Calculating TF-IDF\n{tf_idf_collection}')
@@ -74,6 +79,17 @@ def main() -> None:
     query = 'Which fairy tale has Fairy Queen?'
     print(f'Demo 4: Ranking By Query TF-IDF\n{rank_documents(tf_idf_collection, query, stopwords)}')
     print(f'Demo 5: Ranking By Query BM25\n{rank_documents(bm25_collection, query, stopwords)}')
+
+    file_path = 'assets/metrics.json'
+    file = open(file_path, 'w', encoding='utf-8')
+    file.close()
+    print('Demo 6: Saving Metrics In A JSON File')
+    save_index(bm25_with_cutoff_collection, file_path)
+    print('Demo 6: Metrics Have Been Saved! Check the file.')
+
+    print('Demo 7: Loading & Ranking Metrics In A JSON File')
+    indexes = load_index(file_path)
+    print(rank_documents(indexes, 'Which fairy tale has Fairy Queen?', stopwords))
 
     result = 1
     assert result, "Result is None"

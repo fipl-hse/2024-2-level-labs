@@ -3,7 +3,7 @@ Lab 2.
 
 Text retrieval with BM25
 """
-
+from json import dump, load
 from math import log
 
 # pylint:disable=too-many-arguments, unused-argument
@@ -204,10 +204,10 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not vocab or not isinstance(vocab,list) or
+    if (not vocab or not isinstance(vocab, list) or
             not all(isinstance(token, str) for token in vocab)):
         return None
-    if (not document or not isinstance(document,list) or
+    if (not document or not isinstance(document, list) or
             not all(isinstance(token, str) for token in document)):
         return None
     if (not idf_document or not isinstance(idf_document, dict) or
@@ -228,7 +228,7 @@ def calculate_bm25(
             bm25[token] = 0.0
         else:
             token_count = document.count(token)
-            bm25[token] = (idf_document[token] * (token_count*(k1+1))/
+            bm25[token] = (idf_document[token] * (token_count*(k1 + 1)) /
                            (token_count+k1*(1-b+b*(doc_len/avg_doc_len))))
     return bm25
 
@@ -254,7 +254,7 @@ def rank_documents(
             not all(isinstance(word, str) for word in stopwords)):
         return None
     if (not indexes or not isinstance(indexes, list) or
-            not all(isinstance(index, dict) for index in indexes)):
+            not all(isinstance(doc_index, dict) for doc_index in indexes)):
         return None
     for document in indexes:
         if not all(isinstance(token, str) and
@@ -277,7 +277,6 @@ def rank_documents(
         doc_index_score.append((index, freq_cumulative))
         index += 1
     return sorted(doc_index_score, key=lambda tup: tup[1], reverse=True)
-
 
 
 def calculate_bm25_with_cutoff(
@@ -308,6 +307,34 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not vocab or not isinstance(vocab, list) or
+            not all(isinstance(token, str) for token in vocab)):
+        return None
+    if (not document or not isinstance(document, list) or
+            not all(isinstance(token, str) for token in document)):
+        return None
+    if (not idf_document or not isinstance(idf_document, dict) or
+            not all(isinstance(token, str) and
+                    isinstance(freq, float) for token, freq in idf_document.items())):
+        return None
+    if (not isinstance(avg_doc_len, float) or avg_doc_len is None
+            or not isinstance(doc_len, int) or doc_len is None or isinstance(doc_len, bool)):
+        return None
+    bad_input = (not isinstance(k1, float) or not 1.2 <= k1 <= 2 or not isinstance(b, float) or
+                 not 0 < b < 1 or doc_len < 0)
+    bad_input = bad_input or not alpha or not isinstance(alpha, float) or alpha < 0
+    if bad_input:
+        return None
+
+    bm25_with_cutoff = {}
+    common_tokens = [vocab, document]
+    common_vocab = build_vocabulary(common_tokens)
+    for token in common_vocab:
+        if token in idf_document and idf_document[token] >= alpha:
+            token_count = document.count(token)
+            bm25_with_cutoff[token] = (idf_document[token] * (token_count * (k1 + 1)) /
+                                       (token_count + k1 * (1 - b + b * (doc_len / avg_doc_len))))
+    return bm25_with_cutoff
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
@@ -318,6 +345,10 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if not index or not isinstance(index, list) or not file_path or not isinstance(file_path, str):
+        return
+    with open(file_path, 'w', encoding='utf-8') as file:
+        dump(index, file, indent=4)
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -332,18 +363,39 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not file_path or not isinstance(file_path, str):
+        return None
+    with open(file_path, 'r', encoding='utf-8') as file:
+        loaded_index = load(file)
+    if isinstance(loaded_index, list):
+        return loaded_index
+    return None
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     """
-    Calculate Spearman's rank correlation coefficient between two rankings.
+    Calculate Superman's rank correlation coefficient between two rankings.
 
     Args:
         rank (list[int]): Ranked list of document indices.
         golden_rank (list[int]): Golden ranked list of document indices.
 
     Returns:
-        float | None: Spearman's rank correlation coefficient.
+        float | None: Superman's rank correlation coefficient.
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not rank or not isinstance(rank, list) or
+            not all(isinstance(doc_index, int) for doc_index in rank)):
+        return None
+    if (not golden_rank or not isinstance(golden_rank, list) or
+            not all(isinstance(golden_doc_index, int) for golden_doc_index in golden_rank)):
+        return None
+    observations = len(rank)
+    if not len(golden_rank) == observations:
+        return None
+    rank_difference = 0
+    for doc_index in rank:
+        if doc_index in golden_rank:
+            rank_difference += (rank.index(doc_index) - golden_rank.index(doc_index))**2
+    return 1-(6 * rank_difference)/(observations*(observations**2 - 1))

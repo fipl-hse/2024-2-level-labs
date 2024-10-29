@@ -327,7 +327,6 @@ def rank_documents(
 
     if not ranged_documents:
         return None
-
     return ranged_documents
 
 

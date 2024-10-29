@@ -29,12 +29,31 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    tokenized_documents = [remove_stopwords(tokenize(document), stopwords) for document in documents]
-    vocab = build_vocabulary(tokenized_documents)
-    tf_list = [calculate_tf(vocab, document) for document in tokenized_documents]
-    idf = calculate_idf(vocab, tokenized_documents)
-    tf_idf_list = [calculate_tf_idf(tf, idf) for tf in tf_list]
-    print(tf_idf_list)
+
+    docs_tokens = []
+    cleared_docs = []
+    for document in documents:
+        docs_tokens.append(tokenize(document))
+        cleared_docs.append(remove_stopwords(tokenize(document), stopwords))
+
+    vocab = build_vocabulary(docs_tokens)
+    if vocab is not None:
+        idf = calculate_idf(vocab, docs_tokens)
+    else:
+        idf = {}
+
+    tf_idf_list = []
+
+    if idf is not None:
+        for tokenized_doc in docs_tokens:
+            if isinstance(tokenized_doc, list) and vocab is not None:
+                tf = calculate_tf(vocab, tokenized_doc)
+
+                if tf is not None:
+                    tf_idf = calculate_tf_idf(tf, idf)
+                    if tf_idf is not None:
+                        tf_idf_list.append(tf_idf)
+                        print(tf_idf)
 
 
 if __name__ == "__main__":

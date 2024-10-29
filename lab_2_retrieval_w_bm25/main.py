@@ -172,7 +172,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
         if not isinstance(key_tf, str) or not isinstance(tf[key_tf], float):
             return None
         if key_tf not in idf.keys():
-            tf_idf[key_tf] = 0
+            tf_idf[key_tf] = 0.0
         else:
             if not isinstance(idf[key_tf], float):
                 return None
@@ -181,7 +181,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
         if not isinstance(key_idf, str) or not isinstance(idf[key_idf], float):
             return None
         if key_idf not in tf.keys():
-            tf_idf[key_idf] = 0
+            tf_idf[key_idf] = 0.0
     return tf_idf
 
 def calculate_bm25(
@@ -230,7 +230,7 @@ def calculate_bm25(
         if not isinstance(word, str):
             return None
         if not word in bm25_dic.keys():
-            bm_25 = 0
+            bm_25 = 0.0
             bm25_dic[word] = bm_25
     return bm25_dic
 

@@ -2,7 +2,8 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from main import remove_stopwords, tokenize
+from main import (remove_stopwords, tokenize, rank_documents, calculate_bm25,
+    build_vocabulary, calculate_idf)
 
 def main() -> None:
     """
@@ -27,9 +28,24 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
     text_sort = []
+    bm25_lis = []
+    docs_len = 0
     for text in documents:
-        text_sort.append(remove_stopwords(tokenize(text), stopwords))
-    result = text_sort
+        text_new = tokenize(text)
+        text_sort.append(remove_stopwords(text_new, stopwords))
+        docs_len += len(text_new)
+    avg_docs_len = docs_len / len(documents)
+    voc = build_vocabulary(text_sort)
+    for text in documents:
+        new_text = tokenize(text)
+        idf = calculate_idf(voc, text_sort)
+        bm25_lis.append(calculate_bm25(voc, new_text, idf, 1.5, 0.75,
+                                       avg_docs_len, len(new_text)))
+    query = 'Which fairy tale has Fairy Queen?'
+    rank = rank_documents(bm25_lis, query, stopwords)
+    result = rank
+    print(result)
+    print(documents[0])
     assert result, "Result is None"
 
 

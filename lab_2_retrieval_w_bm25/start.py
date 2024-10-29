@@ -38,9 +38,12 @@ def main() -> None:
         temp.append(tkalt)
     res1 = func.build_vocabulary(temp)
     print(res1)
+    assert isinstance(res1, list), 'Invalid Type'
     tidfttl = []
     curidf = func.calculate_idf(res1, temp)
+    assert isinstance(curidf, dict), 'Invalid Type'
     for al in temp:
+        assert isinstance(al, list), 'Invalid Type'
         curtf = func.calculate_tf(res1, al)
         if not isinstance(curtf, dict) or \
                 not isinstance(curidf, dict):

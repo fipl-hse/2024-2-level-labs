@@ -41,12 +41,13 @@ def main() -> None:
         docs_len += len(text_new)
     avg_docs_len = docs_len / len(documents)
     voc = build_vocabulary(text_sort)
-    for text in documents:
-        new_text = tokenize(text)
+    for new_text in text_sort:
         idf = calculate_idf(voc, text_sort)
         bm25_lis.append(calculate_bm25(voc, new_text, idf, 1.5, 0.75,
                                        avg_docs_len, len(new_text)))
     query = 'Which fairy tale has Fairy Queen?'
+    if bm25_lis is None:
+        return
     rank = rank_documents(bm25_lis, query, stopwords)
     result = rank
     print(result)

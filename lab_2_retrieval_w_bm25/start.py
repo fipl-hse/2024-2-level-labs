@@ -1,9 +1,7 @@
 """
 Laboratory Work #2 starter
 """
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
-                                         calculate_tf, calculate_tf_idf, rank_documents,
-                                         remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (tokenize)
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 

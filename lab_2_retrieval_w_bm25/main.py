@@ -1,11 +1,10 @@
-import math
-import re
-
 """
 Lab 2.
 
 Text retrieval with BM25
 """
+import math
+import re
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -97,7 +96,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return None
     if not isinstance(vocab, list) or any(not isinstance(token, str) for token in vocab):
         return None
-    if not isinstance(document_tokens, list) or any(not isinstance(token, str) for token in document_tokens):
+    if not isinstance(document_tokens, list) or any(not isinstance(
+            token, str) for token in document_tokens):
         return None
     vocab_unique = set(vocab).union(set(document_tokens))
     tf_dict = {token: 0 for token in vocab_unique}
@@ -110,7 +110,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if total_tokens == 0:
         return {token: 0.0 for token in vocab}
 
-    return {token: count / total_tokens for token, count in tf_dict.items()} if len(document_tokens) > 0 else 0.0
+    return {token: count / total_tokens for token, count in tf_dict.items()} if len(
+        document_tokens) > 0 else 0.0
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -208,12 +209,11 @@ def calculate_bm25(
     """
     if not vocab or not document or not idf_document or not avg_doc_len or not doc_len:
         return None
-    if not isinstance(vocab, list) or not all(isinstance(term, str) for term in vocab):
+    if not isinstance(vocab, list) or not all(isinstance(term, str) for term in vocab) or not isinstance(
+            document, list) or not all(isinstance(token, str) for token in document) or len(
+        vocab) == 0 or len(document) == 0:
         return None
-    if not isinstance(document, list) or not all(isinstance(token, str) for token in document):
-        return None
-    if len(vocab) == 0 or len(document) == 0:
-        return None
+
     if not isinstance(idf_document, dict) or len(idf_document) == 0 or any(
             not isinstance(term, str) or not isinstance(score, float) for term, score in idf_document.items()):
         return None
@@ -257,7 +257,8 @@ def rank_documents(
     """
     if not indexes or not isinstance(indexes, list) or not all(isinstance(index, dict) for index in indexes):
         return None
-    if not isinstance(query, str) or not isinstance(stopwords, list) or not all(isinstance(token, str) for token in stopwords):
+    if not isinstance(query, str) or not isinstance(
+            stopwords, list) or not all(isinstance(token, str) for token in stopwords):
         return None
     if tokenize(query) is None:
         return None

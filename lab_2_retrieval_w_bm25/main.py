@@ -213,7 +213,8 @@ def calculate_bm25(
     """
     if (not isinstance(vocab, list) or not isinstance(document, list)
             or not isinstance(idf_document, dict) or not isinstance(avg_doc_len, float)
-            or not isinstance(doc_len, int) or isinstance(doc_len, bool) or doc_len is None or avg_doc_len is None or not isinstance(k1, float)
+            or not isinstance(doc_len, int) or isinstance(doc_len, bool) or doc_len
+            is None or avg_doc_len is None or not isinstance(k1, float)
             or not isinstance(b, float) or len(vocab) == 0 or len(document) == 0
             or len(idf_document.keys()) == 0):
         return None
@@ -225,7 +226,8 @@ def calculate_bm25(
         if not isinstance(elem, str):
             return None
         el_num = document.count(elem)
-        bm_25 = idf_document[elem] * el_num * (k1 + 1) / (el_num + k1 * (1 - b + b * doc_len / avg_doc_len))
+        bm_25 = idf_document[elem] * el_num * (k1 + 1) / (el_num +
+                                                          k1 * (1 - b + b * doc_len / avg_doc_len))
         bm25_dic[elem] = bm_25
     for word in document:
         if not isinstance(word, str):
@@ -254,7 +256,7 @@ def rank_documents(
     """
     if (not isinstance(indexes, list) or not isinstance(query, str)
         or not isinstance(stopwords, list) or len(indexes) == 0):
-            return None
+        return None
     search = remove_stopwords(tokenize(query), stopwords)
     if search is None:
         return None

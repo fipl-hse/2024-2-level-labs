@@ -261,17 +261,17 @@ def rank_documents(
     if search is None:
         return None
     rel_doc_rating = {}
-    for doc in range(len(indexes)):
-        if not isinstance(indexes[doc], dict):
+    for doc_numb, doc in enumerate(indexes):
+        if not isinstance(doc, dict):
             return None
-        for key, value in indexes[doc].items():
+        for key, value in doc.items():
             if not isinstance(key, str) or not isinstance(value, float):
                 return None
         rating = 0
         for token in search:
-            token_metric = indexes[doc].get(token, 0)
+            token_metric = doc.get(token, 0)
             rating += token_metric
-        rel_doc_rating[doc] = rating
+        rel_doc_rating[doc_numb] = rating
     final_rating = sorted(rel_doc_rating.items(), key=lambda x: x[1], reverse=True)
     return final_rating
 

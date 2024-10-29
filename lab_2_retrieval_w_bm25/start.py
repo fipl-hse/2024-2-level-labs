@@ -51,8 +51,10 @@ def main() -> None:
                     tf_idf_list.append(tf_idf)
 
     for index, tf_idf in enumerate(tf_idf_list):
+        result = tf_idf
         print(f"TF-IDF for document {index + 1}:")
         print(tf_idf)
+        assert result, "Result is None"
 
 
 if __name__ == "__main__":

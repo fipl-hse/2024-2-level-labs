@@ -260,7 +260,7 @@ def rank_documents(
         or not isinstance(stopwords, list) or len(indexes) == 0):
         return None
     query_new = tokenize(query)
-    if stopwords is None:
+    if query_new is None:
         return None
     search = remove_stopwords(query_new, stopwords)
     if search is None:

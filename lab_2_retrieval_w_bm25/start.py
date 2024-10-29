@@ -31,6 +31,30 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
     result = tokenize(documents[0])
+    tokenized_doc = [tokenize(doc) for doc in documents]
+    tokenized_doc = [remove_stopwords(doc, stopwords) for doc in tokenized_doc]
+    vocabulary = build_vocabulary(tokenized_doc)
+    tf_doc = [calculate_tf(vocabulary, doc) for doc in tokenized_doc]
+    idf_score = calculate_idf(vocabulary, tokenized_doc)
+    tf_idf_doc = [calculate_tf_idf(tf, idf_score) for tf in tf_doc]
+    for document in tokenized_doc:
+
+        tf_values = calculate_tf(vocabulary, document)
+
+        tf_idf_values = calculate_tf_idf(tf_values, idf_score)
+        tf_idf_doc.append(tf_idf_values)
+
+    for tf_idf_dict in tf_idf_doc:
+        print(f'{tf_idf_dict}\n\n')
+
+    avg_doc_len = sum(len(doc) for doc in tokenized_doc) / len(tokenized_doc)
+    bm25_doc = [
+        calculate_bm25(vocabulary, doc, idf_score, avg_doc_len, len(doc))
+        for doc in tokenized_doc
+    ]
+    query = "A story about a wizard boy in a tower!"
+    ranked_bm25 = rank_documents(bm25_doc, query, stopwords)
+    print(ranked_bm25)
     assert result, "Result is None"
 
 

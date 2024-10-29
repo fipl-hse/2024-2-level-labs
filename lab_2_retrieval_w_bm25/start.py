@@ -64,8 +64,8 @@ def main() -> None:
         return
 
     avg_doc_len_list = []
-    for doc in tokenized_document:
-        avg_doc_len_list.append(len(doc))
+    for i in tokenized_document:
+        avg_doc_len_list.append(len(i))
     avg_doc_len = sum(avg_doc_len_list) / len(tokenized_document)
     # print(f'avg document length: {avg_doc_len}')
 

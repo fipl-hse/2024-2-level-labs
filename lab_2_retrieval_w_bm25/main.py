@@ -27,14 +27,12 @@ def tokenize(text: str) -> list[str] | None:
     tokenized_list = []
 
     for elem in text:
-        if elem.isalpha() == 0:
+        if not elem.isalpha():
             text.replace(elem, ' ')
 
     text.lower()
 
-    fixed_text = text.split()
-
-    for elem in fixed_text:
+    for elem in text.split():
         if elem.isalpha():
             tokenized_list.append(elem)
 
@@ -80,16 +78,12 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if not isinstance(documents, list):
         return None
 
-    for document in documents:
-        for word in document:
-            if document.count(word) > 1:
-                document.remove(word)
-
     vocabulary = []
 
     for document in documents:
         for word in document:
-            vocabulary.append(word)
+            if document.count(word) > 1:
+                vocabulary.append(word)
 
     return vocabulary
 
@@ -142,8 +136,9 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             if word in document:
                 word_number += 1.0
                 continue
-        idf = math.log((len(documents) - (word_number + 0.5)) / (word_number + 0.5))
-        idf_vocab[word] = idf
+        if (len(documents) - (word_number + 0.5)) / (word_number + 0.5) > 0:
+            idf = math.log((len(documents) - (word_number + 0.5)) / (word_number + 0.5))
+            idf_vocab[word] = idf
 
     return idf_vocab
 
@@ -166,6 +161,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     tf_idf_vocab = {}
 
     for word in tf:
+        if not isinstance(tf[word], str) or not isinstance(idf[word], str):
+            return None
         tf_idf_vocab[word] = tf[word] * idf[word]
 
     return tf_idf_vocab

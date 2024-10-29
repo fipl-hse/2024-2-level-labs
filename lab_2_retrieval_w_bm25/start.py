@@ -3,7 +3,8 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords, build_vocabulary, calculate_tf, calculate_idf, calculate_tf_idf)
+from lab_2_retrieval_w_bm25.main import (tokenize, remove_stopwords, build_vocabulary, calculate_tf, calculate_idf,
+                                         calculate_tf_idf)
 
 def main() -> None:
     """
@@ -26,13 +27,13 @@ def main() -> None:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
 
+    with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
+        stopwords = file.read().split("\n")
+
     tokenized_documents = []
 
     for document in documents:
         tokenized_documents.append(tokenize(document))
-
-    with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
-        stopwords = file.read().split("\n")
 
     clear_tokenized_documents = []
 
@@ -40,13 +41,13 @@ def main() -> None:
         clear_document = remove_stopwords(tokenized_document, stopwords)
         clear_tokenized_documents.append(clear_document)
 
-    print(build_vocabulary(clear_tokenized_documents))
+    for clear_document in clear_tokenized_documents:
+        if not isinstance(clear_document, list):
+            return None
+        print(calculate_idf(build_vocabulary(clear_tokenized_documents), clear_document))
+        print(calculate_tf_idf(calculate_tf(build_vocabulary(clear_tokenized_documents), clear_document),
+              calculate_idf(build_vocabulary(clear_tokenized_documents), clear_document)))
 
-    for document in clear_tokenized_documents:
-        print(calculate_tf(build_vocabulary(clear_tokenized_documents), document))
-
-    print(calculate_idf(build_vocabulary(clear_tokenized_documents), clear_tokenized_documents))
-    print(calculate_tf_idf(calculate_tf(build_vocabulary(clear_tokenized_documents), document)), calculate_idf(build_vocabulary(clear_tokenized_documents), clear_tokenized_documents))
     result = None
     assert result, "Result is None"
 

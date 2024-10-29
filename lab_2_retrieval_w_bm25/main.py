@@ -31,8 +31,9 @@ def tokenize(text: str) -> list[str] | None:
     for_tokens = new_text.split(' ')
     tokens = []
     for token in for_tokens:
-        if token.isalpha() is True:
-            tokens.append(token)
+        if token == '':
+            continue
+        tokens.append(token)
     return tokens
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -346,7 +347,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         return None
     if '.' not in file_path:
         return None
-    with open(file_path, "w", encoding = 'utf-8') as out_file:
+    with open(file_path, 'w', encoding = 'utf-8') as out_file:
         json.dump(index, out_file)
     return None
 

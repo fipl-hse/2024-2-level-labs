@@ -76,13 +76,14 @@ def main() -> None:
     for document in tokenized_document:
         doc_len = len(document)
         bm25 = calculate_bm25(vocabulary, document, idf, 1.5, 0.75, avg_doc_len, doc_len)
-        list_of_bm25.append(bm25)
+        if isinstance(bm25, dict):
+            list_of_bm25.append(bm25)
 
         bm25_with_cutoff = calculate_bm25_with_cutoff(vocabulary, document, idf,
                                                       0.2, 1.5, 0.75, avg_doc_len, doc_len)
-        if bm25_with_cutoff is None or bm25 is None:
-            return
-        list_of_bm25_with_cutoff.append(bm25_with_cutoff)
+        if isinstance(bm25_with_cutoff, dict):
+            list_of_bm25_with_cutoff.append(bm25_with_cutoff)
+
     # print(f'bm25 result: {list_of_bm25}')
     # print(f'bm25 with cutoff result: {list_of_bm25_with_cutoff}')
 

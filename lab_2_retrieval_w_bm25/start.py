@@ -37,6 +37,8 @@ def main() -> None:
     tokenized_document = []
     for doc in documents:
         tokenized_doc = tokenize(doc)
+        if tokenized_doc is None:
+            return
         tokens_without_stopwords = remove_stopwords(tokenized_doc, stopwords)
         tokenized_document.append(tokens_without_stopwords)
     #print(f'tokenized document: {tokenized_document}')

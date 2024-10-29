@@ -40,7 +40,8 @@ def main() -> None:
         if tokenized_doc is None:
             continue
         tokens_without_stopwords = remove_stopwords(tokenized_doc, stopwords)
-
+        if tokens_without_stopwords is None:
+            return
         tokenized_document.append(tokens_without_stopwords)
     #print(f'tokenized document: {tokenized_document}')
     if tokenized_document is None:

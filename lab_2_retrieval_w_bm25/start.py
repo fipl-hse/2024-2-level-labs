@@ -2,8 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from main import (remove_stopwords, tokenize, rank_documents, calculate_bm25,
-    build_vocabulary, calculate_idf)
+from main import (build_vocabulary, calculate_bm25, calculate_idf, rank_documents, remove_stopwords,
+                  tokenize)
+
 
 def main() -> None:
     """

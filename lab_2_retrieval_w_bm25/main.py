@@ -201,19 +201,19 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
 
-    if not (vocab or document or idf_document):
+    if not vocab or not document or not idf_document:
         return None
-    if not (isinstance(vocab, list) or isinstance(document, list) or
-            isinstance(idf_document, dict)):
+    if (not isinstance(vocab, list) or not isinstance(document, list) or
+            not isinstance(idf_document, dict)):
         return None
-    if not ((all(isinstance(value, str) for value in vocab)) or
-            all(isinstance(value, str) for value in document)
-            or (all(isinstance(key, str) and isinstance(value, float) for
-                    key, value in idf_document.items()))):
+    if ((not all(isinstance(value, str) for value in vocab)) or
+            (not all(isinstance(value, str) for value in document))
+            or (not all(isinstance(key, str) and isinstance(value, float) for
+                        key, value in idf_document.items()))):
         return None
-    if not (isinstance(k1, float) or isinstance(b, float)
-            or isinstance(avg_doc_len, float) or
-                isinstance(doc_len, int) or isinstance(doc_len, bool)):
+    if ((not isinstance(k1, float)) or (not isinstance(b, float))
+            or ((not isinstance(avg_doc_len, float)) or
+                (not isinstance(doc_len, int)) or (isinstance(doc_len, bool)))):
         return None
     if avg_doc_len is None or avg_doc_len <= 0:
         return None
@@ -248,14 +248,14 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
 
-    if not (isinstance(indexes, list) or
-            (all(isinstance(el, dict) and
-                 all(isinstance(key, str)
-                     and isinstance(value, float)
-                     for key, value in el.items()) for el in indexes))):
+    if (not isinstance(indexes, list) or
+            not all(isinstance(el, dict) and
+                    all(isinstance(key, str)
+                        and isinstance(value, float)
+                        for key, value in el.items()) for el in indexes)):
         return None
-    if not (isinstance(stopwords, list) or all(isinstance(el, str) for el in stopwords)
-            or isinstance(query, str)):
+    if (not isinstance(stopwords, list) or not all(isinstance(el, str) for el in stopwords)
+            or not isinstance(query, str)):
         return None
     if not (indexes or query):
         return None

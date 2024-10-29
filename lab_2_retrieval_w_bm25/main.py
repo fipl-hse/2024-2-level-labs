@@ -113,9 +113,9 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     for elem in vocab:
         if not isinstance(elem, str):
             return None
-        if not elem in tf.keys():
+        if not elem in tf:
             tf[elem] = 0.0
-    for key_elem in tf.keys():
+    for key_elem in tf:
         tf[key_elem] = float(document_tokens.count(key_elem) / len(document_tokens))
     return tf
 
@@ -213,8 +213,8 @@ def calculate_bm25(
     """
     if (not isinstance(vocab, list) or not isinstance(document, list)
             or not isinstance(idf_document, dict) or not isinstance(avg_doc_len, float)
-            or not isinstance(doc_len, int) or isinstance(doc_len, bool) or doc_len
-            is None or avg_doc_len is None or not isinstance(k1, float)
+            or not isinstance(doc_len, int) or isinstance(doc_len, bool)
+            or not isinstance(k1, float)
             or not isinstance(b, float) or len(vocab) == 0 or len(document) == 0
             or len(idf_document.keys()) == 0):
         return None
@@ -232,7 +232,7 @@ def calculate_bm25(
     for word in document:
         if not isinstance(word, str):
             return None
-        if not word in bm25_dic.keys():
+        if not word in bm25_dic:
             bm_25 = 0.0
             bm25_dic[word] = bm_25
     return bm25_dic

@@ -66,12 +66,16 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents):
+    if not documents:
         return None
-
+    if not isinstance(documents, list):
+        return None
+    if not all(isinstance(item, list) and all(isinstance(elem, str)
+                                              for elem in item) for item in documents):
+        return None
     voc_of_un_words = set()
-    for doc in documents:
-        voc_of_un_words.update(doc)
+    for word in documents:
+        voc_of_un_words.update(word)
     return list(voc_of_un_words)
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -87,6 +91,14 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(vocab, list) or not isinstance(document_tokens, list)
+            or not vocab or not document_tokens):
+        return None
+    if (not all(isinstance(word, str) for word in vocab)
+            or not all(isinstance(token, str) for token in document_tokens)):
+        return None
+    calculated_tf = {}
+
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:

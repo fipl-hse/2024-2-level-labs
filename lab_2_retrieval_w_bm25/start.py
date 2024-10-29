@@ -37,10 +37,10 @@ def main() -> None:
     for text in documents:
         tokens = tokenize(text)
         if not isinstance(tokens, list):
-            return None
+            break
         new_tokens = remove_stopwords(tokens, stopwords)
         if not isinstance(new_tokens,list):
-            return None
+            break
         doc_tokens.append(new_tokens)
 
     #подсчёт tf_idf
@@ -54,10 +54,10 @@ def main() -> None:
     for lst in doc_tokens:
         tf = calculate_tf(vocab, lst)
         if not isinstance(tf, dict):
-            return None
+            break
         dict_tf_idf = calculate_tf_idf(tf, idf)
         if not isinstance(dict_tf_idf, dict):
-            return None
+            break
         tf_idf.append(dict_tf_idf)
 
     #получение списка словарей bm25

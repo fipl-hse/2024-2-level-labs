@@ -35,12 +35,15 @@ def main() -> None:
         text_new = tokenize(text)
         if text_new is None:
             return
-        if remove_stopwords(text_new, stopwords) is None:
+        tokens_cleared = remove_stopwords(text_new, stopwords)
+        if tokens_cleared is None:
             return
-        text_sort.append(remove_stopwords(text_new, stopwords))
+        text_sort.append(tokens_cleared)
         docs_len += len(text_new)
     avg_docs_len = docs_len / len(documents)
     voc = build_vocabulary(text_sort)
+    if voc is None:
+        return
     for new_text in text_sort:
         idf = calculate_idf(voc, text_sort)
         bm25_lis.append(calculate_bm25(voc, new_text, idf, 1.5, 0.75,

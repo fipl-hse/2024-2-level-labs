@@ -55,13 +55,14 @@ def main() -> None:
     idf = calculate_idf(vocabulary, tokenized_document)
     for document in tokenized_document:
         tf = calculate_tf(vocabulary, document)
+        if idf is None or tf is None:
+            return
         tf_idf = calculate_tf_idf(tf, idf)
-        if tf_idf is None or tf is None:
+        if tf_idf is None:
             return
         list_of_tf_idf.append(tf_idf)
     #print(f'tf idf result: {list_of_tf_idf}')
-    if idf is None:
-        return
+
 
     avg_doc_len_list = []
     for i in tokenized_document:

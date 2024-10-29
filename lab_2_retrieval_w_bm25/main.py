@@ -55,9 +55,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     words_without_sw = [token for token in tokens if token not in stopwords]
 
-    if not words_without_sw:
-        return None
-    return words_without_sw
+    return words_without_sw or None
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
@@ -84,9 +82,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
             if word not in unique_words:
                 unique_words.append(word)
 
-    if not unique_words:
-        return None
-    return unique_words
+    return unique_words or None
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """
@@ -114,9 +110,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     for token in words:
         result[token] = document_tokens.count(token) / len(document_tokens)
 
-    if not result:
-        return None
-    return result
+    return result or None
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -183,9 +177,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
         if word in idf:
             tf_idf[word] = tf[word] * idf[word]
 
-    if not tf_idf:
-        return None
-    return tf_idf
+    return tf_idf or None
 
 def calculate_bm25(
     vocab: list[str],
@@ -213,14 +205,20 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not vocab or not document or not idf_document:
+    if not vocab or not isinstance(vocab, list) or \
+            not all(isinstance(token, str) for token in vocab):
         return None
-    if not all(isinstance(word, str) for word in vocab) \
-            or not all(isinstance(word, str) for word in document) \
-            or not all(isinstance(key, str) and isinstance(value, float) for key, value in idf_document.items()):
+    if not document or not isinstance(document, list) or \
+            not all(isinstance(token, str) for token in document):
         return None
-    if not isinstance(k1, float) or not isinstance(b, float) \
-            or not isinstance(avg_doc_len, float) or not isinstance(doc_len, int):
+    if not idf_document or not isinstance(idf_document, dict) or \
+            not all(isinstance(token, str) and \
+                isinstance(freq, float) for token, freq in idf_document.items()):
+        return None
+    if not isinstance(k1, float) or not 1.2 <= k1 <= 2 or not isinstance(b, float) or not 0 < b < 1:
+        return None
+    if not isinstance(avg_doc_len, float) or avg_doc_len is None \
+            or not isinstance(doc_len, int) or doc_len is None or isinstance(doc_len, bool):
         return None
 
     bm25 = {}
@@ -233,9 +231,7 @@ def calculate_bm25(
             bm25[token] = ((idf_document[token] * document.count(token) * (k1 + 1))
                            / (document.count(token) + k1 * (1 - b + b * doc_len / avg_doc_len)))
 
-    if not bm25:
-        return None
-    return bm25
+    return bm25 or None
 
 
 def rank_documents(

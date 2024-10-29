@@ -325,8 +325,6 @@ def rank_documents(
                 (ranged_documents[j], ranged_documents[j + 1]) = (ranged_documents[j + 1],
                                                                   ranged_documents[j])
 
-    if not ranged_documents:
-        return None
     return ranged_documents
 
 

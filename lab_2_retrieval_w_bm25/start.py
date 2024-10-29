@@ -40,11 +40,12 @@ def main() -> None:
         if tokenized_doc is None:
             return
         tokens_without_stopwords = remove_stopwords(tokenized_doc, stopwords)
-        tokenized_document.append(tokens_without_stopwords)
-        if tokenized_document is None:
+        if tokens_without_stopwords is None:
             return
+        tokenized_document.append(tokens_without_stopwords)
     #print(f'tokenized document: {tokenized_document}')
-
+    if tokenized_document is None:
+        return
     vocabulary = build_vocabulary(tokenized_document)
     if vocabulary is None:
         return
@@ -55,10 +56,12 @@ def main() -> None:
     for document in tokenized_document:
         tf = calculate_tf(vocabulary, document)
         tf_idf = calculate_tf_idf(tf, idf)
-        if tf_idf is None:
+        if tf_idf is None or tf is None:
             return
         list_of_tf_idf.append(tf_idf)
     #print(f'tf idf result: {list_of_tf_idf}')
+    if idf is None:
+        return
 
     avg_doc_len_list = []
     for doc in tokenized_document:

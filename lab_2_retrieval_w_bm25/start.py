@@ -33,9 +33,12 @@ def main() -> None:
     docs_len = 0
     for text in documents:
         text_new = tokenize(text)
-        if remove_stopwords(text_new, stopwords) is not None and text_new is not None:
-            text_sort.append(remove_stopwords(text_new, stopwords))
-            docs_len += len(text_new)
+        if text_new is None:
+            return
+        if remove_stopwords(text_new, stopwords):
+            return
+        text_sort.append(remove_stopwords(text_new, stopwords))
+        docs_len += len(text_new)
     avg_docs_len = docs_len / len(documents)
     voc = build_vocabulary(text_sort)
     for text in documents:

@@ -53,6 +53,8 @@ def main() -> None:
 
     list_of_tf_idf = []
     idf = calculate_idf(vocabulary, tokenized_document)
+    if idf is None:
+        return
     for document in tokenized_document:
         tf = calculate_tf(vocabulary, document)
         if idf is None or tf is None:

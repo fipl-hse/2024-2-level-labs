@@ -5,6 +5,7 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 import string
+from typing import Set
 
 
 # with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
@@ -82,18 +83,15 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if not isinstance(documents, list):
         return None
 
-    uniq = []
+    uniq = set()
     for document in documents:
-        if not isinstance(document, list):
+        if not isinstance(document, str):
             return None
         for token in document:
             if not isinstance(token, str):
                 return None
-            if token not in uniq:
-                uniq.append(token)
-            if token in uniq:
-                uniq.remove(token)
-            return uniq
+            uniq = uniq | set(token)
+            return list(uniq)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

@@ -20,22 +20,10 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    token_list = []
-    for word in text.lower().split():
-        norm_word = []
-        for letter in word:
-            if not letter.isalpha():
-                continue
-            norm_word.append(letter)
-        if norm_word:
-            token_list.append(''.join(norm_word))
-    return token_list
-
-
-
-
-
-
+    for letter in text:
+        if not letter.isalpha():
+            text = text.replace(letter,' ')
+    return text.lower().split()
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
@@ -74,12 +62,10 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if not isinstance(documents,list) or not\
             all(isinstance(document,list) for document in documents):
         return None
-    vocabulary = []
-    for document in documents:
-        if not all(isinstance(token,str) for token in document):
-            return None
-        vocabulary += (word for word in document if word not in vocabulary)
-    return vocabulary
+    vocabulary = {word for document in documents for word in document
+                  if isinstance(word,str)}
+    if vocabulary:
+        return list(vocabulary)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -200,7 +186,7 @@ def calculate_bm25(
         return None
 
     bm25 = {}
-    for word in set(idf_document) | set(document):
+    for word in set(vocab):
         if word not in idf_document:
             bm25[word] = 0.0
         else:

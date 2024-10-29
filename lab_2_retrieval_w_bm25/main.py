@@ -260,6 +260,8 @@ def rank_documents(
         or not isinstance(stopwords, list) or len(indexes) == 0):
         return None
     query_new = tokenize(query)
+    if stopwords is None:
+        return None
     search = remove_stopwords(query_new, stopwords)
     if search is None:
         return None
@@ -270,7 +272,7 @@ def rank_documents(
         for key, value in doc.items():
             if not isinstance(key, str) or not isinstance(value, float):
                 return None
-        rating = 0
+        rating = 0.0
         for token in search:
             token_metric = doc.get(token, 0.0)
             rating += token_metric

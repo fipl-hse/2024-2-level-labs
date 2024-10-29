@@ -41,9 +41,13 @@ def main() -> None:
             return
         tokens_without_stopwords = remove_stopwords(tokenized_doc, stopwords)
         tokenized_document.append(tokens_without_stopwords)
+        if tokenized_document is None:
+            return
     #print(f'tokenized document: {tokenized_document}')
 
     vocabulary = build_vocabulary(tokenized_document)
+    if vocabulary is None:
+        return
     #print(f'vocabulary with unique words: {vocabulary}')
 
     list_of_tf_idf = []

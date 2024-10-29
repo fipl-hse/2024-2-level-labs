@@ -57,14 +57,13 @@ def main() -> None:
         return
     for document in tokenized_document:
         tf = calculate_tf(vocabulary, document)
-        if idf is None or tf is None:
+        if tf is None:
             return
         tf_idf = calculate_tf_idf(tf, idf)
         if tf_idf is None:
             return
         list_of_tf_idf.append(tf_idf)
     #print(f'tf idf result: {list_of_tf_idf}')
-
 
     avg_doc_len_list = []
     for i in tokenized_document:
@@ -77,13 +76,11 @@ def main() -> None:
     for document in tokenized_document:
         doc_len = len(document)
         bm25 = calculate_bm25(vocabulary, document, idf, 1.5, 0.75, avg_doc_len, doc_len)
-        if bm25 is None:
-            return
         list_of_bm25.append(bm25)
 
         bm25_with_cutoff = calculate_bm25_with_cutoff(vocabulary, document, idf,
                                                       0.2, 1.5, 0.75, avg_doc_len, doc_len)
-        if bm25_with_cutoff is None:
+        if bm25_with_cutoff is None or bm25 is None:
             return
         list_of_bm25_with_cutoff.append(bm25_with_cutoff)
     # print(f'bm25 result: {list_of_bm25}')

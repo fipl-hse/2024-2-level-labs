@@ -377,7 +377,7 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     Calculate Superman's rank correlation coefficient between two rankings.
 
     Args:
-        rank (list[int]): Ranked list of document indices.
+        rank (list[int]): Ranked list ogit  document indices.
         golden_rank (list[int]): Golden ranked list of document indices.
 
     Returns:

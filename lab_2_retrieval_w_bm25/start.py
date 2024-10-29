@@ -3,9 +3,10 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
-                                         calculate_bm25_with_cutoff, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, load_index, rank_documents,
-                                         remove_stopwords, save_index, tokenize)
+                                         calculate_bm25_with_cutoff, calculate_idf,
+                                         calculate_spearman, calculate_tf, calculate_tf_idf,
+                                         load_index, rank_documents, remove_stopwords, save_index,
+                                         tokenize)
 
 
 def main() -> None:
@@ -84,8 +85,10 @@ def main() -> None:
     print(f'Demo 2: Calculating TF-IDF\n{tf_idf_collection}')
     print(f'Demo 3: Calculating BM25\n{bm25_collection}')
     query = 'Which fairy tale has Fairy Queen?'
-    print(f'Demo 4: Ranking By Query TF-IDF\n{rank_documents(tf_idf_collection, query, stopwords)}')
-    print(f'Demo 5: Ranking By Query BM25\n{rank_documents(bm25_collection, query, stopwords)}')
+    tf_idf_ranked = rank_documents(tf_idf_collection, query, stopwords)
+    print(f'Demo 4: Ranking By Query TF-IDF\n{tf_idf_ranked}')
+    bm25_ranked = rank_documents(bm25_collection, query, stopwords)
+    print(f'Demo 5: Ranking By Query BM25\n{bm25_ranked}')
 
     file_path = 'assets/metrics.json'
     print('Demo 6: Saving Metrics In A JSON File')
@@ -96,9 +99,19 @@ def main() -> None:
     indexes = load_index(file_path)
     if not isinstance(indexes, list):
         return
-    print(rank_documents(indexes, 'Which fairy tale has Fairy Queen?', stopwords))
+    bm25_with_cutoff_ranked = rank_documents(indexes, query, stopwords)
+    print(bm25_with_cutoff_ranked)
 
-    result = 1
+    tf_idf_ranks = [tup[0] for tup in tf_idf_ranked]
+    bm25_with_cutoff_ranks = [tup[0] for tup in bm25_with_cutoff_ranked]
+    bm25_ranks = [tup[0] for tup in bm25_ranked]
+    print('Demo 8: Spearman\'s Rank Correlation Between TF_IDF And BM25')
+    spearman_tf_idf = calculate_spearman(tf_idf_ranks, bm25_with_cutoff_ranks)
+    print(spearman_tf_idf)
+    print('Demo 8: Spearman\'s Rank Correlation Between BM25 And BM25 With Cutoff')
+    spearman_bm25 = calculate_spearman(bm25_ranks, bm25_with_cutoff_ranks)
+    print(spearman_bm25)
+    result = spearman_tf_idf, spearman_bm25
     assert result, "Result is None"
 
 

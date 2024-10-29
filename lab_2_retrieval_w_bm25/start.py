@@ -33,27 +33,28 @@ def main() -> None:
     docs_tokens = []
     cleared_docs = []
     for document in documents:
-        docs_tokens.append(tokenize(document))
-        cleared_docs.append(remove_stopwords(tokenize(document), stopwords))
+        tokens = tokenize(document)
+        docs_tokens.append(tokens)
+        cleared_docs.append(remove_stopwords(tokens, stopwords))
 
     vocab = build_vocabulary(docs_tokens)
-    if vocab is not None:
+    if vocab:
         idf = calculate_idf(vocab, docs_tokens)
     else:
         idf = {}
 
     tf_idf_list = []
 
-    if idf is not None:
+    if idf:
         for tokenized_doc in docs_tokens:
-            if isinstance(tokenized_doc, list) and vocab is not None:
+            if tokenized_doc:
                 tf = calculate_tf(vocab, tokenized_doc)
-
-                if tf is not None:
+                if tf:
                     tf_idf = calculate_tf_idf(tf, idf)
-                    if tf_idf is not None:
+                    if tf_idf:
                         tf_idf_list.append(tf_idf)
                         print(tf_idf)
+
 
 
 if __name__ == "__main__":

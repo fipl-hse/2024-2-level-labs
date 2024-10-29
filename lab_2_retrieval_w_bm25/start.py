@@ -57,8 +57,8 @@ def main() -> None:
         return
     for document in tokenized_document:
         tf = calculate_tf(vocabulary, document)
-        if tf is None:
-            return
+        if tf:
+            continue
         tf_idf = calculate_tf_idf(tf, idf)
         if tf_idf is None:
             return

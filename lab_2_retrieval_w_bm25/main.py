@@ -148,7 +148,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         idf = math.log((len(documents) - contains_word + 0.5) / (contains_word + 0.5))
         idf_values[token] = idf
 
-        return idf_values
+    return idf_values
 
 
 
@@ -209,13 +209,13 @@ def calculate_bm25(
     """
     if not vocab or not document or not idf_document or not avg_doc_len or not doc_len:
         return None
-    if not isinstance(vocab, list) or not all(isinstance(term, str) for term in vocab) or not isinstance(
-            document, list) or not all(isinstance(token, str) for token in document) or len(
-        vocab) == 0 or len(document) == 0:
+    if not isinstance(vocab, list) or not all(isinstance(term, str) for term in vocab) or not isinstance(document, list) or not all(isinstance(token, str) for token in document):
         return None
-
+    if  len(vocab) == 0 or len(document) == 0:
+        return None
     if not isinstance(idf_document, dict) or len(idf_document) == 0 or any(
-            not isinstance(term, str) or not isinstance(score, float) for term, score in idf_document.items()):
+            not isinstance(term, str) or not isinstance(
+                score, float) for term, score in idf_document.items()):
         return None
     if not isinstance(k1, float) or not isinstance(b, float) or not isinstance(
             avg_doc_len, float) or not isinstance(doc_len, int) or isinstance(doc_len, bool):
@@ -255,7 +255,8 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not indexes or not isinstance(indexes, list) or not all(isinstance(index, dict) for index in indexes):
+    if not indexes or not isinstance(indexes, list) or not all(
+            isinstance(index, dict) for index in indexes):
         return None
     if not isinstance(query, str) or not isinstance(
             stopwords, list) or not all(isinstance(token, str) for token in stopwords):

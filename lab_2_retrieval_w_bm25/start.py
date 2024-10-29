@@ -35,7 +35,7 @@ def main() -> None:
         text_new = tokenize(text)
         if text_new is None:
             return
-        if remove_stopwords(text_new, stopwords):
+        if remove_stopwords(text_new, stopwords) is None:
             return
         text_sort.append(remove_stopwords(text_new, stopwords))
         docs_len += len(text_new)

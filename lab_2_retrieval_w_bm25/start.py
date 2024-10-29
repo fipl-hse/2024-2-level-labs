@@ -46,8 +46,13 @@ def main() -> None:
         return
     for new_text in text_sort:
         idf = calculate_idf(voc, text_sort)
-        bm25_lis.append(calculate_bm25(voc, new_text, idf, 1.5, 0.75,
-                                       avg_docs_len, len(new_text)))
+        if idf is None:
+            return
+        bm = calculate_bm25(voc, new_text, idf, 1.5, 0.75,
+                      avg_docs_len, len(new_text))
+        if bm is None:
+            return
+        bm25_lis.append(bm)
     query = 'Which fairy tale has Fairy Queen?'
     if bm25_lis is None:
         return

@@ -2,6 +2,8 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
+from main import (build_vocabulary, calculate_idf, calculate_tf, calculate_tf_idf, remove_stopwords,
+                  tokenize)
 
 
 def main() -> None:
@@ -26,7 +28,19 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = None
+    tfs = []
+    for doc in range(len(documents)):
+        documents[doc] = remove_stopwords(tokens=tokenize(documents[doc]), stopwords=stopwords)
+    vocab = build_vocabulary(documents=documents)
+    for doc in documents:
+        tfs.append(calculate_tf(vocab=vocab, document_tokens=doc))
+    idf = calculate_idf(vocab=vocab, documents=documents)
+    tfs_idf = []
+    for tf in tfs:
+        tfs_idf.append(calculate_tf_idf(tf=tf, idf=idf))
+    result = tfs_idf
+    if isinstance(result, list):
+        print(result)
     assert result, "Result is None"
 
 

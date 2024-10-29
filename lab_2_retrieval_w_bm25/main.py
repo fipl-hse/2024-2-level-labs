@@ -4,6 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
+import math
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -128,6 +129,29 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(vocab, list) and isinstance(documents, list)):
+        return None
+    if not vocab or not documents:
+        return None
+    for doc in documents:
+        if not isinstance(doc, list):
+            return None
+        for word in doc:
+            if not isinstance(word, str):
+                return None
+    idf = {}
+    for word in vocab:
+        if not isinstance(word, str):
+            return None
+        documents_contains_word = 0
+        for doc in documents:
+            if word in doc:
+                documents_contains_word += 1
+        idf[f"{word}"] = float(math.log((len(documents) - documents_contains_word + 0.5)
+                                        / (documents_contains_word + 0.5)))
+    if not idf:
+        return None
+    return idf
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -143,6 +167,20 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not (isinstance(tf, dict) and isinstance(idf, dict)):
+        return None
+    for key, value in tf.items():
+        if not (isinstance(key, str) and isinstance(value, float)):
+            return None
+    tf_idf = {}
+    for key, value in idf.items():
+        if not (isinstance(key, str) and isinstance(value, float)):
+            return None
+        if key in tf:
+            tf_idf[f"{key}"] = tf[f"{key}"] * idf[f"{key}"]
+    if not tf_idf:
+        return None
+    return tf_idf
 
 
 def calculate_bm25(

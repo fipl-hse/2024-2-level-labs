@@ -1,4 +1,5 @@
-import re, math
+import math
+import re
 
 """
 Lab 2.
@@ -205,6 +206,38 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not vocab or not document or not idf_document or not avg_doc_len or not doc_len:
+        return None
+    if not isinstance(vocab, list) or not all(isinstance(term, str) for term in vocab):
+        return None
+    if not isinstance(document, list) or not all(isinstance(token, str) for token in document):
+        return None
+    if len(vocab) == 0 or len(document) == 0:
+        return None
+    if not isinstance(idf_document, dict) or len(idf_document) == 0 or any(
+            not isinstance(term, str) or not isinstance(score, float) for term, score in idf_document.items()):
+        return None
+    if not isinstance(k1, float) or not isinstance(b, float) or not isinstance(
+            avg_doc_len, float) or not isinstance(doc_len, int) or isinstance(doc_len, bool):
+        return None
+
+    tokens = list(set(vocab) | set(document))
+    bm25_scores = {}
+    for token in tokens:
+        token_number = 0
+
+        if token in document:
+            token_number += document.count(token)
+        if token in idf_document.keys():
+            score = idf_document[token] * token_number * (k1 + 1) / (
+                    token_number + k1 * (1 - b + b * (doc_len / avg_doc_len)))
+            bm25_scores[token] = score
+        else:
+            bm25_scores[token] = 0.0
+
+    return bm25_scores
+
+
 
 def rank_documents(
     indexes: list[dict[str, float]], query: str, stopwords: list[str]
@@ -222,6 +255,21 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not indexes or not isinstance(indexes, list) or not all(isinstance(index, dict) for index in indexes):
+        return None
+    if not isinstance(query, str) or not isinstance(stopwords, list) or not all(isinstance(token, str) for token in stopwords):
+        return None
+    if tokenize(query) is None:
+        return None
+    query_tokens = remove_stopwords(tokenize(query), stopwords)
+    if query_tokens is None:
+        return None
+
+    doc_scores = []
+    for doc_idx, doc in enumerate(indexes):
+        score = sum(doc.get(token, 0) for token in query_tokens)
+        doc_scores.append((doc_idx, score))
+    return sorted(doc_scores, key=lambda x: x[1], reverse=True)
 
 
 def calculate_bm25_with_cutoff(

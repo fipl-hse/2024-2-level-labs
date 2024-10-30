@@ -23,9 +23,7 @@ def tokenize(text: str) -> list[str] | None:
 
     text = text.lower()
 
-    only_not_letters = 0
-
-    for i, symb in enumerate(text):
+    for symb in text:
         if not symb.isalpha() and symb != ' ':
             text = text.replace(symb, ' ')
     text = text.replace('   ', ' ')
@@ -71,7 +69,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         if not isinstance(token, str):
             clean_tokens = None
             break
-        elif token in stopwords:
+        if token in stopwords:
             continue
         clean_tokens.append(token)
     if not clean_tokens:
@@ -143,13 +141,14 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     for token in document_tokens:
         if not isinstance(token, str):
             return None
-        if token not in frequency.keys():
+        if token not in frequency:
             frequency[token] = document_tokens.count(token) / len(document_tokens)
     if frequency:
         return frequency
     return None
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
+    from math import log
     """
     Calculate inverse document frequency for each term in the vocabulary.
 
@@ -162,8 +161,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    from math import log
-
     if any((not isinstance(vocab, list), not isinstance(documents, list))):
         return None
 
@@ -176,7 +173,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     len_doc = len(documents)
     if len_doc == 0:
         return None
-    map_IDF_scores = {}
+    map_idf_scores = {}
 
     for voc in vocab:
         if not isinstance(voc, str):
@@ -187,10 +184,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             if voc in doc:
                 amount += 1
 
-        IDF = log((len_doc - amount + 0.5) / (amount + 0.5))
-        map_IDF_scores[voc] = IDF
-    if map_IDF_scores:
-        return map_IDF_scores
+        idf = log((len_doc - amount + 0.5) / (amount + 0.5))
+        map_idf_scores[voc] = idf
+    if map_idf_scores:
+        return map_idf_scores
     return None
 
 
@@ -267,9 +264,6 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
 
-    # step zero: pre-check
-    from math import log
-
     if any((not isinstance(vocab, list), not isinstance(document, list))):
         return None
 
@@ -277,7 +271,7 @@ def calculate_bm25(
             not isinstance(b, float))):
         return None
 
-    if any((not isinstance(avg_doc_len, float), type(doc_len) != int)):
+    if any((not isinstance(avg_doc_len, float), not isinstance(doc_len, int), not isinstance(doc_len, bool))):
         return None
 
     if any((vocab == [], idf_document == {}, document == [])):
@@ -301,16 +295,7 @@ def calculate_bm25(
         if pair.split() != [pair]:
             return None
 
-    # division by zero
-    # if avg_doc_len == 0:
-    #    return None
-
-    # step 1
-
     bm5_doc = {}
-    freq_doc = {}
-
-    # step 2: formula
 
     for voc in vocab:
         freq = document.count(voc)
@@ -346,14 +331,6 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-
-    print('indexes')
-    print(indexes)
-    print('query', query)
-    print('stopwords', stopwords)
-
-    # step zero: pre-check
-
     if any((not isinstance(indexes, list), not isinstance(query, str),
             not isinstance(stopwords, list))):
         return None
@@ -379,8 +356,6 @@ def rank_documents(
         if qu not in uniq_query:
             uniq_query.append(qu)
 
-    unsorted_ranking_amount = []
-    unsorted_ranking_docs = []
     unsorted_ranking_map = {}
 
     for i, doc in enumerate(indexes):
@@ -390,9 +365,7 @@ def rank_documents(
                 ranking_word += doc[word]
         unsorted_ranking_map[i] = ranking_word
 
-    sorted_dict = {k: v for k, v in sorted(unsorted_ranking_map.items(),
-                                           key=lambda item: item[1], reverse=True)}
-
+    sorted_dict = dict(sorted(unsorted_ranking_map.items(), key=lambda item: item[1], reverse=True))
     sorted_ranking_map = []
 
     for sort_doc in sorted_dict:

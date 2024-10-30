@@ -56,9 +56,9 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         return None
 
     document_tokens = [word for word in tokens if word not in stopwords]
-    if not document_tokens:
-        return None
-    return document_tokens
+    if document_tokens:
+        return document_tokens
+    return None
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -191,9 +191,9 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
         tf_idf_result = tf[tf_word] * idf[tf_word]
         tf_idf_dict[tf_word] = tf_idf_result
 
-    if not tf_idf_dict:
-        return None
-    return tf_idf_dict
+    if tf_idf_dict:
+        return tf_idf_dict
+    return None
 
 
 def calculate_bm25(
@@ -258,9 +258,9 @@ def calculate_bm25(
                                                * (1 - b + b * (doc_len / avg_doc_len)))))
         bm25_dict[word_from_idf] = bm25_figure
 
-    if not bm25_dict:
-        return None
-    return bm25_dict
+    if bm25_dict:
+        return bm25_dict
+    return None
 
 
 def rank_documents(
@@ -309,9 +309,9 @@ def rank_documents(
     l_of_tuples_dict_plus_its_relevance = sorted(l_of_tuples_dict_plus_its_relevance,
                                                  key=lambda x: x[1], reverse=True)
 
-    if not l_of_tuples_dict_plus_its_relevance:
-        return None
-    return l_of_tuples_dict_plus_its_relevance
+    if l_of_tuples_dict_plus_its_relevance:
+        return l_of_tuples_dict_plus_its_relevance
+    return None
 
 
 def calculate_bm25_with_cutoff(

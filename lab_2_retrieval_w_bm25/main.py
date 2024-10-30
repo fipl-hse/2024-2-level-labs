@@ -260,40 +260,40 @@ def rank_documents(
 #     """
 
 
-def save_index(index: list[dict[str, float]], file_path: str) -> None:
-    """
-    Save the index to a file.
-
-    Args:
-        index (list[dict[str, float]]): The index to save.
-        file_path (str): The path to the file where the index will be saved.
-    """
-
-
-def load_index(file_path: str) -> list[dict[str, float]] | None:
-    """
-    Load the index from a file.
-
-    Args:
-        file_path (str): The path to the file from which to load the index.
-
-    Returns:
-        list[dict[str, float]] | None: The loaded index.
-
-    In case of corrupt input arguments, None is returned.
-    """
-
-
-def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
-    """
-    Calculate Spearman's rank correlation coefficient between two rankings.
-
-    Args:
-        rank (list[int]): Ranked list of document indices.
-        golden_rank (list[int]): Golden ranked list of document indices.
-
-    Returns:
-        float | None: Spearman's rank correlation coefficient.
-
-    In case of corrupt input arguments, None is returned.
-    """
+# def save_index(index: list[dict[str, float]], file_path: str) -> None:
+#     """
+#     Save the index to a file.
+#
+#     Args:
+#         index (list[dict[str, float]]): The index to save.
+#         file_path (str): The path to the file where the index will be saved.
+#     """
+#
+#
+# def load_index(file_path: str) -> list[dict[str, float]] | None:
+#     """
+#     Load the index from a file.
+#
+#     Args:
+#         file_path (str): The path to the file from which to load the index.
+#
+#     Returns:
+#         list[dict[str, float]] | None: The loaded index.
+#
+#     In case of corrupt input arguments, None is returned.
+#     """
+#
+#
+# def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
+#     """
+#     Calculate Spearman's rank correlation coefficient between two rankings.
+#
+#     Args:
+#         rank (list[int]): Ranked list of document indices.
+#         golden_rank (list[int]): Golden ranked list of document indices.
+#
+#     Returns:
+#         float | None: Spearman's rank correlation coefficient.
+#
+#     In case of corrupt input arguments, None is returned.
+#     """

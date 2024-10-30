@@ -272,11 +272,9 @@ def rank_documents(
     result_not_sorted = {}
 
     for bm25_tfidf_dict in indexes:
-        value_sum = 0.0
         i = indexes.index(bm25_tfidf_dict)
-        for token in processed_query:
-            if token in bm25_tfidf_dict:
-                value_sum += bm25_tfidf_dict[token]
+        value_sum = sum(bm25_tfidf_dict[token] for token in processed_query
+                        if token in bm25_tfidf_dict)
         result_not_sorted[i] = value_sum
 
     result_lst = list(result_not_sorted.items())

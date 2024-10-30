@@ -271,7 +271,7 @@ def calculate_bm25(
             not isinstance(b, float))):
         return None
 
-    if any((not isinstance(avg_doc_len, float), not isinstance(doc_len, int), not isinstance(doc_len, bool))):
+    if any((not isinstance(avg_doc_len, float), not isinstance(doc_len, int), isinstance(doc_len, bool))):
         return None
 
     if any((vocab == [], idf_document == {}, document == [])):

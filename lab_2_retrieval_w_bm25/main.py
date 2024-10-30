@@ -56,10 +56,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     """
     clean_tokens = []
 
-    if not isinstance(tokens, list):
-        return None
-
-    if any((not isinstance(stopwords, list), not stopwords)):
+    if any((not isinstance(tokens, list), not isinstance(stopwords, list),
+            not stopwords, not tokens)):
         return None
 
     for word in stopwords:
@@ -92,7 +90,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     In case of corrupt input arguments, None is returned.
     """
 
-    if not isinstance(documents, list):
+    if any((not isinstance(documents, list), not documents)):
         return None
 
     unique_words = []
@@ -123,10 +121,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     In case of corrupt input arguments, None is returned.
     """
 
-    if any((not isinstance(vocab, list), not isinstance(document_tokens, list))):
-        return None
-
-    if len(vocab) == 0 or len(document_tokens) == 0:
+    if any((not isinstance(vocab, list), not isinstance(document_tokens, list),
+            not vocab, not document_tokens)):
         return None
 
     frequency = {}
@@ -163,7 +159,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     # lab_2_retrieval_w_bm25/main.py:150:0: R0911: Too many return statements
     #(7/6) (too-many-return-statements)
 
-    if any((not isinstance(vocab, list), not isinstance(documents, list), not documents)):
+    if any((not isinstance(vocab, list), not isinstance(documents, list),
+            not documents, not vocab)):
         return None
 
     for doc in documents:
@@ -252,8 +249,8 @@ def calculate_bm25(
             not isinstance(idf_document, dict),
             not isinstance(k1, float), not isinstance(b, float),
             not isinstance(avg_doc_len, float), not isinstance(doc_len, int),
-            isinstance(doc_len, bool),
-            vocab == [], idf_document == {}, document == [])):
+            isinstance(doc_len, bool), not avg_doc_len,
+            not doc_len, not vocab, not idf_document, not document)):
         return None
 
     for voc in vocab:
@@ -274,7 +271,7 @@ def calculate_bm25(
     for voc in vocab:
         freq = document.count(voc)
         bm5_doc[voc] = (idf_document[voc] * freq * (k1 + 1)
-                    / (freq + k1 * (1 - b + b * ((abs(doc_len)) / avg_doc_len))))
+                    / (freq + k1 * (1 - b + b * (doc_len / avg_doc_len))))
 
     for tok in document:
         bm5_doc[tok] = 0.0
@@ -283,7 +280,6 @@ def calculate_bm25(
             bm5_doc[tok] = (idf_document[tok] * freq * (k1 + 1)
                     / (freq + k1 * (1 - b + b * ((abs(doc_len)) / avg_doc_len))))
 
-    # step last: cleaning
     if not bm5_doc:
         return None
     return bm5_doc
@@ -306,7 +302,8 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
     if any((not isinstance(indexes, list), not isinstance(query, str),
-            not isinstance(stopwords, list), not query, query == 'no query')):
+            not isinstance(stopwords, list),query == 'no query',
+            not query, not indexes, not stopwords)):
         return None
 
     for index in indexes:

@@ -101,9 +101,9 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     all_words = set(vocab).union(document_tokens)
     tf_dict = {}
     for t_word in all_words:
-        if t_word in document_tokens:
-            tf_dict[t_word] = document_tokens.count(t_word) / len(document_tokens)
-        else:
+
+        tf_dict[t_word] = document_tokens.count(t_word) / len(document_tokens)
+        if t_word not in document_tokens:
             tf_dict[t_word] = 0.0
 
     return tf_dict
@@ -159,9 +159,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     tf_idf_dict = {}
     for tf_idf_word in tf:
-        if tf_idf_word in idf:
-            tf_idf_dict[tf_idf_word] = tf[tf_idf_word] * idf[tf_idf_word]
-        else:
+        tf_idf_dict[tf_idf_word] = tf[tf_idf_word] * idf[tf_idf_word]
+        if tf_idf_word not in idf:
             tf_idf_dict[tf_idf_word] = 0.0
 
     return tf_idf_dict

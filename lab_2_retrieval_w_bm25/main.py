@@ -160,9 +160,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    #lab_2_retrieval_w_bm25/main.py:150:0: R0911: Too many return statements (7/6) (too-many-return-statements)
+    # lab_2_retrieval_w_bm25/main.py:150:0: R0911: Too many return statements
+    #(7/6) (too-many-return-statements)
 
-    if any((not isinstance(vocab, list), not isinstance(documents, list))):
+    if any((not isinstance(vocab, list), not isinstance(documents, list), not documents)):
         return None
 
     for doc in documents:
@@ -171,9 +172,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         for token in doc:
             if not isinstance(token, str):
                 return None
-    len_doc = len(documents)
-    if not documents:
-        return None
     map_idf_scores = {}
     for voc in vocab:
         if not isinstance(voc, str):
@@ -182,7 +180,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         for doc in documents:
             if voc in doc:
                 amount += 1
-        idf = log((len_doc - amount + 0.5) / (amount + 0.5))
+        idf = log((len(documents) - amount + 0.5) / (amount + 0.5))
         map_idf_scores[voc] = idf
     if map_idf_scores:
         return map_idf_scores
@@ -294,8 +292,6 @@ def calculate_bm25(
 def rank_documents(
     indexes: list[dict[str, float]], query: str, stopwords: list[str]
 ) -> list[tuple[int, float]] | None:
-    #lab_2_retrieval_w_bm25/main.py:318:0: R0914: Too many local variables (16/15) (too-many-locals)
-    #lab_2_retrieval_w_bm25/main.py:318:0: R0912: Too many branches (14/12) (too-many-branches)
     """
     Rank documents for the given query.
 

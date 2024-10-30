@@ -3,8 +3,8 @@ Lab 2.
 
 Text retrieval with BM25
 """
-import json
 ## pylint:disable=too-many-arguments, unused-argument
+import json
 from math import log
 
 
@@ -111,12 +111,12 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         if not isinstance(token, str):
             return None
         if token not in vocab:
-            tf[token] = document_tokens.count(token)/length
+            tf[token] = document_tokens.count(token) / length
     for word in vocab:
         if not isinstance(word, str):
             return None
         if word in document_tokens and word not in tf:
-            tf[word] = document_tokens.count(word)/length
+            tf[word] = document_tokens.count(word) / length
             continue
         tf[word] = 0.0
     return tf
@@ -151,7 +151,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         for lst in documents:
             if word in lst:
                 n += 1
-        idf[word] = log((len(documents) + 0.5 - n)/(n + 0.5))
+        idf[word] = log((len(documents) + 0.5 - n) / (n + 0.5))
     return idf
 
 
@@ -232,8 +232,8 @@ def calculate_bm25(
         if word not in vocab:
             bm25[word] = 0.0
     for key in vocab:
-        bm25[key] = (idf_document[key]*(document.count(key)*(k1+1))/
-                     (document.count(key)+k1*(1-b+b*(doc_len/avg_doc_len))))
+        bm25[key] = (idf_document[key] * (document.count(key) * (k1 + 1)) /
+                     (document.count(key) + k1 * (1 - b + b * (doc_len / avg_doc_len))))
     return bm25
 
 
@@ -330,8 +330,8 @@ def calculate_bm25_with_cutoff(
     for key in vocab:
         if key not in cut_idf:
             continue
-        bm25_cut[key] = (cut_idf[key]*(document.count(key)*(k1+1))/
-                     (document.count(key)+k1*(1-b+b*(doc_len/avg_doc_len))))
+        bm25_cut[key] = (cut_idf[key] * (document.count(key) * (k1 + 1)) /
+                     (document.count(key) + k1 * (1 - b + b * (doc_len / avg_doc_len))))
     return bm25_cut
 
 
@@ -396,4 +396,4 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
         if value not in golden_rank:
             return 0.0
         sum_square += (index - golden_rank.index(value)) ** 2
-    return 1 - (6*sum_square)/(n * (n ** 2 - 1))
+    return 1 - (6 * sum_square)/(n * (n ** 2 - 1))

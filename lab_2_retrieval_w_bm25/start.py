@@ -47,10 +47,10 @@ def main() -> None:
     tf_idf = []
     vocab = build_vocabulary(doc_tokens)
     if not isinstance(vocab, list):
-        return None
+        return
     idf = calculate_idf(vocab, doc_tokens)
     if not isinstance(idf, dict):
-        return None
+        return
     for lst in doc_tokens:
         tf = calculate_tf(vocab, lst)
         if not isinstance(tf, dict):
@@ -64,14 +64,14 @@ def main() -> None:
     length_all = 0.0
     for lst in doc_tokens:
         length_all += len(lst)
-    avg_doc_len = length_all/len(doc_tokens)
+    avg_doc_len = length_all / len(doc_tokens)
     bm25 = []
     for lst in doc_tokens:
         index = calculate_bm25(vocab, lst, idf,
                                1.5, 0.75,
                                avg_doc_len, len(doc_tokens))
         if not isinstance(index, dict):
-            return None
+            return
         bm25.append(index)
 
     #получение списка словарей bm25_cutoff
@@ -81,7 +81,7 @@ def main() -> None:
                                1.5, 0.75,
                                avg_doc_len, len(doc_tokens))
         if not isinstance(index, dict):
-            return None
+            return
         bm25_cut.append(index)
 
     #пример сохранения и загрузки в файл
@@ -94,7 +94,7 @@ def main() -> None:
     list_bm25_cut = rank_documents(bm25_cut, 'Which fairy tale has Fairy Queen?', stopwords)
     if not isinstance(list_tf_idf, list) or not isinstance(list_bm25, list)\
         or not isinstance(list_bm25_cut, list):
-        return None
+        return
     rank_tf_idf = []
     rank_bm25 = []
     rank_bm25_cut = []
@@ -111,7 +111,6 @@ def main() -> None:
     spear_bm25 = calculate_spearman(rank_bm25, golden_rank)
     spear_bm25_cut = calculate_spearman(rank_bm25_cut, golden_rank)
     result = f'sp_tf_idf: {spear_tf_idf}, sp_bm25: {spear_bm25}, sp_bm25_cut: {spear_bm25_cut}'
-    print(result)
     assert result, "Result is None"
 
 

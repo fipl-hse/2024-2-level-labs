@@ -111,10 +111,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     len_document = len(document_tokens)
     token_set = set(set(vocab) | set(document_tokens))
-    tf_dict = {}
-    for token in token_set:
-        tf = document_tokens.count(token) / len_document
-        tf_dict[token] = tf
+    tf_dict = {token: (document_tokens.count(token) / len_document) for token in token_set}
 
     return tf_dict
 

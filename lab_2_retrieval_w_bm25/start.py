@@ -111,6 +111,7 @@ def main() -> None:
     spear_bm25 = calculate_spearman(rank_bm25, golden_rank)
     spear_bm25_cut = calculate_spearman(rank_bm25_cut, golden_rank)
     result = f'sp_tf_idf: {spear_tf_idf}, sp_bm25: {spear_bm25}, sp_bm25_cut: {spear_bm25_cut}'
+    print(result)
     assert result, "Result is None"
 
 

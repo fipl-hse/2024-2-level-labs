@@ -148,9 +148,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         if not isinstance(word, str):
             return None
         n = 0
-        for lst in documents:
-            if word in lst:
-                n += 1
+        n = sum(n + 1 for lst in documents if word in lst)
         idf[word] = log((len(documents) + 0.5 - n) / (n + 0.5))
     return idf
 

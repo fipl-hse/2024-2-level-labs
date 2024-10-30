@@ -4,6 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
+from math import log
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -128,7 +129,6 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if len(vocab) == 0 or len(document_tokens) == 0:
         return None
 
-
     frequency = {}
 
     for voc in vocab:
@@ -148,7 +148,6 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     return None
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
-    from math import log
     """
     Calculate inverse document frequency for each term in the vocabulary.
 
@@ -161,6 +160,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    #lab_2_retrieval_w_bm25/main.py:150:0: R0911: Too many return statements (7/6) (too-many-return-statements)
+
     if any((not isinstance(vocab, list), not isinstance(documents, list))):
         return None
 
@@ -171,19 +172,16 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             if not isinstance(token, str):
                 return None
     len_doc = len(documents)
-    if len_doc == 0:
+    if not documents:
         return None
     map_idf_scores = {}
-
     for voc in vocab:
         if not isinstance(voc, str):
             return None
-
         amount = 0
         for doc in documents:
             if voc in doc:
                 amount += 1
-
         idf = log((len_doc - amount + 0.5) / (amount + 0.5))
         map_idf_scores[voc] = idf
     if map_idf_scores:
@@ -204,27 +202,15 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
-    if any((not isinstance(tf, dict), not isinstance(idf, dict))):
+
+    if any((not isinstance(tf, dict), not isinstance(idf, dict), not idf, not tf)):
         return None
-
-    for t_k in tf.keys():
-        if not isinstance(t_k, str):
+    for t_it in tf:
+        if any((not isinstance(t_it, str), not isinstance(tf[t_it], float))):
             return None
-
-    for i_k in idf.keys():
-        if not isinstance(i_k, str):
+    for i_it in idf:
+        if any((not isinstance(i_it, str), not isinstance(idf[i_it], float))):
             return None
-
-    for t_v in tf.values():
-        if not isinstance(t_v, float):
-            return None
-
-    for i_v in idf.values():
-        if not isinstance(i_v, float):
-            return None
-
-    if not idf or not tf:
-        return None
 
     map_scores = {}
 
@@ -264,36 +250,26 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
 
-    if any((not isinstance(vocab, list), not isinstance(document, list))):
-        return None
-
-    if any((not isinstance(idf_document, dict), not isinstance(k1, float),
-            not isinstance(b, float))):
-        return None
-
-    if any((not isinstance(avg_doc_len, float), not isinstance(doc_len, int), isinstance(doc_len, bool))):
-        return None
-
-    if any((vocab == [], idf_document == {}, document == [])):
+    if any((not isinstance(vocab, list), not isinstance(document, list),
+            not isinstance(idf_document, dict),
+            not isinstance(k1, float), not isinstance(b, float),
+            not isinstance(avg_doc_len, float), not isinstance(doc_len, int),
+            isinstance(doc_len, bool),
+            vocab == [], idf_document == {}, document == [])):
         return None
 
     for voc in vocab:
         if not isinstance(voc, str):
             return None
-        if voc.split(' ')[0] != voc:
-            return None
 
     for token in document:
         if not isinstance(token, str):
-            return None
-        if token.split(' ')[0] != token:
             return None
 
     for pair in idf_document:
         if not (isinstance(pair, str) and isinstance(idf_document[pair], float)):
             return None
-        if pair.split() != [pair]:
-            return None
+
 
     bm5_doc = {}
 
@@ -318,6 +294,8 @@ def calculate_bm25(
 def rank_documents(
     indexes: list[dict[str, float]], query: str, stopwords: list[str]
 ) -> list[tuple[int, float]] | None:
+    #lab_2_retrieval_w_bm25/main.py:318:0: R0914: Too many local variables (16/15) (too-many-locals)
+    #lab_2_retrieval_w_bm25/main.py:318:0: R0912: Too many branches (14/12) (too-many-branches)
     """
     Rank documents for the given query.
 
@@ -332,15 +310,8 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
     if any((not isinstance(indexes, list), not isinstance(query, str),
-            not isinstance(stopwords, list))):
+            not isinstance(stopwords, list), not query, query == 'no query')):
         return None
-
-    if not query or query == 'no query':
-        return None
-
-    for stopword in stopwords:
-        if not isinstance(stopword, str):
-            return None
 
     for index in indexes:
         if not isinstance(index, dict):
@@ -349,10 +320,8 @@ def rank_documents(
             if any((not isinstance(ind, str), not isinstance(index[ind], float))):
                 return None
 
-    tokenized_query = remove_stopwords(tokenize(query), stopwords)
-
     uniq_query = []
-    for qu in tokenized_query:
+    for qu in remove_stopwords(tokenize(query), stopwords):
         if qu not in uniq_query:
             uniq_query.append(qu)
 
@@ -361,7 +330,7 @@ def rank_documents(
     for i, doc in enumerate(indexes):
         ranking_word = 0
         for word in uniq_query:
-            if word in doc.keys():
+            if word in doc:
                 ranking_word += doc[word]
         unsorted_ranking_map[i] = ranking_word
 

@@ -22,22 +22,10 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    text = text.lower()
-
-    for symb in text:
-        if not symb.isalpha() and symb != ' ':
-            text = text.replace(symb, ' ')
-    text = text.replace('   ', ' ')
-    text = text.replace('  ', ' ')
-
-    text = text.strip()
-
-    tokens = text.split(' ')
-
-    if tokens == ['']:
-        tokens = []
-
-    return tokens
+    for letter in text:
+        if not letter.isalpha() and letter != ' ':
+            text = text.replace(letter, ' ')
+    return text.lower().split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:

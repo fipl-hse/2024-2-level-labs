@@ -23,28 +23,6 @@ def tokenize(text: str) -> list[str] | None:
         return None
     return [word for word in ''.join(char if char.isalpha() else ' ' for char in text).lower().split() if word]
 
-    # tokens = [''.join([char if char.isalpha() else '' for char in word]) for word in text.lower().split()]
-    # return [token for token in tokens if token]
-
-    # tokens = []
-    # current_token = ""
-    # for char in text.lower():
-    #     if char.isalpha():
-    #         current_token += char
-    #     else:
-    #         if current_token:
-    #             tokens.append(current_token)
-    #             current_token = ""
-    # if current_token:
-    #     tokens.append(current_token)
-    #
-    # return tokens
-    #
-    #
-    # tokens = [''.join([char if char.isalpha() else '' for char in word]) for word in text.lower().split()]
-    # return [token for token in tokens if token]
-    #
-    #
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
@@ -131,14 +109,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             or not isinstance(documents, list) or not all(isinstance(docum, list) for docum in documents)
             or not all(isinstance(item, str) for docum in documents for item in docum) or not vocab or not documents):
         return None
-    # idf_result = {word: log((len(documents) - sum(1 for doc in documents if word in doc) + 0.5) / (sum(1 for doc in documents if word in doc + 0.5))) for word in vocab}
-    #
-    #
-    # idf_result = {}
-    # doc_num = len(documents)
-    # for word in vocab:
-    #     words_count = sum(1 for doc in documents if word in doc)
-    #     idf_result[word] = log((doc_num - words_count + 0.5) / (words_count + 0.5))
     idf_result = {word: log((len(documents) - sum(1 for doc in documents if word in doc) + 0.5)
                             / (sum(1 for doc in documents if word in doc) + 0.5)) for word in vocab}
     return idf_result
@@ -238,22 +208,9 @@ def rank_documents(
     clear_query = remove_stopwords(tok_query, stopwords)
     if not isinstance(clear_query, list):
         return None
-
-    # if not isinstance(indexes, list) or not isinstance(query, str) or not indexes or not query:
-    #     return None
-    # for elem in indexes:
-    #     if not isinstance(elem, dict) or not elem:
-    #         return None
-    # tokens_query = tokenize(query)
-    # if not isinstance(tokens_query, list):
-    #     return None
-    # lst_query = remove_stopwords(tokens_query, stopwords)
-    # if lst_query is None:
-    #     return None
     result = [(i, round(sum(dictionary.get(word, 0) for word in clear_query), 4))
               for i, dictionary in enumerate(indexes)]
     return sorted(result, reverse=True, key=lambda res: res[1])
-
 
 
 def calculate_bm25_with_cutoff(

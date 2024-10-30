@@ -5,7 +5,6 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 import math
-import json
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -297,7 +296,6 @@ def calculate_bm25_with_cutoff(
     """
 
 
-
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
     """
     Save the index to a file.
@@ -306,7 +304,6 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
-
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -323,7 +320,6 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
     """
 
 
-
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     """
     Calculate Spearman's rank correlation coefficient between two rankings.
@@ -337,4 +333,3 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
-

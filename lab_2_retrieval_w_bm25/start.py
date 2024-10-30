@@ -79,7 +79,7 @@ def main() -> None:
         for i in bm25_work:
             rang_2.append(i[0])
 
-    result = (f'Метрика TF-IDF: {rang_1}, метрика BM25: {rang_2}')
+    result = f'Метрика TF-IDF: {rang_1}, метрика BM25: {rang_2}'
     assert result, "Result is None"
 
 

@@ -3,7 +3,6 @@ Lab 2.
 
 Text retrieval with BM25
 """
-
 from math import log
 
 
@@ -21,8 +20,10 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str) or not text:
         return None
-    return [word for word in ''.join(char if char.isalpha()
-                                     else ' ' for char in text).lower().split() if word]
+    for item in text:
+        if not item.isalpha() and item != ' ':
+            text = text.replace(item, ' ')
+    return text.lower().split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -228,8 +229,6 @@ def rank_documents(
     result = [(i, round(sum(dictionary.get(word, 0) for word in clear_query), 4))
               for i, dictionary in enumerate(indexes)]
     return sorted(result, reverse=True, key=lambda res: res[1])
-
-
 # def calculate_bm25_with_cutoff(
 #     vocab: list[str],
 #     document: list[str],

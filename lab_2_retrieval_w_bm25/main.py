@@ -136,6 +136,11 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tf, idf, dict[str,float]):
+        return None
+    from math import pow
+    TF-IDF == pow(tf, idf)
+    return TF-IDF
 
 
 def calculate_bm25(

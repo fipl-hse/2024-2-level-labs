@@ -250,6 +250,7 @@ def calculate_bm25(
             not isinstance(k1, float), not isinstance(b, float),
             not isinstance(avg_doc_len, float), not isinstance(doc_len, int),
             isinstance(doc_len, bool), not avg_doc_len,
+            not isinstance(k1, float), not isinstance(b, float),
             not doc_len, not vocab, not idf_document, not document)):
         return None
 
@@ -302,7 +303,7 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
     if any((not isinstance(indexes, list), not isinstance(query, str),
-            not isinstance(stopwords, list),query == 'no query',
+            not isinstance(stopwords, list), query == 'no query',
             not query, not indexes, not stopwords)):
         return None
 
@@ -312,6 +313,10 @@ def rank_documents(
         for ind in index:
             if any((not isinstance(ind, str), not isinstance(index[ind], float))):
                 return None
+
+    for stopword in stopwords:
+        if not isinstance(stopword, str):
+            return None
 
     uniq_query = []
     for qu in remove_stopwords(tokenize(query), stopwords):

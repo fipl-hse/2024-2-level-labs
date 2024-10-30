@@ -4,8 +4,10 @@ Laboratory Work #2 starter
 
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, rank_documents, remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
+                                         calculate_idf, calculate_tf,
+                                         calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -69,7 +71,8 @@ def main() -> None:
 
         tf_idf_work = rank_documents(tf_idf_res, 'Which fairy tale has Fairy Queen?', stopwords)
         bm25_work = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
-        if not isinstance(tf_idf_work, list) or not isinstance(bm25_work, list) or not tf_idf_work or not bm25_work:
+        if (not isinstance(tf_idf_work, list) or not isinstance(bm25_work, list)
+                or not tf_idf_work or not bm25_work):
             return None
         rang_1 = []
         rang_2 = []

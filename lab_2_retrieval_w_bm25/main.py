@@ -91,7 +91,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return None
     n_t = document_tokens.count
     D = len(vocab)
-    TF = n_t+D
+    TF = n_t/D
     dict_tf = {}
     dict_tf[document_tokens] = TF
     return dict_tf
@@ -109,6 +109,19 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, documents, list[str]):
+        return None
+    from math import log
+    amount_of_doc = []
+    N = documents.count()
+    if word in documents:
+        amount_of_doc.append(documents)
+    \sum ^ {m}_{j = 1}n_j = amount_of_doc.count()
+    IDF = ln(\frac{N - \sum ^ {m}_{j = 1}n_j + 0.5}{\sum ^ {m}_{j = 1}n_j + 0.5})
+    dict_idf = {}
+    dict_idf[documents] = IDF
+    return dict_idf
+
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:

@@ -30,9 +30,9 @@ def tokenize(text: str) -> list[str] | None:
 
     result = []
     for word in text.split(" "):
-        if not word.isalpha():
-            continue
         result.append(word.lower())
+    while "" in result:
+        result.remove("")
 
     return result
 

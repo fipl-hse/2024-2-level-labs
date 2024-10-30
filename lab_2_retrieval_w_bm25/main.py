@@ -64,9 +64,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not documents:
-        return None
-    if not isinstance(documents, list):
+    if not documents or not isinstance(documents, list):
         return None
     if not all(isinstance(item, list) and all(isinstance(elem, str)
                                               for elem in item) for item in documents):
@@ -99,11 +97,11 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             not all(isinstance(k, str) for k in vocab)):
         return None
     dictionary_for_tf = {}
-    for word in vocab:
-        dictionary_for_tf[word] = 0.0
-        if word in document_tokens:
-            dictionary_for_tf[word] = document_tokens.count(word) / len(document_tokens)
     for token in document_tokens:
+        for word in vocab:
+            dictionary_for_tf[word] = 0.0
+            if word in document_tokens:
+                dictionary_for_tf[word] = document_tokens.count(word) / len(document_tokens)
         if token in dictionary_for_tf:
             continue
         dictionary_for_tf[token] = document_tokens.count(token) / len(document_tokens)
@@ -123,12 +121,11 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if not vocab or not documents:
+    if not vocab or not documents or not isinstance(vocab, list) or not isinstance(documents, list):
         return None
-    if (not isinstance(vocab, list) or not isinstance(documents, list) or
-            not all(isinstance(p, str) for p in vocab) or
+    if (not all(isinstance(p, str) for p in vocab) or
             not all(isinstance(k, list) and all(isinstance(elem, str)
-                                                for elem in k) for k in documents)):
+                                                 for elem in k) for k in documents)):
         return None
     counter_for_documents = len(documents)
     dictionary_for_idf = {}
@@ -156,9 +153,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
-    if not tf or not idf:
-        return None
-    if not isinstance(tf, dict) or not isinstance(idf, dict):
+    if (not tf or not idf or
+            not isinstance(tf, dict) or not isinstance(idf, dict)):
         return None
     if (not all(isinstance(key, str) for key in tf.keys()) or
             not all(isinstance(value, float) for value in tf.values())):
@@ -389,8 +385,8 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not rank or not golden_rank or not isinstance(rank, list)
-            or not isinstance(golden_rank, list)):
+    if (not rank or not golden_rank or not
+    isinstance(rank, list) or not isinstance(golden_rank, list)):
         return None
     if (not all(isinstance(i, int) for i in rank) or
             not all(isinstance(k, int) for k in golden_rank)):

@@ -150,8 +150,6 @@ def calculate_bm25(
     vocab: list[str],
     document: list[str],
     idf_document: dict[str, float],
-    k1: float = 1.5,
-    b: float = 0.75,
     avg_doc_len: float | None = None,
     doc_len: int | None = None,
 ) -> dict[str, float] | None:

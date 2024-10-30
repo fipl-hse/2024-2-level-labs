@@ -82,16 +82,20 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
     if not isinstance(documents, list):
         return None
+    if len(documents) == 0:
+        return None
 
     uniq_words = set()
     for document in documents:
         if not isinstance(document, list):
             return None
+        if len(document) == 0:
+            return None
         for word in document:
             if not isinstance(word, str):
                 return None
-            uniq_words.update(word)
-        return list(uniq_words)
+            uniq_words.update({word})
+    return list(uniq_words)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

@@ -24,33 +24,28 @@ def main() -> None:
         "assets/fairytale_9.txt",
         "assets/fairytale_10.txt",
     ]
-    documents = []
+    documents: list[str] = []
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-    clean_docs = []
-    for doc in documents:
-        doc_tokenized = tokenize(doc)
-        if doc_tokenized is None:
-            result = None
-            assert result, "Result is None"
+    clean_docs: list[list[str]] = []
+
+    for document in documents:
+        doc_tokenized = tokenize(document)
+        assert doc_tokenized, "Result is None"
         clean_doc = remove_stopwords(doc_tokenized, stopwords)
-        if clean_doc is None:
-            result = None
-            assert result, "Result is None"
+        assert clean_doc, "Result is None"
         clean_docs.append(clean_doc)
-    if clean_docs is None:
-        result = None
-        assert result, "Result is None"
 
     for doc in clean_docs:
+        print('doc = ', doc)
         assert isinstance(doc, list), "Result is None"
-        for each in doc:
-            assert isinstance(each, str), "Result is None"
-            # if not isinstance(each, str):
+        for d in doc:
+            assert isinstance(d, str), "Result is None"
+            # if not isinstance(d, str):
             #     result = None
             #     assert result, "Result is None"
 
@@ -68,23 +63,23 @@ def main() -> None:
         if not isinstance(doc, list):
             result = None
             assert result, "Result is None"
-        for each in doc:
-            if not isinstance(each, str):
+        for f in doc:
+            if not isinstance(f, str):
                 result = None
                 assert result, "Result is None"
-        tf_doc = calculate_tf(vocabulary, doc)
-        if any((tf_doc is None, not isinstance(tf_doc, dict))):
+        calculate_tf_result = calculate_tf(vocabulary, doc)
+        if any((calculate_tf_result is None, not isinstance(calculate_tf_result, dict))):
             result = None
             assert result, "Result is None"
-        for k in tf_doc:
+        for k in calculate_tf_result:
             if not isinstance(k, str):
                 result = None
                 assert result, "Result is None"
-            for each in tf_doc.values():
-                if not isinstance(each, float):
+            for tf_ in calculate_tf_result.values():
+                if not isinstance(tf_, float):
                     result = None
                     assert result, "Result is None"
-        tf_documents.append(tf_doc)
+        tf_documents.append(calculate_tf_result)
 
     # simplify
     idf_documents = calculate_idf(vocabulary, clean_docs)
@@ -92,7 +87,8 @@ def main() -> None:
     for tf_doc in tf_documents:
         if not isinstance(idf_documents, dict) \
                 or not all(isinstance(key, str) for key in idf_documents) \
-                or not all(isinstance(value, float) for value in idf_documents.values()):
+                or not all(isinstance(value, float) for value in idf_documents.values()) \
+                or not idf_documents or not tf_doc:
             result = None
             assert result, "Result is None"
         tf_idf = calculate_tf_idf(tf_doc, idf_documents)

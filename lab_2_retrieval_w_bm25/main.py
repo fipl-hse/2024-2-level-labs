@@ -21,7 +21,6 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     my_text = text.lower()
-    my_text.split()
     tokenized_text = []
     for token in my_text.split():
         if token.isalpha():

@@ -30,24 +30,50 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
     all_tokenized_docs = []
-    for file in documents:
-        tokenized_document = tokenize(file)
-        all_tokenized_docs.append(remove_stopwords(tokenized_document, stopwords))
+    for text in documents:
+        tokenized_document = tokenize(text)
+        if tokenized_document is None:
+            result = None
+            assert result, "Result is None"
+        without_stopwords = remove_stopwords(tokenized_document, stopwords)
+        if without_stopwords is None:
+            result = None
+            assert result, "Result is None"
+        all_tokenized_docs.append(without_stopwords)
     vocabulary = build_vocabulary(all_tokenized_docs)
+    if vocabulary is None:
+        result = None
+        assert result, "Result is None"
     tf = []
-    for document in all_tokenized_docs:
-        tf.append(calculate_tf(vocabulary, document))
     idf = calculate_idf(vocabulary, all_tokenized_docs)
+    for tokenized_doc in all_tokenized_docs:
+        tf_of_doc = calculate_tf(vocabulary, tokenized_doc)
+        if tf_of_doc is None:
+            result = None
+            assert result, "Result is None"
+        tf.append(tf_of_doc)
+    if idf is None:
+        result = None
+        assert result, "Result is None"
     tf_idf = []
-    for doc in tf:
-        tf_idf.append(calculate_tf_idf(doc, idf))
+    for tf_doc in tf:
+        tf_idf_of_doc = calculate_tf_idf(tf_doc, idf)
+        if tf_idf_of_doc is None:
+            result = None
+            assert result, "Result is None"
+        tf_idf.append(tf_idf_of_doc)
     bm25 = []
     avg_len = 0.0
-    for doc in all_tokenized_docs:
-        avg_len += len(doc)
-    avg_len /= len(all_tokenized_docs)
-    for doc in all_tokenized_docs:
-        bm25.append(calculate_bm25(vocabulary, doc, idf, 1.5, 0.75, avg_len, len(doc)))
+    for tokenized_doc in all_tokenized_docs:
+        avg_len += float(len(tokenized_doc))
+    avg_len /= float(len(all_tokenized_docs))
+    for tokenized_doc in all_tokenized_docs:
+        bm25_of_doc = calculate_bm25(vocabulary, tokenized_doc, idf, 1.5, 0.75,
+                                     avg_len, len(tokenized_doc))
+        if bm25_of_doc is None:
+            result = None
+            assert result, "Result is None"
+        bm25.append(bm25_of_doc)
     rank_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
     rank_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
     result = rank_tf_idf

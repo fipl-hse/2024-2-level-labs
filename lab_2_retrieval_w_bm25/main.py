@@ -113,11 +113,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         return None
     from math import log
     amount_of_doc = []
-    N = documents.count()
     if word in documents:
         amount_of_doc.append(documents)
-    \sum ^ {m}_{j = 1}n_j = amount_of_doc.count()
-    IDF = ln(\frac{N - \sum ^ {m}_{j = 1}n_j + 0.5}{\sum ^ {m}_{j = 1}n_j + 0.5})
+    N = documents.count()
+    IDF = log({N - amount_of_doc.count() + 0.5},{amount_of_doc.count() + 0.5}, 10)
     dict_idf = {}
     dict_idf[documents] = IDF
     return dict_idf

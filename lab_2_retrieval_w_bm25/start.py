@@ -2,8 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -28,18 +29,30 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    text_1 = remove_stopwords(tokenize('''There was a boy, who was a wizard. He used his wand to do
-    spells. He was studying in a magic school. His best friend was a wizard too.'''), stopwords)
-    text_2 = remove_stopwords(tokenize('''Steven was a boy who loved pets. He had a cat, two dogs
-    and three parrots. Every morning he did not want to go to school, because he had to leave his
-    pets at home.'''), stopwords)
-    text_3 = remove_stopwords(tokenize('''A dragon and a princess had a picnic date at the top
-    of the hill. They rarely leaved the tower, but the summer weather was just perfect for the
-    hill picnic.'''), stopwords)
-    tf = calculate_tf(build_vocabulary([text_1, text_2, text_3]), text_1)
-    idf = calculate_idf(build_vocabulary([text_1, text_2, text_3]), [text_1, text_2, text_3])
-    result = calculate_tf_idf(tf, idf)
-    print(result)
+    all_tokenized_docs = []
+    for file in documents:
+        tokenized_document = tokenize(file)
+        all_tokenized_docs.append(remove_stopwords(tokenized_document, stopwords))
+    vocabulary = build_vocabulary(all_tokenized_docs)
+    tf = []
+    for document in all_tokenized_docs:
+        tf.append(calculate_tf(vocabulary, document))
+    idf = calculate_idf(vocabulary, all_tokenized_docs)
+    tf_idf = []
+    for doc in tf:
+        tf_idf.append(calculate_tf_idf(doc, idf))
+    bm25 = []
+    avg_len = 0.0
+    for doc in all_tokenized_docs:
+        avg_len += len(doc)
+    avg_len /= len(all_tokenized_docs)
+    for doc in all_tokenized_docs:
+        bm25.append(calculate_bm25(vocabulary, doc, idf, 1.5, 0.75, avg_len, len(doc)))
+    rank_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
+    rank_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
+    result = rank_tf_idf
+    result_2 = rank_bm25
+    print(result, '\n', result_2)
     assert result, "Result is None"
 
 

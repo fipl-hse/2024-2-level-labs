@@ -90,10 +90,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if not isinstance(vocab, document_tokens, list[str]):
         return None
     n_t = document_tokens.count
-    D = len(vocab)
-    TF = n_t/D
+    d = len(vocab)
+    tf = n_t/d
     dict_tf = {}
-    dict_tf[document_tokens] = TF
+    dict_tf[document_tokens] = tf
     return dict_tf
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -115,10 +115,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     amount_of_doc = []
     if word in documents:
         amount_of_doc.append(documents)
-    N = documents.count()
-    IDF = log({N - amount_of_doc.count() + 0.5},{amount_of_doc.count() + 0.5}, 10)
+    n = documents.count()
+    idf = log({n - amount_of_doc.count() + 0.5},{amount_of_doc.count() + 0.5}, 10)
     dict_idf = {}
-    dict_idf[documents] = IDF
+    dict_idf[documents] = idf
     return dict_idf
 
 
@@ -139,7 +139,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     if not isinstance(tf, idf, dict[str,float]):
         return None
     from math import pow
-    TF-IDF == pow(tf, idf)
+    tf-idf == pow(tf, idf)
     return TF-IDF
 
 

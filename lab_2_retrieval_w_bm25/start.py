@@ -37,10 +37,10 @@ def main() -> None:
         tokens = tokenize(text)
         if not isinstance(tokens, list):
             return None
-    needful_tokens = remove_stopwords(tokens, stopwords)
-    if not isinstance(needful_tokens, list):
-        return None
-    doc_tokens.append(needful_tokens)
+        needful_tokens = remove_stopwords(tokens, stopwords)
+        if not isinstance(needful_tokens, list):
+            return None
+        doc_tokens.append(needful_tokens)
 
     tf_idf_res = []
     vocab = build_vocabulary(doc_tokens)

@@ -5,6 +5,7 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 import math
+import json
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -187,13 +188,13 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
 
 def calculate_bm25(
-    vocab: list[str],
-    document: list[str],
-    idf_document: dict[str, float],
-    k1: float = 1.5,
-    b: float = 0.75,
-    avg_doc_len: float | None = None,
-    doc_len: int | None = None,
+        vocab: list[str],
+        document: list[str],
+        idf_document: dict[str, float],
+        k1: float = 1.5,
+        b: float = 0.75,
+        avg_doc_len: float | None = None,
+        doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document.
@@ -243,7 +244,7 @@ def calculate_bm25(
 
 
 def rank_documents(
-    indexes: list[dict[str, float]], query: str, stopwords: list[str]
+        indexes: list[dict[str, float]], query: str, stopwords: list[str]
 ) -> list[tuple[int, float]] | None:
     """
     Rank documents for the given query.
@@ -259,7 +260,7 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
     if not isinstance(indexes, list) or not isinstance(query, str) \
-            or not isinstance(stopwords,list) or not any(indexes and stopwords):
+            or not isinstance(stopwords, list) or not any(indexes and stopwords):
         return None
     if not all(isinstance(doc, dict) for doc in indexes) \
             or not any(isinstance(word, str) and isinstance(value, float)
@@ -280,14 +281,14 @@ def rank_documents(
 
 
 def calculate_bm25_with_cutoff(
-    vocab: list[str],
-    document: list[str],
-    idf_document: dict[str, float],
-    alpha: float,
-    k1: float = 1.5,
-    b: float = 0.75,
-    avg_doc_len: float | None = None,
-    doc_len: int | None = None,
+        vocab: list[str],
+        document: list[str],
+        idf_document: dict[str, float],
+        alpha: float,
+        k1: float = 1.5,
+        b: float = 0.75,
+        avg_doc_len: float | None = None,
+        doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document with IDF cutoff.
@@ -307,6 +308,37 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(document, list) \
+            or not isinstance(idf_document, dict) or not any(vocab and document and idf_document):
+        return None
+    if not all(isinstance(word, str) for word in vocab) \
+            or not all(isinstance(word, str) for word in document) \
+            or not any(isinstance(word, str) and isinstance(value, float)
+                       for word, value in idf_document.items()):
+        return None
+    if not isinstance(alpha, float) or not isinstance(k1, float) or not isinstance(b, float) \
+            or not 1.2 <= k1 <= 2.0 or not 0.0 <= b <= 1.0:
+        return None
+    if not isinstance(avg_doc_len, float) or isinstance(avg_doc_len, (bool, int)) \
+            or avg_doc_len < 0:
+        return None
+    if not isinstance(doc_len, int) or isinstance(doc_len, bool) or doc_len < 0:
+        return None
+    bm25_optimized = {}
+    for word in vocab:
+        if word in idf_document and idf_document[word] >= alpha:
+            bm25_optimized[word] = (idf_document[word] *
+                                    ((document.count(word) * (k1 + 1)) /
+                                     (document.count(word) + k1 *
+                                      (1 - b + (b * doc_len / avg_doc_len)))))
+    for word in document:
+        if word not in bm25_optimized:
+            if word in idf_document and idf_document[word] >= alpha:
+                bm25_optimized[word] = (idf_document[word] *
+                                        ((document.count(word) * (k1 + 1)) /
+                                         (document.count(word) + k1 *
+                                          (1 - b + (b * doc_len / avg_doc_len)))))
+    return bm25_optimized
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:
@@ -317,6 +349,15 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if not isinstance(index, list) or not isinstance(file_path, str) \
+            or not any(index and file_path) \
+            or not all(isinstance(doc, dict) for doc in index) \
+            or not any(isinstance(word, str) and isinstance(value, float)
+                       for doc in index for word, value in doc.items()):
+        return None
+    with open(file_path, 'w', encoding='utf-8') as new_file:
+        json.dump(index, new_file, indent=4, ensure_ascii=False)
+    return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -331,6 +372,16 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(file_path, str) or not file_path:
+        return None
+    with open(file_path, 'r', encoding='utf-8') as file_to_read:
+        indexes = json.load(file_to_read)
+    if not isinstance(indexes, list) or not indexes \
+            or not all(isinstance(doc, dict) for doc in indexes) \
+            or not any(isinstance(word, str) and isinstance(value, float)
+                       for doc in indexes for word, value in doc.items()):
+        return None
+    return indexes
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -346,3 +397,13 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(rank, list) or not isinstance(golden_rank, list) \
+            or not any(rank and golden_rank) \
+            or not all(isinstance(indice, int) for indice in rank) \
+            or not all(isinstance(indice, int) for indice in golden_rank):
+        return None
+    if len(rank) != len(golden_rank):
+        return None
+    spearman = 1 - ((6 * (sum((value - golden_rank[i]) ** 2 for i, value in enumerate(rank))))
+                    / (len(rank) * (len(rank) ** 2 - 1)))
+    return spearman

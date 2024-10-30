@@ -2,9 +2,11 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
-                                         calculate_tf, calculate_tf_idf, rank_documents,
-                                         remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
+                                         calculate_bm25_with_cutoff, calculate_idf,
+                                         calculate_spearman, calculate_tf, calculate_tf_idf,
+                                         load_index, rank_documents, remove_stopwords, save_index,
+                                         tokenize)
 
 
 def main() -> None:
@@ -74,11 +76,34 @@ def main() -> None:
             result = None
             assert result, "Result is None"
         bm25.append(bm25_of_doc)
+    bm25_opt = []
+    for tokenized_doc in all_tokenized_docs:
+        bm25_opt_of_doc = calculate_bm25_with_cutoff(vocabulary, tokenized_doc, idf, 0.2,
+                                                     1.5, 0.75, avg_len, len(tokenized_doc))
+        if bm25_opt_of_doc is None:
+            result = None
+            assert result, "Result is None"
+        bm25_opt.append(bm25_opt_of_doc)
     rank_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
     rank_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
-    result = rank_tf_idf
-    result_2 = rank_bm25
-    print(result, '\n', result_2)
+    save_index(bm25_opt, 'assets/metrics.json')
+    loaded_metrics = load_index('assets/metrics.json')
+    if loaded_metrics is None:
+        result = None
+        assert result, "Result is None"
+    rank_bm25_opt = rank_documents(loaded_metrics, 'Which fairy tale has Fairy Queen?', stopwords)
+    if rank_tf_idf is None or rank_bm25 is None or rank_bm25_opt is None:
+        result = None
+        assert result, "Result is None"
+    golden_rank = [v[0] for v in rank_bm25_opt]
+    spearman_tf_idf = calculate_spearman([v[0] for v in rank_tf_idf], golden_rank)
+    spearman_bm25 = calculate_spearman([v[0] for v in rank_bm25], golden_rank)
+    spearman_bm25_opt = calculate_spearman([v[0] for v in rank_bm25_opt], golden_rank)
+    if spearman_tf_idf is None or spearman_bm25 is None or spearman_bm25_opt is None:
+        result = None
+        assert result, "Result is None"
+    result = golden_rank
+    print(result, spearman_tf_idf, spearman_bm25, spearman_bm25_opt)
     assert result, "Result is None"
 
 

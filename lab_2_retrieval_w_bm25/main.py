@@ -89,9 +89,9 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     """
     if not isinstance(vocab, document_tokens, list[str]):
         return None
-    n_t = document_tokens.count()
-    |D| = len(document_tokens)
-    TF = \frac{n_t}{|D|}
+    n_t = document_tokens.count
+    D = len(vocab)
+    TF = n_t+D
     dict_tf = {}
     dict_tf[document_tokens] = TF
     return dict_tf

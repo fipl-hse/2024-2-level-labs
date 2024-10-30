@@ -2,7 +2,8 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import remove_stopwords, tokenize,
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
+                                         calculate_tf_idf, remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -34,6 +35,17 @@ def main() -> None:
     for document in documents:
         doc_with_tokens.append(tokenize(document))
         cleared_doc.append(remove_stopwords(tokenize(document), stopwords))
+
+    vocab = build_vocabulary(doc_with_tokens)
+    doc_with_tf = []
+    for doc_with_tokens in doc_with_tf:
+        doc_with_tf.append(calculate_tf(vocab,doc_with_tokens))
+
+    idf = calculate_idf(vocab, doc_with_tokens)
+
+    for doc in doc_with_tf:
+        result = calculate_tf_idf(doc, idf)
+        print(result)
 
     print(doc_with_tokens[0])
     print(cleared_doc[0])

@@ -5,7 +5,7 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 
-from math import log
+import math
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -117,12 +117,18 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not isinstance(vocab, list) or not all (isinstance(token, str) for token in vocab) or not vocab):
+    if (not isinstance(vocab, list)
+            or not all(isinstance(word, str) for word in vocab)
+            or not vocab):
         return None
-    if (not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents) or not documents):
+    if (not isinstance(documents, list)
+            or not all(isinstance(token, list) for token in documents)
+            or not documents):
         return None
-    if not all (isinstance(word, str) for doc in documents for word in doc):
-        return None
+    for text in documents:
+        for word in text:
+            if not isinstance(word, str):
+                return None
     calculated_idf = {}
     num_docs = len(documents)
     for term in vocab:
@@ -130,9 +136,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         for document in documents:
             if term in documents:
                 doc_count += 1
-            if doc_count == 0:
-                return None
-        calculated_idf[term] = log((num_docs + 1) / (doc_count + 1)) + 1
+        if doc_count > 0:
+            calculated_idf[term] = math.log((num_docs + 0.5) / (doc_count + 0.5))
     return calculated_idf
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:

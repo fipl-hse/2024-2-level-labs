@@ -27,7 +27,8 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    result = remove_stopwords(tokenize(documents))
+    result = remove_stopwords(tokenize(documents[text]), stopwords)
+    print(result)
     assert result, "Result is None"
 
 

@@ -230,34 +230,34 @@ def rank_documents(
     return sorted(result, reverse=True, key=lambda res: res[1])
 
 
-def calculate_bm25_with_cutoff(
-    vocab: list[str],
-    document: list[str],
-    idf_document: dict[str, float],
-    alpha: float,
-    k1: float = 1.5,
-    b: float = 0.75,
-    avg_doc_len: float | None = None,
-    doc_len: int | None = None,
-) -> dict[str, float] | None:
-    """
-    Calculate BM25 scores for a document with IDF cutoff.
-
-    Args:
-        vocab (list[str]): Vocabulary list.
-        document (list[str]): Tokenized document.
-        idf_document (dict[str, float]): Inverse document frequencies.
-        alpha (float): IDF cutoff threshold.
-        k1 (float): BM25 parameter.
-        b (float): BM25 parameter.
-        avg_doc_len (float | None): Average document length.
-        doc_len (int | None): Length of the document.
-
-    Returns:
-        dict[str, float] | None: Mapping from terms to their BM25 scores with cutoff applied.
-
-    In case of corrupt input arguments, None is returned.
-    """
+# def calculate_bm25_with_cutoff(
+#     vocab: list[str],
+#     document: list[str],
+#     idf_document: dict[str, float],
+#     alpha: float,
+#     k1: float = 1.5,
+#     b: float = 0.75,
+#     avg_doc_len: float | None = None,
+#     doc_len: int | None = None,
+# ) -> dict[str, float] | None:
+#     """
+#     Calculate BM25 scores for a document with IDF cutoff.
+#
+#     Args:
+#         vocab (list[str]): Vocabulary list.
+#         document (list[str]): Tokenized document.
+#         idf_document (dict[str, float]): Inverse document frequencies.
+#         alpha (float): IDF cutoff threshold.
+#         k1 (float): BM25 parameter.
+#         b (float): BM25 parameter.
+#         avg_doc_len (float | None): Average document length.
+#         doc_len (int | None): Length of the document.
+#
+#     Returns:
+#         dict[str, float] | None: Mapping from terms to their BM25 scores with cutoff applied.
+#
+#     In case of corrupt input arguments, None is returned.
+#     """
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:

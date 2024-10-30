@@ -3,9 +3,9 @@ Lab 2.
 
 Text retrieval with BM25
 """
+import json
 # pylint:disable=too-many-arguments, unused-argument
 import math
-import json
 
 
 def tokenize(text: str) -> list[str] | None:

@@ -71,8 +71,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         if token in stopwords:
             continue
         clean_tokens.append(token)
-    if not clean_tokens:
-        return None
+
     return clean_tokens
 
 
@@ -103,9 +102,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
                 return None
             if token not in unique_words:
                 unique_words.append(token)
-    if unique_words:
-        return unique_words
-    return None
+
+    return unique_words
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """
@@ -139,9 +137,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             return None
         if token not in frequency:
             frequency[token] = document_tokens.count(token) / len(document_tokens)
-    if frequency:
-        return frequency
-    return None
+
+    return frequency
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """
@@ -179,9 +176,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
                 amount += 1
         idf = log((len(documents) - amount + 0.5) / (amount + 0.5))
         map_idf_scores[voc] = idf
-    if map_idf_scores:
-        return map_idf_scores
-    return None
+
+    return map_idf_scores
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -212,10 +208,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     for t in tf.keys():
         score = tf[t] * idf[t]
         map_scores[t] = score
-    if map_scores:
-        return map_scores
 
-    return None
+    return map_scores
 
 
 def calculate_bm25(
@@ -245,27 +239,31 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
 
-    if any((not isinstance(vocab, list), not isinstance(document, list),
-            not isinstance(idf_document, dict),
-            not isinstance(k1, float), not isinstance(b, float),
-            not isinstance(avg_doc_len, float), not isinstance(doc_len, int),
-            isinstance(doc_len, bool), not avg_doc_len,
-            not isinstance(k1, float), not isinstance(b, float),
-            not doc_len, not vocab, not idf_document, not document)):
+    if not vocab or not isinstance(vocab, list):
         return None
 
-    for voc in vocab:
-        if not isinstance(voc, str):
+    for item in vocab:
+        if not isinstance(item, str):
             return None
 
-    for token in document:
-        if not isinstance(token, str):
+
+    if not document or not isinstance(document, list):
+        return None
+
+    for item in document:
+        if not isinstance(item, str):
+            return None
+    if not idf_document or not isinstance(idf_document, dict):
+        return None
+
+    for item in idf_document:
+        if not isinstance(item, str) or not isinstance(idf_document[item], float):
             return None
 
-    for pair in idf_document:
-        if not (isinstance(pair, str) and isinstance(idf_document[pair], float)):
-            return None
-
+    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) \
+        or isinstance(doc_len, bool) or not isinstance(k1, float) \
+            or not isinstance(b, float):
+        return None
 
     bm5_doc = {}
 
@@ -281,8 +279,6 @@ def calculate_bm25(
             bm5_doc[tok] = (idf_document[tok] * freq * (k1 + 1)
                     / (freq + k1 * (1 - b + b * ((abs(doc_len)) / avg_doc_len))))
 
-    if not bm5_doc:
-        return None
     return bm5_doc
 
 
@@ -318,15 +314,22 @@ def rank_documents(
         if not isinstance(stopword, str):
             return None
 
+    tokenized_query = tokenize(query)
+    if tokenized_query is None:
+        return None
+    clean_query = remove_stopwords(tokenized_query, stopwords)
+    if clean_query is None:
+        return None
+
     uniq_query = []
-    for qu in remove_stopwords(tokenize(query), stopwords):
+    for qu in clean_query:
         if qu not in uniq_query:
             uniq_query.append(qu)
 
     unsorted_ranking_map = {}
 
     for i, doc in enumerate(indexes):
-        ranking_word = 0
+        ranking_word = 0.0
         for word in uniq_query:
             if word in doc:
                 ranking_word += doc[word]
@@ -338,8 +341,6 @@ def rank_documents(
     for sort_doc in sorted_dict:
         sorted_ranking_map.append((sort_doc, sorted_dict[sort_doc]))
 
-    if not sorted_ranking_map:
-        return None
     return sorted_ranking_map
 
 

@@ -45,14 +45,14 @@ def main() -> None:
     if clean_docs is None:
         result = None
         assert result, "Result is None"
+
     for doc in clean_docs:
-        if not isinstance(doc, list):
-            result = None
-            assert result, "Result is None"
+        assert isinstance(doc, list), "Result is None"
         for each in doc:
-            if not isinstance(each, str):
-                result = None
-                assert result, "Result is None"
+            assert isinstance(each, str), "Result is None"
+            # if not isinstance(each, str):
+            #     result = None
+            #     assert result, "Result is None"
 
     vocabulary = build_vocabulary(clean_docs)
     if not isinstance(vocabulary, list):

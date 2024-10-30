@@ -22,7 +22,7 @@ def tokenize(text: str) -> list[str] | None:
         return None
     for item in text:
         if not item.isalpha() and item != ' ':
-            text = text.replace(item, ' ')
+            text=text.replace(item, ' ')
     return text.lower().split()
 
 

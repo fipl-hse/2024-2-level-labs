@@ -74,7 +74,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     for doc in documents:
         if not all(isinstance(tkn, str) for tkn in doc):
             return None
-    out = list(set([tkn for tkn in sum(documents, [])]))
+    out = list({tkn for tkn in sum(documents, [])})
     return out
 
 
@@ -126,7 +126,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         return None
     ttl = len(documents)
     out = {}
-    for wrd in vocab:
+    vocexp = set(vocab)
+    for a in documents:
+        vocexp.update(a)
+    for wrd in vocexp:
         if not isinstance(wrd, str):
             return None
         temp = 0
@@ -211,7 +214,8 @@ def calculate_bm25(
             or not isinstance(doc_len, int) or doc_len is None or isinstance(doc_len, bool)):
         return None
     out = {}
-    for wrd in vocab:
+    vocexp = set(vocab + document)
+    for wrd in vocexp:
         curidf = idf_document[wrd]
         curcnt = document.count(wrd)
         tmpvar = (curcnt * (k1 + 1)) / (curcnt + k1 * (1 - b + b * (doc_len / avg_doc_len)))

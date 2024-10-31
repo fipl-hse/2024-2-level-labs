@@ -1,13 +1,14 @@
 """
 Run tests for each lab using pytest.
 """
-import subprocess
+from typing import Optional
 
 from tap import Tap
 
-from config.cli_unifier import _run_console_tool, choose_python_exe
-from config.common import check_result
-from config.constants import PROJECT_CONFIG_PATH
+from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.collect_coverage.run_coverage import get_target_score
+from config.common import check_skip
+from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.project_config import ProjectConfig
 
 
@@ -17,52 +18,82 @@ class CommandLineInterface(Tap):
     """
     pr_name: str
     pr_author: str
+    lab_path: Optional[str] = None
+    pytest_label: Optional[str] = None
 
 
-def run_tests(pr_name: str, pr_author: str, lab: str) -> subprocess.CompletedProcess:
+def prepare_pytest_args(lab_path: str, target_score: int,
+                        pytest_label: Optional[str] = None) -> list[str]:
     """
-    Run pytest tests for a specific lab.
+    Build the arguments for running pytest.
 
     Args:
-        pr_name (str): Pull request name.
-        pr_author (str): Pull request author.
-        lab (str): Name of the lab.
+        lab_path (str): Path to the lab.
+        target_score (int): Target score for the lab.
+        pytest_label (Optional[str]): Label for pytest.
 
     Returns:
-        subprocess.CompletedProcess: Result of the subprocess execution.
+        list[str]: List of arguments for pytest.
     """
-    args = [
-        str('config/run_pytest.py'),
-        '--pr_name', pr_name,
-        '--pr_author', pr_author,
-        '-l', lab,
-        '-m', lab
-    ]
-    return _run_console_tool(str(choose_python_exe()), args, debug=True)
+    if pytest_label is None:
+        pytest_label = lab_path
+
+    pytest_args = [
+        "-m",
+        f"mark{target_score} and {pytest_label}" if lab_path else pytest_label, "--capture=no"]
+    print(pytest_args)
+
+    if lab_path == "lab_5_scrapper":
+        pytest_args.append("--ignore=lab_6_pipeline")
+
+    return pytest_args
+
+
+@handles_console_error()
+def run_pytest(pytest_args: list[str]) -> tuple[str, str, int]:
+    """
+    Run pytest with the given arguments.
+
+    Args:
+        pytest_args (list[str]): Arguments for pytest.
+
+    Returns:
+        tuple[str, str, int]: stdout, stderr, exit code
+    """
+    args = ["-m", "pytest", *pytest_args]
+    return _run_console_tool(str(choose_python_exe()), args, cwd=PROJECT_ROOT, debug=True)
 
 
 def main() -> None:
     """
-    Main function to run tests.
+    Main function to run tests for only one lab or for one by one.
     """
     args = CommandLineInterface(underscores_to_dashes=True).parse_args()
 
-    project_config = ProjectConfig(PROJECT_CONFIG_PATH)
-    labs = project_config.get_labs_names()
+    if args.lab_path:
+        if check_skip(args.pr_name, args.lab_path):
+            return
+        target_score = get_target_score(PROJECT_ROOT / args.lab_path)
+        pytest_args = prepare_pytest_args(args.lab_path, target_score, args.pytest_label)
 
-    print(f"Current scope: {labs}")
+        run_pytest(pytest_args)
 
-    for lab_name in labs:
-        print(f"Running tests for lab {lab_name}")
+    else:
+        project_config = ProjectConfig(PROJECT_CONFIG_PATH)
+        labs = project_config.get_labs_names()
 
-        result = run_tests(args.pr_name, args.pr_author, lab_name)
+        print(f"Current scope: {labs}")
 
-        print(result.stdout.decode('utf-8'))
-        print(result.stderr.decode('utf-8'))
+        for lab_name in labs:
+            if check_skip(args.pr_name, lab_name):
+                continue
+            print(f"Running tests for lab {lab_name}")
 
-        check_result(result.returncode)
+            target_score = get_target_score(PROJECT_ROOT / lab_name)
+            pytest_args = prepare_pytest_args(lab_name, target_score)
 
-    print("All tests passed.")
+            run_pytest(pytest_args)
+
 
 
 if __name__ == "__main__":

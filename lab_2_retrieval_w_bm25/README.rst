@@ -317,11 +317,11 @@ They rarely leaved the tower, but the summer weather was just perfect for the hi
 Детские истории имеют следующие:
 
 -   ``{'wizard': 0.784, 'go': 0.0, 'weather': 0.0, 'morning': 0.0, 'rarely': 0.0,
-    'best': 0.65, 'date': 0.0, 'perfect': 0.0, 'used': 0.65, 'wand': 0.65, 'boy': -0.65,
-    'cat': 0.0, 'spells': 0.65, 'studying': 0.65, 'home': 0.0, 'dogs': 0.0, 'leave': 0.0,
-    'hill': 0.0, 'princess': 0.0, 'steven': 0.0, 'friend': 0.65, 'picnic': 0.0,
+    'best': 0.565, 'date': 0.0, 'perfect': 0.0, 'used': 0.565, 'wand': 0.565, 'boy': -0.565,
+    'cat': 0.0, 'spells': 0.565, 'studying': 0.565, 'home': 0.0, 'dogs': 0.0, 'leave': 0.0,
+    'hill': 0.0, 'princess': 0.0, 'steven': 0.0, 'friend': 0.565, 'picnic': 0.0,
     'three': 0.0, 'loved': 0.0, 'want': 0.0, 'parrots': 0.0, 'tower': 0.0, 'leaved': 0.0,
-    'dragon': 0.0, 'two': 0.0, 'summer': 0.0, 'school': -0.65, 'magic': 0.65, 'every': 0.0,
+    'dragon': 0.0, 'two': 0.0, 'summer': 0.0, 'school': -0.565, 'magic': 0.565, 'every': 0.0,
     'pets': 0.0, 'top': 0.0}``
 
 -   ``{'wizard': 0.0, 'go': 0.466, 'weather': 0.0, 'morning': 0.466, 'rarely': 0.0,

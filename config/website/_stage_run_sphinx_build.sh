@@ -8,13 +8,9 @@ echo 'Running Sphinx build check...'
 
 configure_script
 
-pushd config/website/test_sphinx_project
+rm -rf dist
 
-  # Treat warnings as errors, build full documentation
-  rm -rf _build
-  make html SPHINXOPTS="-W --keep-going -n"
-  check_if_failed
-
-popd
+sphinx-build -b html -W --keep-going -n . dist
+check_if_failed
 
 echo "Sphinx build succeeded."

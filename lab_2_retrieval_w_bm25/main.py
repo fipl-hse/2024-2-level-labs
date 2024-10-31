@@ -27,10 +27,8 @@ def tokenize(text: str) -> list[str] | None:
     text = text.lower()
     raw_text = []
     for symbol in text:
-        if symbol.isalpha():
+        if symbol.isalpha() or symbol == ' ':
             raw_text.append(symbol)
-            continue
-        raw_text.append(' ')
 
     raw_text_str = ''.join(raw_text)
     tokens = raw_text_str.split(' ')

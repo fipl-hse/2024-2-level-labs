@@ -51,7 +51,9 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tokens, list) or not isinstance(stopwords, list) or len(tokens) == 0 or len(stopwords) == 0:
+    if not isinstance(tokens, list) or not isinstance(stopwords, list):
+        return None
+    if len(tokens) == 0 or len(stopwords) == 0:
         return None
 
     for stopword in stopwords:
@@ -92,8 +94,6 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
             unique.add(token)
     if len(unique) == 0:
         return None
-    else:
-        return list(unique)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -133,9 +133,6 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     if len(result) == 0:
         return None
-    else:
-        return result
-
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """
@@ -163,7 +160,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             if not isinstance(word, str):
                 return None
 
-    N = len(documents)
+    numb = len(documents)
     idf = {}
     for word in vocab:
         if not isinstance(word, str):
@@ -173,7 +170,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             if word in document:
                 summ += 1
 
-        idf[word] = math.log((N - summ + 0.5) / (summ + 0.5))
+        idf[word] = math.log((numb - summ + 0.5) / (summ + 0.5))
 
     return idf
 

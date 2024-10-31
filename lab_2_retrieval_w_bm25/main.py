@@ -190,20 +190,25 @@ def calculate_bm25(
 
     if (not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)
             or not isinstance(document, list) or not all(isinstance(token, str) for token in document)
-            or len(vocab) == 0 or len(document) == 0 or not isinstance(idf_document, dict)
-            or len(idf_document) == 0 or not all(isinstance(value, float) for value in idf_document.values())
-            or not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float)
+            or len(vocab) == 0 or len(document) == 0 or not
+            isinstance(idf_document, dict) or len(idf_document) == 0
+            or not all(isinstance(value, float) for value in idf_document.values())
+            or not isinstance(k1, float) or not isinstance(b, float)
+            or not isinstance(avg_doc_len, float)
             or not isinstance(doc_len, int) or isinstance(doc_len, bool)):
         return None
     bm25 = {}
     for token in vocab:
-        bm25[token] = 0.0
         if token in idf_document:
             token_count = document.count(token)
             denominator = token_count + k1 * (1 - b + b * (doc_len / avg_doc_len))
             if denominator > 0:
                 bm25[token] = idf_document[token] * (token_count * (k1 + 1)) / denominator
-    return bm25 or None
+            else:
+                bm25[token] = 0.0
+        else:
+            bm25[token] = 0.0
+    return bm25
 
 
 def rank_documents(

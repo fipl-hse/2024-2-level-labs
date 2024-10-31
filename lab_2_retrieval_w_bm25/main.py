@@ -22,7 +22,6 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     new_text = ''
-    tokenized_list = []
     for sign in text.lower():
         if not sign.isalpha():
             added = ' '

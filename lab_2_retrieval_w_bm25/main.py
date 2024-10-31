@@ -27,12 +27,12 @@ def tokenize(text: str) -> list[str] | None:
     text = text.lower()
     raw_text = []
     for symbol in text:
-        if symbol.isalpha() or symbol == ' ':
+        if symbol.isalpha():
             raw_text.append(symbol)
-        if symbol == '\n':
-            raw_text.append('')
+            continue
+        raw_text.append(' ')
 
-    raw_text_str = ''.join(raw_text).lower()
+    raw_text_str = ''.join(raw_text)
     tokens = raw_text_str.split(' ')
 
     return tokens

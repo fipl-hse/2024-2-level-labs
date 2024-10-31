@@ -71,7 +71,8 @@ def main() -> None:
     args = CommandLineInterface(underscores_to_dashes=True).parse_args()
 
     if args.lab_path:
-        check_skip(args.pr_name, args.lab_path)
+        if check_skip(args.pr_name, args.lab_path):
+            return
         target_score = get_target_score(PROJECT_ROOT / args.lab_path)
         pytest_args = prepare_pytest_args(args.lab_path, target_score, args.pytest_label)
 
@@ -84,7 +85,8 @@ def main() -> None:
         print(f"Current scope: {labs}")
 
         for lab_name in labs:
-            check_skip(args.pr_name, lab_name)
+            if check_skip(args.pr_name, lab_name):
+                continue
             print(f"Running tests for lab {lab_name}")
 
             target_score = get_target_score(PROJECT_ROOT / lab_name)

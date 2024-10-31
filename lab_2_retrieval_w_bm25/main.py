@@ -153,9 +153,9 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     In case of corrupt input arguments, None is returned.
     """
 
-    if not tf or not idf or not isinstance(tf, dict) or not isinstance(idf, dict):
-        return None
-    if not all(isinstance(word, str) for word in idf):
+    if (not isinstance(tf, dict) or not isinstance(idf, dict) or
+            not all(isinstance(key, str) for key in tf.keys()) or
+            not all(isinstance(value, float) for value in tf.values())):
         return None
     tf_idf_dict = {word: tf[word] * idf.get(word, 0) for word in tf.keys()}
     return tf_idf_dict or None
@@ -188,20 +188,12 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
 
-    if not (vocab or document or idf_document):
-        return None
-    if (not isinstance(vocab, list) or not isinstance(document, list)
-            or not isinstance(idf_document, dict)):
-        return None
-    if (not all(isinstance(word, str) for word in vocab)
-            or not all(isinstance(word, str) for word in document)):
-        return None
-    if not all(isinstance(key, str)
-               and isinstance(value, float) for key, value in idf_document.items()):
-        return None
-    if (not isinstance(k1, float) or not isinstance(b, float)
-            or not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)
-            or isinstance(doc_len, bool)):
+    if (not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)
+            or not isinstance(document, list) or not all(isinstance(token, str) for token in document)
+            or len(vocab) == 0 or len(document) == 0 or not isinstance(idf_document, dict)
+            or len(idf_document) == 0 or not all(isinstance(value, float) for value in idf_document.values())
+            or not isinstance(k1, float) or not isinstance(b, float) or not isinstance(avg_doc_len, float)
+            or not isinstance(doc_len, int) or isinstance(doc_len, bool)):
         return None
     bm25 = {}
     for token in vocab:

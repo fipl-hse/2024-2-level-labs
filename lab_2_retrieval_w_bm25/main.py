@@ -147,9 +147,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         if not isinstance(word, str):
             return None
     for document in documents:
-        if not isinstance(document, list):
-            return None
-        if len(document) == 0:
+        if not isinstance(document, list) or len(document) == 0:
             return None
         for word in document:
             if not isinstance(word, str):
@@ -179,22 +177,14 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     """
     if not isinstance(tf, dict) or not isinstance(idf, dict):
         return None
-    if len(tf) == 0:
-        return None
-    if len(idf) == 0:
+    if len(tf) == 0 or len(idf) == 0:
         return None
 
-    for key in tf:
-        if not isinstance(key, str):
+    for key, value in tf.items():
+        if not isinstance(key, str) or not isinstance(value, float):
             return None
-    for value in tf.values():
-        if not isinstance(value, float):
-            return None
-    for key in idf:
-        if not isinstance(key, str):
-            return None
-    for value in idf.values():
-        if not isinstance(value, float):
+    for key, value in idf.items():
+        if not isinstance(key, str) or not isinstance(value, float):
             return None
 
     tf_idf_dict = {}
@@ -231,7 +221,8 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not isinstance(document, list) or not isinstance(idf_document, dict):
+    if not isinstance(vocab, list) or not isinstance(document, list) \
+            or not isinstance(idf_document, dict):
         return None
     if not isinstance(k1, float) or not isinstance(b, float):
         return None
@@ -277,7 +268,8 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(indexes, list) or not isinstance(query, str) or not isinstance(stopwords, list):
+    if not isinstance(indexes, list) or not isinstance(query, str) \
+            or not isinstance(stopwords, list):
         return None
     if len(indexes) == 0 or len(query) == 0 or len(stopwords) == 0:
         return None

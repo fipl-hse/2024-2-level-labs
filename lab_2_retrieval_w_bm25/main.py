@@ -4,6 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
+
 import math
 
 def tokenize(text: str) -> list[str] | None:
@@ -64,17 +65,13 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list) or len(documents) == 0:
+    if not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents):
         return None
-    unique_words = []
-    for text in documents:
-        if not isinstance(text, list):
-            return None
-        for word in text:
-            if not isinstance(word, str):
-                return None
-        unique_words += [word for word in text if word not in unique_words]
-    return unique_words
+
+    voc_of_un_words = set()
+    for doc in documents:
+        voc_of_un_words.update(doc)
+    return list(voc_of_un_words)
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """

@@ -124,6 +124,9 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     if not isinstance(documents, list) or not \
             all(isinstance(a, list) for a in documents):
         return None
+    for a in documents:
+        if not all(isinstance(elm, str) for elm in a):
+            return None
     ttl = len(documents)
     out = {}
     vocexp = set(vocab)
@@ -134,12 +137,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             return None
         temp = 0
         for a in documents:
-            if not all(isinstance(elm, str) for elm in a):
-                return None
             if a.count(wrd) > 0:
                 temp += 1
         if temp != 0:
-            out[wrd] = math.log1p(ttl / temp)
+            out[wrd] = math.log1p((ttl - temp + 0.5) / (temp + 0.5))
         else:
             out[wrd] = 0.0
     return out

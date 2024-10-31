@@ -89,25 +89,20 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab):
-        return None
-    if not isinstance(document_tokens, list) or not all(isinstance(token, str) for token in document_tokens):
-        return None
-    if not vocab or not document_tokens:
+    if not ((isinstance(vocab, list) and vocab and all(isinstance(word_1, str) for word_1 in vocab)) and
+       (isinstance(document_tokens, list) and document_tokens and
+       all(isinstance(word_2, str) for word_2 in document_tokens))):
         return None
 
-    term_frequencies = {}
-    token_counts = {}
+    all_words = set(vocab).union(document_tokens)
+    tf_dict = {}
+    for t_word in all_words:
 
-    for token in document_tokens:
-        token_counts[token] = token_counts.get(token, 0) + 1
+        tf_dict[t_word] = document_tokens.count(t_word) / len(document_tokens)
+        if t_word not in document_tokens:
+            tf_dict[t_word] = 0.0
 
-    document_length = len(document_tokens)
-    for term in vocab:
-        count = token_counts.get(term, 0)
-        term_frequencies[term] = count / document_length if document_length > 0 else 0.0
-
-    return term_frequencies
+    return tf_dict
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:

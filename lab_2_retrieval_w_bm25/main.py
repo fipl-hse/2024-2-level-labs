@@ -262,6 +262,8 @@ def rank_documents(
             return None
 
     tokenized_query = tokenize(query)
+    if not tokenized_query:
+        return None
     tokenized_query = remove_stopwords(tokenized_query, stopwords)
     if not tokenized_query:
         return None

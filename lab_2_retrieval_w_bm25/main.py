@@ -22,7 +22,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     out = []
-    wrd = ''  # temp var
+    wrd = ''
     for char in text.lower():
         if char.isalpha():
             wrd += char

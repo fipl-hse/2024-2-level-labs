@@ -66,7 +66,7 @@ def main() -> None:
         if not isinstance(bm, dict):
             return
     print(okapi)
-    tstqr = 'Which fairy tale has Fairy Queen?'  # TestQuery
+    tstqr = 'Which fairy tale has Fairy Queen?'
     res2 = func.rank_documents(tidfttl, tstqr, stopwords)
     print(res2)
     res3 = func.rank_documents(okapi, tstqr, stopwords)

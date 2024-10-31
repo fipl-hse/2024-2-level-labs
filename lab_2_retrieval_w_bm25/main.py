@@ -30,7 +30,7 @@ def tokenize(text: str) -> list[str] | None:
             if wrd != '':
                 out.append(wrd)
             wrd = ''
-    return out or None
+    return out
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -52,10 +52,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if (not stopwords or not isinstance(stopwords, list) or
             not all(isinstance(word, str) for word in stopwords)):
         return None
-    srtd = []
-    for token in tokens:
-        if token not in stopwords:
-            srtd.append(token)
+    srtd = [t for t in tokens if t not in stopwords]
     return srtd
 
 
@@ -255,6 +252,8 @@ def rank_documents(
     if not qtoken or not isinstance(qtoken, list):
         return None
     prcsd = remove_stopwords(qtoken, stopwords)
+    if not prcsd:
+        return None
     dscore = []
     curid = 0
     for doc in indexes:

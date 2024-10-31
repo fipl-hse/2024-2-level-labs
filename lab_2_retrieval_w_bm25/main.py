@@ -92,13 +92,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if (not all(isinstance(term, str) for term in vocab) or
             not all(isinstance(token, str) for token in document_tokens)):
         return None
-    tf_dict = {word: 0 for word in vocab}
-    if len(document_tokens) == 0:
-        return {word: 0.0 for word in vocab}
-    for word in document_tokens:
-        if word in vocab:
-            tf_dict[word] += 1
-    return {word: times/len(document_tokens) for word,times in tf_dict.items()}
+    tf_dict = {word: (document_tokens.count(word) / len(document_tokens)) for word in set(vocab + document_tokens)}
+    return tf_dict
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -132,6 +127,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     return idf_dict
 
 
+
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
     """
     Calculate TF-IDF scores for a document.
@@ -149,7 +145,10 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
         return None
     if not all(isinstance(word, str) for word in idf):
         return None
-    return {word: tf[word] * idf[word] for word in tf if word in idf}
+    tf_idf = {word: tf[word] * idf[word] for word in tf if word in idf}
+    if not tf_idf:
+        return None
+    return tf_idf
 
 
 def calculate_bm25(
@@ -189,14 +188,18 @@ def calculate_bm25(
     if not all((isinstance(key, str) and isinstance(value, float) for key, value in
                 idf_document.items())):
         return None
+    if not vocab or not document or not idf_document:
+        return None
 
     bm25 = {}
-    for word in set(vocab):
+    for word in set(vocab + document):
         if word not in idf_document:
             bm25[word] = 0.0
         else:
             bm25[word] = (idf_document[word] * document.count(word) * (k1 + 1) /
                               (document.count(word) + k1 * (1 - b + b * doc_len / avg_doc_len)))
+    if not bm25:
+        return None
     return bm25
 
 def rank_documents(
@@ -233,6 +236,8 @@ def rank_documents(
                                in document)
         results.append((num,token_values_sum))
     results.sort(key=lambda x: x[-1], reverse=True)
+    if not results:
+        return None
     return results
 
 

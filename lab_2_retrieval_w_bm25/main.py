@@ -41,11 +41,11 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     In case of corrupt input arguments, None is returned.
     """
 
-    if not (isinstance(tokens, list) or all(isinstance(token, str)
-                                            for token in tokens) or tokens):
+    if (not tokens or not isinstance(tokens, list) or not
+            all(isinstance(token, str)for token in tokens)):
         return None
-    if not (isinstance(stopwords, list) or all(isinstance(word, str)
-                                               for word in stopwords) or stopwords):
+    if (not stopwords or not isinstance(stopwords, list) or not
+            all(isinstance(stopword, str) for stopword in stopwords)):
         return None
     return [token for token in tokens if token not in stopwords]
 
@@ -66,8 +66,9 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if (not isinstance(documents, list) or not documents
             or not all(isinstance(doc, list) for doc in documents)):
         return None
-    if not all(isinstance(token, str) for doc in documents for token in doc):
-        return None
+    for doc in documents:
+        if not all(isinstance(token, str) for token in doc):
+            return None
     vocabulary = set()
     for doc in documents:
         vocabulary.update(doc)
@@ -88,13 +89,11 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     In case of corrupt input arguments, None is returned.
     """
 
-    if not (vocab or document_tokens):
+    if (not vocab or not document_tokens or not isinstance(vocab, list)
+            or not isinstance(document_tokens, list)):
         return None
-    if vocab is None or document_tokens is None:
-        return None
-    if not (isinstance(vocab, list) or isinstance(document_tokens, list)):
-        return None
-    if not all(isinstance(word, str) for word in vocab + document_tokens):
+    if (not all(isinstance(word, str) for word in vocab)
+            or not all(isinstance(word, str) for word in document_tokens)):
         return None
     unique_words = set(vocab).union(set(document_tokens))
     tf_dict = {word: 0 for word in unique_words}

@@ -4,8 +4,6 @@ Laboratory Work #2 starter
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
                                          calculate_tf_idf, remove_stopwords, tokenize)
-
-
 def main() -> None:
     """
     Launches an implementation
@@ -51,6 +49,7 @@ def main() -> None:
     # print(tf_values_lst)
     for doc in tf_values_lst:
         print(calculate_tf_idf(doc, calculate_idf(vocab, meaningful_docs)))
+    assert result, "Result is None"
 
 if __name__ == "__main__":
     main()

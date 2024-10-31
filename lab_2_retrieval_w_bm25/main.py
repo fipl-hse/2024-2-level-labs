@@ -92,7 +92,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     for document in documents:
         for word in document:
-            if document.count(word) > 1:
+            if document.count(word) == 1:
                 vocabulary.append(word)
 
     return vocabulary

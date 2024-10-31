@@ -158,7 +158,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     if not all(isinstance(word, str) for word in idf):
         return None
     tf_idf_dict = {word: tf[word] * idf.get(word, 0) for word in tf.keys()}
-    return tf_idf_dict
+    return tf_idf_dict or None
 
 
 def calculate_bm25(
@@ -205,16 +205,13 @@ def calculate_bm25(
         return None
     bm25 = {}
     for token in vocab:
-        if token not in idf_document:
-            bm25[token] = 0.0
-        else:
+        bm25[token] = 0.0
+        if token in idf_document:
             token_count = document.count(token)
             denominator = token_count + k1 * (1 - b + b * (doc_len / avg_doc_len))
-            if denominator == 0:
-                bm25[token] = 0.0
-            else:
+            if denominator > 0:
                 bm25[token] = idf_document[token] * (token_count * (k1 + 1)) / denominator
-    return bm25
+    return bm25 or None
 
 
 def rank_documents(

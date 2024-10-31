@@ -62,6 +62,7 @@ def main() -> None:
             if not isinstance(bm25_res, dict):
                 return None
             bm25.append(bm25_res)
+
         tf_idf_work = rank_documents(tf_idf_res, 'Which fairy tale has Fairy Queen?', stopwords)
         bm25_work = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
         if (not isinstance(tf_idf_work, list) or not isinstance(bm25_work, list)

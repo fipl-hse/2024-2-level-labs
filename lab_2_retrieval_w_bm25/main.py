@@ -3,7 +3,7 @@ Lab 2.
 
 Text retrieval with BM25
 """
-import copy
+# import copy
 import math
 
 # pylint:disable=too-many-arguments, unused-argument
@@ -27,8 +27,7 @@ def tokenize(text: str) -> list[str] | None:
     for element in text.lower():
         if element.isalpha() or element == ' ':
             tokenized_text += element
-        else:
-            tokenized_text += ' '
+            continue
     return tokenized_text.split()
 
 
@@ -51,11 +50,12 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if (not isinstance(stopwords, list) or not all(isinstance(words, str) for words in stopwords)
             or not stopwords):
         return None
-    new_tokens = copy.deepcopy(tokens)
+    new_tokens = set(tokens) - set(stopwords)
+    '''new_tokens = copy.deepcopy(tokens)
     for token in tokens:
         if token in stopwords:
-            new_tokens.remove(token)
-    return new_tokens
+            new_tokens.remove(token)'''
+    return list(new_tokens)
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

@@ -33,14 +33,14 @@ def main() -> None:
     for document in documents:
         tokenized_text = tokenize(document)
         if not isinstance(tokenized_text, list):
-            return None
+            return
         without_stopwords = remove_stopwords(tokenized_text, stopwords)
         if not isinstance(without_stopwords, list):
-            return None
+            return
         clear_texts.append(without_stopwords)
     vocabulary = build_vocabulary(clear_texts)
     if not isinstance(vocabulary, list):
-        return None
+        return
     tf_idf = []
     bm25 = []
     idf = calculate_idf(vocabulary, clear_texts)
@@ -48,18 +48,17 @@ def main() -> None:
     for text in clear_texts:
         tf = calculate_tf(vocabulary, text)
         if not isinstance(tf, dict) or not isinstance(idf, dict):
-            return None
+            return
         tf_idf_text = calculate_tf_idf(tf, idf)
         bm25_text = calculate_bm25(vocabulary, text, idf, 1.5, 0.75, avgdl, len(text))
         if not isinstance(tf_idf_text, dict) or not isinstance(bm25_text, dict):
-            return None
+            return
         tf_idf.append(tf_idf_text)
         bm25.append(bm25_text)
     rank_tf_idf = rank_documents(tf_idf, 'Which fairy tale has Fairy Queen?', stopwords)
     rank_bm25 = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
     result = rank_tf_idf, rank_bm25
     assert result, "Result is None"
-    return None
 
 
 if __name__ == "__main__":

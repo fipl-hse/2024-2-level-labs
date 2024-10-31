@@ -2,8 +2,9 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_idf, calculate_tf,
-                                         calculate_tf_idf, remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
+                                         remove_stopwords, tokenize)
 
 
 def main() -> None:
@@ -29,31 +30,40 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    tokenized_documents = []
-    for document in documents:
-        tokenized_doc = tokenize(document)
-        if tokenized_doc is not None:
-            tokenized_doc = remove_stopwords(tokenized_doc, stopwords)
-        if tokenized_doc is not None:
-            tokenized_documents.append(tokenized_doc)
-    vocab = build_vocabulary(tokenized_documents)
-    if vocab is None:
-        return
-    idf = calculate_idf(vocab, tokenized_documents)
-    if idf is None:
-        return
-    for tokenized_doc in tokenized_documents:
-        if tokenized_doc is None:
+
+    text_sort = []
+    bm25_lis = []
+    docs_len = 0
+    for text in documents:
+        text_new = tokenize(text)
+        if text_new is None:
             return
-        tf = calculate_tf(vocab, tokenized_doc)
-        if tf is not None:
-            tf_idf_doc = calculate_tf_idf(tf, idf)
-            if tf_idf_doc is not None:
-                tf_idf.append(tf_idf_doc)
-    if tf_idf:
-        result = tf_idf
-    else:
-        result = None
+        tokens_cleared = remove_stopwords(text_new, stopwords)
+        if tokens_cleared is None:
+            return
+        text_sort.append(tokens_cleared)
+        docs_len += len(text_new)
+    avg_docs_len = docs_len / len(documents)
+    voc = build_vocabulary(text_sort)
+    if voc is None:
+        return
+    for new_text in text_sort:
+        idf = calculate_idf(voc, text_sort)
+        if idf is None:
+            return
+        bm = calculate_bm25(voc, new_text, idf, 1.5, 0.75,
+                            avg_docs_len, len(new_text))
+        if bm is None:
+            return
+        bm25_lis.append(bm)
+    query = 'Which fairy tale has Fairy Queen?'
+    if bm25_lis is None:
+        return
+    rank = rank_documents(bm25_lis, query, stopwords)
+    result = rank
+    print(result)
+    print(documents[0])
+
     assert result, "Result is None"
 
 

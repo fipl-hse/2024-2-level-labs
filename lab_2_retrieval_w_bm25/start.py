@@ -50,11 +50,7 @@ def main() -> None:
         return None
     for item in doc_tokens:
         tf = calculate_tf(vocab, item)
-        if not isinstance(tf, dict):
-            return None
         union_dict = calculate_tf_idf(tf, idf)
-        if not isinstance(union_dict, dict):
-            return None
         tf_idf_res.append(union_dict)
 
         length = 0.0

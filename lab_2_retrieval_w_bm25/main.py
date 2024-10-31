@@ -21,11 +21,10 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(text, str):
+    if not text or not isinstance(text, str):
         return None
 
-    clean_text = re.sub(r'[^\s\w]+|\d+', r' ', text.lower())
-    return clean_text.split()
+    return re.sub(r'[^\s\w]+|\d+', r' ', text.lower()).split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -48,7 +47,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
             or not all(isinstance(stopword, str) for stopword in stopwords):
         return None
 
-    return [token for token in tokens if token not in stopwords]
+    return list(filter(lambda token: token not in stopwords, tokens))
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -101,7 +100,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     for token in document_tokens:
         if token not in vocab:
             vocab.append(token)
-    return dict(zip(vocab, [document_tokens.count(term) / len(document_tokens) for term in vocab]))
+    tokens_num = len(document_tokens)
+    return dict(zip(vocab, [document_tokens.count(term) / tokens_num for term in vocab]))
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -127,12 +127,13 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             return None
 
     idf_dict = {}
+    docs_num = len(documents)
     for term in vocab:
         documents_w_term = 0
         for document in documents:
             if term in document:
                 documents_w_term += 1
-        idf_dict[term] = math.log((len(documents) - documents_w_term + 0.5)
+        idf_dict[term] = math.log((docs_num - documents_w_term + 0.5)
                                   / (documents_w_term + 0.5))
     return idf_dict
 
@@ -153,7 +154,6 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     if not tf or not isinstance(tf, dict) or not idf or not isinstance(idf, dict) \
             or not all(isinstance(term, str) for term in idf):
         return None
-
     return {term: tf[term] * idf[term] for term in tf if term in idf} or None
 
 
@@ -199,9 +199,10 @@ def calculate_bm25(
 
     vocab.extend([term for term in document if term not in vocab])
     idf_document.update({term: 0.0 for term in vocab if term not in idf_document})
-    immutable = k1 * (1 - b + b * doc_len / avg_doc_len)
-    return {term: idf_document[term] *
-            document.count(term) * (k1 + 1) / (document.count(term) + immutable)
+    immutable_1 = k1 + 1
+    immutable_2 = k1 * (1 - b + b * doc_len / avg_doc_len)
+    return {term: idf_document[term] * document.count(term) * immutable_1
+            / (document.count(term) + immutable_2)
             for term in vocab}
 
 
@@ -279,16 +280,18 @@ def calculate_bm25_with_cutoff(
             or not isinstance(k1, float) or not isinstance(b, float) \
             or not isinstance(avg_doc_len, float):
         return None
-    if not isinstance(doc_len, int) or doc_len < 0 or not all(isinstance(term, str) for term in vocab) \
+    if not isinstance(doc_len, int) or doc_len < 0 \
+            or not all(isinstance(term, str) for term in vocab) \
             or not all(isinstance(token, str) for token in document):
         return None
     if isinstance(doc_len, bool) or not all(isinstance(term, str) for term in idf_document) \
             or not all(isinstance(freq, float) for freq in idf_document.values()):
         return None
 
-    immutable = k1 * (1 - b + b * doc_len / avg_doc_len)
-    return {term: idf_document[term] * document.count(term) * (k1 + 1)
-            / (document.count(term) + immutable)
+    immutable_1 = k1 + 1
+    immutable_2 = k1 * (1 - b + b * doc_len / avg_doc_len)
+    return {term: idf_document[term] * document.count(term) * immutable_1
+            / (document.count(term) + immutable_2)
             for term in vocab if idf_document[term] > alpha}
 
 
@@ -306,6 +309,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
 
     with open(file_path, 'w', encoding='utf-8') as index_file:
         json.dump(index, index_file, indent=4)
+    return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -325,6 +329,8 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     with open(file_path, 'r', encoding='utf-8') as index_file:
         index = json.load(index_file)
+    if not isinstance(index, list):
+        return None
     return index
 
 
@@ -349,8 +355,6 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
         return None
 
     n = len(rank)
-    rank_diff_sum = 0.0
-    for number in rank:
-        if number in golden_rank:
-            rank_diff_sum += (golden_rank.index(number) - rank.index(number)) ** 2
+    rank_diff_sum = sum((rank.index(number) - golden_rank.index(number)) ** 2
+                        for number in rank if number in golden_rank)
     return 1 - (6 * rank_diff_sum) / (n * (n ** 2 - 1))

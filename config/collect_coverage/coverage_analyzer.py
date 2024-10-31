@@ -7,12 +7,13 @@ from pathlib import Path
 from typing import Iterable, Mapping, Optional
 
 from config.collect_coverage.run_coverage import (CoverageCreateReportError, CoverageRunError,
+                                                  extract_percentage_from_report,
                                                   run_coverage_collection)
 from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.lab_settings import LabSettings
 from config.project_config import ProjectConfig
 
-CoverageResults = Mapping[str, tuple[Optional[int], ]]
+CoverageResults = Mapping[str, tuple[Optional[int],]]
 
 
 def collect_coverage(all_labs_names: Iterable[Path],
@@ -35,9 +36,13 @@ def collect_coverage(all_labs_names: Iterable[Path],
                 check_target = False
             else:
                 check_target = True
-            percentage = run_coverage_collection(lab_path=lab_path,
-                                                                   artifacts_path=artifacts_path,
-                                                                   check_target_score=check_target)
+            run_coverage_collection(
+                lab_path=lab_path,
+                artifacts_path=artifacts_path,
+                check_target_score=check_target
+            )
+            report_path = artifacts_path / f'{lab_path.name}.json'
+            percentage = extract_percentage_from_report(report_path)
         except (CoverageRunError, CoverageCreateReportError) as e:
             print(e)
         finally:

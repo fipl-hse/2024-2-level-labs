@@ -2,7 +2,6 @@
 Check mypy for type checking in Python code.
 """
 # pylint: disable=duplicate-code
-import subprocess
 from os import listdir
 from pathlib import Path
 
@@ -13,7 +12,7 @@ from config.project_config import ProjectConfig
 
 
 @handles_console_error()
-def check_mypy_on_paths(paths: list[Path], path_to_config: Path) -> subprocess.CompletedProcess:
+def check_mypy_on_paths(paths: list[Path], path_to_config: Path) -> tuple[str, str, int]:
     """
     Run mypy checks for the project.
 
@@ -22,7 +21,7 @@ def check_mypy_on_paths(paths: list[Path], path_to_config: Path) -> subprocess.C
         path_to_config (Path): Path to the config.
 
     Returns:
-        subprocess.CompletedProcess: Program execution values.
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     mypy_args = [
         "-m",

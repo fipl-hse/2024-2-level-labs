@@ -26,7 +26,6 @@ def get_paths() -> list:
         'build',
         'russian-syntagrus-ud-2.0-170801.udpipe',
         'tmp',
-        '_build',
         'intersphinx',
         'test_tmp',
         'dist'
@@ -70,7 +69,6 @@ def check_paths(list_with_paths: list) -> list:
         is_ok_file = (
                 path.name not in paths_to_exclude and
                 '__pycache__' not in str(path) and
-                'assets' not in str(path) and
                 path.suffix not in bad_endings
         )
         if is_file and is_ok_file:

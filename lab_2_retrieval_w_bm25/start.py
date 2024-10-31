@@ -52,6 +52,7 @@ def main() -> None:
         union_dict = calculate_tf_idf(tf, idf)
         tf_idf_res.append(union_dict)
 
+
         length = 0.0
         for item in doc_tokens:
             length += len(item)

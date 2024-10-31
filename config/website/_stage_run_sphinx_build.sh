@@ -10,7 +10,7 @@ configure_script
 
 rm -rf dist
 
-make -C config/website/test_sphinx_project html SPHINXOPTS="-W --keep-going -n"
+sphinx-build -b html -W --keep-going -n . dist
 check_if_failed
 
 echo "Sphinx build succeeded."

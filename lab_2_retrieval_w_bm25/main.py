@@ -65,10 +65,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if not (len(tokens) and len(stopwords)):
         return None
 
-    tokens_without_stopwords = []
-    for token in tokens:
-        if token not in stopwords:
-            tokens_without_stopwords.append(token)
+    tokens_without_stopwords = ([token for token in tokens if token not in stopwords]
+                                if tokens and stopwords else None)
 
     return tokens_without_stopwords
 
@@ -164,10 +162,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     for doc in documents:
         for token in set(doc):
             if token in vocab:
-                if not token in idf_dict:
-                    idf_dict[token] = 1
-                else:
-                    idf_dict[token] += 1
+                idf_dict[token] = idf_dict.get(token, 0) + 1
 
     idf_final = {}
     for key, value in idf_dict.items():
@@ -324,7 +319,7 @@ def rank_documents(
             if ranged_documents[j][1] < ranged_documents[j + 1][1]:
                 (ranged_documents[j], ranged_documents[j + 1]) = (ranged_documents[j + 1],
                                                                   ranged_documents[j])
-    # что-то тут странное
+
     if not ranged_documents:
         return None
     return ranged_documents

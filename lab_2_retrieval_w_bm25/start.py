@@ -103,12 +103,14 @@ def main() -> None:
     r_bm25 = [elem[0] for elem in bm25_ranking]
     r_bm25_with_cutoff = [elem[0] for elem in bm25_with_cutoff_ranking]
 
-    tfidf_spearman_corr = calculate_spearman(r_tfidf, r_bm25_with_cutoff)
-    bm25_spearman_corr = calculate_spearman(r_bm25, r_bm25_with_cutoff)
-    print(f'tfidf spearman: {tfidf_spearman_corr}')
-    print(f'bm25 spearman: {bm25_spearman_corr}')
+    tfidf_bm25_corr = calculate_spearman(r_tfidf, r_bm25)
+    tfidf_bm25cut_spearman_corr = calculate_spearman(r_tfidf, r_bm25_with_cutoff)
+    bm25_bm25cut_spearman_corr = calculate_spearman(r_bm25, r_bm25_with_cutoff)
+    print(f'tfidf and bm25 spearman correlation: {tfidf_bm25_corr}')
+    print(f'tfidf and bm25 with cutoff spearman correlation: {tfidf_bm25cut_spearman_corr}')
+    print(f'bm25 and bm25 with cutoff spearman correlation: {bm25_bm25cut_spearman_corr}')
 
-    result = bm25_spearman_corr, tfidf_spearman_corr
+    result = tfidf_bm25_corr, bm25_bm25cut_spearman_corr, tfidf_bm25cut_spearman_corr
     assert result, "Result is None"
 
 

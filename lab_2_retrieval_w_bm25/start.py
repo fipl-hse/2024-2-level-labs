@@ -90,6 +90,7 @@ def main() -> None:
     query = 'Which fairy tale has Fairy Queen?'
     #query = 'A story about a wizard boy in a tower!'
     tf_idf_ranking = rank_documents(list_of_tf_idf, query, stopwords)
+    #print(tf_idf_ranking)
     bm25_ranking = rank_documents(list_of_bm25, query, stopwords)
     bm25_with_cutoff_ranking = rank_documents(list_of_bm25_with_cutoff, query, stopwords)
 

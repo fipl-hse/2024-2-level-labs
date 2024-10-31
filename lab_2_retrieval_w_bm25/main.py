@@ -73,6 +73,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     unique_tokens = set(token for document in documents for token in document)
     return list(unique_tokens)
 
+
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """
     Calculate term frequency for the given tokens based on the vocabulary.
@@ -90,20 +91,18 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
        not (isinstance(document_tokens, list) and all(isinstance(token, str) for token in document_tokens) and document_tokens):
         return None
 
-    token_count = len(document_tokens)
+    total_tokens = len(document_tokens)
+    if total_tokens == 0:
+        return {term: 0.0 for term in vocab}  # Avoid division by zero
 
-    if token_count == 0:
-        return {word: 0.0 for word in vocab}
-
-    token_frequency = {}
+    tf = {}
+    token_counts = {}
 
     for token in document_tokens:
-        if token in token_frequency:
-            token_frequency[token] += 1
-        else:
-            token_frequency[token] = 1
+        token_counts[token] = token_counts.get(token, 0) + 1
 
-    tf = {word: token_frequency.get(word, 0) / token_count for word in vocab}
+    for term in vocab:
+        tf[term] = token_counts.get(term, 0) / total_tokens
 
     return tf
 

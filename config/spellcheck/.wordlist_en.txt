@@ -44,6 +44,7 @@ adv
 advanced
 advancedmorphologicalanalysispipeline
 advancedmorphologicalanalysispipelinetest
+advancedsearchengine
 advb
 advpro
 aforementioned
@@ -90,6 +91,7 @@ andrey
 angle
 anim
 animacy
+ann
 annotation
 anonymous
 another
@@ -150,6 +152,7 @@ automatically
 autongramlanguagemodel
 available
 avgdl
+axis
 axmatova
 back-off
 backoff
@@ -164,6 +167,7 @@ baseexception
 basemodel
 basic
 basically
+basicsearchengine
 bca
 bcd
 be
@@ -196,6 +200,7 @@ blocks
 blok
 blyudova
 bm
+bmod
 bonuses
 bool
 bootstrap
@@ -265,6 +270,7 @@ click
 clickcrawler
 clone
 closely
+closest
 cmd
 code
 collaborators
@@ -418,6 +424,7 @@ dependent
 dependents
 deprel
 deps
+depth
 derive
 derives
 described
@@ -444,6 +451,7 @@ difference
 different
 differently
 digraph
+dimensions
 directory
 disable
 disables
@@ -498,6 +506,7 @@ edition
 effortless
 egor
 either
+elements
 elif
 else
 employed
@@ -517,6 +526,7 @@ encoded
 encoding
 encounter
 end
+engine
 english
 enough
 ensure
@@ -542,6 +552,7 @@ est
 established
 estimation
 etc
+euclidean
 evaluation
 even
 eventually
@@ -629,6 +640,7 @@ finds
 finished
 finishes
 first
+fit
 flexible
 float
 focus
@@ -801,6 +813,7 @@ incorrectnumberofarticleserror
 incorrectseedurlerror
 incorrecttimeouterror
 incorrectverifyerror
+ind
 index
 indexes
 indicates
@@ -882,8 +895,13 @@ joined
 json
 juice
 just
+k-nearest
 kashchikhin
 kazyulina
+kd
+kd-tree
+kdtree
+kdtreeretriever
 keep
 keeps
 key
@@ -891,7 +909,9 @@ key-value
 keys
 keywords
 klimova
+knearestneighbourretriever
 knn
+knnalgorithm
 know
 known
 knows
@@ -910,6 +930,8 @@ later
 latter
 lbyl
 lead
+leaf
+leafs
 leap
 learn
 learning
@@ -1010,6 +1032,7 @@ meaning
 meanings
 means
 media
+median
 mentor
 mentors
 merge
@@ -1034,6 +1057,7 @@ mistake
 mitigated
 mkdir
 mle
+mod
 mode
 model
 models
@@ -1067,6 +1091,7 @@ my
 mypy
 myself
 n-gram
+naivekdtree
 name
 named
 names
@@ -1079,6 +1104,7 @@ necessary
 need
 needed
 needn
+neighbours
 networkx
 new
 newline
@@ -1098,6 +1124,7 @@ nmt
 nn
 no
 node
+nodelike
 nodes
 nom
 nomn
@@ -1214,6 +1241,7 @@ patternsearcher
 patternsearchertests
 patternsearchpipeline
 patternsearchpipelinetests
+payload
 penalties
 people
 per
@@ -1290,6 +1318,9 @@ previously
 princess
 principle
 print
+priority
+priorityadvancedsearchengine
+prioritykdtreeretriever
 private
 privet
 pro
@@ -1409,6 +1440,7 @@ relevant
 reliable
 rely
 remember
+remotebranches
 removal
 remove
 removes
@@ -1445,6 +1477,7 @@ results
 retrieval
 retrieve
 retrieved
+retriever
 retrieves
 retrieving
 return
@@ -1496,6 +1529,7 @@ script
 scroll
 scrolling
 search
+searchengine
 searchers
 searches
 searching
@@ -1610,6 +1644,7 @@ starting-guide-label
 starts
 state
 stated
+states
 statistical
 statistics
 status
@@ -1845,6 +1880,12 @@ varying
 vasilisa
 ve
 vec
+vector
+vectorization
+vectorize
+vectorized
+vectorizer
+vectors
 venv
 verb
 verify

@@ -30,11 +30,10 @@ def tokenize(text: str) -> list[str] | None:
         if not elem.isalpha():
             text.replace(elem, ' ')
 
-    text.lower()
+    l_text = text.lower()
 
-    for elem in text.split():
-        if elem.isalpha():
-            tokenized_list.append(elem)
+    for elem in l_text.split():
+        tokenized_list.append(elem)
 
     return tokenized_list
 

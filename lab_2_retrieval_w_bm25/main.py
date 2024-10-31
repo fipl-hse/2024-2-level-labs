@@ -137,10 +137,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             return None
         temp = 0
         for a in documents:
-            if a.count(wrd) > 0:
+            if wrd in a:
                 temp += 1
         if temp != 0:
-            out[wrd] = math.log1p((ttl - temp + 0.5) / (temp + 0.5))
+            out[wrd] = math.log((ttl - temp + 0.5) / (temp + 0.5))
         else:
             out[wrd] = 0.0
     return out

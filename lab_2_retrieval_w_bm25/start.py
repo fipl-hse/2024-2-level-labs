@@ -77,9 +77,9 @@ def main() -> None:
     #получение списка словарей bm25_cutoff
     bm25_cut = []
     for lst in doc_tokens:
-        index = calculate_bm25_with_cutoff(vocab, lst, idf, 0.2,
-                               1.5, 0.75,
-                               avg_doc_len, len(doc_tokens))
+        index = calculate_bm25_with_cutoff(vocab, lst, idf,
+                                           0.2,1.5, 0.75,
+                                           avg_doc_len, len(doc_tokens))
         if not isinstance(index, dict):
             return
         bm25_cut.append(index)

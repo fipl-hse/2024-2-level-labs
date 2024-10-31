@@ -157,7 +157,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
             not all(isinstance(key, str) for key in tf.keys()) or
             not all(isinstance(value, float) for value in tf.values())):
         return None
-    tf_idf_dict = {word: tf[word] * idf.get(word, 0) for word in tf.keys()}
+    tf_idf_dict = {token: tf[token] * idf[token] for token in tf if token in idf}
     return tf_idf_dict or None
 
 
@@ -188,27 +188,29 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
 
-    if (not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)
-            or not isinstance(document, list) or not all(isinstance(token, str) for token in document)
-            or len(vocab) == 0 or len(document) == 0 or not
-            isinstance(idf_document, dict) or len(idf_document) == 0
-            or not all(isinstance(value, float) for value in idf_document.values())
-            or not isinstance(k1, float) or not isinstance(b, float)
-            or not isinstance(avg_doc_len, float)
-            or not isinstance(doc_len, int) or isinstance(doc_len, bool)):
+    bad_input = (not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)
+                 or not isinstance(document, list)
+                 or not all(isinstance(token, str) for token in document)
+                 or len(vocab) == 0 or len(document) == 0
+                 or not isinstance(idf_document, dict) or len(idf_document) == 0
+                 or not all(isinstance(value, float) for value in idf_document.values())
+                 or not isinstance(k1, float) or not isinstance(b, float)
+                 or not isinstance(avg_doc_len, float)
+                 or not isinstance(doc_len, int) or isinstance(doc_len, bool))
+    if bad_input:
         return None
     bm25 = {}
     for token in vocab:
+        token_count = document.count(token)
         if token in idf_document:
-            token_count = document.count(token)
             denominator = token_count + k1 * (1 - b + b * (doc_len / avg_doc_len))
             if denominator > 0:
                 bm25[token] = idf_document[token] * (token_count * (k1 + 1)) / denominator
             else:
-                bm25[token] = 0.0
+                bm25[token] = 0
         else:
-            bm25[token] = 0.0
-    return bm25
+            bm25[token] = 0
+    return bm25 or None
 
 
 def rank_documents(

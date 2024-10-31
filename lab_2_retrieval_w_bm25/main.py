@@ -196,7 +196,10 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
             return None
         tf_idf_vocab[word] = tf[word] * idf[word]
 
-    print(tf_idf_vocab)
+    if None in tf_idf_vocab:
+        return None
+
+    return tf_idf_vocab
 
 
 def calculate_bm25(

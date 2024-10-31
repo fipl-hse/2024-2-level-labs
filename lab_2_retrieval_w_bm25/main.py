@@ -92,7 +92,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if (not all(isinstance(term, str) for term in vocab) or
             not all(isinstance(token, str) for token in document_tokens)):
         return None
-    tf_dict = {word: (document_tokens.count(word) / len(document_tokens)) for word in set(vocab + document_tokens)}
+    tf_dict = {word: (document_tokens.count(word) / len(document_tokens)) for
+               word in set(vocab + document_tokens)}
     return tf_dict
 
 

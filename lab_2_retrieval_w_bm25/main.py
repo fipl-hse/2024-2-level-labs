@@ -159,7 +159,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             if word in document:
                 word_number += 1
         if ((documents_number - (word_number + 0.5)) / (word_number + 0.5)) > 0 and math.log((documents_number - (word_number + 0.5)) / (word_number + 0.5)) != None:
-            idf = math.log((9 - (word_number + 0.5)) / (word_number + 0.5))
+            idf = math.log((documents_number + 0.5 - (word_number + 0.5)) / (word_number + 0.5))
             idf_vocab[word] = idf
             word_number = 0
 

@@ -60,11 +60,11 @@ def main() -> None:
     alen /= len(temp)
     okapi = []
     for e in temp:
-        okapi.append(func.calculate_bm25(res1, e, curidf,
-                                         1.5, 0.75, alen, len(e)))
-    for bm in okapi:
-        if not isinstance(bm, dict):
+        curbm = func.calculate_bm25(res1, e, curidf,
+                                         1.5, 0.75, alen, len(e))
+        if not isinstance(curbm, dict):
             return
+        okapi.append(curbm)
     print(okapi)
     tstqr = 'Which fairy tale has Fairy Queen?'
     res2 = func.rank_documents(tidfttl, tstqr, stopwords)

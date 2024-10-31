@@ -90,13 +90,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     In case of corrupt input arguments, None is returned.
     """
     if not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab):
-        print("Error: vocab must be a list of strings.")
         return None
-    if not isinstance(document_tokens, list) or not all(isinstance(word, str) for word in document_tokens):
-        print("Error: document_tokens must be a list of strings.")
+    if not isinstance(document_tokens, list) or not all(isinstance(token, str) for token in document_tokens):
         return None
     if not vocab or not document_tokens:
-        print("Error: vocab and document_tokens cannot be empty.")
         return None
 
     term_frequencies = {}
@@ -105,9 +102,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     for token in document_tokens:
         token_counts[token] = token_counts.get(token, 0) + 1
 
+    document_length = len(document_tokens)
     for term in vocab:
         count = token_counts.get(term, 0)
-        term_frequencies[term] = count / len(document_tokens) if len(document_tokens) > 0 else 0
+        term_frequencies[term] = count / document_length if document_length > 0 else 0.0
 
     return term_frequencies
 

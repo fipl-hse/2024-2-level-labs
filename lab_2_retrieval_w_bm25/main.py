@@ -21,8 +21,9 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
+    ok_symbols = ("-", " ","'")
     for symbol in text:
-        if not symbol.isalpha() and not symbol in ["-", " ","'"]:
+        if not symbol.isalpha() and symbol not in ok_symbols:
             text = text.replace(symbol, ' ')
     return text.lower().split()
 
@@ -46,11 +47,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if not all(isinstance(stopword, str) for stopword in stopwords)\
             or not all(isinstance(token, str) for token in tokens):
         return None
-    removed_stopwords = []
-    for token in tokens:
-        if token not in stopwords:
-            removed_stopwords.append(token)
-    return removed_stopwords
+    return [token for token in tokens if token not in stopwords]
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -97,10 +94,9 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return None
     tf_dict = {}
     for word in vocab:
+        tf_dict[word] = 0.0
         if word in document_tokens:
             tf_dict[word] = document_tokens.count(word) / len(document_tokens)
-        else:
-            tf_dict[word] = 0.0
     return tf_dict
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -124,7 +120,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         if not all(isinstance(token, str) for token in token_lst):
             return None
     idf_dict = {}
-    #word_met_in_document = 0.0
     for word in vocab:
         word_met_in_document = 0.0
         for token_lst in documents:

@@ -51,5 +51,6 @@ def main() -> None:
         print(calculate_tf_idf(doc, calculate_idf(vocab, meaningful_docs)))
     assert result, "Result is None"
 
+
 if __name__ == "__main__":
     main()

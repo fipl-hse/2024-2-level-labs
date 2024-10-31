@@ -6,6 +6,7 @@ Text retrieval with BM25
 # pylint:disable=too-many-arguments, unused-argument
 import math
 
+
 def tokenize(text: str) -> list[str] | None:
     """
     Tokenize the input text into lowercase words without punctuation, digits and other symbols.
@@ -49,6 +50,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         if word not in stopwords:
             text_without_stopwords.append(word)
     return text_without_stopwords
+
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """

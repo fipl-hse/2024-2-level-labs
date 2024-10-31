@@ -233,6 +233,31 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(document, list) or not isinstance(idf_document, dict) \
+            or not isinstance(k1, float) or not isinstance(b, float):
+        return None
+    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) or isinstance(doc_len, bool):
+        return None
+    if len(vocab) == 0 or len(document) == 0 or len(idf_document) == 0:
+        return None
+    for word in vocab:
+        if not isinstance(word, str):
+            return None
+    for word in document:
+        if not isinstance(word, str):
+            return None
+    for key, value in idf_document.items():
+        if not isinstance(key, str) or not isinstance(value, float):
+            return None
+
+    bm25 = {}
+    for word in document:
+        if word not in vocab:
+            bm25[word] = 0.0
+    for key in vocab:
+        bm25[key] = ((idf_document[key] * document.count(key) * (k1 + 1))
+                     / (document.count(key) + k1 * (1 - b + b * (doc_len / avg_doc_len))))
+    return bm25
 
 
 def rank_documents(
@@ -251,6 +276,36 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(indexes, list) or not isinstance(query, str) or not isinstance(stopwords, list) \
+            or len(indexes) == 0 or len(query) == 0 or len(stopwords) == 0:
+        return None
+    for index_dict in indexes:
+        if not isinstance(index_dict, dict):
+            return None
+        for key, values in index_dict.items():
+            if not isinstance(key, str) or not isinstance(values, float):
+                return None
+    for words in stopwords:
+        if not isinstance(words, str):
+            return None
+
+    query_token = tokenize(query)
+    if not isinstance(query_token, list) or len(query_token) == 0:
+        return None
+    clear_query_token = remove_stopwords(query_token, stopwords)
+    if not isinstance(clear_query_token, list) or len(clear_query_token) == 0:
+        return None
+
+    doc_rang = []
+    rang = 0
+    for document in indexes:
+        query_token_metric = 0.0
+        for token in clear_query_token:
+            if token in document:
+                query_token_metric += document[token]
+        doc_rang.append((rang, query_token_metric))
+        rang += 1
+    return sorted(doc_rang, key=lambda tup: tup[1], reverse=True)
 
 
 def calculate_bm25_with_cutoff(

@@ -53,7 +53,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
             not all(isinstance(stopword, str) for stopword in stopwords):
         return None
 
-    words_without_sw = [token for token in tokens if token not in stopwords]
+    words_without_sw = [token for token in tokens if  token is not None and token not in stopwords]
 
     return words_without_sw or None
 

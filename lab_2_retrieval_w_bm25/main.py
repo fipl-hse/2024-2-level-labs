@@ -128,7 +128,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     out = {}
     vocexp = set(vocab)
     for a in documents:
-        vocexp.update(a)
+        vocexp.update(set(a))
     for wrd in vocexp:
         if not isinstance(wrd, str):
             return None
@@ -214,8 +214,8 @@ def calculate_bm25(
             or not isinstance(doc_len, int) or doc_len is None or isinstance(doc_len, bool)):
         return None
     out = {}
-    vocexp = set(vocab + document + list(idf_document.keys()))
-    for wrd in vocexp:
+    #vocexp = set(vocab + document + list(idf_document.keys()))
+    for wrd in list(idf_document.keys()):
         curidf = idf_document[wrd]
         curcnt = document.count(wrd)
         tmpvar = (curcnt * (k1 + 1)) / (curcnt + k1 * (1 - b + b * (doc_len / avg_doc_len)))

@@ -48,9 +48,11 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     """
     if not isinstance(tokens, str):
         return None
-    for word in tokens:
+    list_tokens = [tokens]
+    for word in list_tokens:
         if word in stopwords:
-            clear_words = tokens.remove(word)
+            list_tokens.remove(word)
+    clear_words = list_tokens
     return clear_words
 
 
@@ -68,9 +70,12 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, str):
+    if not isinstance(documents, list):
         return None
-    vocab = [documents]
+    vocab = []
+    for word in documents:
+        if word not in stopwords:
+            vocab.append(word)
     return vocab
 
 
@@ -90,10 +95,11 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if not isinstance(vocab, document_tokens, list[str]):
         return None
     n_t = document_tokens.count
-    d = len(vocab)
-    tf = n_t/d
+    calc_d = len(vocab)
+    calc_tf = n_t/calc_d
     dict_tf = {}
-    dict_tf[document_tokens] = tf
+    str_document_tokens = ()
+    dict_tf[document_tokens] = calc_tf
     return dict_tf
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -115,10 +121,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     amount_of_doc = []
     if word in documents:
         amount_of_doc.append(documents)
-    n = documents.count()
-    idf = log({n - amount_of_doc.count() + 0.5},{amount_of_doc.count() + 0.5}, 10)
+    calc_n = documents.count()
+    calc_idf = log({calc_n - amount_of_doc.count() + 0.5},{amount_of_doc.count() + 0.5}, 10)
     dict_idf = {}
-    dict_idf[documents] = idf
+    dict_idf[documents] = calc_idf
     return dict_idf
 
 
@@ -138,9 +144,8 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     """
     if not isinstance(tf, idf, dict[str,float]):
         return None
-    from math import pow
-    tf-idf == pow(tf, idf)
-    return TF-IDF
+    calc_tf_idf = tf / idf
+    return calc_tf_idf
 
 
 def calculate_bm25(

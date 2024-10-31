@@ -28,13 +28,7 @@ def tokenize(text: str) -> list[str] | None:
             continue
         text = text.replace(symbol, " ")
 
-    result = []
-    for word in text.split(" "):
-        result.append(word.lower())
-    while "" in result:
-        result.remove("")
-
-    return result
+    return text.lower().split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:

@@ -123,7 +123,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     same_words_vocab = build_vocabulary(same_words)
 
     for word in same_words_vocab:
-        if len(document_tokens) != 0 and word != None and (document_tokens.count(word) / len(document_tokens)) != None:
+        if len(document_tokens) != 0 and word is not None and (document_tokens.count(word) / len(document_tokens)) is not None:
             freq_vocab[word] = document_tokens.count(word) / len(document_tokens)
 
     return freq_vocab
@@ -158,7 +158,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         for document in documents:
             if word in document:
                 word_number += 1
-        if ((documents_number - (word_number + 0.5)) / (word_number + 0.5)) > 0 and math.log((documents_number - (word_number + 0.5)) / (word_number + 0.5)) != None:
+        if ((documents_number - (word_number + 0.5)) / (word_number + 0.5)) > 0 and math.log((documents_number - (word_number + 0.5)) / (word_number + 0.5)) is not None:
             idf = math.log((documents_number + 1 - (word_number + 0.5)) / (word_number + 0.5))
             idf_vocab[word] = idf
             word_number = 0
@@ -192,7 +192,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     tf_idf_vocab = {}
 
     for word in tf:
-        if tf[word] == None or idf[word] == None or word == None:
+        if tf[word] is None or idf[word] is None or word is None:
             return None
         tf_idf_vocab[word] = tf[word] * idf[word]
 

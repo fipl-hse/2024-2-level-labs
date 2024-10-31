@@ -40,9 +40,11 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
+    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) \
+            or not tokens:
         return None
-    if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords):
+    if not stopwords or not isinstance(stopwords, list) or \
+            not all(isinstance(stopword, str) for stopword in stopwords):
         return None
 
     return [token for token in tokens if token not in stopwords and token is not None]
@@ -87,24 +89,27 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not (isinstance(vocab, list) and all(isinstance(token, str) for token in vocab) and vocab) or \
-       not (isinstance(document_tokens, list) and all(isinstance(token, str) for token in document_tokens) and document_tokens):
+    if not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab):
+        print("Error: vocab must be a list of strings.")
+        return None
+    if not isinstance(document_tokens, list) or not all(isinstance(word, str) for word in document_tokens):
+        print("Error: document_tokens must be a list of strings.")
+        return None
+    if not vocab or not document_tokens:
+        print("Error: vocab and document_tokens cannot be empty.")
         return None
 
-    total_tokens = len(document_tokens)
-    if total_tokens == 0:
-        return {term: 0.0 for term in vocab}  # Avoid division by zero
-
-    tf = {}
+    term_frequencies = {}
     token_counts = {}
 
     for token in document_tokens:
         token_counts[token] = token_counts.get(token, 0) + 1
 
     for term in vocab:
-        tf[term] = token_counts.get(term, 0) / total_tokens
+        count = token_counts.get(term, 0)
+        term_frequencies[term] = count / len(document_tokens) if len(document_tokens) > 0 else 0
 
-    return tf
+    return term_frequencies
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:

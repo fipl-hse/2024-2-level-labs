@@ -23,13 +23,8 @@ def tokenize(text: str) -> list[str] | None:
 
     if not isinstance(text, str):
         return None
-    tokens = []
-    for token in text.lower().split():
-        clean_word = ''.join(char if char.isalpha() else ' ' for char in token)
-        for word in clean_word.split():
-            if word:
-                tokens.append(word)
-    return tokens
+    text = ''.join(char if char.isalpha() else ' ' for char in text.lower())
+    return text.split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -47,10 +42,10 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     """
 
     if not (isinstance(tokens, list) or all(isinstance(token, str)
-                                               for token in tokens) or tokens):
+                                            for token in tokens) or tokens):
         return None
     if not (isinstance(stopwords, list) or all(isinstance(word, str)
-                                                  for word in stopwords) or stopwords):
+                                               for word in stopwords) or stopwords):
         return None
     return [token for token in tokens if token not in stopwords]
 
@@ -68,7 +63,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     In case of corrupt input arguments, None is returned.
     """
 
-    if not (isinstance(documents, list) or all(isinstance(doc, list) for doc in documents)):
+    if (not isinstance(documents, list) or not documents
+            or not all(isinstance(doc, list) for doc in documents)):
         return None
     if not all(isinstance(token, str) for doc in documents for token in doc):
         return None
@@ -201,7 +197,7 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
 
-    if not vocab or not document or not idf_document:
+    if not (vocab or document or idf_document):
         return None
     if (not isinstance(vocab, list) or not isinstance(document, list) or
             not isinstance(idf_document, dict)):
@@ -249,12 +245,12 @@ def rank_documents(
     """
 
     if (not isinstance(indexes, list) or
-            not all(isinstance(el, dict) and
+            not all(isinstance(index, dict) and
                     all(isinstance(key, str)
                         and isinstance(value, float)
-                        for key, value in el.items()) for el in indexes)):
+                        for key, value in index.items()) for index in indexes)):
         return None
-    if (not isinstance(stopwords, list) or not all(isinstance(el, str) for el in stopwords)
+    if (not isinstance(stopwords, list) or not all(isinstance(index, str) for index in stopwords)
             or not isinstance(query, str)):
         return None
     if not (indexes or query):

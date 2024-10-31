@@ -28,11 +28,12 @@ def tokenize(text: str) -> list[str] | None:
 
     for elem in text:
         if not elem.isalpha():
+            text = text.replace(elem, ' ')
+        else:
             if '.' in elem or ',' in elem or '?' in elem or '!' in elem:
                 elem = elem.replace('.', ' ')
             if elem[-1] == '.':
                 elem = elem.replace('.', '')
-            text = text.replace(elem, ' ')
 
     l_text = text.lower()
 

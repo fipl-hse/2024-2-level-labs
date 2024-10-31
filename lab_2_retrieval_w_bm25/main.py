@@ -61,9 +61,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     for token in tokens:
         if token not in stopwords:
             tokens_cleared.append(token)
-    if all(isinstance(tokens, str) for tokens in tokens_cleared) or tokens_cleared is not None:
-        return tokens_cleared
-    return None
+    return tokens_cleared
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -84,8 +82,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         return None
     unique_words = []
     for document in documents:
-        unique_words += list(set(document))
-    return unique_words
+        unique_words += set(document)
+    return list(set(unique_words))
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -176,14 +174,10 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
         return None
     tf_idf = {}
     for word, value in tf.items():
-        for same_word, its_value in idf.items():
-            if word == same_word:
-                tf_idf[word] = value * its_value
+        tf_idf[word] = value * idf.get(word, 0.0)
     for word, value in idf.items():
         if word not in tf_idf:
-            for same_word, its_value in tf.items():
-                if word == same_word:
-                    tf_idf[word] = value * its_value
+            tf_idf[word] = value * idf.get(word, 0.0)
     return tf_idf
 
 
@@ -228,18 +222,14 @@ def calculate_bm25(
         return None
     bm25 = {}
     for word in vocab:
-        if word in idf_document:
-            bm25[word] = idf_document[word] * ((document.count(word) * (k1 + 1)) /
-                                               (document.count(word) + k1 *
-                                                (1 - b + (b * doc_len / avg_doc_len))))
+        bm25[word] = (idf_document.get(word, 0.0) *
+                      ((document.count(word) * (k1 + 1)) /
+                       (document.count(word) + k1 * (1 - b + (b * doc_len / avg_doc_len)))))
     for word in document:
         if word not in bm25:
-            if word in idf_document:
-                bm25[word] = idf_document[word] * ((document.count(word) * (k1 + 1)) /
-                                                   (document.count(word) + k1 *
-                                                    (1 - b + (b * doc_len / avg_doc_len))))
-                continue
-            bm25[word] = 0.0
+            bm25[word] = (idf_document.get(word, 0.0) *
+                          ((document.count(word) * (k1 + 1)) /
+                           (document.count(word) + k1 * (1 - b + (b * doc_len / avg_doc_len)))))
     return bm25
 
 
@@ -326,14 +316,14 @@ def calculate_bm25_with_cutoff(
         return None
     bm25_optimized = {}
     for word in vocab:
-        if word in idf_document and idf_document[word] >= alpha:
+        if idf_document.get(word, 0.0) >= alpha:
             bm25_optimized[word] = (idf_document[word] *
                                     ((document.count(word) * (k1 + 1)) /
                                      (document.count(word) + k1 *
                                       (1 - b + (b * doc_len / avg_doc_len)))))
     for word in document:
         if word not in bm25_optimized:
-            if word in idf_document and idf_document[word] >= alpha:
+            if idf_document.get(word, 0.0) >= alpha:
                 bm25_optimized[word] = (idf_document[word] *
                                         ((document.count(word) * (k1 + 1)) /
                                          (document.count(word) + k1 *
@@ -404,6 +394,7 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
         return None
     if len(rank) != len(golden_rank):
         return None
-    spearman = 1 - ((6 * (sum((value - golden_rank[i]) ** 2 for i, value in enumerate(rank))))
-                    / (len(rank) * (len(rank) ** 2 - 1)))
+    spearman = 1 - ((6 * (sum((i - golden_rank.index(value)) ** 2 for i, value in enumerate(rank)
+                              if value in golden_rank))
+                    / (len(rank) * (len(rank) ** 2 - 1))))
     return spearman

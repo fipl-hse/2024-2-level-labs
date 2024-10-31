@@ -30,12 +30,15 @@ def tokenize(text: str) -> list[str] | None:
         if not elem.isalpha():
             if '.' in elem or ',' in elem or '?' in elem or '!' in elem:
                 elem = elem.replace('.', ' ')
+            if elem[-1] == '.':
+                elem = elem.replace('.', '')
             text = text.replace(elem, ' ')
 
     l_text = text.lower()
 
     for elem in l_text.split():
-        tokenized_list.append(elem)
+        if elem not in ['.', ',', '!', '?', ':', ';']:
+            tokenized_list.append(elem)
 
     return tokenized_list
 

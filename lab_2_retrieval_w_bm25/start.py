@@ -30,31 +30,23 @@ def main() -> None:
     result = remove_stopwords
     assert result, "Result is None"
 
-    docs_tokens = []
-    for document in documents:
-        tokens = tokenize(document)
-        if tokens is not None:
-            cleared_tokens = remove_stopwords(tokens, stopwords)
-            docs_tokens.append(cleared_tokens)
+    doc_with_tokens = [tokenize(document) for document in documents]
+    cleared_doc = [remove_stopwords(tokens, stopwords) for tokens in doc_with_tokens]
 
-    vocab = build_vocabulary(docs_tokens)
+    vocab = build_vocabulary(doc_with_tokens)
 
-    idf = calculate_idf(vocab, docs_tokens) if vocab is not None else {}
+    doc_with_tf = [calculate_tf(vocab, tokens) for tokens in doc_with_tokens]
 
-    tf_idf_list = []
-    for tokenized_doc in docs_tokens:
-        if isinstance(tokenized_doc, list) and vocab is not None:
-            tf = calculate_tf(vocab, tokenized_doc)
-            if tf is not None:
-                tf_idf = calculate_tf_idf(tf, idf)
-                if tf_idf is not None:
-                    tf_idf_list.append(tf_idf)
+    idf = calculate_idf(vocab, doc_with_tokens)
 
-    for index, tf_idf in enumerate(tf_idf_list):
-        result = tf_idf
-        print(f"TF-IDF for document {index + 1}:")
-        print(tf_idf)
-        assert result, "Result is None"
+    for tf_vector in doc_with_tf:
+        result = calculate_tf_idf(tf_vector, idf)
+        print(result)
+
+    print(doc_with_tokens[0])
+    print(cleared_doc[0])
+
+    assert cleared_doc, "Result is None"
 
 if __name__ == "__main__":
     main()

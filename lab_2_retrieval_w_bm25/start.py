@@ -45,9 +45,4 @@ def main() -> None:
     for doc_tf in doc_tfs:
         result = calculate_tf_idf(doc_tf, idf)
         print(result)
-        assert result, "Result is None"
-
-if __name__ == "__main__":
-    main()
-
-
+        assert result

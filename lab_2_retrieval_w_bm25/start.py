@@ -44,11 +44,12 @@ def main() -> None:
         clear_documents.append(remove_stopwords(tok_doc, stopwords))
 
     vocab = build_vocabulary(clear_documents)
+    idf_vocab = calculate_idf(vocab, clear_documents)
 
     for doc in clear_documents:
-        tf_vocab = calculate_tf(vocab, doc)
-        idf_vocab = calculate_idf(vocab, doc)
-        tf_idf_vocab = calculate_tf_idf(tf_vocab, idf_vocab)
+        if doc is not None:
+            tf_vocab = calculate_tf(vocab, doc)
+            tf_idf_vocab = calculate_tf_idf(tf_vocab, idf_vocab)
 
     result = None
     assert result, "Result is None"

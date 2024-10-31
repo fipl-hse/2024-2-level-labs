@@ -120,7 +120,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     tf_dict = {}
     for word in vocab:
-        tf_dict[word] = document_tokens.count(word) / len(document_tokens)
+        if word in document_tokens and word not in tf_dict:
+            tf_dict[word] = document_tokens.count(word) / len(document_tokens)
+        else:
+            tf_dict[word] = 0.0
     return tf_dict
 
 

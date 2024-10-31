@@ -201,16 +201,16 @@ def calculate_bm25(
         return None
     bm25 = {}
     for token in vocab:
-        token_count = document.count(token)
+        token_count = document.count(token) if token in idf_document else 0
         if token in idf_document:
             denominator = token_count + k1 * (1 - b + b * (doc_len / avg_doc_len))
             if denominator > 0:
                 bm25[token] = idf_document[token] * (token_count * (k1 + 1)) / denominator
             else:
-                bm25[token] = 0
+                bm25[token] = 0.0
         else:
-            bm25[token] = 0
-    return bm25 or None
+            bm25[token] = 0.0
+    return bm25
 
 
 def rank_documents(

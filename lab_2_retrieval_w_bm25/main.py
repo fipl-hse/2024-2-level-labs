@@ -76,10 +76,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         if token not in stopwords:
             clear_text.append(token)
 
-    if clear_text is not None:
-        return clear_text
-    return None
-
+    return clear_text
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """

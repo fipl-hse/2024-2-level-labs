@@ -82,7 +82,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not documents or not isinstance(documents, list) or not all(isinstance(document, list) for document in documents)):
+    if (not documents or not isinstance(documents, list)
+            or not all(isinstance(document, list) for document in documents)):
         return None
     for document in documents:
         if not all(isinstance(token, str) for token in document):
@@ -111,10 +112,12 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not vocab or not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)):
+    if (not vocab or not isinstance(vocab, list)
+            or not all(isinstance(token, str) for token in vocab)):
         return None
 
-    if (not document_tokens or not isinstance(document_tokens, list) or not all(isinstance(token, str) for token in document_tokens)):
+    if (not document_tokens or not isinstance(document_tokens, list)
+            or not all(isinstance(token, str) for token in document_tokens)):
         return None
 
     freq_vocab = {}
@@ -123,7 +126,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     same_words_vocab = build_vocabulary(same_words)
 
     for word in same_words_vocab:
-        if len(document_tokens) != 0 and word is not None and (document_tokens.count(word) / len(document_tokens)) is not None:
+        if len(document_tokens) != 0 and word is not None \
+                and (document_tokens.count(word) / len(document_tokens)) is not None:
             freq_vocab[word] = document_tokens.count(word) / len(document_tokens)
 
     return freq_vocab
@@ -142,9 +146,11 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not vocab or not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)):
+    if (not vocab or not isinstance(vocab, list)
+            or not all(isinstance(token, str) for token in vocab)):
         return None
-    if not documents or not isinstance(documents, list) or not all(isinstance(document, list) for document in documents):
+    if not documents or not isinstance(documents, list) \
+            or not all(isinstance(document, list) for document in documents):
         return None
     for document in documents:
         if not all(isinstance(token, str) for token in document):
@@ -158,7 +164,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         for document in documents:
             if word in document:
                 word_number += 1
-        if ((documents_number - (word_number + 0.5)) / (word_number + 0.5)) > 0 and math.log((documents_number - (word_number + 0.5)) / (word_number + 0.5)) is not None:
+        if ((documents_number - (word_number + 0.5)) / (word_number + 0.5)) > 0 \
+                and math.log((documents_number - (word_number + 0.5)) / (word_number + 0.5)) is not None:
             idf = math.log((documents_number + 1 - (word_number + 0.5)) / (word_number + 0.5))
             idf_vocab[word] = idf
             word_number = 0
@@ -184,9 +191,11 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     """
     if not tf or not idf or not isinstance(tf, dict) or not isinstance(idf, dict):
         return None
-    if (not all(isinstance(token, str) for token in tf.keys()) or not all(isinstance(score, float) for score in tf.values())):
+    if (not all(isinstance(token, str) for token in tf.keys())
+            or not all(isinstance(score, float) for score in tf.values())):
         return None
-    if (not all(isinstance(token, str) for token in idf.keys()) or not all(isinstance(score, float) for score in idf.values())):
+    if (not all(isinstance(token, str) for token in idf.keys())
+            or not all(isinstance(score, float) for score in idf.values())):
         return None
 
     tf_idf_vocab = {}

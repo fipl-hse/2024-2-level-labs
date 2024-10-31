@@ -215,8 +215,8 @@ def calculate_bm25(
             or not isinstance(doc_len, int) or doc_len is None or isinstance(doc_len, bool)):
         return None
     out = {}
-    #vocexp = set(vocab + document + list(idf_document.keys()))
-    for wrd in list(idf_document.keys()):
+    vocexp = set(vocab + document + list(idf_document.keys()))
+    for wrd in vocexp:
         curidf = idf_document[wrd]
         curcnt = document.count(wrd)
         tmpvar = (curcnt * (k1 + 1)) / (curcnt + k1 * (1 - b + b * (doc_len / avg_doc_len)))

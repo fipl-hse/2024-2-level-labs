@@ -3,6 +3,7 @@ Lab 2.
 
 Text retrieval with BM25
 """
+from math import log
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -119,10 +120,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             return None
 
     tf_dict = {}
+    for word in document_tokens:
+        tf_dict[word] = document_tokens.count(word) / len(document_tokens)
     for word in vocab:
-        if word in document_tokens and word not in tf_dict:
-            tf_dict[word] = document_tokens.count(word) / len(document_tokens)
-        else:
+        if word not in document_tokens:
             tf_dict[word] = 0.0
     return tf_dict
 
@@ -140,6 +141,29 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not isinstance(documents, list):
+        return None
+    if len(vocab) == 0 or len(documents) == 0:
+        return None
+    for word in vocab:
+        if not isinstance(word, str):
+            return None
+    for document in documents:
+        if not isinstance(document, list):
+            return None
+        if len(document) == 0:
+            return None
+        for word in document:
+            if not isinstance(word, str):
+                return None
+
+    idf_dict = {}
+    len_documents = len(documents)
+    for word in vocab:
+        n = 0
+        n = sum(n + 1 for lst in documents if word in lst)
+        idf_dict[word] = log((len_documents + 0.5 - n)/(n + 0.5))
+    return idf_dict
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -155,6 +179,32 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(tf, dict) or not isinstance(idf, dict):
+        return None
+    if len(tf) == 0:
+        return None
+    if len(idf) == 0:
+        return None
+
+    for key in tf:
+        if not isinstance(key, str):
+            return None
+    for value in tf.values():
+        if not isinstance(value, float):
+            return None
+    for key in idf:
+        if not isinstance(key, str):
+            return None
+    for value in idf.values():
+        if not isinstance(value, float):
+            return None
+
+    tf_idf_dict = {}
+    for key, value in tf.items():
+        if key not in idf:
+            tf[key] = 0.0
+        tf_idf_dict[key] = tf[key] * idf[key]
+    return tf_idf_dict
 
 
 def calculate_bm25(

@@ -5,8 +5,8 @@ Laboratory Work #2 starter
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
                                          calculate_bm25_with_cutoff, calculate_idf,
                                          calculate_spearman, calculate_tf, calculate_tf_idf,
-                                         load_index, rank_documents, remove_stopwords,
-                                         save_index, tokenize)
+                                         load_index, rank_documents, remove_stopwords, save_index,
+                                         tokenize)
 
 
 def main() -> None:

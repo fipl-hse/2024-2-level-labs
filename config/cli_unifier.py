@@ -17,18 +17,31 @@ LOG_TEMPLATE = """
 """
 
 
-def log_output(output_type: str, content: bytes) -> None:
+def convert_raw_output_to_str(content: bytes) -> str:
+    """
+    Converts result of the command-line process output to str.
+
+    Args:
+        content(bytes): raw result from the subprocess call
+
+    Returns:
+        str: string representation
+    """
+    return content.decode("utf-8").replace('\r', '')
+
+
+def log_output(output_type: str, content: bytes | str) -> None:
     """
     Prints result of the command-line process.
 
     Args:
         output_type(str): type of output, for example stdout or stderr
-        content(bytes): raw result from the subprocess call
+        content(bytes | str): raw result from the subprocess call
     """
     print(
         LOG_TEMPLATE.format(
             output_type=output_type,
-            content=content.decode("utf-8").replace('\r', ''),
+            content=convert_raw_output_to_str(content) if isinstance(content, bytes) else content
         )
     )
 
@@ -61,8 +74,9 @@ def prepare_args_for_shell(args: list[object]) -> str:
     return " ".join(map(str, args))
 
 
-def _run_console_tool(exe: str, /, args: list[str],
-                      **kwargs: Any) -> subprocess.CompletedProcess:
+def _run_console_tool(
+        exe: str, /, args: list[str], **kwargs: Any
+) -> tuple[str, str, int]:
     """
     Run CLI commands.
 
@@ -72,7 +86,7 @@ def _run_console_tool(exe: str, /, args: list[str],
         **kwargs (Any): Options
 
     Returns:
-        subprocess.CompletedProcess: Program execution values
+        tuple[str, str, int]: stdout, stderr, exit code
     """
     kwargs_processed: list[str] = []
     for item in kwargs.items():
@@ -90,16 +104,20 @@ def _run_console_tool(exe: str, /, args: list[str],
         arguments = []
         for index, option in enumerate(options[1:]):
             arguments.append(f'"{option}"' if '--' in options[index] else option)
-        print(f'Attempting to run with the following arguments: {" ".join(arguments)}')
+        print(f'Attempting to run with the following arguments: {" ".join([str(exe), *arguments])}')
 
     env = kwargs.get('env')
     if env:
-        return subprocess.run(options, capture_output=True, check=True, env=env)
-
-    if kwargs.get('cwd'):
-        return subprocess.run(options, capture_output=True, check=True, cwd=kwargs.get('cwd'))
-
-    return subprocess.run(options, capture_output=True, check=True)
+        result = subprocess.run(options, capture_output=True, check=True, env=env)
+    elif kwargs.get('cwd'):
+        result = subprocess.run(options, capture_output=True, check=True, cwd=kwargs.get('cwd'))
+    else:
+        result = subprocess.run(options, capture_output=True, check=True)
+    return (
+        convert_raw_output_to_str(result.stdout),
+        convert_raw_output_to_str(result.stderr),
+        result.returncode
+    )
 
 
 def handles_console_error(exit_code_on_error: int = 1,
@@ -115,7 +133,7 @@ def handles_console_error(exit_code_on_error: int = 1,
         Callable: The wrapped function.
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[[Any], tuple[str, str, int]]) -> Callable:
         """
         Decorator to handle console tool errors.
 
@@ -127,7 +145,7 @@ def handles_console_error(exit_code_on_error: int = 1,
         """
 
         @functools.wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> None:
+        def wrapper(*args: Any, **kwargs: Any) -> tuple[str, str, int]:
             """
             Wrapper function to handle console tool errors.
 
@@ -136,7 +154,8 @@ def handles_console_error(exit_code_on_error: int = 1,
                 **kwargs (Any): Arbitrary keyword arguments to pass to the decorated function.
             """
             try:
-                result = func(*args, **kwargs)
+                print(f'Call to {func.__name__}')
+                stdout, stderr, return_code = func(*args, **kwargs)
             except subprocess.CalledProcessError as error:
                 print(f"Exit code: {error.returncode}.")
                 log_output('Console run stdout', error.output)
@@ -144,13 +163,19 @@ def handles_console_error(exit_code_on_error: int = 1,
                 if error.returncode in ok_codes:
                     print(f"Exit code: {error.returncode}.")
                     log_output('Console run stdout', error.output)
-                else:
-                    print(f"Check failed with exit code {error.returncode}.")
                     log_output('Console run stderr', error.stderr)
-                    sys.exit(exit_code_on_error)
+                    return (
+                        convert_raw_output_to_str(error.output),
+                        convert_raw_output_to_str(error.stderr),
+                        error.returncode
+                    )
+                print(f"Check failed with exit code {error.returncode}.")
+                log_output('Console run stderr', error.stderr)
+                sys.exit(exit_code_on_error)
             else:
-                print(f"Exit code: {result.returncode}.")
-                log_output('Console run stdout', result.stdout)
+                print(f"Exit code: {return_code}.")
+                log_output('Console run stdout', stdout)
+                return stdout, stderr, return_code
 
         return wrapper
 

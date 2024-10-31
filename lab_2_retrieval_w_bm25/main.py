@@ -62,13 +62,18 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list) or not all(isinstance(document, list) for document in documents):
+    if not isinstance(documents, list):
         return None
+    if not all(isinstance(document, list) for document in documents):
+        return None
+
     for document in documents:
         for token in document:
             if not isinstance(token, str):
                 return None
-    return list(set([token for document in documents for token in document]))
+
+    unique_tokens = set(token for document in documents for token in document)
+    return list(unique_tokens)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -126,7 +131,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     for word in vocab:
         doc_w_words = 0
         for doc in documents:
-            if word in documents:
+            if word in doc:
                 doc_w_words += 1
         idf[word] = math.log((len(documents) - doc_w_words + 0.5) / (doc_w_words + 0.5))
     return idf

@@ -130,7 +130,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     freq_vocab = {}
 
-    for word in vocab:
+    same_words = [document_tokens, vocab]
+    same_words_vocab = build_vocabulary(same_words)
+
+    for word in same_words_vocab:
         if len(document_tokens) != 0 and word != None and (document_tokens.count(word) / len(document_tokens)) != None:
             freq_vocab[word] = document_tokens.count(word) / len(document_tokens)
 

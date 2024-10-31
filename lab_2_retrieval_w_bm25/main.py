@@ -24,14 +24,11 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    text = text.lower()
-    raw_text = []
     for symbol in text:
-        if symbol.isalpha() or symbol == ' ':
-            raw_text.append(symbol)
+        if not symbol.isalpha() and symbol != ' ':
+            text = text.replace(symbol, ' ')
 
-    raw_text_str = ''.join(raw_text)
-    tokens = raw_text_str.split(' ')
+    tokens = text.lower().split()
 
     return tokens
 

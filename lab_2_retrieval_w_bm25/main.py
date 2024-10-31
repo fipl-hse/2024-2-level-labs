@@ -24,6 +24,7 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
+    text = text.lower()
     raw_text = []
     for symbol in text:
         if symbol.isalpha() or symbol == ' ':
@@ -88,6 +89,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         for token in value:
             if token not in vocab:
                 vocab.append(token)
+
+    return vocab
 
 
 

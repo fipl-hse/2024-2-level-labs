@@ -63,6 +63,9 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if not isinstance(documents,list) or not\
             all(isinstance(document,list) for document in documents):
         return None
+    for document in documents:
+        if not all(isinstance(word,str) for word in document):
+            return None
     vocabulary = {word for document in documents for word in document
                   if isinstance(word,str)}
     if not vocabulary:
@@ -262,6 +265,26 @@ def calculate_bm25_with_cutoff(
 
     In case of corrupt input arguments, None is returned.
     """
+    if (not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab)
+            or not isinstance(document, list) or not
+            all(isinstance(word, str) for word in document) or not isinstance(k1, float)):
+        return None
+    if (not isinstance(b, float) or not isinstance(avg_doc_len, float)
+    or not isinstance(doc_len, int) or not isinstance(idf_document, dict)
+    or isinstance(doc_len, bool)):
+        return None
+    if not all((isinstance(key, str) and isinstance(value, float) for key, value in
+                idf_document.items())):
+        return None
+    if not isinstance(alpha,float) or doc_len < 0 or not vocab\
+            or not document or not idf_document:
+        return None
+    bm25_wcoff = {}
+    for word in vocab:
+        if idf_document[word] >= alpha:
+            bm25_wcoff[word] = (idf_document[word] * document.count(word) * (k1 + 1) /
+                          (document.count(word) + k1 * (1 - b + b * doc_len / avg_doc_len)))
+    return bm25_wcoff
 
 
 def save_index(index: list[dict[str, float]], file_path: str) -> None:

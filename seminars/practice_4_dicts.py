@@ -94,9 +94,12 @@ def find_key(data: dict[str, int]) -> str:
     """
     # student realisation goes here
 
+    for i, k in data.items():
+        if k == max(data.values()):
+            return i
 
 # Function calls with expected result:
-# assert find_key({'Andrej': 10000, 'Artyom': 15000, 'Alexander': 100000}) == 'Alexander'
+assert find_key({'Andrej': 10000, 'Artyom': 15000, 'Alexander': 100000}) == 'Alexander'
 
 # Task 4
 # easy level
@@ -107,11 +110,12 @@ def remove_duplicates(data: dict[str, int]) -> dict[str, int]:
     # student realisation goes here
 
 
+
 # Function calls with expected result
-# assert remove_duplicates({
-#     'Marat': 10000,
-#     'Yaroslav': 15000,
-#     'Sasha': 10000}) == {'Yaroslav': 15000}
+assert remove_duplicates({
+    'Marat': 10000,
+    'Yaroslav': 15000,
+    'Sasha': 10000}) == {'Yaroslav': 15000}
 
 # Task 5
 # medium level

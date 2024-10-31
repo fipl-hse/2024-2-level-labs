@@ -111,22 +111,11 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not vocab:
+    if (not vocab or not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)):
         return None
 
-    if not isinstance(vocab, list):
+    if (not document_tokens or not isinstance(document_tokens, list) or not all(isinstance(token, str) for token in document_tokens)):
         return None
-
-    for word in vocab:
-        if not isinstance(word, str) or not word.isalpha():
-            return None
-
-    if not isinstance(document_tokens, list):
-        return None
-
-    for token in document_tokens:
-        if not isinstance(token, str) or not token.isalpha():
-            return None
 
     freq_vocab = {}
 

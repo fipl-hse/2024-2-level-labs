@@ -200,16 +200,17 @@ def calculate_bm25(
     if bad_input:
         return None
     bm25 = {}
-    for token in vocab:
-        token_count = document.count(token) if token in idf_document else 0
-        if token in idf_document:
-            denominator = token_count + k1 * (1 - b + b * (doc_len / avg_doc_len))
-            if denominator > 0:
-                bm25[token] = idf_document[token] * (token_count * (k1 + 1)) / denominator
-            else:
-                bm25[token] = 0.0
+    token_list = list(set(vocab).union(document))
+    for token in token_list:
+        token_count = 0
+        if token in document:
+            token_count += document.count(token)
+        if (token in idf_document.keys() and
+                doc_len is not None and avg_doc_len is not None):
+            bm25[token] = (idf_document[token] * (token_count * (k1 + 1)) /
+                           (token_count + k1 * (1 - b + b * (doc_len / avg_doc_len))))
         else:
-            bm25[token] = 0.0
+            bm25[token] = 0
     return bm25
 
 

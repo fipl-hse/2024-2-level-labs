@@ -157,12 +157,15 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         for document in documents:
             if word in document:
                 word_number += 1
-        if ((len(documents) - (word_number + 0.5)) / (word_number + 0.5)) > 0:
+        if ((len(documents) - (word_number + 0.5)) / (word_number + 0.5)) > 0 and math.log((len(documents) - (word_number + 0.5)) / (word_number + 0.5)) != None:
             idf = math.log((len(documents) - (word_number + 0.5)) / (word_number + 0.5))
             idf_vocab[word] = idf
             word_number = 0
 
-    print(idf_vocab)
+    if None in idf_vocab:
+        return None
+
+    return idf_vocab
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:

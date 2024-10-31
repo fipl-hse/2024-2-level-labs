@@ -27,12 +27,6 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    print(tokenize)
-    print(remove_stopwords)
-    print(build_vocabulary)
-    print(calculate_tf)
-    print(calculate_idf)
-    print(calculate_tf_idf)
 #    result = None
     result = documents
     assert result, "Result is None"

@@ -70,9 +70,6 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         if not isinstance(stopword, str):
             return None
 
-    if not tokens or not stopwords:
-        return None
-
     clear_text = []
 
     for token in tokens:
@@ -81,6 +78,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     if clear_text is not None:
         return clear_text
+    return None
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -124,7 +122,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not vocab or not(isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab))):
+    if not vocab or not(isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)):
         return None
     if not document_tokens or not isinstance(document_tokens, list) or not all(isinstance(token, str) for token in document_tokens):
         return None

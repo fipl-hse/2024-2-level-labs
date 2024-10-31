@@ -170,6 +170,8 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             idf = math.log((documents_number + 1 - (word_number + 0.5)) / (word_number + 0.5))
             idf_vocab[word] = idf
             word_number = 0
+        else:
+            idf_vocab[word] = 0
 
     if None in idf_vocab:
         return None
@@ -202,8 +204,6 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     tf_idf_vocab = {}
 
     for word in tf:
-        if tf[word] is None or idf[word] is None or word is None:
-            return None
         tf_idf_vocab[word] = tf[word] * idf[word]
 
     if None in tf_idf_vocab:

@@ -128,7 +128,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     return dict_idf
 
 
-
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
     """
     Calculate TF-IDF scores for a document.

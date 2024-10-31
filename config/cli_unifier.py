@@ -104,7 +104,7 @@ def _run_console_tool(
         arguments = []
         for index, option in enumerate(options[1:]):
             arguments.append(f'"{option}"' if '--' in options[index] else option)
-        print(f'Attempting to run with the following arguments: {" ".join(arguments)}')
+        print(f'Attempting to run with the following arguments: {" ".join([str(exe), *arguments])}')
 
     env = kwargs.get('env')
     if env:
@@ -133,7 +133,7 @@ def handles_console_error(exit_code_on_error: int = 1,
         Callable: The wrapped function.
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[[Any], tuple[str, str, int]]) -> Callable:
         """
         Decorator to handle console tool errors.
 
@@ -163,6 +163,7 @@ def handles_console_error(exit_code_on_error: int = 1,
                 if error.returncode in ok_codes:
                     print(f"Exit code: {error.returncode}.")
                     log_output('Console run stdout', error.output)
+                    log_output('Console run stderr', error.stderr)
                     return (
                         convert_raw_output_to_str(error.output),
                         convert_raw_output_to_str(error.stderr),

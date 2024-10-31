@@ -23,7 +23,6 @@ def main() -> None:
         "assets/fairytale_10.txt",
     ]
     documents = []
-    tf_idf = []
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
@@ -42,6 +41,7 @@ def main() -> None:
             return
         text_sort.append(tokens_cleared)
         docs_len += len(text_new)
+
     avg_docs_len = docs_len / len(documents)
     voc = build_vocabulary(text_sort)
     if voc is None:
@@ -55,9 +55,10 @@ def main() -> None:
         if bm is None:
             return
         bm25_lis.append(bm)
-    query = 'Which fairy tale has Fairy Queen?'
     if bm25_lis is None:
         return
+
+    query = 'Which fairy tale has Fairy Queen?'
     rank = rank_documents(bm25_lis, query, stopwords)
     result = rank
     print(result)

@@ -3,13 +3,6 @@ Lab 2.
 
 Text retrieval with BM25
 """
-# pylint:disable=too-many-arguments, unused-argument
-import string
-from typing import Set
-
-
-# with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
-# stopwords = file.read().split("\n")
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -57,11 +50,12 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         for elem in stopwords:
             if not isinstance(elem, str):
                 return None
-
-        tokens_cleared = []
         for elem in tokens:
             if not isinstance(elem, str):
                 return None
+
+        tokens_cleared = []
+        for elem in tokens:
             if elem not in stopwords:
                 tokens_cleared.append(elem)
 
@@ -84,8 +78,6 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         return None
     if len(documents) == 0:
         return None
-
-    uniq_words = set()
     for document in documents:
         if not isinstance(document, list):
             return None
@@ -94,6 +86,10 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         for word in document:
             if not isinstance(word, str):
                 return None
+
+    uniq_words = set()
+    for document in documents:
+        for word in document:
             uniq_words.update({word})
     return list(uniq_words)
 
@@ -115,13 +111,13 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return None
     if len(vocab) == 0 or len(document_tokens) == 0:
         return None
-
-    word_freq = {}
-    tf_dict = {}
     for word in vocab:
         if not isinstance(word, str):
             return None
 
+    word_freq = {}
+    tf_dict = {}
+    for word in vocab:
         word_freq[word] = word.count(word) / len(vocab)
         tf = word_freq[word] / len(document_tokens)
         tf_dict[word] = tf
@@ -159,13 +155,13 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
 
 def calculate_bm25(
-        vocab: list[str],
-        document: list[str],
-        idf_document: dict[str, float],
-        k1: float = 1.5,
-        b: float = 0.75,
-        avg_doc_len: float | None = None,
-        doc_len: int | None = None,
+    vocab: list[str],
+    document: list[str],
+    idf_document: dict[str, float],
+    k1: float = 1.5,
+    b: float = 0.75,
+    avg_doc_len: float | None = None,
+    doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document.
@@ -187,7 +183,7 @@ def calculate_bm25(
 
 
 def rank_documents(
-        indexes: list[dict[str, float]], query: str, stopwords: list[str]
+    indexes: list[dict[str, float]], query: str, stopwords: list[str]
 ) -> list[tuple[int, float]] | None:
     """
     Rank documents for the given query.
@@ -205,14 +201,14 @@ def rank_documents(
 
 
 def calculate_bm25_with_cutoff(
-        vocab: list[str],
-        document: list[str],
-        idf_document: dict[str, float],
-        alpha: float,
-        k1: float = 1.5,
-        b: float = 0.75,
-        avg_doc_len: float | None = None,
-        doc_len: int | None = None,
+    vocab: list[str],
+    document: list[str],
+    idf_document: dict[str, float],
+    alpha: float,
+    k1: float = 1.5,
+    b: float = 0.75,
+    avg_doc_len: float | None = None,
+    doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document with IDF cutoff.

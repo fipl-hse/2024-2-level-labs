@@ -165,8 +165,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         for document in documents:
             if word in document:
                 word_number += 1.0
-                continue
-        if (len(documents) - (word_number + 0.5)) / (word_number + 0.5) > 0:
+        if ((len(documents) - (word_number + 0.5)) / (word_number + 0.5)) > 0:
             idf = math.log((len(documents) - (word_number + 0.5)) / (word_number + 0.5))
             idf_vocab[word] = idf
 

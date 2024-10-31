@@ -55,7 +55,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     words_without_sw = [token for token in tokens if token not in stopwords and token is not None]
 
-    return words_without_sw
+    return words_without_sw or None
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """

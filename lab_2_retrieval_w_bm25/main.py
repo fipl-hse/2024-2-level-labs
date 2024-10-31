@@ -121,9 +121,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     In case of corrupt input arguments, None is returned.
     """
 
-    if not (vocab or documents):
-        return None
-    if not (isinstance(vocab, list) or isinstance(documents, list)):
+    if not vocab or not documents or not isinstance(vocab, list) or not isinstance(documents, list):
         return None
     if not all(isinstance(word, str) for word in vocab):
         return None
@@ -155,15 +153,9 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     In case of corrupt input arguments, None is returned.
     """
 
-    if not (tf or idf):
+    if not tf or not idf or not isinstance(tf, dict) or not isinstance(idf, dict):
         return None
-    if not (isinstance(tf, dict) or isinstance(idf, dict)):
-        return None
-    if (not (all(isinstance(word, str) for word in tf.keys())
-             or all(isinstance(word, str) for word in idf.keys()))):
-        return None
-    if not (all(isinstance(value, (int, float)) for value in tf.values()) or all(
-            isinstance(value, (int, float)) for value in idf.values())):
+    if not all(isinstance(word, str) for word in idf):
         return None
     tf_idf_dict = {word: tf[word] * idf.get(word, 0) for word in tf.keys()}
     return tf_idf_dict
@@ -198,19 +190,18 @@ def calculate_bm25(
 
     if not (vocab or document or idf_document):
         return None
-    if (not isinstance(vocab, list) or not isinstance(document, list) or
-            not isinstance(idf_document, dict)):
+    if (not isinstance(vocab, list) or not isinstance(document, list)
+            or not isinstance(idf_document, dict)):
         return None
-    if ((not all(isinstance(value, str) for value in vocab)) or
-            (not all(isinstance(value, str) for value in document))
-            or (not all(isinstance(key, str) and isinstance(value, float) for
-                        key, value in idf_document.items()))):
+    if (not all(isinstance(word, str) for word in vocab)
+            or not all(isinstance(word, str) for word in document)):
         return None
-    if ((not isinstance(k1, float)) or (not isinstance(b, float))
-            or ((not isinstance(avg_doc_len, float)) or
-                (not isinstance(doc_len, int)) or (isinstance(doc_len, bool)))):
+    if not all(isinstance(key, str)
+               and isinstance(value, float) for key, value in idf_document.items()):
         return None
-    if avg_doc_len is None or avg_doc_len <= 0:
+    if (not isinstance(k1, float) or not isinstance(b, float)
+            or not isinstance(avg_doc_len, float) or not isinstance(doc_len, int)
+            or isinstance(doc_len, bool)):
         return None
     bm25 = {}
     for token in vocab:
@@ -257,8 +248,8 @@ def rank_documents(
     query_tokenized = tokenize(query)
     if not query_tokenized:
         return None
-    query_tokenized = remove_stopwords(query_tokenized, stopwords)
-    if not query_tokenized:
+    query_removed = remove_stopwords(query_tokenized, stopwords)
+    if not query_removed:
         return None
     doc_scores = []
     index = 0
@@ -269,7 +260,7 @@ def rank_documents(
                 freq += document[token]
         doc_scores.append((index, freq))
         index += 1
-    return sorted(doc_scores, key=lambda tup: tup[1], reverse=True)
+    return sorted(doc_scores, key=lambda tup: tup[1], reverse=True) or None
 
 
 def calculate_bm25_with_cutoff(

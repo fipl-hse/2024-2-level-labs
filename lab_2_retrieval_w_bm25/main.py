@@ -89,17 +89,19 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not (isinstance(vocab, list) and vocab and all(isinstance(word, str) for word in vocab) and
-            isinstance(document_tokens, list) and document_tokens and
-            all(isinstance(token, str) for token in document_tokens)):
+    if (not vocab or not document_tokens or not isinstance(vocab, list)
+            or not isinstance(document_tokens, list)):
+        return None
+    if (not all(isinstance(word, str) for word in vocab)
+            or not all(isinstance(word, str) for word in document_tokens)):
         return None
 
-    document_length = len(document_tokens)
+    all_words = set(vocab) | set(document_tokens)
     tf_dict = {}
+    document_length = len(document_tokens)
 
-    for term in vocab:
-        count = document_tokens.count(term)
-        tf_dict[term] = count / document_length if document_length > 0 else 0.0
+    for word in all_words:
+        tf_dict[word] = document_tokens.count(word) / document_length if document_length > 0 else 0.0
 
     return tf_dict
 

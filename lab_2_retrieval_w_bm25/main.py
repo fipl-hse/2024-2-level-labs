@@ -118,16 +118,14 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return None
 
     for word in vocab:
-        if not isinstance(word, str):
-            return None
-        if not word.isalpha():
+        if not isinstance(word, str) or not word.isalpha():
             return None
 
     if not isinstance(document_tokens, list):
         return None
 
     for token in document_tokens:
-        if not isinstance(token, str):
+        if not isinstance(token, str) or not token.isalpha():
             return None
 
     freq_vocab = {}

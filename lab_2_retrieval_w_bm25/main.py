@@ -25,9 +25,10 @@ def tokenize(text: str) -> list[str] | None:
     for char in text:
         if char.isalpha():
             tokenize_text += char.lower()
-        elif tokenize_text:
-            tokens.append(tokenize_text)
-            tokenize_text = ""
+        else:
+            if tokenize_text:
+                tokens.append(tokenize_text)
+                tokenize_text = ""
     if tokenize_text:
         tokens.append(tokenize_text)
     return tokens
@@ -49,11 +50,12 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         return None
     if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords):
         return None
+    if not (len(tokens) and len(stopwords)):
+        return None
     filtered_tokens = []
     for token in tokens:
         if token not in stopwords:
             filtered_tokens.append(token)
-
     return filtered_tokens
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -68,19 +70,16 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list):
+    if not isinstance(documents, list) or not all(isinstance(document, list) for document in documents):
         return None
-    for document in documents:
-        if not isinstance(document, list):
-            return None
-        for token in document:
-            if not isinstance(token, str):
-                return None
-
+    if not all(isinstance(token, str) for document in documents for token in document):
+        return None
     vocabulary = set()
     for document in documents:
         for token in document:
             vocabulary.add(token)
+    if not vocabulary:
+        return None
     return list(vocabulary)
 
 
@@ -97,6 +96,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
+    
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:

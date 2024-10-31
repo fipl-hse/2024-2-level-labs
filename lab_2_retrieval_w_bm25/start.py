@@ -3,9 +3,8 @@ Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
-                                         calculate_idf, calculate_tf,
-                                         calculate_tf_idf, rank_documents,
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
+                                         calculate_tf, calculate_tf_idf, rank_documents,
                                          remove_stopwords, tokenize)
 
 
@@ -51,8 +50,6 @@ def main() -> None:
     for item in doc_tokens:
         tf = calculate_tf(vocab, item)
         union_dict = calculate_tf_idf(tf, idf)
-        if not isinstance(union_dict, dict):
-            return None
         tf_idf_res.append(union_dict)
 
         length = 0.0
@@ -65,7 +62,6 @@ def main() -> None:
             if not isinstance(bm25_res, dict):
                 return None
             bm25.append(bm25_res)
-
         tf_idf_work = rank_documents(tf_idf_res, 'Which fairy tale has Fairy Queen?', stopwords)
         bm25_work = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
         if (not isinstance(tf_idf_work, list) or not isinstance(bm25_work, list)

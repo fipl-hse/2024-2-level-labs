@@ -58,10 +58,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     for data in stopwords:
         if not isinstance(data, str):
             return None
-    tokens_cleared = []
-    for elem in tokens:
-        if not elem in stopwords:
-            tokens_cleared.append(elem)
+    tokens_cleared = [elem for elem in tokens if elem not in stopwords]
     return tokens_cleared
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -148,7 +145,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
                     return None
             if elem in doc:
                 doc_number += 1
-                continue
         idf[elem] = log((len(documents) - doc_number + 0.5) / (doc_number + 0.5))
     return idf
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:

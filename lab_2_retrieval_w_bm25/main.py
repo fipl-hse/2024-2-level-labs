@@ -4,7 +4,6 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-
 import math
 
 def tokenize(text: str) -> list[str] | None:
@@ -72,6 +71,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     for doc in documents:
         voc_of_un_words.update(doc)
     return list(voc_of_un_words)
+
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """

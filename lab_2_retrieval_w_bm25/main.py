@@ -192,7 +192,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     tf_idf_vocab = {}
 
     for word in tf:
-        if not isinstance(tf[word], str) or not isinstance(idf[word], str):
+        if tf[word] == None or idf[word] == None or word == None:
             return None
         tf_idf_vocab[word] = tf[word] * idf[word]
 

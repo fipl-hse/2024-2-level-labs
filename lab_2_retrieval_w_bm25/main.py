@@ -56,10 +56,21 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not tokens or not isinstance(tokens, list)) or not all(isinstance(token, str) for token in tokens):
+    if not isinstance(tokens, list):
         return None
 
-    if (not stopwords or not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords)):
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+
+    if not isinstance(stopwords, list):
+        return None
+
+    for stopword in stopwords:
+        if not isinstance(stopword, str):
+            return None
+
+    if not tokens or not stopwords:
         return None
 
     clear_text = []
@@ -68,7 +79,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         if token not in stopwords:
             clear_text.append(token)
 
-    return clear_text
+    if clear_text is not None:
+        return clear_text
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -122,7 +134,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     for word in vocab:
         freq_vocab[word] = document_tokens.count(word) / len(document_tokens)
 
-    return freq_vocab
+    print(freq_vocab)
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -158,7 +170,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
             idf = math.log((len(documents) - (word_number + 0.5)) / (word_number + 0.5))
             idf_vocab[word] = idf
 
-    return idf_vocab
+    print(idf_vocab)
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -188,7 +200,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
             return None
         tf_idf_vocab[word] = tf[word] * idf[word]
 
-    return tf_idf_vocab
+    print(tf_idf_vocab)
 
 
 def calculate_bm25(

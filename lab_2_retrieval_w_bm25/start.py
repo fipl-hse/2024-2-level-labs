@@ -35,19 +35,20 @@ def main() -> None:
     tokenized_documents = []
 
     for document in documents:
-        tokenized_documents.append(tokenize(document))
+        tokenized_document = tokenize(document)
+        tokenized_documents.append(tokenized_document)
 
-    clear_tokenized_documents = []
+    clear_documents = []
 
-    for tokenized_document in tokenized_documents:
-        clear_document = remove_stopwords(tokenized_document, stopwords)
-        clear_tokenized_documents.append(clear_document)
+    for tok_doc in tokenized_documents:
+        clear_documents.append(remove_stopwords(tok_doc, stopwords))
 
-    for clear_document in clear_tokenized_documents:
-        if not isinstance(clear_document, list):
-            return None
-        return calculate_tf_idf(calculate_tf(build_vocabulary(clear_tokenized_documents), clear_document),
-                                calculate_idf(build_vocabulary(clear_tokenized_documents), clear_document))
+    vocab = build_vocabulary(clear_documents)
+
+    for doc in clear_documents:
+        tf_vocab = calculate_tf(vocab, doc)
+        idf_vocab = calculate_idf(vocab, doc)
+        tf_idf_vocab = calculate_tf_idf(tf_vocab, idf_vocab)
 
     result = None
     assert result, "Result is None"

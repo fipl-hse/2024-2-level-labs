@@ -21,9 +21,8 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    ok_symbols = ("-", " ","'")
     for symbol in text:
-        if not symbol.isalpha() and symbol not in ok_symbols:
+        if not symbol.isalpha() and symbol != ' ':
             text = text.replace(symbol, ' ')
     return text.lower().split()
 
@@ -98,7 +97,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             tf_dict[word] = 0.0
         for unique_word in vocab:
             if unique_word not in tf_dict:
-                tf_dict[word] = 0.0
+                tf_dict[unique_word] = 0.0
             tf_dict[word] = document_tokens.count(word) / len(document_tokens)
     return tf_dict
 

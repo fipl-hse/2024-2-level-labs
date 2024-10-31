@@ -74,11 +74,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     for doc in documents:
         if not all(isinstance(tkn, str) for tkn in doc):
             return None
-    out = []
-    for doc in documents:
-        for tkn in doc:
-            if tkn not in out:
-                out.append(tkn)
+    out = list(set([tkn for tkn in sum(documents, [])]))
     return out
 
 
@@ -102,7 +98,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             not all(isinstance(token, str) for token in document_tokens)):
         return None
     outpt = {}
-    for wrd in vocab:
+    vocexp = set(vocab + document_tokens)
+    for wrd in vocexp:
         outpt[wrd] = document_tokens.count(wrd) / len(document_tokens)
     return outpt
 
@@ -138,7 +135,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
                 return None
             if a.count(wrd) > 0:
                 temp += 1
-        out[wrd] = math.log1p(ttl / temp)
+        if temp != 0:
+            out[wrd] = math.log1p(ttl / temp)
+        else:
+            out[wrd] = 0.0
     return out
 
 

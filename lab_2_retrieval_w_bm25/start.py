@@ -33,22 +33,30 @@ def main() -> None:
     docs_tokens = []
     for document in documents:
         tokens = tokenize(document)
-        if tokens is not None:
-            cleared_tokens = remove_stopwords(tokens, stopwords)
-            docs_tokens.append(cleared_tokens)
+        if tokens is None:
+            return None
+        cleared_tokens = remove_stopwords(tokens, stopwords)
+        if cleared_tokens is None:
+            return None
+        docs_tokens.append(cleared_tokens)
 
     vocab = build_vocabulary(docs_tokens)
+    if vocab is None:
+        return None
 
-    idf = calculate_idf(vocab, docs_tokens) if vocab is not None else {}
+    idf = calculate_idf(vocab, docs_tokens)
+    if idf is None:
+        return None
 
     tf_idf_list = []
     for tokenized_doc in docs_tokens:
-        if isinstance(tokenized_doc, list) and vocab is not None:
-            tf = calculate_tf(vocab, tokenized_doc)
-            if tf is not None:
-                tf_idf = calculate_tf_idf(tf, idf)
-                if tf_idf is not None:
-                    tf_idf_list.append(tf_idf)
+        tf = calculate_tf(vocab, tokenized_doc)
+        if tf is None:
+            return None
+        tf_idf = calculate_tf_idf(tf, idf)
+        if tf_idf is None:
+            return None
+        tf_idf_list.append(tf_idf)
 
     for index, tf_idf in enumerate(tf_idf_list):
         result = tf_idf

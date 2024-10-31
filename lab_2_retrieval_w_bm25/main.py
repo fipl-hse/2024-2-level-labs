@@ -21,11 +21,10 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    text = text.lower()
-    for char in '!,?.:";()[]{}':
-        text = text.replace(char, ' ')
-    tokens = text.split()
-    tokens = [token for token in tokens if token.isalpha()]
+
+    tokenized_text = ''.join(char if char.isalpha() else ' ' for char in text.lower())
+    tokens = [token for token in tokenized_text.split() if token]
+
     return tokens
 
 
@@ -64,17 +63,13 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if (not isinstance(documents, list) or
-            not all(isinstance(document, list) for document in documents)):
+    if not isinstance(documents, list) or not all(isinstance(document, list) for document in documents):
         return None
     for document in documents:
         for token in document:
             if not isinstance(token, str):
                 return None
-    vocab = [token for document in documents for token in document]
-    if not vocab:
-        return None
-    return vocab
+    return list(set([token for document in documents for token in document]))
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -165,9 +160,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
         if word in idf:
             tf_idf[word] = tf[word] * idf[word]
 
-    if not tf_idf:
-        return None
-    return tf_idf
+    return tf_idf or None
 
 
 def calculate_bm25(

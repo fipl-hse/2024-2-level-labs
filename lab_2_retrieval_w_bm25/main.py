@@ -24,7 +24,6 @@ def tokenize(text: str) -> list[str] | None:
 
     tokenized_text = ''.join(char if char.isalpha() else ' ' for char in text.lower())
     tokens = [token for token in tokenized_text.split() if token]
-
     return tokens
 
 

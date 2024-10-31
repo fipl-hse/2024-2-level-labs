@@ -142,7 +142,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if not vocab or not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab):
+    if (not vocab or not isinstance(vocab, list) or not all(isinstance(token, str) for token in vocab)):
         return None
     if not documents or not isinstance(documents, list) or not all(isinstance(document, list) for document in documents):
         return None
@@ -150,17 +150,17 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         if not all(isinstance(token, str) for token in document):
             return None
 
-    word_number = 0.0
+    word_number = 0
     idf_vocab = {}
 
     for word in vocab:
         for document in documents:
             if word in document:
-                word_number += 1.0
+                word_number += 1
         if ((len(documents) - (word_number + 0.5)) / (word_number + 0.5)) > 0:
             idf = math.log((len(documents) - (word_number + 0.5)) / (word_number + 0.5))
             idf_vocab[word] = idf
-            word_number = 0.0
+            word_number = 0
 
     print(idf_vocab)
 

@@ -62,7 +62,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list):
+    if documents is None or not isinstance(documents, list) or len(documents) == 0:
         return None
     if not all(isinstance(document, list) for document in documents):
         return None
@@ -74,7 +74,6 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     unique_tokens = set(token for document in documents for token in document)
     return list(unique_tokens)
-
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """
@@ -94,6 +93,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return None
 
     token_count = len(document_tokens)
+
+    if token_count == 0:
+        return {word: 0.0 for word in vocab}
+
     token_frequency = {}
 
     for token in document_tokens:
@@ -102,9 +105,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         else:
             token_frequency[token] = 1
 
-    tf = {}
-    for word in vocab:
-        tf[word] = token_frequency.get(word, 0) / token_count
+    tf = {word: token_frequency.get(word, 0) / token_count for word in vocab}
 
     return tf
 

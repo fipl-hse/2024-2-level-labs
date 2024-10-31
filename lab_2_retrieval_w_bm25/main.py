@@ -29,11 +29,8 @@ def tokenize(text: str) -> list[str] | None:
         else:
             added = sign
         new_text = f'{new_text}{added}'
-    while '  ' in new_text:
-        new_text = new_text.replace('  ', ' ')
-    for token in new_text.split():
-        tokenized_list.append(token)
-    return tokenized_list
+    new_text = new_text.replace('  ', ' ')
+    return new_text.split()
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
@@ -82,8 +79,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         for word in text:
             if not isinstance(word, str):
                 return None
-            if not word in unique_words:
-                unique_words.append(word)
+        unique_words += [word for word in text if word not in unique_words]
     return unique_words
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

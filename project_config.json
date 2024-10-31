@@ -7,6 +7,10 @@
         {
             "name": "lab_2_retrieval_w_bm25",
             "coverage": 97
+        },
+        {
+            "name": "lab_3_ann_retriever",
+            "coverage": 79
         }
     ],
     "addons": [],

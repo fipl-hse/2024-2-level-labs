@@ -73,7 +73,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
             or not all(isinstance(token, list) for token in documents):
         return None
 
-    unique_words = list()
+    unique_words = []
 
     for doc in documents:
         if not all(isinstance(token, str) for token in doc):

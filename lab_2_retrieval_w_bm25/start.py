@@ -27,19 +27,31 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-        tfa = []
-        for document in range(len(documents)):
-            documents[document] = remove_stopwords(tokens=tokenize(documents[document]), stopwords=stopwords)
-        vocab = build_vocabulary(documents=documents)
+        tokenized_documents = []
         for document in documents:
-            tfa.append(calculate_tf(vocab=vocab, document_tokens=document))
-        idf = calculate_idf(vocab=vocab, documents=documents)
-        tfa_idf = []
-        for tf in tfa:
-            tfa_idf.append(calculate_tf_idf(tf=tf, idf=idf))
-        result = tfa_idf
-        if isinstance(result, list):
-            print(result)
+            tokens = tokenize(document)
+            if tokens is not None:
+                tokens = remove_stopwords(tokens, stopwords)
+                tokenized_documents.append(tokens)
+        vocab = build_vocabulary(tokenized_documents)
+        idf = calculate_idf(vocab, tokenized_documents)
+        tf_idf_l = []
+        for document_tokens in tokenized_documents:
+            tf = calculate_tf(document_tokens, vocab)
+            if not tf:
+                return None
+            else:
+                tf_idf = calculate_tf_idf(tf, idf)
+                if not tf_idf:
+                    return None
+                else:
+                    tf_idf_l.append(tf_idf)
+        document_number = 1
+        for tf_idf in tf_idf_l:
+            print(f"TF-IDF для документа {document_number}:")
+            print(tf_idf)
+            document_number += 1
+    result = tf_idf
     assert result, "Result is None"
 
 

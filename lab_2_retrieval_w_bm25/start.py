@@ -42,9 +42,9 @@ def main() -> None:
     tidfttl = []
     curidf = func.calculate_idf(res1, temp)
     assert isinstance(curidf, dict), 'Invalid Type'
-    for al in temp:
-        assert isinstance(al, list), 'Invalid Type'
-        curtf = func.calculate_tf(res1, al)
+    for tk in temp:
+        assert isinstance(tk, list), 'Invalid Type'
+        curtf = func.calculate_tf(res1, tk)
         if not isinstance(curtf, dict) or \
                 not isinstance(curidf, dict):
             return
@@ -53,22 +53,24 @@ def main() -> None:
             return
         tidfttl.append(tidf)
         print(tidf)
-    alen = 0
-    for al in temp:
-        alen+=len(al)
+    alen = 0.0
+    assert len(temp) != 0, 'Token list is empty'
+    for tk in temp:
+        alen+=len(tk)
     alen /= len(temp)
     okapi = []
     for e in temp:
         okapi.append(func.calculate_bm25(res1, e, curidf,
                                          1.5, 0.75, alen, len(e)))
-    for al in okapi:
-        if not isinstance(al, dict):
+    for bm in okapi:
+        if not isinstance(bm, dict):
             return
     print(okapi)
     tstqr = 'Which fairy tale has Fairy Queen?'
     res2 = func.rank_documents(tidfttl, tstqr, stopwords)
     print(res2)
     res3 = func.rank_documents(okapi, tstqr, stopwords)
+    print(res3)
     result = 1
     assert result, "Result is None"
 

@@ -173,13 +173,13 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
 
 def calculate_bm25(
-        vocab: list[str],
-        document: list[str],
-        idf_document: dict[str, float],
-        k1: float = 1.5,
-        b: float = 0.75,
-        avg_doc_len: float | None = None,
-        doc_len: int | None = None,
+    vocab: list[str],
+    document: list[str],
+    idf_document: dict[str, float],
+    k1: float = 1.5,
+    b: float = 0.75,
+    avg_doc_len: float | None = None,
+    doc_len: int | None = None,
 ) -> dict[str, float] | None:
     """
     Calculate BM25 scores for a document.
@@ -253,7 +253,9 @@ def rank_documents(
             return None
     if not tokenize(query) or not isinstance(tokenize(query), list):
         return None
-    prcsd = remove_stopwords(tokenize(query), stopwords)
+    else:
+        qtoken = tokenize(query)
+    prcsd = remove_stopwords(qtoken, stopwords)
     dscore = []
     curid = 0
     for doc in indexes:

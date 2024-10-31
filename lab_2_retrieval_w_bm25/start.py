@@ -56,7 +56,7 @@ def main() -> None:
     alen = 0.0
     assert len(temp) != 0, 'Token list is empty'
     for tk in temp:
-        alen+=len(tk)
+        alen += len(tk)
     alen /= len(temp)
     okapi = []
     for e in temp:
@@ -66,7 +66,7 @@ def main() -> None:
         if not isinstance(bm, dict):
             return
     print(okapi)
-    tstqr = 'Which fairy tale has Fairy Queen?'
+    tstqr = 'Which fairy tale has Fairy Queen?'  # TestQuery
     res2 = func.rank_documents(tidfttl, tstqr, stopwords)
     print(res2)
     res3 = func.rank_documents(okapi, tstqr, stopwords)

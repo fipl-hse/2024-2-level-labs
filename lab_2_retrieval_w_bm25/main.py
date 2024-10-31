@@ -118,12 +118,9 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         if not isinstance(word, str):
             return None
 
-    word_freq = {}
     tf_dict = {}
     for word in vocab:
-        word_freq[word] = word.count(word) / len(vocab)
-        tf = word_freq[word] / len(document_tokens)
-        tf_dict[word] = tf
+        tf_dict[word] = document_tokens.count(word) / len(document_tokens)
     return tf_dict
 
 

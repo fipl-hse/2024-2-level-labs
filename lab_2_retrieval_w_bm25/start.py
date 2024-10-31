@@ -27,18 +27,19 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-        list_of_lists = []
-
-        for text in documents:
-            list_of_lists.append(remove_stopwords(tokenize(text), stopwords))
-
-        doc_vocab = build_vocabulary(list_of_lists)
-        tf_idf_list = []
-
-        for i in range(len(list_of_lists)):
-            tf_idf_list.append(calculate_tf_idf(calculate_tf(doc_vocab, list_of_lists[i]), calculate_idf(doc_vocab, list_of_lists)))
-        print(tf_idf_list)
-    result = tf_idf_list
+        tfa = []
+        for document in range(len(documents)):
+            documents[document] = remove_stopwords(tokens=tokenize(documents[document]), stopwords=stopwords)
+        vocab = build_vocabulary(documents=documents)
+        for document in documents:
+            tfa.append(calculate_tf(vocab=vocab, document_tokens=document))
+        idf = calculate_idf(vocab=vocab, documents=documents)
+        tfa_idf = []
+        for tf in tfa:
+            tfa_idf.append(calculate_tf_idf(tf=tf, idf=idf))
+        result = tfa_idf
+        if isinstance(result, list):
+            print(result)
     assert result, "Result is None"
 
 

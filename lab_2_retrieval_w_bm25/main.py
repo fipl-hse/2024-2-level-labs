@@ -93,12 +93,18 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
        not (isinstance(document_tokens, list) and all(isinstance(token, str) for token in document_tokens) and document_tokens):
         return None
 
+    token_count = len(document_tokens)
+    token_frequency = {}
+
+    for token in document_tokens:
+        if token in token_frequency:
+            token_frequency[token] += 1
+        else:
+            token_frequency[token] = 1
+
     tf = {}
-    total_tokens = len(document_tokens)
-    for word in (vocab + document_tokens):
-        if word not in tf:
-            tf[word] = 0
-        tf[word] += document_tokens.count(word) / total_tokens
+    for word in vocab:
+        tf[word] = token_frequency.get(word, 0) / token_count
 
     return tf
 

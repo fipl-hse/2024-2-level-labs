@@ -49,6 +49,8 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     document = []
 
+    if not tokens or not stopwords:
+        return None
     if not isinstance(tokens, list) or not all(isinstance(value, str) for value in tokens):
         return None
     if not isinstance(stopwords, list) or not all(isinstance(value, str) for value in stopwords):

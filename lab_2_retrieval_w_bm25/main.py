@@ -217,10 +217,13 @@ def calculate_bm25(
     out = {}
     vocexp = set(vocab + document + list(idf_document.keys()))
     for wrd in vocexp:
-        curidf = idf_document[wrd]
-        curcnt = document.count(wrd)
-        tmpvar = (curcnt * (k1 + 1)) / (curcnt + k1 * (1 - b + b * (doc_len / avg_doc_len)))
-        out[wrd] = curidf * tmpvar
+        if wrd in list(idf_document.keys()):
+            curidf = idf_document[wrd]
+            curcnt = document.count(wrd)
+            tmpvar = (curcnt * (k1 + 1)) / (curcnt + k1 * (1 - b + b * (doc_len / avg_doc_len)))
+            out[wrd] = curidf * tmpvar
+        else:
+            out[wrd] = 0.0
     return out
 
 

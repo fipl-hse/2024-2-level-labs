@@ -30,9 +30,11 @@ def main() -> None:
         tokenized_documents = []
         for document in documents:
             tokens = tokenize(document)
-            if tokens is not None:
+            if tokens:
                 tokens = remove_stopwords(tokens, stopwords)
                 tokenized_documents.append(tokens)
+            else:
+                return None
         vocab = build_vocabulary(tokenized_documents)
         idf = calculate_idf(vocab, tokenized_documents)
         tf_idf_l = []

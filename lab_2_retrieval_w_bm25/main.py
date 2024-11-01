@@ -52,8 +52,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if (not stopwords or not isinstance(stopwords, list) or
             not all(isinstance(word, str) for word in stopwords)):
         return None
-    srtd = [t for t in tokens if t not in stopwords]
-    return srtd
+    return [t for t in tokens if t not in stopwords]
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -74,8 +73,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     for doc in documents:
         if not all(isinstance(tkn, str) for tkn in doc):
             return None
-    out = list(set(sum(documents, [])))
-    return out
+    return list(set(sum(documents, [])))
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

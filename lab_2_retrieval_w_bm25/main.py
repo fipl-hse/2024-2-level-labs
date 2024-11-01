@@ -3,7 +3,7 @@ Lab 2.
 
 Text retrieval with BM25
 """
-# pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
+# pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code, too-many-arguments
 from math import log
 
 
@@ -226,8 +226,7 @@ def calculate_bm25(
             or not isinstance(idf_document, dict) or \
             not isinstance(k1, float) or not isinstance(b, float):
         return None
-    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) \
-            or isinstance(doc_len, bool) or \
+    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) or \
             len(vocab) == 0 or len(document) == 0 or len(idf_document) == 0:
         return None
     for word in vocab:

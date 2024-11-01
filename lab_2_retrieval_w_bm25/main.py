@@ -80,10 +80,10 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
             or not all(isinstance(d, list) for d in documents) \
             or not all(isinstance(d, str) for document in documents for d in document):
         return None
-    unique_words = []
+    unique_words = set()
     for document in documents:
-        unique_words += set(document)
-    return list(set(unique_words))
+        unique_words.update(set(document))
+    return list(unique_words)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

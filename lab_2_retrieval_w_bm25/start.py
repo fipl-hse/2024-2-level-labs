@@ -59,7 +59,6 @@ def main() -> None:
     rank = rank_documents(bm25_lis, query, stopwords)
     result = rank
     print(result)
-    print(documents[0])
     assert result, "Result is None"
 
 

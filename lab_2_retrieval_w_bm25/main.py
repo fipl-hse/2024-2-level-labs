@@ -21,13 +21,10 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    new_text = ''
-    for sign in text.lower():
+    new_text = text.lower()
+    for sign in text:
         if not sign.isalpha():
-            added = ' '
-        else:
-            added = sign
-        new_text = f'{new_text}{added}'
+            new_text = new_text.lower().replace(sign, ' ')
     new_text = new_text.replace('  ', ' ')
     return new_text.split()
 

@@ -68,6 +68,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     for document in documents:
         if not all(isinstance(token, str) for token in document):
             return None
+
     vocab = []
     new_vocab = [term for doc in documents for term in doc if term not in vocab]
     return new_vocab
@@ -93,9 +94,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             or not all(isinstance(token, str) for token in document_tokens):
         return None
 
-    for token in document_tokens:
-        if token not in vocab:
-            vocab.append(token)
+    vocab.extend([term for term in document_tokens if term not in vocab])
     tokens_num = len(document_tokens)
     return dict(zip(vocab, [document_tokens.count(term) / tokens_num for term in vocab]))
 
@@ -305,7 +304,6 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
 
     with open(file_path, 'w', encoding='utf-8') as index_file:
         json.dump(index, index_file, indent=4)
-    return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:

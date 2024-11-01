@@ -53,7 +53,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     """
     if not isinstance(tokens, list) or not isinstance(stopwords, list):
         return None
-    if len(tokens) == 0 or len(stopwords) == 0:
+    if not tokens or not stopwords:
         return None
 
     for stopword in stopwords:
@@ -92,7 +92,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
             if not isinstance(token, str):
                 return None
             unique.add(token)
-    if len(unique) == 0:
+    if not unique:
         return None
 
     return list(unique)
@@ -122,7 +122,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         if len(document_tokens) > 0:
             result[word] = nb_occurence / len(document_tokens)
 
-    if len(vocab) == 0:
+    if not vocab0:
         return None
 
     for word in document_tokens:
@@ -133,7 +133,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
             if len(document_tokens) > 0:
                 result[word] = nb_occurence / len(document_tokens)
 
-    if len(result) == 0:
+    if not result:
         return None
 
     return result
@@ -154,7 +154,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     if not isinstance(vocab, list) or not isinstance(documents, list):
         return None
 
-    if len(vocab) == 0 or len(documents) == 0:
+    if not vocab or not documents:
         return None
 
     for document in documents:
@@ -201,7 +201,7 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
             return None
         result[word] = tf[word] * idf[word]
 
-    if len(result) == 0:
+    if not result:
         return None
     return result
 

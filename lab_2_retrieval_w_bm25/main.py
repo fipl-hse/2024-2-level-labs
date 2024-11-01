@@ -47,12 +47,10 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     for word in tokens + stopwords:
         if not isinstance(word, str):
             return None
-    for stopword in stopwords:
-        while stopword in tokens:
-            tokens.remove(stopword)
-    if not tokens:
+    tokens_without_sw = [token for token in tokens if token in stopwords]
+    if not tokens_without_sw:
         return None
-    return tokens
+    return tokens_without_sw
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:

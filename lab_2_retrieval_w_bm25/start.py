@@ -35,34 +35,34 @@ def main() -> None:
     bm25_list = []
     for text in documents:
         tokens = tokenize(text)
-        if not isinstance(tokens, list):
-            return None
+        if tokens is None:
+            return
         cleared_tokens = remove_stopwords(tokens, stopwords)
+        if cleared_tokens is None:
+            return
         doc_tokens.append(cleared_tokens)
         docs_len += len(tokens)
     av_docs_len = docs_len / len(documents)
-    if not isinstance(doc_tokens, list):
-        return None
+    if doc_tokens is None:
+        return
     vocab = build_vocabulary(list(doc_tokens))
-    if vocab is None or not isinstance(vocab, list):
-        return None
+    if vocab is None:
+        return
     idf = calculate_idf(vocab, list(doc_tokens))
-    if not isinstance(idf, dict):
+    if idf is None:
         return
     tf_idf = []
     for lst in doc_tokens:
-        if lst is None or not isinstance(lst, list):
-            return None
+        if lst is None:
+            return
         tf = calculate_tf(vocab, lst)
-        if not isinstance(tf, dict):
+        if tf is None:
             return
         tf_idf_dict = calculate_tf_idf(tf, idf)
-        if not isinstance(tf_idf_dict, dict):
+        if tf_idf_dict is None:
             return
         tf_idf.append(tf_idf_dict)
 
-        if lst is None or not isinstance(lst, list):
-            return None
         bm = calculate_bm25(vocab, lst, idf, 1.5, 0.75,
                             av_docs_len, len(lst))
         if bm is None:

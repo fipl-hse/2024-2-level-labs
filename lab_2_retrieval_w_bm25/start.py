@@ -96,14 +96,18 @@ def main() -> None:
         result = None
         assert result, "Result is None"
     golden_rank = [v[0] for v in rank_bm25_opt]
+    spearman_tf_idf_bm25 = calculate_spearman([v[0] for v in rank_tf_idf],
+                                              [v[0] for v in rank_bm25])
     spearman_tf_idf = calculate_spearman([v[0] for v in rank_tf_idf], golden_rank)
     spearman_bm25 = calculate_spearman([v[0] for v in rank_bm25], golden_rank)
-    spearman_bm25_opt = calculate_spearman([v[0] for v in rank_bm25_opt], golden_rank)
-    if spearman_tf_idf is None or spearman_bm25 is None or spearman_bm25_opt is None:
+    if spearman_tf_idf_bm25 is None or spearman_tf_idf is None or spearman_bm25 is None:
         result = None
         assert result, "Result is None"
     result = golden_rank
-    print(result, spearman_tf_idf, spearman_bm25, spearman_bm25_opt)
+    print(f'Golden standard: {result}')
+    print(f'Spearman coefficient for TF-IDF and BM25: {spearman_tf_idf_bm25}')
+    print(f'Spearman coefficient for TF-IDF and golden standard: {spearman_tf_idf}')
+    print(f'Spearman coefficient for BM25 and golden standard: {spearman_bm25}')
     assert result, "Result is None"
 
 

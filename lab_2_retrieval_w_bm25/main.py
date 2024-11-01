@@ -4,7 +4,6 @@ Lab 2.
 Text retrieval with BM25
 """
 
-
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -27,8 +26,7 @@ def tokenize(text: str) -> list[str] | None:
     for token in text:
         if not token.isalpha() and token != ' ':
             text = text.replace(token, ' ')
-    text = text.lower().split()
-    return text
+    return text.lower().split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:

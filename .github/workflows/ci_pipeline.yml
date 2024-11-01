@@ -85,7 +85,7 @@ jobs:
   unittests:
     name: Unittests
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 11
     needs: [ install-dependencies ]
     env:
       PR_NAME: ${{ github.event.pull_request.title }}

@@ -34,16 +34,16 @@ def main() -> None:
     for text in documents:
         tokens = tokenize(text)
         if not isinstance(tokens, list):
-            return None
+            return
         needful_tokens = remove_stopwords(tokens, stopwords)
         if not isinstance(needful_tokens, list):
-            return None
+            return
         doc_tokens.append(needful_tokens)
 
     tf_idf_res = []
     vocab = build_vocabulary(doc_tokens)
     if not isinstance(vocab, list):
-        return None
+        return
     idf = calculate_idf(vocab, doc_tokens)
     assert isinstance(idf, dict)
     for item in doc_tokens:
@@ -51,7 +51,7 @@ def main() -> None:
         assert isinstance(tf, dict)
         union_dict = calculate_tf_idf(tf, idf)
         if not isinstance(union_dict, dict):
-            return None
+            return
         tf_idf_res.append(union_dict)
 
 
@@ -61,14 +61,14 @@ def main() -> None:
         bm25 = []
         bm25_res = calculate_bm25(vocab, item, idf, 1.5, 0.75, avg_len, len(doc_tokens))
         if not isinstance(bm25_res, dict):
-            return None
+            return
         bm25.append(bm25_res)
 
         tf_idf_work = rank_documents(tf_idf_res, 'Which fairy tale has Fairy Queen?', stopwords)
         bm25_work = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)
         if (not isinstance(tf_idf_work, list) or not isinstance(bm25_work, list)
                 or not tf_idf_work or not bm25_work):
-            return None
+            return
         rang_1 = []
         rang_2 = []
         for i in tf_idf_work:

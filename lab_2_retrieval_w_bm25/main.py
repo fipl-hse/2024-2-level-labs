@@ -46,14 +46,13 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tokens, list, stopwords, list ):
+    if not isinstance(tokens, list[str]):
         return None
     list_tokens = [tokens]
     for word in list_tokens:
         if word in stopwords:
             list_tokens.remove(word)
-    clear_words = list_tokens
-    return clear_words
+    return list_tokens
 
 
 

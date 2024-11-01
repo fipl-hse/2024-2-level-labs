@@ -43,10 +43,10 @@ def main() -> None:
     av_docs_len = docs_len / len(documents)
     if doc_tokens is None or not isinstance(doc_tokens, list):
         return None
-    vocab = build_vocabulary(doc_tokens)
+    vocab = build_vocabulary(list(doc_tokens))
     if vocab is None or not isinstance(vocab, list):
         return None
-    idf = calculate_idf(vocab, doc_tokens)
+    idf = calculate_idf(vocab, list(doc_tokens))
     if not isinstance(idf, dict):
         return
     tf_idf = []

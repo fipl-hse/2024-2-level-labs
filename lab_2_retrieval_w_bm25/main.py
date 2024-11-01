@@ -25,10 +25,10 @@ def tokenize(text: str) -> list[str] | None:
     for char in text:
         if char.isalpha():
             tokenize_text += char.lower()
-        else:
-            if tokenize_text:
-                tokens.append(tokenize_text)
-                tokenize_text = ""
+            continue
+        if tokenize_text:
+            tokens.append(tokenize_text)
+            tokenize_text = ""
     if tokenize_text:
         tokens.append(tokenize_text)
     return tokens

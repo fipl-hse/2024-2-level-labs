@@ -56,15 +56,13 @@ def main() -> None:
 
 
         length = 0.0
-        for item in doc_tokens:
-            length += len(item)
+        length += len(item)
         avg_len = length / len(doc_tokens)
         bm25 = []
-        for item in doc_tokens:
-            bm25_res = calculate_bm25(vocab, item, idf, 1.5, 0.75, avg_len, len(doc_tokens))
-            if not isinstance(bm25_res, dict):
-                return None
-            bm25.append(bm25_res)
+        bm25_res = calculate_bm25(vocab, item, idf, 1.5, 0.75, avg_len, len(doc_tokens))
+        if not isinstance(bm25_res, dict):
+            return None
+        bm25.append(bm25_res)
 
         tf_idf_work = rank_documents(tf_idf_res, 'Which fairy tale has Fairy Queen?', stopwords)
         bm25_work = rank_documents(bm25, 'Which fairy tale has Fairy Queen?', stopwords)

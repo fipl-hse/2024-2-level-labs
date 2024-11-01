@@ -26,17 +26,15 @@ def tokenize(text: str) -> list[str] | None:
 
     tokenized_list = []
 
-    for elem in text:
+    for elem in text.lower():
         if not elem.isalpha() or elem != ' ':
             text = text.replace(elem, ' ')
 
-    l_text = text.lower()
-
-    for elem in l_text.split():
+    for elem in text:
         if elem not in ['.', ',', '!', '?', ':', ';']:
             tokenized_list.append(elem)
 
-    return tokenized_list
+    return text.split()
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """

@@ -20,11 +20,16 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    tokenized_text = []
-    for token in my_text.lower().split():
+    tokenized_text = text.lower().split()
+    for token in tokenized_text:
+        if token.isdigit():
+            tokenized_text.remove(token)
         if token.isalpha():
             tokenized_text.append(token)
+        else:
+            tokenized_text.remove(token)
     return tokenized_text
+
 
 
 

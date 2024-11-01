@@ -5,7 +5,7 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 import math
-
+import json
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -301,6 +301,19 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
         index (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
+    if not isinstance(index, list) or not isinstance(file_path,str)\
+            or not index or not file_path:
+        return None
+    for dictionary in index:
+        if not isinstance(dictionary, dict):
+            return None
+        if not (isinstance(word,str) and isinstance(info,float) for
+                word,info in dictionary.items()):
+            return None
+    with open(file_path, 'w', encoding='utf-8') as out_file:
+        json.dump(index, out_file, indent=6)
+    return None
+
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:
@@ -315,6 +328,13 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(file_path, str) or not file_path:
+        return None
+    with open(file_path, 'r', encoding='utf-8') as file:
+        saved_data = json.load(file)
+    if not isinstance(saved_data, list):
+        return None
+    return saved_data
 
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
@@ -330,3 +350,18 @@ def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(rank, list) or not isinstance(golden_rank,list)\
+        or not rank or not golden_rank:
+        return None
+    if not all(isinstance(num,int) for num in rank) or not\
+            all(isinstance(gold_num,int) for gold_num in golden_rank):
+        return None
+    if len(rank) != len(golden_rank):
+        return None
+
+    length = len(rank)
+    all_diff = 0
+    for count, num in enumerate(rank):
+        if num in golden_rank:
+            all_diff += (count - golden_rank.index(num)) ** 2
+    return 1 - (6 * all_diff) / (length * (length ** 2 - 1))

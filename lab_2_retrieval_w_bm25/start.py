@@ -45,9 +45,8 @@ def main() -> None:
     print(tokenized_docs)
 
     vocabulary = build_vocabulary(tokenized_docs)
-    if not vocabulary:
-        return
-    idf = calculate_idf(vocabulary, tokenized_docs)
+    if vocabulary:
+        idf = calculate_idf(vocabulary, tokenized_docs)
 
     tf_idf_all = []
     bm25_all = []

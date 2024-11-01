@@ -35,20 +35,20 @@ def main() -> None:
     bm25_list = []
     for text in documents:
         tokens = tokenize(text)
-        cleared_tokens = remove_stopwords(tokens, stopwords)
+        cleared_tokens = remove_stopwords(tokens, list(stopwords))
         doc_tokens.append(cleared_tokens)
-        docs_len += len(tokens)
+        docs_len += len(list(tokens))
     av_docs_len = docs_len / len(documents)
 
-    vocab = build_vocabulary(doc_tokens)
-    idf = calculate_idf(vocab, doc_tokens)
+    vocab = build_vocabulary(list(doc_tokens))
+    idf = calculate_idf(list(vocab), list(doc_tokens))
     tf_idf = []
     for lst in doc_tokens:
-        tf = calculate_tf(vocab, lst)
-        tf_idf_dict = calculate_tf_idf(tf, idf)
-        tf_idf.append(tf_idf_dict)
+        tf = calculate_tf(list(vocab), list(lst))
+        tf_idf_dict = calculate_tf_idf(dict(tf), dict(idf))
+        tf_idf.append(dict(tf_idf_dict))
 
-        bm = calculate_bm25(vocab, lst, idf, 1.5, 0.75, av_docs_len, len(lst))
+        bm = calculate_bm25(list(vocab), list(lst), dict(idf), 1.5, 0.75, av_docs_len, len(list(lst)))
         if bm is None:
             return
         bm25_list.append(bm)

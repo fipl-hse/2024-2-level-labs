@@ -222,15 +222,11 @@ def calculate_bm25(
     In case of corrupt input arguments, None is returned.
     """
     if not isinstance(vocab, list) or not isinstance(document, list) \
-            or not isinstance(idf_document, dict):
+            or not isinstance(idf_document, dict) or \
+            not isinstance(k1, float) or not isinstance(b, float):
         return None
-    if not isinstance(k1, float) or not isinstance(b, float):
-        return None
-    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int):
-        return None
-    if isinstance(doc_len, bool):
-        return None
-    if len(vocab) == 0 or len(document) == 0 or len(idf_document) == 0:
+    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) or isinstance(doc_len, bool) or \
+            len(vocab) == 0 or len(document) == 0 or len(idf_document) == 0:
         return None
     for word in vocab:
         if not isinstance(word, str):
@@ -269,9 +265,8 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
     if not isinstance(indexes, list) or not isinstance(query, str) \
-            or not isinstance(stopwords, list):
-        return None
-    if len(indexes) == 0 or len(query) == 0 or len(stopwords) == 0:
+            or not isinstance(stopwords, list) or \
+            len(indexes) == 0 or len(query) == 0 or len(stopwords) == 0:
         return None
     for index_dict in indexes:
         if not isinstance(index_dict, dict):

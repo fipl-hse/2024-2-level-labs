@@ -7,6 +7,8 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
+from lab_2_retrieval_w_bm25.main import calculate_idf, remove_stopwords, tokenize
+
 
 class NodeLike(Protocol):
     """Type alias for a tree node."""
@@ -18,6 +20,7 @@ class NodeLike(Protocol):
         Returns:
             dict: state of the Node instance
         """
+
 
     def load(self, state: dict) -> bool:
         """
@@ -74,6 +77,9 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words.
         """
+        if not isinstance(stop_words, list) or not all(isinstance(item, str) for item in stop_words) or not stop_words:
+            raise ValueError
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -87,6 +93,15 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+        text = text.lower()
+        tokenized_text = ''
+        for element in text:
+            if element.isalpha() or element.isspace():
+                tokenized_text += element
+        first_tokens = tokenized_text.split()
+        return self._remove_stop_words(first_tokens)
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -100,6 +115,15 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(documents, list) or not all(isinstance(item, str) for item in documents) or not documents:
+            return None
+        doc = []
+        for text in documents:
+            processed_text = self.tokenize(text)
+            if processed_text == None:
+                return None
+            doc.append(processed_text)
+        return doc
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -113,6 +137,10 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(tokens, list) or not all(isinstance(item, str) for item in tokens) or not tokens:
+            return None
+        filtered_tokens = [word for word in tokens if word not in set(self._stop_words)]
+        return filtered_tokens
 
 
 class Vectorizer:
@@ -132,11 +160,19 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize.
         """
+        if not isinstance(corpus, list) or not all(isinstance(item, list) for item in corpus) or not all(isinstance(elem, str) for item in corpus for elem in item):
+            raise ValueError
+        self._corpus = corpus
+
 
     def build(self) -> None:
         """
         Builds vocabulary with tokenized_documents.
         """
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
+
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """

@@ -27,12 +27,12 @@ class NodeLike(Protocol):
             state (dict): saved state of the Node.
 
         Returns:
-            bool: True is loaded successfully, False in other cases.
+            bool: True if Node was loaded successfully, False in other cases.
         """
 
 
 Vector = tuple[float, ...]
-"Type alias for vector representation of a text."
+"Type alias for vector representation of a text.\n"
 
 
 def save_vector(vector: Vector) -> dict:
@@ -196,7 +196,7 @@ class Vectorizer:
             file_path (str): The path to the file where the instance will be saved.
 
         Returns:
-            bool: True if the vectorizer saved successfully.
+            bool: True if the vectorizer was saved successfully.
 
         In case of corrupt input arguments, False is returned.
         """
@@ -308,7 +308,7 @@ class BasicSearchEngine:
         Save the Vectorizer state to file.
 
         Args:
-            file_path (str): The path to the file where the instance will be saved.
+            file_path (str): The path to the file where to save the instance.
 
         Returns:
             bool: returns True if save was done correctly, False in another cases.
@@ -322,7 +322,7 @@ class BasicSearchEngine:
             state (dict): state with documents.
 
         Returns:
-            bool: True if documents was loaded, False in other cases.
+            bool: True if documents were loaded, False in other cases.
         """
 
     def load(self, file_path: str) -> bool:
@@ -333,7 +333,7 @@ class BasicSearchEngine:
             file_path (str): state with documents.
 
         Returns:
-            bool: True if documents was loaded, False in other cases.
+            bool: True if documents were loaded, False in other cases.
         """
 
     def retrieve_vectorized(self, query_vector: Vector) -> str | None:
@@ -385,15 +385,15 @@ class Node(NodeLike):
             dict: state of the Node instance
         """
 
-    def load(self, state: dict) -> bool:
+    def load(self, state: dict[str, dict | int]) -> bool:
         """
         Load Node instance from state.
 
         Args:
-            state (dict): saved state of the Node.
+            state (dict[str, dict | int]): saved state of the Node.
 
         Returns:
-            bool: True is loaded successfully, False in other cases.
+            bool: True if Node was loaded successfully, False in other cases.
         """
 
 
@@ -555,13 +555,13 @@ class SearchEngine(BasicSearchEngine):
             file_path (str): The path to the file from which to load the instance.
 
         Returns:
-            bool: True if engine was load successfully, False in other cases.
+            bool: True if engine was loaded successfully, False in other cases.
         """
 
 
 class AdvancedSearchEngine(SearchEngine):
     """
-    Retriever based on KDTree algorithm with priority.
+    Retriever based on KDTree algorithm.
     """
 
     _tree: KDTree

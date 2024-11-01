@@ -226,7 +226,7 @@ def calculate_bm25(
             or not isinstance(idf_document, dict) or \
             not isinstance(k1, float) or not isinstance(b, float):
         return None
-    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) or \
+    if not isinstance(avg_doc_len, float) or not (type(doc_len) is int) or \
             len(vocab) == 0 or len(document) == 0 or len(idf_document) == 0:
         return None
     for word in vocab:

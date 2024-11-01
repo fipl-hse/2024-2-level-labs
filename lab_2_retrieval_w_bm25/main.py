@@ -27,10 +27,8 @@ def tokenize(text: str) -> list[str] | None:
     tokenized_list = []
 
     for elem in text:
-        if not elem.isalpha():
+        if not elem.isalpha() or elem != ' ':
             text = text.replace(elem, ' ')
-        elif elem == ' ':
-            text = text.replace(elem, '')
 
     l_text = text.lower()
 

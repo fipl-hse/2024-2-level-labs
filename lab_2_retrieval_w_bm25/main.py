@@ -3,7 +3,7 @@ Lab 2.
 
 Text retrieval with BM25
 """
-## pylint:disable=too-many-arguments, unused-argument
+# pylint:disable=too-many-arguments, unused-argument
 import json
 from math import log
 
@@ -24,14 +24,14 @@ def tokenize(text: str) -> list[str] | None:
         return None
     new_text = ''
     for character in text.lower():
-        if character.isalpha() is True:
+        if character.isalpha():
             new_text += character
             continue
         new_text += ' '
     for_tokens = new_text.split(' ')
     tokens = []
     for token in for_tokens:
-        if token == '':
+        if not token:
             continue
         tokens.append(token)
     return tokens

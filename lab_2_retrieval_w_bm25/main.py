@@ -46,7 +46,7 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tokens, str):
+    if not isinstance(tokens, list, stopwords, list ):
         return None
     list_tokens = [tokens]
     for word in list_tokens:
@@ -92,7 +92,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, document_tokens, list[str]):
+    if not isinstance(vocab, list[str], document_tokens, list[str]):
         return None
     n_t = document_tokens.count
     calc_d = len(vocab)

@@ -3,6 +3,7 @@ Lab 2.
 
 Text retrieval with BM25
 """
+# pylint:disable=too-many-locals, unused-argument, unused-variable
 from math import log
 
 

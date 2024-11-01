@@ -24,11 +24,11 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    for elem in text.lower():
+    for elem in text:
         if not elem.isalpha() and elem != ' ':
             text = text.replace(elem, ' ')
 
-    return text.split()
+    return text.lower().split()
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """

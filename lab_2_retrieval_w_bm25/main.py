@@ -122,7 +122,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         if len(document_tokens) > 0:
             result[word] = nb_occurence / len(document_tokens)
 
-    if not vocab0:
+    if not vocab:
         return None
 
     for word in document_tokens:

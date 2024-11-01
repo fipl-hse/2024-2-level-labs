@@ -266,9 +266,8 @@ def rank_documents(
     In case of corrupt input arguments, None is returned.
     """
     if not isinstance(indexes, list) or not isinstance(query, str) \
-            or not isinstance(stopwords, list):
-        return None
-    if len(indexes) == 0 or len(query) == 0 or len(stopwords) == 0:
+            or not isinstance(stopwords, list) or \
+            len(indexes) == 0 or len(query) == 0 or len(stopwords) == 0:
         return None
     for index_dict in indexes:
         if not isinstance(index_dict, dict):

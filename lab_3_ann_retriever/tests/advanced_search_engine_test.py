@@ -59,7 +59,7 @@ class AdvancedSearchEngineTest(unittest.TestCase):
         """
         bad_inputs = [{}, [], (), 7, 0.7, False]
         for bad_input in bad_inputs:
-            actual = self.retriever.save(bad_input)  # type: ignore
+            actual = self.retriever.save(bad_input)
             self.assertFalse(actual)
 
     @pytest.mark.lab_3_ann_retriever

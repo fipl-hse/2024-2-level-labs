@@ -80,11 +80,9 @@ def main() -> None:
                 break
             list_of_dict_with_bm25.append(bm_25)
 
-    '''rank_result_tfidfdict = rank_documents(list_of_tf_idf_dict,
-                                 'A story about a wizard boy in a tower!', stopwords)'''
-    rank_result_tfidfdict = rank_documents(list_of_tf_idf_dict,
-                                           'Which fairy tale has Fairy Queen?', stopwords)
-    rank_result_bm25 = rank_documents(list_of_dict_with_bm25,
+    rank_result = rank_documents(list_of_tf_idf_dict,
+                                 'A story about a wizard boy in a tower!', stopwords)
+    rank_result = rank_documents(list_of_dict_with_bm25,
                                  'A story about a wizard boy in a tower!', stopwords)
 
     list_of_dict_bm25_with_cutoff = []
@@ -110,17 +108,9 @@ def main() -> None:
     for index_in_tuple in tuples_r_docs_result_with_bm25cutoff:
         r_docs_result_with_bm25cutoff.append(index_in_tuple[0])
 
-    r_tf_idf = [elem[0] for elem in rank_result_tfidfdict]
-
-    sp_c_bm25_tf_idf = calculate_spearman(r_docs_result_with_bm25, r_tf_idf)
-    sp_c_tf_idf_bm25_cutoff = calculate_spearman(r_docs_result_with_bm25cutoff, r_tf_idf)
-    sp_c_bm25_bm25_cutoff = calculate_spearman(r_docs_result_with_bm25, r_docs_result_with_bm25cutoff)
+    calculate_spearman(r_docs_result_with_bm25, r_docs_result_with_bm25cutoff)
 
     result = list_of_dict_bm25_with_cutoff
-
-    print(f'spearman correlation: tf-idf and bm25: {sp_c_bm25_tf_idf}')
-    print(f'spearman correlation: tf-idf and bm25 with cutoff: {sp_c_tf_idf_bm25_cutoff}')
-    print(f'spearman correlation: bm25 and bm25 with cutoff: {sp_c_bm25_bm25_cutoff}')
     assert result, "Result is None"
 
 

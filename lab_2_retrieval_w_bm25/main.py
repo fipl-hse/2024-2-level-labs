@@ -26,7 +26,7 @@ def tokenize(text: str) -> list[str] | None:
     for letter in text.lower():
         if not letter.isalpha() and letter != ' ':
             text = text.lower().replace(letter, ' ')
-    tokenized_text = text.lower().split()
+    tokenized_text = text.split()
 
     if not all(isinstance(symbol, str) for symbol in tokenized_text):
         return None

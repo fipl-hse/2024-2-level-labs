@@ -35,17 +35,23 @@ def main() -> None:
     bm25_list = []
     for text in documents:
         tokens = tokenize(text)
-        cleared_tokens = remove_stopwords(tokens, list(stopwords))
+        cleared_tokens = remove_stopwords(list(tokens), list(stopwords))
         doc_tokens.append(cleared_tokens)
         docs_len += len(list(tokens))
     av_docs_len = docs_len / len(documents)
 
     vocab = build_vocabulary(list(doc_tokens))
     idf = calculate_idf(list(vocab), list(doc_tokens))
+    if not isinstance(idf, dict):
+        return
     tf_idf = []
     for lst in doc_tokens:
         tf = calculate_tf(list(vocab), list(lst))
+        if not isinstance(tf, dict):
+            return
         tf_idf_dict = calculate_tf_idf(dict(tf), dict(idf))
+        if not isinstance(tf_idf_dict, dict):
+            return
         tf_idf.append(dict(tf_idf_dict))
 
         bm = calculate_bm25(list(vocab), list(lst), dict(idf), 1.5, 0.75,

@@ -68,13 +68,9 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     for document in documents:
         if not all(isinstance(token, str) for token in document):
             return None
-
     vocab = []
-    for document in documents:
-        for term in document:
-            if term not in vocab:
-                vocab.append(term)
-    return vocab
+    new_vocab = [term for doc in documents for term in doc if term not in vocab]
+    return new_vocab
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:

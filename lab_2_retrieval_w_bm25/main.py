@@ -26,8 +26,8 @@ def tokenize(text: str) -> list[str] | None:
     for element in text.lower():
         if element.isalpha() or element == ' ':
             tokenized_text += element
-        else:
-            tokenized_text += ' '
+            continue
+        tokenized_text += ' '
     return tokenized_text.split()
 
 

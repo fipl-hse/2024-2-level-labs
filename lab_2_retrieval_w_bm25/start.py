@@ -35,6 +35,8 @@ def main() -> None:
     bm25_list = []
     for text in documents:
         tokens = tokenize(text)
+        if not isinstance(tokens, list):
+            return None
         cleared_tokens = remove_stopwords(tokens, stopwords)
         doc_tokens.append(cleared_tokens)
         docs_len += len(tokens)

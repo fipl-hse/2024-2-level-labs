@@ -36,42 +36,42 @@ def main() -> None:
     for text in documents:
         tokens = tokenize(text)
         if tokens is None:
-            result = None
+            return
         cleared_tokens = remove_stopwords(tokens, stopwords)
         if cleared_tokens is None:
-            result = None
+            return
         doc_tokens.append(cleared_tokens)
         docs_len += len(tokens)
     av_docs_len = docs_len / len(documents)
     if doc_tokens is None:
-        result = None
+        return
     vocab = build_vocabulary(list(doc_tokens))
     if vocab is None:
-        result = None
+        return
     idf = calculate_idf(vocab, list(doc_tokens))
     if idf is None:
-        result = None
+        return
     tf_idf = []
     for lst in doc_tokens:
         if lst is None:
-            result = None
+            break
         tf = calculate_tf(vocab, lst)
         if tf is None:
-            result = None
+            break
         tf_idf_dict = calculate_tf_idf(tf, idf)
         if tf_idf_dict is None:
-            result = None
+            break
         tf_idf.append(tf_idf_dict)
 
         bm = calculate_bm25(vocab, lst, idf, 1.5, 0.75,
                             av_docs_len, len(lst))
         if bm is None:
-            result = None
+            break
         bm25_list.append(bm)
 
     query = 'Which fairy tale has Fairy Queen?'
     if bm25_list is None:
-        result = None
+        return
     rank = rank_documents(bm25_list, query, stopwords)
     result = rank
     print(result)

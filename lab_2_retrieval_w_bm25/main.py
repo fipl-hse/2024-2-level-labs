@@ -21,7 +21,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    punctuation = '''!'"#$%&()*+,-./:;<=>?@[]^_`{|}~1234567890'''r'\''
+    punctuation = """!'"#$%&()*+,-./:;<=>?@[]^_`{|}~1234567890"""r"\""
     for p in punctuation:
         if p in text:
             text = text.replace(p, ' ')

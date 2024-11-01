@@ -4,6 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
+from math import log
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -121,7 +122,6 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
     """
     if not isinstance(vocab, documents, list[str]):
         return None
-    from math import log
     amount_of_doc = []
     if word in documents:
         amount_of_doc.append(documents)

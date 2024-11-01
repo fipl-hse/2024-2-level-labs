@@ -136,6 +136,8 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     if len(result) == 0:
         return None
 
+    return result
+
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """
     Calculate inverse document frequency for each term in the vocabulary.

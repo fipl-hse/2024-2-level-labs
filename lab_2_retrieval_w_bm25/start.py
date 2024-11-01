@@ -41,7 +41,7 @@ def main() -> None:
         doc_tokens.append(cleared_tokens)
         docs_len += len(tokens)
     av_docs_len = docs_len / len(documents)
-    if not isinstance(doc_tokens, list):
+    if doc_tokens is None or not isinstance(doc_tokens, list):
         return None
 
     vocab = build_vocabulary(doc_tokens)
@@ -52,6 +52,8 @@ def main() -> None:
         return
     tf_idf = []
     for lst in doc_tokens:
+        if lst is None or not isinstance(lst, list):
+            return None
         tf = calculate_tf(vocab, lst)
         if not isinstance(tf, dict):
             return
@@ -60,6 +62,8 @@ def main() -> None:
             return
         tf_idf.append(tf_idf_dict)
 
+        if lst is None or not isinstance(lst, list):
+            return None
         bm = calculate_bm25(vocab, lst, idf, 1.5, 0.75,
                             av_docs_len, len(lst))
         if bm is None:

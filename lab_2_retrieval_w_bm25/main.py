@@ -95,6 +95,8 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     if len(unique) == 0:
         return None
 
+    return list(unique)
+
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """

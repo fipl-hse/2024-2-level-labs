@@ -48,7 +48,8 @@ def main() -> None:
         tf_idf_dict = calculate_tf_idf(dict(tf), dict(idf))
         tf_idf.append(dict(tf_idf_dict))
 
-        bm = calculate_bm25(list(vocab), list(lst), dict(idf), 1.5, 0.75, av_docs_len, len(list(lst)))
+        bm = calculate_bm25(list(vocab), list(lst), dict(idf), 1.5, 0.75,
+                            av_docs_len, len(list(lst)))
         if bm is None:
             return
         bm25_list.append(bm)

@@ -20,7 +20,7 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    punctuation = '''!'"#$%&()*+,-./:;<=>?@[]'''r'''\^_`{|}~1234567890'''
+    punctuation = '''!'"#$%&()*+,-./:;<=>?@[]^_`{|}~1234567890'''r'\''
     for p in punctuation:
         if p in text:
             text = text.replace(p, ' ')
@@ -225,7 +225,8 @@ def calculate_bm25(
             or not isinstance(idf_document, dict) or \
             not isinstance(k1, float) or not isinstance(b, float):
         return None
-    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) or isinstance(doc_len, bool) or \
+    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) \
+            or isinstance(doc_len, bool) or \
             len(vocab) == 0 or len(document) == 0 or len(idf_document) == 0:
         return None
     for word in vocab:

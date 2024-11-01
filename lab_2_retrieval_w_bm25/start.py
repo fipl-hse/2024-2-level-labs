@@ -48,6 +48,7 @@ def main() -> None:
     assert isinstance(idf, dict)
     for item in doc_tokens:
         tf = calculate_tf(vocab, item)
+        assert isinstance(tf, dict)
         union_dict = calculate_tf_idf(tf, idf)
         if not isinstance(union_dict, dict):
             return None

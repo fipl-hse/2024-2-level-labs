@@ -41,7 +41,7 @@ def main() -> None:
         doc_tokens.append(cleared_tokens)
         docs_len += len(tokens)
     av_docs_len = docs_len / len(documents)
-    if doc_tokens is None or not isinstance(doc_tokens, list):
+    if not isinstance(doc_tokens, list):
         return None
     vocab = build_vocabulary(list(doc_tokens))
     if vocab is None or not isinstance(vocab, list):

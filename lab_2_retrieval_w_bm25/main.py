@@ -24,15 +24,9 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    tokenized_list = []
-
     for elem in text.lower():
-        if not elem.isalpha() or elem != ' ':
+        if not elem.isalpha() and elem != ' ':
             text = text.replace(elem, ' ')
-
-    for elem in text:
-        if elem not in ['.', ',', '!', '?', ':', ';']:
-            tokenized_list.append(elem)
 
     return text.split()
 

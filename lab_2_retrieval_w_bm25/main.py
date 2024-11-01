@@ -304,6 +304,7 @@ def save_index(index: list[dict[str, float]], file_path: str) -> None:
 
     with open(file_path, 'w', encoding='utf-8') as index_file:
         json.dump(index, index_file, indent=4)
+    return None
 
 
 def load_index(file_path: str) -> list[dict[str, float]] | None:

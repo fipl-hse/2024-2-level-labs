@@ -100,7 +100,7 @@ def main() -> None:
         print(bm25_spearman)
 
 
-    result = '????'
+    result = (tf_idf_spearman, bm25_spearman)
     assert result, "Result is None"
 
 

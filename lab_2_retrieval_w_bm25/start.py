@@ -9,6 +9,7 @@ from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
                                          load_index, rank_documents, remove_stopwords, save_index,
                                          tokenize)
 
+
 def main() -> None:
     """
     Launches an implementation

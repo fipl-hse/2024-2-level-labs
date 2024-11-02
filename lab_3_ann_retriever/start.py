@@ -3,6 +3,7 @@ Laboratory Work #3 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+from lab_3_ann_retriever.main import Tokenizer
 from pathlib import Path
 
 
@@ -30,7 +31,11 @@ def main() -> None:
     """
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    result = None
+    tokens = Tokenizer(open_files()[1])
+    tokenized_docs = tokens.tokenize_documents(open_files()[0])
+    secret_text = tokens.tokenize(text)
+    result = tokenized_docs
+    print(result)
     assert result, "Result is None"
 
 

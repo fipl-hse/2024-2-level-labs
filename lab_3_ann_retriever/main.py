@@ -5,6 +5,8 @@ Vector search with text retrieving
 """
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
+from lab_2_retrieval_w_bm25.main import (calculate_idf, calculate_tf_idf)
+from re import sub
 from typing import Protocol
 
 
@@ -74,6 +76,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words.
         """
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -87,6 +90,10 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+
+        return self._remove_stop_words(sub(r'[^а-яё]+', ' ', text.lower()).split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -100,6 +107,11 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(documents, list) or not documents \
+                or not all(isinstance(doc, str) for doc in documents):
+            return None
+
+        return [tok_doc for doc in documents if (tok_doc := self.tokenize(doc)) is not None] or None
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -113,6 +125,11 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(tokens, list) or not tokens \
+                or not all(isinstance(token, str) for token in tokens):
+            return None
+
+        return [token for token in tokens if token not in self._stop_words]
 
 
 class Vectorizer:
@@ -151,6 +168,7 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
 
+
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
         """
         Getting TF-IDF for document.
@@ -163,6 +181,7 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """

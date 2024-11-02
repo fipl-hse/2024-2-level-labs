@@ -92,7 +92,7 @@ def main() -> None:
     print(f'Spearman BM25 with cutoff: {spearman_bm_25_adv}')
     result = spearman_bm_25_adv
     assert result, "Result is None"
-    return result
+    return None
 
 
 if __name__ == "__main__":

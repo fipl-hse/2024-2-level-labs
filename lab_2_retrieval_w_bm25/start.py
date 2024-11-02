@@ -6,11 +6,6 @@ from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calcu
                                          remove_stopwords, tokenize)
 
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
-                                         calculate_bm25_with_cutoff, calculate_idf,
-                                         calculate_spearman, calculate_tf, calculate_tf_idf,
-                                         load_index, rank_documents, remove_stopwords, save_index,
-                                         tokenize)
 
 
 def main() -> None:

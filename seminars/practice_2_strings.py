@@ -54,7 +54,6 @@ def multiply_string(input_string: str, how_many: int) -> str:
     """
     # student realisation goes here
 
-
 # Function calls with expected result:
 # multiply_string('Hi', 2) → 'HiHi'
 # multiply_string('Hi', 3) → 'HiHiHi'
@@ -69,7 +68,6 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
-
 
 # Function calls with expected result:
 # front_times('Chocolate', 2) → 'ChoCho'
@@ -87,7 +85,6 @@ def extra_end(input_string: str) -> str:
     """
     # student realisation goes here
 
-
 # Function calls with expected result:
 # extra_end('Hello') → 'lololo'
 # extra_end('ab') → 'ababab'
@@ -102,8 +99,6 @@ def make_abba(first_string: str, second_string: str) -> str:
     """
     # student realisation goes here
 
-
-# make_abba('Hi', 'Bye') → 'HiByeByeHi'
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
 # make_abba('What', 'Up') → 'WhatUpUpWhat'
 # make_abba('', 'y') → 'yy'
@@ -120,9 +115,6 @@ def reverse_word(sentence: str) -> str:
     """
     # student realisation goes here
 
-
-# reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
-#
 # reverse_word("This is a test") == "This is a test"
 #
 # reverse_word("This is another test") == "This is rehtona test"

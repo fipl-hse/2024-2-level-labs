@@ -28,6 +28,10 @@ def tokenize(text: str) -> list[str] | None:
             text = text.replace(char, ' ')
     return text.lower().split()
 
+    for elem in text:
+        if not elem.isalpha() and elem != ' ':
+            text = text.replace(elem, ' ')
+    return text.lower().split()
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
@@ -77,6 +81,14 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
         result |= set(doc)
     return list(result)
 
+    unique = []
+
+    for doc in documents:
+        for word in doc:
+            if word not in unique:
+                unique.append(word)
+
+    return unique
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
     """

@@ -34,7 +34,6 @@ class KDTreeTest(unittest.TestCase):
         self.point = (953.58398, 382.63101)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_ideal(self):
         """
@@ -46,7 +45,6 @@ class KDTreeTest(unittest.TestCase):
         np.testing.assert_almost_equal(actual, expected)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_invalid_input(self):
         """
@@ -66,7 +64,6 @@ class KDTreeTest(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_return_value(self):
         """

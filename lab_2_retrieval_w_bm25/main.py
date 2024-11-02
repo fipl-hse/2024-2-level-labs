@@ -7,6 +7,8 @@ Text retrieval with BM25
 from json import dump, load
 from math import log
 
+import math
+
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -23,10 +25,19 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
 
-    for char in text:
-        if not char.isalpha() and char != ' ':
-            text = text.replace(char, ' ')
-    return text.lower().split()
+    extra_symb = ',.:?!;%$#№"&()[]{}~0123456789‘’º -\n><*=@+/\''
+    word = ''
+    result = []
+    for letter in text.lower():
+        if not letter in extra_symb:
+            word += letter
+        else:
+            if len(word) > 0:
+                result.append(word)
+            word = ''
+    if len(word) > 0:
+        result.append(word)
+    return result
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -42,14 +53,22 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or \
-            not tokens:
+    if not isinstance(tokens, list) or not isinstance(stopwords, list):
         return None
-    if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords) or \
-            not stopwords:
+    if not tokens or not stopwords:
         return None
 
-    return [token for token in tokens if token not in stopwords]
+    for stopword in stopwords:
+        if not isinstance(stopword, str):
+            return None
+
+    result = []
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+        if not token in stopwords:
+            result.append(token)
+    return result
 
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
@@ -64,18 +83,21 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list) or \
-            not all(isinstance(document, list) for document in documents) or \
-            not documents:
+    if not isinstance(documents, list):
         return None
-    for document in documents:
-        if not all(isinstance(item, str) for item in document):
-            return None
 
-    result = set()
-    for doc in documents:
-        result |= set(doc)
-    return list(result)
+    unique = set()
+    for document in documents:
+        if not isinstance(document, list):
+            return None
+        for token in document:
+            if not isinstance(token, str):
+                return None
+            unique.add(token)
+    if not unique:
+        return None
+
+    return list(unique)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -91,18 +113,32 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab) or \
-            not vocab:
-        return None
-    if not isinstance(document_tokens, list) or \
-            not all(isinstance(token, str) for token in document_tokens) or not document_tokens:
+    if not isinstance(vocab, list) or not isinstance(document_tokens, list):
         return None
 
     result = {}
-    for word in set(vocab) | set(document_tokens):
-        result[word] = document_tokens.count(word) / len(document_tokens)
-    return result
+    for word in vocab:
+        if not isinstance(word, str):
+            return None
+        nb_occurence = document_tokens.count(word)
+        if len(document_tokens) > 0:
+            result[word] = nb_occurence / len(document_tokens)
 
+    if not vocab:
+        return None
+
+    for word in document_tokens:
+        if not isinstance(word, str):
+            return None
+        if not word in vocab:
+            nb_occurence = document_tokens.count(word)
+            if len(document_tokens) > 0:
+                result[word] = nb_occurence / len(document_tokens)
+
+    if not result:
+        return None
+
+    return result
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """
@@ -117,21 +153,31 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab) or not vocab:
-        return None
-    if not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents) or \
-            not all(isinstance(item, str) for doc in documents for item in doc) or \
-            not documents:
+    if not isinstance(vocab, list) or not isinstance(documents, list):
         return None
 
-    total_documents = len(documents)
+    if not vocab or not documents:
+        return None
+
+    for document in documents:
+        if not isinstance(document, list):
+            return None
+        for word in document:
+            if not isinstance(word, str):
+                return None
+
+    numb = len(documents)
     idf = {}
     for word in vocab:
-        doc_has_word_count = 0
+        if not isinstance(word, str):
+            return None
+        summ = 0
         for document in documents:
             if word in document:
-                doc_has_word_count += 1
-        idf[word] = log((total_documents - doc_has_word_count + 0.5) / (doc_has_word_count + 0.5))
+                summ += 1
+
+        idf[word] = math.log((numb - summ + 0.5) / (summ + 0.5))
+
     return idf
 
 
@@ -148,17 +194,19 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
-    if not tf or not isinstance(tf, dict) or not all(isinstance(key, str) for key in tf) or \
-            not all(isinstance(value, float) for value in tf.values()):
-        return None
-    if not idf or not isinstance(idf, dict) or not all(isinstance(key, str) for key in idf) or \
-            not all(isinstance(value, float) for value in idf.values()):
+    if not isinstance(tf, dict) or not isinstance(idf, dict):
         return None
 
-    tf_idf = {}
+    result = {}
     for word in tf:
-        tf_idf[word] = tf[word] * idf[word]
-    return tf_idf
+        if not isinstance(word, str) or not word in idf:
+            return None
+        result[word] = tf[word] * idf[word]
+
+    if not result:
+        return None
+    return result
+
 
 
 def calculate_bm25(

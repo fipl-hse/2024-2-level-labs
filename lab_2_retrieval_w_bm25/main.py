@@ -23,16 +23,14 @@ def tokenize(text: str) -> list[str] | None:
     if not isinstance(text, str):
         return None
     tokens = []
-    for elem in text.lower():
+    text = text.lower()
+    for elem in text:
+        if not elem.isalpha():
+            elem = elem.replace(elem, ' ')
         tokens.append(elem)
-        if elem.isalpha():
-            continue
-        tokens[tokens.index(elem)] = " "
     tokens = ''.join(tokens).split(' ')
     while '' in tokens:
         tokens.remove('')
-    if not isinstance(tokens, list):
-        return None
     return tokens
 
 

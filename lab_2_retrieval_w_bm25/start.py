@@ -37,18 +37,13 @@ def main() -> None:
     for doc in documents:
         tok_doc = tokenize(doc)
         tokens.append(tok_doc)
-        if not isinstance(tok_doc, list):
-            result = None
-            assert result, "Result is None"
-        clear_tok_doc = remove_stopwords(tok_doc, stopwords)
-        if not isinstance(clear_tok_doc, list):
-            result = None
-            assert result, "Result is None"
-        clear_tokens.append(clear_tok_doc)
+        if tok_doc is not None:
+            clear_tok_doc = remove_stopwords(tok_doc, stopwords)
+            if clear_tok_doc is not None:
+                clear_tokens.append(clear_tok_doc)
     unique_tokens = build_vocabulary(clear_tokens)
     if not isinstance(unique_tokens, list):
-        result = None
-        assert result, "Result is None"
+        return None
     idf = calculate_idf(unique_tokens, clear_tokens)
     metrics_tf_idf = []
     metrics_bm_25 = []
@@ -56,30 +51,22 @@ def main() -> None:
     adv_len = sum(len(tokens) for tokens in clear_tokens)/len(clear_tokens)
     for tok in tokens:
         if not isinstance(tok, list):
-            result = None
-            assert result, "Result is None"
+            return None
         tf = calculate_tf(unique_tokens, tok)
         if not isinstance(tf, dict) or not isinstance(idf, dict):
-            result = None
-            assert result, "Result is None"
+            return None
         tf_idf = calculate_tf_idf(tf, idf)
-        if not isinstance(tf_idf, dict):
-            result = None
-            assert result, "Result is None"
-        metrics_tf_idf.append(tf_idf)
+        if tf_idf is not None:
+            metrics_tf_idf.append(tf_idf)
         bm_25 = calculate_bm25(unique_tokens, tok, idf,
                                1.5, 0.75, adv_len, len(tok))
-        if not isinstance(bm_25, dict):
-            result = None
-            assert result, "Result is None"
-        metrics_bm_25.append(bm_25)
+        if bm_25 is not None:
+            metrics_bm_25.append(bm_25)
         bm_25_adv = calculate_bm25_with_cutoff(unique_tokens, tok, idf,
                                                0.2, 1.5, 0.75,
                                                adv_len, len(tok))
-        if not isinstance(bm_25_adv, dict):
-            result = None
-            assert result, "Result is None"
-        bm_25_advanced.append(bm_25_adv)
+        if bm_25_adv is not None:
+            bm_25_advanced.append(bm_25_adv)
     rank_tf_idf = rank_documents(metrics_tf_idf,
                                  'Which fairy tale has Fairy Queen?',
                                  stopwords)
@@ -89,8 +76,7 @@ def main() -> None:
     save_index(bm_25_advanced, "assets/metrics.json")
     loaded = load_index("assets/metrics.json")
     if not isinstance(loaded, list):
-        result = None
-        assert result, "Result is None"
+        return None
     rank_from_json = rank_documents(loaded,
                                     'Which fairy tale has Fairy Queen?',
                                     stopwords)
@@ -100,11 +86,13 @@ def main() -> None:
                                         [golden[0] for golden in rank_from_json])
     spearman_bm_25_adv = calculate_spearman([num[0] for num in rank_from_json],
                                             [golden[0] for golden in rank_from_json])
-    print(f'golden rank: {[golden[0] for golden in rank_from_json]}')
+    print(f'Golden rank: {[golden[0] for golden in rank_from_json]}')
     print(f'Spearman tf_idf: {spearman_tf_idf}')
     print(f'Spearman BM25: {spearman_bm_25}')
     print(f'Spearman BM25 with cutoff: {spearman_bm_25_adv}')
-    # assert result, "Result is None"
+    result = None
+    assert result, "Result is None"
+    return result
 
 
 if __name__ == "__main__":

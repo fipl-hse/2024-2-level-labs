@@ -8,6 +8,12 @@ from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
                                          load_index, rank_documents, remove_stopwords, save_index,
                                          tokenize)
 
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
+                                         calculate_bm25_with_cutoff, calculate_idf,
+                                         calculate_spearman, calculate_tf, calculate_tf_idf,
+                                         load_index, rank_documents, remove_stopwords, save_index,
+                                         tokenize)
+
 
 def main() -> None:
     """
@@ -29,122 +35,88 @@ def main() -> None:
     for path in paths_to_texts:
         with open(path, "r", encoding="utf-8") as file:
             documents.append(file.read())
+
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-    documents_preprocessed = []
-    for document in documents:
-        document_tokenized = tokenize(document)
-        if document_tokenized is None:
-            result = None
-            assert result, "Result is None"
-        document_preprocessed = remove_stopwords(document_tokenized, stopwords)
-        if document_preprocessed is None:
-            result = None
-            assert result, "Result is None"
-        documents_preprocessed.append(document_preprocessed)
-    if not all(isinstance(doc, list) for doc in documents_preprocessed) or \
-            not isinstance(documents_preprocessed, list) or \
-            not all(isinstance(token, str) for doc in documents_preprocessed for token in doc):
-        result = None
-        assert result, "Result is None"
+    tokenized_document = []
+    for doc in documents:
+        tokenized_doc = tokenize(doc)
+        if tokenized_doc is None:
+            continue
+        tokens_without_stopwords = remove_stopwords(tokenized_doc, stopwords)
+        if tokens_without_stopwords is None:
+            return
+        tokenized_document.append(tokens_without_stopwords)
+    #print(f'tokenized document: {tokenized_document}')
+    if tokenized_document is None:
+        return
+    vocabulary = build_vocabulary(tokenized_document)
+    if vocabulary is None:
+        return
+    #print(f'vocabulary with unique words: {vocabulary}')
 
-    vocabulary = build_vocabulary(documents_preprocessed)
-    if not isinstance(vocabulary, list) or not all(isinstance(word, str) for word in vocabulary):
-        result = None
-        assert result, "Result is None"
-
-    tf_documents: list[dict[str, float]] = []
-    for doc in documents_preprocessed:
-        if not isinstance(doc, list) or not all(isinstance(item, str) for item in doc):
-            result = None
-            assert result, "Result is None"
-        tf_ = calculate_tf(vocabulary, doc)
-        if tf_ is None or not isinstance(tf_, dict) or not all(isinstance(k, str) for k in tf_) \
-                or not all(isinstance(v, float) for v in tf_.values()):
-            result = None
-            assert result, "Result is None"
-        tf_documents.append(tf_)
-
-    idf_documents = calculate_idf(vocabulary, documents_preprocessed)
-    tf_idf_documents: list[dict[str, float]] = []
-    for tf_ in tf_documents:
-        if not isinstance(idf_documents, dict) \
-                or not all(isinstance(key, str) for key in idf_documents) \
-                or not all(isinstance(value, float) for value in idf_documents.values()):
-            result = None
-            assert result, "Result is None"
-        tf_idf = calculate_tf_idf(tf_, idf_documents)
+    list_of_tf_idf = []
+    idf = calculate_idf(vocabulary, tokenized_document)
+    if idf is None:
+        return
+    for document in tokenized_document:
+        tf = calculate_tf(vocabulary, document)
+        if tf is None:
+            break
+        tf_idf = calculate_tf_idf(tf, idf)
         if tf_idf is None:
-            result = None
-            assert result, "Result is None"
-        tf_idf_documents.append(tf_idf)
+            return
+        list_of_tf_idf.append(tf_idf)
+    #print(f'tf idf result: {list_of_tf_idf}')
 
-    bm25_documents: list[dict[str, float]] = []
-    avg_doc_len = sum(len(document) for document in documents_preprocessed) / len(
-        documents_preprocessed)
-    for document_ in documents_preprocessed:
-        if not isinstance(document_, list) or not all(isinstance(item, str) for item in document_):
-            result = None
-            assert result, "Result is None"
-        if idf_documents is None:
-            result = None
-            assert result, "Result is None"
-        bm25 = calculate_bm25(vocabulary, document_, idf_documents,
-                              avg_doc_len=avg_doc_len, doc_len=len(document_))
-        if bm25 is None:
-            result = None
-            assert result, "Result is None"
-        bm25_documents.append(bm25)
+    avg_doc_len_list = []
+    for i in tokenized_document:
+        avg_doc_len_list.append(len(i))
+    avg_doc_len = sum(avg_doc_len_list) / len(tokenized_document)
+    # print(f'avg document length: {avg_doc_len}')
+
+    list_of_bm25 = []
+    list_of_bm25_with_cutoff = []
+    for document in tokenized_document:
+        doc_len = len(document)
+        bm25 = calculate_bm25(vocabulary, document, idf, 1.5, 0.75, avg_doc_len, doc_len)
+        if isinstance(bm25, dict):
+            list_of_bm25.append(bm25)
+
+        bm25_with_cutoff = calculate_bm25_with_cutoff(vocabulary, document, idf,
+                                                      0.2, 1.5, 0.75, avg_doc_len, doc_len)
+        if isinstance(bm25_with_cutoff, dict):
+            list_of_bm25_with_cutoff.append(bm25_with_cutoff)
+
+    # print(f'bm25 result: {list_of_bm25}')
+    # print(f'bm25 with cutoff result: {list_of_bm25_with_cutoff}')
 
     query = 'Which fairy tale has Fairy Queen?'
-    tf_idf_ranked = rank_documents(tf_idf_documents, query, stopwords)
-    if tf_idf_ranked is None:
-        result = None
-        assert result, "Result is None"
-    bm25_ranked = rank_documents(bm25_documents, query, stopwords)
-    if bm25_ranked is None:
-        result = None
-        assert result, "Result is None"
+    #query = 'A story about a wizard boy in a tower!'
+    tf_idf_ranking = rank_documents(list_of_tf_idf, query, stopwords)
+    #print(tf_idf_ranking)
+    bm25_ranking = rank_documents(list_of_bm25, query, stopwords)
+    bm25_with_cutoff_ranking = rank_documents(list_of_bm25_with_cutoff, query, stopwords)
 
-    bm25_with_cutoff = []
-    for document_1 in documents_preprocessed:
-        if not isinstance(document_1, list) or \
-                not all(isinstance(item, str) for item in document_1):
-            result = None
-            assert result, "Result is None"
-        if idf_documents is None:
-            result = None
-            assert result, "Result is None"
-        result_ = calculate_bm25_with_cutoff(vocabulary, document_1, idf_documents, 0.2,
-                                            avg_doc_len=avg_doc_len, doc_len=len(document_1))
-        if result_ is None:
-            result = None
-            assert result, "Result is None"
-        bm25_with_cutoff.append(result_)
+    file_path = 'assets/metrics.json'
+    save_index(list_of_bm25_with_cutoff, file_path)
+    indexes = load_index(file_path)
+    if indexes is None:
+        return
 
-    save_index(bm25_with_cutoff, 'assets/metrics.json')
-    loaded_bm25_with_cutoff = load_index('assets/metrics.json')
+    r_tfidf = [elem[0] for elem in tf_idf_ranking]
+    r_bm25 = [elem[0] for elem in bm25_ranking]
+    r_bm25_with_cutoff = [elem[0] for elem in bm25_with_cutoff_ranking]
 
-    if not isinstance(loaded_bm25_with_cutoff, list):
-        result = None
-        assert result, "Result is None"
-    bm25_cutoff_ranked = rank_documents(loaded_bm25_with_cutoff,
-                                        'Which fairy tale has Fairy Queen?', stopwords)
+    tfidf_bm25_corr = calculate_spearman(r_tfidf, r_bm25)
+    tfidf_bm25cut_spearman_corr = calculate_spearman(r_tfidf, r_bm25_with_cutoff)
+    bm25_bm25cut_spearman_corr = calculate_spearman(r_bm25, r_bm25_with_cutoff)
+    print(f'tfidf and bm25 spearman correlation: {tfidf_bm25_corr}')
+    print(f'tfidf and bm25 with cutoff spearman correlation: {tfidf_bm25cut_spearman_corr}')
+    print(f'bm25 and bm25 with cutoff spearman correlation: {bm25_bm25cut_spearman_corr}')
 
-    tf_idf_ranks_only = [item[0] for item in tf_idf_ranked]
-    bm25_ranks_only = [item[0] for item in bm25_ranked]
-    bm25_cutoff_ranks_only = [item[0] for item in bm25_cutoff_ranked]
-
-    spearman_tf_idf_bm25 = calculate_spearman(tf_idf_ranks_only, bm25_ranks_only)
-    spearman_tf_idf_bm25_cutoff = calculate_spearman(tf_idf_ranks_only, bm25_cutoff_ranks_only)
-    spearman_bm25_bm25_cutoff = calculate_spearman(bm25_cutoff_ranks_only, bm25_ranks_only)
-    print('spearman for tf-idf and bm25:', spearman_tf_idf_bm25)
-    print('spearman for tf-idf and bm25 with cutoff:', spearman_tf_idf_bm25_cutoff)
-    print('spearman for bm25 and bm25 with cutoff:', spearman_bm25_bm25_cutoff)
-
-    result = bm25_cutoff_ranks_only
-    print('golden standard:', result)
+    result = tfidf_bm25_corr, bm25_bm25cut_spearman_corr, tfidf_bm25cut_spearman_corr
     assert result, "Result is None"
 
 

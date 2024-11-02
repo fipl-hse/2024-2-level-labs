@@ -4,8 +4,6 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-from json import dump, load
-from math import log
 
 import json
 import math

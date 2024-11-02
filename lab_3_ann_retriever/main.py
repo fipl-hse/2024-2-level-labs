@@ -5,8 +5,6 @@ Vector search with text retrieving
 """
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
-from lab_2_retrieval_w_bm25.main import (calculate_idf, calculate_tf_idf)
-from re import sub
 from typing import Protocol
 
 
@@ -29,12 +27,12 @@ class NodeLike(Protocol):
             state (dict): saved state of the Node.
 
         Returns:
-            bool: True if Node was loaded successfully, False in other cases.
+            bool: True is loaded successfully, False in other cases.
         """
 
 
 Vector = tuple[float, ...]
-"Type alias for vector representation of a text.\n"
+"Type alias for vector representation of a text."
 
 
 def save_vector(vector: Vector) -> dict:
@@ -76,7 +74,6 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words.
         """
-        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -90,10 +87,6 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(text, str) or not text:
-            return None
-
-        return self._remove_stop_words(sub(r'[^а-яё]+', ' ', text.lower()).split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -107,11 +100,6 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(documents, list) or not documents \
-                or not all(isinstance(doc, str) for doc in documents):
-            return None
-
-        return [tok_doc for doc in documents if (tok_doc := self.tokenize(doc)) is not None] or None
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -125,11 +113,6 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokens, list) or not tokens \
-                or not all(isinstance(token, str) for token in tokens):
-            return None
-
-        return [token for token in tokens if token not in self._stop_words]
 
 
 class Vectorizer:
@@ -168,7 +151,6 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
 
-
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
         """
         Getting TF-IDF for document.
@@ -181,7 +163,6 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -215,7 +196,7 @@ class Vectorizer:
             file_path (str): The path to the file where the instance will be saved.
 
         Returns:
-            bool: True if the vectorizer was saved successfully.
+            bool: True if the vectorizer saved successfully.
 
         In case of corrupt input arguments, False is returned.
         """
@@ -327,7 +308,7 @@ class BasicSearchEngine:
         Save the Vectorizer state to file.
 
         Args:
-            file_path (str): The path to the file where to save the instance.
+            file_path (str): The path to the file where the instance will be saved.
 
         Returns:
             bool: returns True if save was done correctly, False in another cases.
@@ -341,7 +322,7 @@ class BasicSearchEngine:
             state (dict): state with documents.
 
         Returns:
-            bool: True if documents were loaded, False in other cases.
+            bool: True if documents was loaded, False in other cases.
         """
 
     def load(self, file_path: str) -> bool:
@@ -352,7 +333,7 @@ class BasicSearchEngine:
             file_path (str): state with documents.
 
         Returns:
-            bool: True if documents were loaded, False in other cases.
+            bool: True if documents was loaded, False in other cases.
         """
 
     def retrieve_vectorized(self, query_vector: Vector) -> str | None:
@@ -404,15 +385,15 @@ class Node(NodeLike):
             dict: state of the Node instance
         """
 
-    def load(self, state: dict[str, dict | int]) -> bool:
+    def load(self, state: dict) -> bool:
         """
         Load Node instance from state.
 
         Args:
-            state (dict[str, dict | int]): saved state of the Node.
+            state (dict): saved state of the Node.
 
         Returns:
-            bool: True if Node was loaded successfully, False in other cases.
+            bool: True is loaded successfully, False in other cases.
         """
 
 
@@ -574,13 +555,13 @@ class SearchEngine(BasicSearchEngine):
             file_path (str): The path to the file from which to load the instance.
 
         Returns:
-            bool: True if engine was loaded successfully, False in other cases.
+            bool: True if engine was load successfully, False in other cases.
         """
 
 
 class AdvancedSearchEngine(SearchEngine):
     """
-    Retriever based on KDTree algorithm.
+    Retriever based on KDTree algorithm with priority.
     """
 
     _tree: KDTree

@@ -7,6 +7,8 @@ from json import dump, load
 from math import log
 
 # pylint:disable=too-many-arguments, unused-argument
+from json import dump, load
+from math import log
 
 
 def tokenize(text: str) -> list[str] | None:

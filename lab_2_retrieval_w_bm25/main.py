@@ -3,6 +3,8 @@ Lab 2.
 
 Text retrieval with BM25
 """
+
+
 # pylint:disable=too-many-arguments, unused-argument
 from json import dump, load
 from math import log
@@ -28,6 +30,17 @@ def tokenize(text: str) -> list[str] | None:
             text = text.replace(char, ' ')
     return text.lower().split()
 
+    if not isinstance(text, str):
+        return None
+
+    for symbol in text:
+        if not symbol.isalpha() and symbol != ' ':
+            text = text.replace(symbol, ' ')
+
+    tokens = text.lower().split()
+
+    return tokens
+
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
@@ -51,6 +64,21 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     return [token for token in tokens if token not in stopwords]
 
+    document = []
+
+    if not tokens or not stopwords:
+        return None
+    if not isinstance(tokens, list) or not all(isinstance(value, str) for value in tokens):
+        return None
+    if not isinstance(stopwords, list) or not all(isinstance(value, str) for value in stopwords):
+        return None
+
+    for value in tokens:
+        if value not in stopwords:
+            document.append(value)
+
+    return document
+
 
 def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
     """
@@ -64,18 +92,20 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list) or \
-            not all(isinstance(document, list) for document in documents) or \
-            not documents:
+    vocab = []
+    if not isinstance(documents, list) or not all(isinstance(value, list) for value in documents):
         return None
-    for document in documents:
-        if not all(isinstance(item, str) for item in document):
+    for value in documents:
+        if not all(isinstance(token, str) for token in value):
             return None
 
-    result = set()
-    for doc in documents:
-        result |= set(doc)
-    return list(result)
+    for value in documents:
+        for token in value:
+            if token not in vocab:
+                vocab.append(token)
+
+    return vocab
+
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -102,7 +132,6 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
     for word in set(vocab) | set(document_tokens):
         result[word] = document_tokens.count(word) / len(document_tokens)
     return result
-
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """

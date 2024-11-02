@@ -3,6 +3,7 @@ Lab 2.
 
 Text retrieval with BM25
 """
+
 # pylint:disable=too-many-arguments, unused-argument
 from json import dump, load
 from math import log
@@ -28,6 +29,14 @@ def tokenize(text: str) -> list[str] | None:
             text = text.replace(char, ' ')
     return text.lower().split()
 
+    if not isinstance(text, str):
+        return None
+
+    for token in text:
+        if not token.isalpha() and token != ' ':
+            text = text.replace(token, ' ')
+    return text.lower().split()
+
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
@@ -47,6 +56,14 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
         return None
     if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords) or \
             not stopwords:
+        return None
+
+    return [token for token in tokens if token not in stopwords]
+
+    if not isinstance(tokens, list) or not isinstance(stopwords, list) or not \
+            all(isinstance(token, str) for token in tokens) or not \
+            all(isinstance(word, str) for word in stopwords) or not \
+            len(tokens) > 0 or not len(stopwords) > 0:
         return None
 
     return [token for token in tokens if token not in stopwords]

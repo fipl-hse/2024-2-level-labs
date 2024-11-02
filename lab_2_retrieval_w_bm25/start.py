@@ -90,7 +90,7 @@ def main() -> None:
     print(f'Spearman tf_idf: {spearman_tf_idf}')
     print(f'Spearman BM25: {spearman_bm_25}')
     print(f'Spearman BM25 with cutoff: {spearman_bm_25_adv}')
-    result = None
+    result = spearman_bm_25_adv
     assert result, "Result is None"
     return result
 

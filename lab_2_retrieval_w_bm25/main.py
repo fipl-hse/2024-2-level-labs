@@ -4,8 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-from json import dump, load
-from math import log
+import math
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -22,10 +21,9 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-
-    for char in text:
-        if not char.isalpha() and char != ' ':
-            text = text.replace(char, ' ')
+    for symbol in text:
+        if not symbol.isalpha() and symbol != ' ':
+            text = text.replace(symbol, ' ')
     return text.lower().split()
 
 
@@ -42,13 +40,11 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or \
-            not tokens:
+    if not isinstance(tokens, list) or not isinstance(stopwords, list) or not tokens or not stopwords:
         return None
-    if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords) or \
-            not stopwords:
+    if not all(isinstance(stopword, str) for stopword in stopwords)\
+            or not all(isinstance(token, str) for token in tokens):
         return None
-
     return [token for token in tokens if token not in stopwords]
 
 
@@ -64,18 +60,16 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(documents, list) or \
-            not all(isinstance(document, list) for document in documents) or \
-            not documents:
+    if not isinstance(documents, list) or not all(isinstance(meaningful_list, list) for meaningful_list in documents)\
+            or not documents:
         return None
-    for document in documents:
-        if not all(isinstance(item, str) for item in document):
+    for meaningful_list in documents:
+        if not all(isinstance(word, str) for word in meaningful_list):
             return None
-
-    result = set()
-    for doc in documents:
-        result |= set(doc)
-    return list(result)
+    unique_words = set()
+    for meaningful_list in documents:
+        unique_words.update(meaningful_list)
+    return list(unique_words)
 
 
 def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, float] | None:
@@ -91,18 +85,21 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab) or \
-            not vocab:
+    if not isinstance(vocab, list)\
+            or not all(isinstance(unique_word, str) for unique_word in vocab) or not vocab:
         return None
-    if not isinstance(document_tokens, list) or \
-            not all(isinstance(token, str) for token in document_tokens) or not document_tokens:
+    if not isinstance(document_tokens, list)\
+            or not all(isinstance(token, str) for token in document_tokens) or not document_tokens:
         return None
-
-    result = {}
-    for word in set(vocab) | set(document_tokens):
-        result[word] = document_tokens.count(word) / len(document_tokens)
-    return result
-
+    tf_dict = {}
+    for word in document_tokens:
+        if word not in tf_dict:
+            tf_dict[word] = 0.0
+        for unique_word in vocab:
+            if unique_word not in tf_dict:
+                tf_dict[unique_word] = 0.0
+            tf_dict[word] = document_tokens.count(word) / len(document_tokens)
+    return tf_dict
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
     """
@@ -117,24 +114,22 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab) or not vocab:
+    if (not isinstance(vocab, list) or not isinstance(documents, list)
+            or not all(isinstance(word, str) for word in vocab)
+            or not all(isinstance(token_lst, list) for token_lst in documents)
+            or not vocab or not documents):
         return None
-    if not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents) or \
-            not all(isinstance(item, str) for doc in documents for item in doc) or \
-            not documents:
-        return None
-
-    total_documents = len(documents)
-    idf = {}
+    for token_lst in documents:
+        if not all(isinstance(token, str) for token in token_lst):
+            return None
+    idf_dict = {}
     for word in vocab:
-        doc_has_word_count = 0
-        for document in documents:
-            if word in document:
-                doc_has_word_count += 1
-        idf[word] = log((total_documents - doc_has_word_count + 0.5) / (doc_has_word_count + 0.5))
-    return idf
-
-
+        word_met_in_document = 0.0
+        for token_lst in documents:
+            if word in token_lst:
+                word_met_in_document += 1.0
+        idf_dict[word] = math.log((len(documents) - word_met_in_document+0.5)/(word_met_in_document+0.5))
+    return idf_dict
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
     """
     Calculate TF-IDF scores for a document.
@@ -148,18 +143,15 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
-    if not tf or not isinstance(tf, dict) or not all(isinstance(key, str) for key in tf) or \
-            not all(isinstance(value, float) for value in tf.values()):
+    if (not isinstance(tf, dict) or not isinstance(idf, dict) or not all(isinstance(key, str) for
+        key in tf.keys()) or not all(isinstance(value, float) for value in tf.values())
+        or not all(isinstance(key,str) for key in idf.keys()) or not all(isinstance(value, float)
+        for value in idf.values()) or not tf or not idf):
         return None
-    if not idf or not isinstance(idf, dict) or not all(isinstance(key, str) for key in idf) or \
-            not all(isinstance(value, float) for value in idf.values()):
-        return None
-
-    tf_idf = {}
+    tf_idf_dict = {}
     for word in tf:
-        tf_idf[word] = tf[word] * idf[word]
-    return tf_idf
-
+        tf_idf_dict[word] = tf[word]*idf[word]
+    return tf_idf_dict
 
 def calculate_bm25(
     vocab: list[str],

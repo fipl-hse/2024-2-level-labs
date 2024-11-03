@@ -91,7 +91,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
-        _stop_words = stop_words.copy()
+        self._stop_words = stop_words.copy()
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -110,7 +110,7 @@ class Tokenizer:
         for symbol in text:
             if not symbol.isalpha() and symbol != ' ':
                 text = text.replace(symbol, ' ')
-        return text.lower().split()
+        return self._remove_stop_words(text.lower().split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -127,7 +127,13 @@ class Tokenizer:
         if not (documents and isinstance(documents, list) and all(
                 isinstance(document, str) for document in documents)):
             return None
-        return [self.tokenize(document) for document in documents]
+        tokenized_documents = []
+        for document in documents:
+            tokenized_document = self.tokenize(document)
+            if tokenized_document is None:
+                return None
+            tokenized_documents.append(tokenized_document)
+        return tokenized_documents
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """

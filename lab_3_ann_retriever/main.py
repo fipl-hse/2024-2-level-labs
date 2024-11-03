@@ -11,7 +11,6 @@ Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
 
-
 class NodeLike(Protocol):
     """
     Type alias for a tree node.

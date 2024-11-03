@@ -2,8 +2,8 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
-                                         rank_documents, remove_stopwords, tokenize)
+from main import (build_vocabulary, calculate_bm25, calculate_idf, rank_documents, remove_stopwords,
+                  tokenize)
 
 
 def main() -> None:
@@ -30,17 +30,17 @@ def main() -> None:
         stopwords = file.read().split("\n")
 
     text_sort = []
-    bm25_lis = []
+    bm25 = []
     docs_len = 0
     for text in documents:
-        text_new = tokenize(text)
-        if text_new is None:
+        tokenized_text = tokenize(text)
+        if tokenized_text is None:
             return
-        tokens_cleared = remove_stopwords(text_new, stopwords)
+        tokens_cleared = remove_stopwords(tokenized_text, stopwords)
         if tokens_cleared is None:
             return
         text_sort.append(tokens_cleared)
-        docs_len += len(text_new)
+        docs_len += len(tokenized_text)
 
     avg_docs_len = docs_len / len(documents)
     voc = build_vocabulary(text_sort)
@@ -54,15 +54,14 @@ def main() -> None:
                             avg_docs_len, len(new_text))
         if bm is None:
             return
-        bm25_lis.append(bm)
-    if bm25_lis is None:
+        bm25.append(bm)
+    if bm25 is None:
         return
 
     query = 'Which fairy tale has Fairy Queen?'
-    rank = rank_documents(bm25_lis, query, stopwords)
+    rank = rank_documents(bm25, query, stopwords)
     result = rank
     print(result)
-    print(documents[0])
 
     assert result, "Result is None"
 

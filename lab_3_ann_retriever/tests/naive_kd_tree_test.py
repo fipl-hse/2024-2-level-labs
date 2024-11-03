@@ -36,7 +36,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.point = (953.58398, 382.63101)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_fields(self):
@@ -46,7 +45,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertIsNone(NaiveKDTree()._root)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_build_ideal(self):
@@ -58,7 +56,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_build_invalid_input(self):
@@ -72,7 +69,6 @@ class NaiveKDTreeTest(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_build_return_value(self):
@@ -83,7 +79,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertIsInstance(actual, bool)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_query_ideal(self):
@@ -97,7 +92,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertEqual(expected_neighbor, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_query_invalid_input(self):
@@ -117,7 +111,6 @@ class NaiveKDTreeTest(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_query_return_value(self):
@@ -133,7 +126,6 @@ class NaiveKDTreeTest(unittest.TestCase):
             self.assertIsInstance(ind[1], int)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_ideal(self):
@@ -147,7 +139,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertEqual(actual[0][1], expected[0][1])
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_invalid_input(self):
@@ -168,7 +159,6 @@ class NaiveKDTreeTest(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_return_value(self):
@@ -184,7 +174,6 @@ class NaiveKDTreeTest(unittest.TestCase):
             self.assertIsInstance(neigbour[1], int)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_query_none_knn(self):
@@ -196,7 +185,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertIsNone(actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_none_distance(self):

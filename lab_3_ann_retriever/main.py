@@ -97,7 +97,7 @@ class Tokenizer:
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
-        Tokenize the input documents .
+        Tokenize the input documents.
 
         Args:
             documents (list[str]): Documents to tokenize.
@@ -370,10 +370,7 @@ class BasicSearchEngine:
             return None
         relevant_docs = []
         for item in knn:
-            index = item[0]
-            distance = item[-1]
-            if isinstance(index, int) and 0 <= index < len(self._documents):
-                relevant_docs.append((distance, self._documents[index]))
+            relevant_docs.append((item[-1], self._documents[item[0]]))
         return relevant_docs
 
     def _calculate_knn(
@@ -454,7 +451,14 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not query_vector:
+            return None
 
+        knn = self._calculate_knn(query_vector, self._document_vectors, 1)
+        if not knn:
+            return None
+
+        return self._documents[knn[0][0]]
 
 
 class Node(NodeLike):

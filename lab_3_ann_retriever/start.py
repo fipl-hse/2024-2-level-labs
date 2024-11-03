@@ -3,7 +3,7 @@ Laboratory Work #3 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from lab_3_ann_retriever.main import Tokenizer
+from lab_3_ann_retriever.main import (BasicSearchEngine, Tokenizer, Vectorizer)
 from pathlib import Path
 
 
@@ -22,19 +22,27 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return (documents, stopwords)
+    return documents, stopwords
 
 
 def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
+    with open("assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    tokens = Tokenizer(open_files()[1])
-    tokenized_docs = tokens.tokenize_documents(open_files()[0])
-    secret_text = tokens.tokenize(text)
-    result = tokenized_docs
+    stopwords = open_files()[1]
+    documents = open_files()[0]
+    tokenizer = Tokenizer(stopwords)
+    tokenized_docs = tokenizer.tokenize_documents(documents)
+    vectorizer = Vectorizer(tokenized_docs)
+    vectorizer.build()
+    secret_tokens = text.split(", ")
+    secret_vector = tuple(float(token) for token in secret_tokens)
+    print('secret vector', secret_vector)
+    search_engine = BasicSearchEngine(vectorizer, tokenizer)
+    search_engine.index_documents(documents)
+    result = search_engine.retrieve_vectorized(secret_vector)
     print(result)
     assert result, "Result is None"
 

@@ -130,7 +130,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
                 tf_dict[elem] = 0.0
             tf_dict[word] = document_tokens.count(word) / len(document_tokens)
 
-    return tf_dict
+    return tf_dict or None
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:

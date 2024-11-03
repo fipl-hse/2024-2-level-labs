@@ -74,6 +74,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words.
         """
+        _stop_words = stop_words.copy()
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -87,6 +88,12 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+        for symbol in text:
+            if not symbol.isalpha() and symbol != ' ':
+                text = text.replace(symbol, ' ')
+        return text.lower().split()
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -100,6 +107,10 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (documents and isinstance(documents, list) and all(
+                isinstance(document, str) for document in documents)):
+            return None
+        return [self.tokenize(document) for document in documents]
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -113,6 +124,10 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (isinstance(tokens, list) and tokens and all(
+                isinstance(token, str) for token in tokens)):
+            return None
+        return list(filter(lambda word: word not in self._stop_words, tokens))
 
 
 class Vectorizer:
@@ -263,7 +278,7 @@ class BasicSearchEngine:
         """
 
     def retrieve_relevant_documents(
-        self, query: str, n_neighbours: int
+            self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Indexes documents for retriever.
@@ -279,7 +294,7 @@ class BasicSearchEngine:
         """
 
     def _calculate_knn(
-        self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
+            self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
         """
         Calculate TF-IDF scores for a document.
@@ -361,11 +376,11 @@ class Node(NodeLike):
     right_node: NodeLike | None
 
     def __init__(
-        self,
-        vector: Vector = (),
-        payload: int = -1,
-        left_node: NodeLike | None = None,
-        right_node: NodeLike | None = None,
+            self,
+            vector: Vector = (),
+            payload: int = -1,
+            left_node: NodeLike | None = None,
+            right_node: NodeLike | None = None,
     ) -> None:
         """
         Initialize an instance of the Node class.
@@ -521,7 +536,7 @@ class SearchEngine(BasicSearchEngine):
         """
 
     def retrieve_relevant_documents(
-        self, query: str, n_neighbours: int = 1
+            self, query: str, n_neighbours: int = 1
     ) -> list[tuple[float, str]] | None:
         """
         Indexes documents for retriever.

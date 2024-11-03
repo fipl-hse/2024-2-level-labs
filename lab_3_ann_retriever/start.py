@@ -34,11 +34,23 @@ def main() -> None:
         text = text_file.read()
     documents = open_files()[0]
     stopwords = open_files()[1]
-    tokenizer = Tokenizer(stopwords)
-    result = tokenizer.tokenize_documents(documents)
-    print(result)
-    assert result, "Result is None"
+    # documents = ['Векторы используются для поиска релевантного документа. Давайте научимся, как их создавать и использовать!', 'Мой кот Вектор по утрам приносит мне тапочки, а по вечерам мы гуляем с ним на шлейке во дворе. Вектор забавный и храбрый. Он не боится собак!', 'Котёнок, которого мы нашли во дворе, очень забавный и пушистый. По утрам я играю с ним в догонялки перед работой.', 'Моя собака думает, что её любимый плед — это кошка. Просто он очень пушистый и мягкий. Забавно наблюдать, как они спят вместе!']
 
+    tokenizer = Tokenizer(stopwords)
+    tokenized_docs = tokenizer.tokenize_documents(documents)
+    vectorizer = Vectorizer(tokenized_docs)
+    vectorizer.build()
+
+    # vectors = [vectorizer.vectorize(doc) for doc in tokenized_docs]
+
+    search = BasicSearchEngine(vectorizer, tokenizer)
+    search.index_documents(documents)
+    # print(search.retrieve_vectorized(vectors[1]))
+    # print(vectorizer.vector2tokens(vectors[0]))
+    secret_vector = tuple(float(cor) for cor in text.split(", "))
+    print(secret_vector)
+    # print(search.retrieve_vectorized(secret_vector))
+    # print(search.)
 
 if __name__ == "__main__":
     main()

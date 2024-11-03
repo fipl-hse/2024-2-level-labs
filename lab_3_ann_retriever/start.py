@@ -45,12 +45,12 @@ def main() -> None:
 
     search = BasicSearchEngine(vectorizer, tokenizer)
     search.index_documents(documents)
-    # print(search.retrieve_vectorized(vectors[1]))
-    # print(vectorizer.vector2tokens(vectors[0]))
+
     secret_vector = tuple(float(cor) for cor in text.split(", "))
-    print(secret_vector)
-    # print(search.retrieve_vectorized(secret_vector))
-    # print(search.)
+    print(vectorizer.vector2tokens(secret_vector))
+    result = search.retrieve_vectorized(secret_vector)
+    print(result)
+    assert result, "Result is None"
 
 if __name__ == "__main__":
     main()

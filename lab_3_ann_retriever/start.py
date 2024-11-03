@@ -12,7 +12,7 @@ def open_files() -> tuple[list[str], list[str]]:
     """
     # stubs: keep.
 
-    Opens files
+    Open files.
 
     Returns:
         tuple[list[str], list[str]]: Documents and stopwords
@@ -28,7 +28,7 @@ def open_files() -> tuple[list[str], list[str]]:
 
 def main() -> None:
     """
-    Launches an implementation.
+    Launch an implementation.
     """
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()

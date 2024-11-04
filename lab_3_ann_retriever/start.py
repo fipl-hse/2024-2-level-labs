@@ -34,6 +34,7 @@ def main() -> None:
         text = text_file.read()
     documents = open_files()[0]
     stopwords = open_files()[1]
+    result = 1
     # documents = [
     #     'Мой кот Вектор по утрам приносит мне тапочки, а по вечерам мы гуляем с ним на шлейке во
     #     дворе. Вектор забавный и храбрый. Он не боится собак!',
@@ -45,17 +46,18 @@ def main() -> None:
     #     Забавно наблюдать, как они спят вместе!']
     tokenizer = Tokenizer(stopwords)
     tokenized_docs = tokenizer.tokenize_documents(documents)
+    if tokenized_docs is None:
+        return None
     vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()
 
     # vectors = [vectorizer.vectorize(doc) for doc in tokenized_docs]
-    # search = BasicSearchEngine(vectorizer, tokenizer)
+    search = BasicSearchEngine(vectorizer, tokenizer)
     # search.index_documents(documents)
     # print(search.retrieve_relevant_documents("Нижний Новгород", 3))
 
     naive_kdtree_retriever = SearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
-    naive_kdtree_retriever.index_documents(documents)
-    result = 1
+    # naive_kdtree_retriever.index_documents(documents)
     # result = naive_kdtree_retriever.retrieve_relevant_documents("Нижний Новгород")
     print(result)
     assert result, "Result is None"

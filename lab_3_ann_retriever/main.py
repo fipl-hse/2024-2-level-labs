@@ -9,6 +9,8 @@ from typing import Protocol
 
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
+from math import sqrt
+
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
@@ -51,9 +53,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
-    if not ((isinstance(query_vector, tuple) or isinstance(query_vector, list)) and (
-            isinstance(document_vector, tuple) or isinstance(document_vector, list)) and
-            all(isinstance(cor, float) for cor in query_vector) and
+    if not (isinstance(query_vector, (list, tuple)) and isinstance(document_vector, (list, tuple))
+            and all(isinstance(cor, float) for cor in query_vector) and
             all(isinstance(cor, float) for cor in document_vector) and
             (len(query_vector) == len(document_vector) or len(query_vector) == 0 or len(
                 document_vector) == 0)
@@ -64,7 +65,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     distance: float = 0.0
     for idx, query_cor in enumerate(query_vector):
         distance += (query_cor - document_vector[idx]) ** 2
-    return distance ** 0.5
+    return sqrt(distance)
 
 
 def save_vector(vector: Vector) -> dict:
@@ -595,21 +596,21 @@ class NaiveKDTree:
         while dimensions_info:
             cur_vectors: list[tuple[Vector, int]] = dimensions_info[0]["vectors"]
             depth: int = dimensions_info[0]["depth"]
-            parentNode: Node = dimensions_info[0]["parentNode"]
-            isLeftSubDim: bool = dimensions_info.pop(0)["isLeftSubDim"]
+            parent_node: Node = dimensions_info[0]["parentNode"]
+            is_left_sub_dim: bool = dimensions_info.pop(0)["isLeftSubDim"]
             if cur_vectors:
                 axis = depth % len(cur_vectors[0])
                 cur_vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
                 median_index = len(cur_vectors) // 2
                 median_node = Node(cur_vectors[median_index][0], cur_vectors[median_index][1])
 
-                if parentNode.payload == -1:
+                if parent_node.payload == -1:
                     self._root = median_node
                 else:
-                    if isLeftSubDim:
-                        parentNode.left_node = median_node
+                    if is_left_sub_dim:
+                        parent_node.left_node = median_node
                     else:
-                        parentNode.right_node = median_node
+                        parent_node.right_node = median_node
                 left_dim = {
                     "vectors": cur_vectors[:median_index],
                     "depth": depth + 1,

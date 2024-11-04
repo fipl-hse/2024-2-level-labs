@@ -716,6 +716,34 @@ class KDTree(NaiveKDTree):
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (isinstance(vector, (tuple, list)) and all(isinstance(cor, float) for cor in vector)
+                and isinstance(k, int) and vector and isinstance(self._root, Node)):
+            return None
+        best: list[tuple[float, int]] = []
+        cur_nodes_depth: list[tuple[Node, int]] = [(self._root, 0)]
+
+        while cur_nodes_depth:
+            cur_node_depth = cur_nodes_depth.pop(0)
+            distance = calculate_distance(vector, cur_node_depth[0].vector)
+            if distance is None:
+                return None
+            if len(best) < k or distance < max(best, key=lambda best_p: best_p[0])[0]:
+                best.append((distance, cur_node_depth[0].payload))
+                if len(best) > k:
+                    del best[best.index(max(best, key=lambda best_p: best_p[0]))]
+            axis = cur_node_depth[1] % len(vector)
+            if vector[axis] < cur_node_depth[0].vector[axis]:
+                closest_node = cur_node_depth[0].left_node
+                far_node = cur_node_depth[0].right_node
+            else:
+                closest_node = cur_node_depth[0].right_node
+                far_node = cur_node_depth[0].left_node
+            if isinstance(closest_node, Node):
+                cur_nodes_depth.append((closest_node, cur_node_depth[1] + 1))
+            if (vector[axis] - cur_node_depth[0].vector[axis]) < \
+                    max(best, key=lambda best_p: best_p[0])[0] and isinstance(far_node, Node):
+                cur_nodes_depth.append((far_node, cur_node_depth[1] + 1))
+        return best
 
 
 class SearchEngine(BasicSearchEngine):

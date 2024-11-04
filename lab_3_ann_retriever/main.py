@@ -4,10 +4,11 @@ Lab 3.
 Vector search with text retrieving
 """
 
+from math import sqrt
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
-from math import sqrt
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -515,6 +516,10 @@ class Node(NodeLike):
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+        self.vector = vector
+        self.payload = payload
+        self.left_node = left_node
+        self.right_node = right_node
 
     def save(self) -> dict:
         """
@@ -547,6 +552,7 @@ class NaiveKDTree:
         """
         Initialize an instance of the KDTree class.
         """
+        self._root = None
 
     def build(self, vectors: list[Vector]) -> bool:
         """
@@ -560,6 +566,15 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(vectors, list) or not vectors:
+            return False
+
+        depth = 0
+        parent = Node(Vector(), payload=-1)
+        is_left = True
+        state_info = [vectors, depth, parent, is_left]
+
+
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """

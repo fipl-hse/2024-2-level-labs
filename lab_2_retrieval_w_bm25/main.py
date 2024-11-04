@@ -320,13 +320,14 @@ def calculate_bm25_with_cutoff(
             isinstance(avg_doc_len, float) and
             avg_doc_len > 0 and
             isinstance(doc_len, int) and
-            doc_len is not True):
+            doc_len >= 0):
         return None
     if not (all(isinstance(voc_word, str) for voc_word in vocab) and
             all(isinstance(doc_word, str) for doc_word in document) and
             all(isinstance(idf_key, str) and
                 isinstance(idf_document[idf_key], float) for idf_key in idf_document) and
-            isinstance(alpha, float)):
+            isinstance(alpha, float) and
+            doc_len is not True):
         return None
 
     result_dict = {}

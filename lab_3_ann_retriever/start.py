@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from main import *
+from lab_3_ann_retriever.main import Tokenizer, Vectorizer, SearchEngine, BasicSearchEngine
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -45,9 +45,9 @@ def main() -> None:
     vectorizer.build()
 
     # vectors = [vectorizer.vectorize(doc) for doc in tokenized_docs]
-    search = BasicSearchEngine(vectorizer, tokenizer)
-    search.index_documents(documents)
-    print(search.retrieve_relevant_documents("Нижний Новгород", 3))
+    # search = BasicSearchEngine(vectorizer, tokenizer)
+    # search.index_documents(documents)
+    # print(search.retrieve_relevant_documents("Нижний Новгород", 3))
 
     naive_kdtree_retriever = SearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
     naive_kdtree_retriever.index_documents(documents)

@@ -61,7 +61,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         return None
     if not query_vector or not document_vector:
         return 0.0
-    distance = 0.0
+    distance: float = 0.0
     for idx in range(len(query_vector)):
         distance += (query_vector[idx] - document_vector[idx]) ** 2
     return distance ** 0.5
@@ -212,9 +212,11 @@ class Vectorizer:
         for idx in range(len(self._vocabulary)):
             self._token2ind[self._vocabulary[idx]] = idx
 
-        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if calculate_idf(self._vocabulary, self._corpus) is None:
+            return False
 
-        if self._idf_values is None or self._idf_values is None or self._vocabulary is None:
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if self._idf_values is None or self._vocabulary is None:
             return False
         return True
 
@@ -783,19 +785,19 @@ class SearchEngine(BasicSearchEngine):
         """
 
 
-class AdvancedSearchEngine(SearchEngine):
-    """
-    Retriever based on KDTree algorithm.
-    """
-
-    _tree: KDTree
-
-    def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:
-        """
-        Initialize an instance of the AdvancedSearchEngine class.
-
-        Args:
-            vectorizer (Vectorizer): Vectorizer for documents vectorization
-            tokenizer (Tokenizer): Tokenizer for tokenization
-        """
-        super.__init__()
+# class AdvancedSearchEngine(SearchEngine):
+#     """
+#     Retriever based on KDTree algorithm.
+#     """
+#
+#     _tree: KDTree
+#
+#     def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:
+#         """
+#         Initialize an instance of the AdvancedSearchEngine class.
+#
+#         Args:
+#             vectorizer (Vectorizer): Vectorizer for documents vectorization
+#             tokenizer (Tokenizer): Tokenizer for tokenization
+#         """
+#         super.__init__()

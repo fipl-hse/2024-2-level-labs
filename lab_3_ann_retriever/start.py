@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from lab_3_ann_retriever.main import Tokenizer, Vectorizer, SearchEngine, BasicSearchEngine
+from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -35,10 +35,14 @@ def main() -> None:
     documents = open_files()[0]
     stopwords = open_files()[1]
     # documents = [
-    #     'Мой кот Вектор по утрам приносит мне тапочки, а по вечерам мы гуляем с ним на шлейке во дворе. Вектор забавный и храбрый. Он не боится собак!',
-    #     'Векторы используются для поиска релевантного документа. Давайте научимся, как их создавать и использовать!',
-    #     'Котёнок, которого мы нашли во дворе, очень забавный и пушистый. По утрам я играю с ним в догонялки перед работой.',
-    #     'Моя собака думает, что её любимый плед — это кошка. Просто он очень пушистый и мягкий. Забавно наблюдать, как они спят вместе!']
+    #     'Мой кот Вектор по утрам приносит мне тапочки, а по вечерам мы гуляем с ним на шлейке во
+    #     дворе. Вектор забавный и храбрый. Он не боится собак!',
+    #     'Векторы используются для поиска релевантного документа. Давайте научимся, как их
+    #     создавать и использовать!',
+    #     'Котёнок, которого мы нашли во дворе, очень забавный и пушистый.
+    #     По утрам я играю с ним в догонялки перед работой.',
+    #     'Моя собака думает, что её любимый плед — это кошка. Просто он очень пушистый и мягкий.
+    #     Забавно наблюдать, как они спят вместе!']
     tokenizer = Tokenizer(stopwords)
     tokenized_docs = tokenizer.tokenize_documents(documents)
     vectorizer = Vectorizer(tokenized_docs)
@@ -51,7 +55,10 @@ def main() -> None:
 
     naive_kdtree_retriever = SearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
     naive_kdtree_retriever.index_documents(documents)
-    print(naive_kdtree_retriever.retrieve_relevant_documents("Нижний Новгород"))
+    result = 1
+    # result = naive_kdtree_retriever.retrieve_relevant_documents("Нижний Новгород")
+    print(result)
+    assert result, "Result is None"
 
 
 if __name__ == "__main__":

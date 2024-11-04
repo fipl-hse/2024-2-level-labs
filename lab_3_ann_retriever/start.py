@@ -4,7 +4,7 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-from main import Tokenizer
+from main import Tokenizer, BasicSearchEngine, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -29,7 +29,7 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
+    with open("assets/secrets/secret_3.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
 
     documents, stopwords = open_files()
@@ -37,7 +37,13 @@ def main() -> None:
     tokenizer = Tokenizer(stopwords)
     tokenized_documents = tokenizer.tokenize_documents(documents)
 
-    result = None
+    vectorizer = Vectorizer(tokenized_documents)
+    vectorizer.build()
+
+    secret_vector = tuple(float(value.replace(',', '')) for value in text.split())
+
+    result = vectorizer.vector2tokens(secret_vector)
+    print(result)
     assert result, "Result is None"
 
 

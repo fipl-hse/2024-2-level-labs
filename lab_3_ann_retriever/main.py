@@ -253,6 +253,13 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if len(vector) != len(self._vocabulary):
+            return None
+        tokens = []
+        for word in self._vocabulary:
+            if vector[self._token2ind[word]] != 0.0:
+                tokens.append(word)
+        return tokens
 
 
     def save(self, file_path: str) -> bool:
@@ -321,6 +328,8 @@ class BasicSearchEngine:
         """
         self._vectorizer = vectorizer
         self._tokenizer = tokenizer
+        self._documents = []
+        self._document_vectors = []
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -340,13 +349,6 @@ class BasicSearchEngine:
 
         self._document_vectors = [self._index_document(doc) for doc in documents]
         self._documents = documents
-        # for doc in documents:
-        #     if doc is None:
-        #         return False
-        #     vectorized_doc = self._index_document(doc)
-        #     if vectorized_doc is None:
-        #         return False
-        #     self._document_vectors.append(vectorized_doc)
         return True if None not in self._document_vectors else False
 
     def retrieve_relevant_documents(
@@ -364,6 +366,22 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not query or not isinstance(n_neighbours, int) or \
+                n_neighbours <= 0:
+            return None
+
+        query_vectorized = self._index_document(query)
+        if query_vectorized is None:
+            return None
+        self.index_documents(self._documents)
+        knn = self._calculate_knn(query_vectorized, self._document_vectors, n_neighbours)
+        if knn is None or not knn:
+            return None
+        relevant_docs = []
+        for pair in knn:
+            index, value = pair
+            relevant_docs.append((value, self._documents[index]))
+        return relevant_docs
 
     def save(self, file_path: str) -> bool:
         """
@@ -399,6 +417,8 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        knn = self._calculate_knn(query_vector, self._document_vectors, 1)
+        return self._documents[knn[0][0]]
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
@@ -416,6 +436,15 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document_vectors, list) or not isinstance(n_neighbours, int) or \
+                not query_vector:
+            return None
+
+        distances = []
+        for i in range(len(document_vectors)):
+            distances.append((i, calculate_distance(query_vector, document_vectors[i])))
+        distances = sorted(distances, key=lambda t: t[1])
+        return distances[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """

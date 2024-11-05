@@ -3,9 +3,11 @@ Lab 3.
 
 Vector search with text retrieving
 """
-
+import math as m
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+from lab_2_retrieval_w_bm25 import main as lab_2
+
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -49,6 +51,16 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    if (query_vector is None or document_vector is None
+            or not all(isinstance(elem, float) for elem in query_vector)
+            or not all(isinstance(elem, float) for elem in document_vector)):
+        return None
+    if not query_vector or not document_vector:
+        return 0.0
+    distance = m.sqrt(sum((query_vector[index] - document_vector[index])**2
+                         for index in range(len(document_vector))))
+    return distance
+
 
 
 def save_vector(vector: Vector) -> dict:
@@ -134,10 +146,13 @@ class Tokenizer:
         if (not isinstance(documents, list)
                 or not all(isinstance(doc, str) for doc in documents)):
             return None
+        result = []
         for doc in documents:
-            if self.tokenize(doc) is None:
+            doc_tokens = self.tokenize(doc)
+            if not isinstance(doc_tokens, list) or doc_tokens is None:
                 return None
-        return [self.tokenize(doc) for doc in documents if self.tokenize(doc) is not None]
+            result.append(doc_tokens)
+        return result
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -155,11 +170,7 @@ class Tokenizer:
                 or not all(isinstance(token, str) for token in tokens)
                 or len(tokens) == 0):
             return None
-        for token in tokens:
-            if token in self._stop_words:
-                continue
-            tokens.remove(token)
-        return tokens
+        return [token for token in tokens if token not in self._stop_words]
 
 
 class Vectorizer:
@@ -179,6 +190,7 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
+        self._corpus = corpus
 
     def build(self) -> bool:
         """
@@ -187,6 +199,23 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        if (not isinstance(self._corpus, list) or not self._corpus
+                or not all(isinstance(tokens, list) for tokens in self._corpus)
+                or not all(isinstance(word, str) for tokens in self._corpus for word in tokens)):
+            return False
+        self._vocabulary = []
+        self._idf_values = {}
+        self._token2ind = {}
+        for tokens in self._corpus:
+            for word in tokens:
+                if word in self._vocabulary:
+                    continue
+                self._vocabulary.append(word)
+        self._vocabulary = sorted(self._vocabulary)
+        self._idf_values = lab_2.calculate_idf(self._vocabulary, self._corpus)
+        for token in self._vocabulary:
+            self._token2ind[token] = self._vocabulary.index(token)
+        return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -200,6 +229,11 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(tokenized_document, list) or len(tokenized_document) == 0\
+                or not all(isinstance(word, str) for word in tokenized_document):
+            return None
+        vector = self._calculate_tf_idf(tokenized_document)
+        return vector
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -213,6 +247,18 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if len(vector) != len(self._vocabulary):
+            return None
+        self.build()
+        tokens = []
+        for word, index in self._token2ind.items():
+            if not isinstance(index, int):
+                return None
+            if vector[index] != 0.0:
+                tokens.append(word)
+        return tokens
+
+
 
     def save(self, file_path: str) -> bool:
         """
@@ -250,6 +296,28 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not isinstance(document, list) or len(document) == 0
+                or not all(isinstance(word, str) for word in document)):
+            return None
+        self.build()
+        tf = lab_2.calculate_tf(self._vocabulary, document)
+        if not isinstance(tf, dict):
+            return None
+        tf_idf = {}
+        vector = [0.0 for elem in self._vocabulary]
+        for word in document:
+            if word not in self._idf_values:
+                continue
+            tf_idf_word = tf[word] * self._idf_values[word]
+            if word not in self._vocabulary:
+                continue
+            tf_idf[word] = tf_idf_word
+        for token in tf_idf:
+            if token in self._token2ind:
+                index = self._token2ind[token]
+                vector[index] = tf_idf[token]
+        return tuple(vector)
+
 
 
 class BasicSearchEngine:
@@ -270,6 +338,8 @@ class BasicSearchEngine:
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        self._tokenizer = tokenizer
+        self._vectorizer = vectorizer
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -283,6 +353,17 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
+        if (not isinstance(documents, list)
+                or not all(isinstance(text, str) for text in documents)):
+            return False
+        self._documents = documents
+        if not all(isinstance(self._index_document(text), tuple) for text in documents):
+            return False
+        self._document_vectors = [self._index_document(text) for text in documents]
+        if not self._document_vectors or self._document_vectors is None\
+                or None in self._document_vectors:
+            return False
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -299,6 +380,19 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not isinstance(query, str) or not query
+                or not isinstance(n_neighbours, int) or n_neighbours <= 0):
+            return None
+        query_vector = self._index_document(query)
+        if query_vector is None or not query_vector:
+            return None
+        distances = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
+        if distances is None or not distances:
+            return None
+        result = []
+        for distance in distances:
+            result.append((distance[1], self._documents[distance[0]]))
+        return result
 
     def save(self, file_path: str) -> bool:
         """
@@ -334,6 +428,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        document = self._calculate_knn(query_vector, self._document_vectors, 1)
+        if not document or document is None:
+            return None
+        pair = document[0]
+        return self._documents[pair[0]]
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
@@ -351,6 +450,19 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document_vectors, list) or not isinstance(n_neighbours, int):
+            return None
+        if not query_vector or query_vector is None \
+                or not document_vectors or document_vectors is None:
+            return None
+        if not all(isinstance(num, float) for num in query_vector)\
+                or not all(isinstance(num, float) for vector in document_vectors
+                           for num in vector):
+            return None
+        distances = [calculate_distance(query_vector, vector) for vector in document_vectors]
+        distances = list(enumerate(distances))
+        distances = sorted(distances, key=lambda x: x[1])
+        return distances[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -364,6 +476,13 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document, str):
+            return None
+        tokens = self._tokenizer.tokenize(document)
+        if not isinstance(tokens, list):
+            return None
+        vector = self._vectorizer.vectorize(tokens)
+        return vector
 
     def _dump_documents(self) -> dict:
         """

@@ -95,9 +95,10 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(vocab, list) or not all(isinstance(elem, str) for elem in vocab)\
-        or not isinstance(document_tokens, list) or not vocab or not document_tokens\
-            or not all(isinstance(elem, str) for elem in document_tokens):
+    if not vocab or not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab):
+        return None
+    if not document_tokens or not isinstance(document_tokens, list)\
+            or not all(isinstance(item, str) for item in document_tokens):
         return None
 
     tf = {}

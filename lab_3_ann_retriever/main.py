@@ -108,10 +108,10 @@ class Tokenizer:
         if not isinstance(text, str):
             return None
 
-        for letter in text.lower():
+        for letter in text:
             if not letter.isalpha() and letter != ' ':
-                text = text.lower().replace(letter, ' ')
-        clean_text = text.split()
+                text = text.replace(letter, ' ')
+        clean_text = text.lower().split()
 
         return self._remove_stop_words(clean_text)
 

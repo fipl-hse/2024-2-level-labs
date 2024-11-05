@@ -1,0 +1,196 @@
+# pylint: disable=protected-access
+"""
+Checks the third lab's Naive КD Tree class.
+"""
+
+import unittest
+from unittest import mock
+
+import numpy as np
+import pytest
+
+import lab_3_ann_retriever.main
+from lab_3_ann_retriever.main import NaiveKDTree
+
+
+class NaiveKDTreeTest(unittest.TestCase):
+    """
+    Tests NaiveKDTree class functionality.
+    """
+
+    def setUp(self) -> None:
+        self.kdtree = NaiveKDTree()
+        self.points = [
+            [63.63961, 144.23502],
+            [222.23357, 385.66147],
+            [545.48236, 146.25533],
+            [645.48749, 502.83917],
+            [1043.4875, 168.47868],
+            [1494.0156, 590.72247],
+            [1096.0155, 661.43311],
+            [803.07129, 323.03201],
+            [358.60416, 654.36206],
+            [510.12704, 321.01172],
+            [852.56873, 677.59558],
+        ]
+        self.point = (953.58398, 382.63101)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_fields(self):
+        """
+        Check fields of class are created correctly
+        """
+        self.assertIsNone(NaiveKDTree()._root)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_build_ideal(self):
+        """
+        Ideal scenario for build method
+        """
+        expected = True
+        actual = self.kdtree.build(self.points)
+        self.assertEqual(expected, actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_build_invalid_input(self):
+        """
+        Invalid input scenario for build method
+        """
+        expected = False
+        bad_inputs = [[], {}, (), "", None]
+        for bad_input in bad_inputs:
+            actual = self.kdtree.build(bad_input)
+            self.assertEqual(expected, actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_build_return_value(self):
+        """
+        Checks return type for build method
+        """
+        actual = self.kdtree.build(self.points)
+        self.assertIsInstance(actual, bool)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_query_ideal(self):
+        """
+        Ideal scenario for query method
+        """
+        self.kdtree.build(self.points)
+        actual = self.kdtree._find_closest(self.point, 1)
+
+        expected_neighbor = [(161.88301532908295, 7)]
+        self.assertEqual(expected_neighbor, actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_query_invalid_input(self):
+        """
+        Invalid input scenario for query method
+        """
+        expected = None
+        bad_inputs = [[], {}, 0.7, (), "", None]
+        for bad_input in bad_inputs:
+            actual = self.kdtree.query(bad_input)
+            self.assertEqual(expected, actual)
+
+            actual = self.kdtree.query(bad_input, bad_input)
+            self.assertEqual(expected, actual)
+
+            actual = self.kdtree.query(self.point, bad_input)
+            self.assertEqual(expected, actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_query_return_value(self):
+        """
+        Checks return type for query method
+        """
+        self.kdtree.build(self.points)
+        actual = self.kdtree._find_closest(self.point, 1)
+        self.assertIsInstance(actual, list)
+        for ind in actual:
+            self.assertIsInstance(ind, tuple)
+            self.assertIsInstance(ind[0], float)
+            self.assertIsInstance(ind[1], int)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_find_closest_ideal(self):
+        """
+        Ideal scenario for _find_closest method
+        """
+        expected = [(161.88301532908295, 7)]
+        self.kdtree.build(self.points)
+        actual = self.kdtree._find_closest(self.point)
+        np.testing.assert_almost_equal(actual[0][0], expected[0][0])
+        self.assertEqual(actual[0][1], expected[0][1])
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_find_closest_invalid_input(self):
+        """
+        Invalid input scenario for _find_closest method
+        """
+        expected = None
+        self.kdtree.build(self.points)
+        bad_inputs = [(), None, {}, 0.7, [], ""]
+        for bad_input in bad_inputs:
+            actual = self.kdtree._find_closest(self.point, bad_input)
+            self.assertEqual(expected, actual)
+
+            actual = self.kdtree._find_closest(bad_input, bad_input)
+            self.assertEqual(expected, actual)
+
+            actual = self.kdtree._find_closest(bad_input)
+            self.assertEqual(expected, actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_find_closest_return_value(self):
+        """
+        Checks return type for _find_closest method
+        """
+        self.kdtree.build(self.points)
+        actual = self.kdtree._find_closest(self.point)
+        self.assertIsInstance(actual, list)
+        for neigbour in actual:
+            self.assertIsInstance(neigbour, tuple)
+            self.assertIsInstance(neigbour[0], float)
+            self.assertIsInstance(neigbour[1], int)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_query_none_knn(self):
+        """
+        Checks return of inner Naive KD Tree functions
+        """
+        with mock.patch.object(self.kdtree, "_find_closest", return_value=None):
+            actual = self.kdtree.query(self.point)
+        self.assertIsNone(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_find_closest_none_distance(self):
+        """
+        Checks return of _find_closest method with None in calculating distance
+        """
+        with mock.patch.object(lab_3_ann_retriever.main, "calculate_distance", return_value=None):
+            actual = self.kdtree._find_closest(self.point)
+        self.assertIsNone(actual)

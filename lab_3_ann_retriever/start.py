@@ -55,6 +55,7 @@ def main() -> None:
     result = kdtree_retriever.retrieve_relevant_documents(query, 3)
     print(result)
     assert result, "Result is None"
+    return None
 
 
 if __name__ == "__main__":

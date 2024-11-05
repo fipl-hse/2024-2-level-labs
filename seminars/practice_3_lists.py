@@ -60,15 +60,13 @@ def count_evens(nums: list) -> int:
     """
     Return the number of even ints in the given array.
     """
-    # counter_even = 0
-    # for i in nums:
-    #     if i % 2 == 0:
-    #         counter_even += 1
-    # print(counter_even)
+    # student realization goes here
 
 
 # Function calls with expected result:
-#count_evens([1, 3, 5])
+# count_evens([2, 1, 2, 3, 4]) → 3
+# count_evens([2, 2, 0]) → 3
+# count_evens([1, 3, 5]) → 0
 
 # Task 2:
 # easy level
@@ -79,21 +77,13 @@ def sum13(nums: list) -> int:
     so it does not count and numbers that come after a 13
     also do not count.
     """
-    # if len(nums) == 0:
-    #     return None
-    # sum = 0
-    # for i in nums:
-    #     if i != 13:
-    #         sum += i
-    #     else:
-    #         return sum
-    # return sum
+    # student realization goes here
 
 # Function calls with expected result:
-#sum13([1, 2, 2, 1])
-#print(sum13([0, 4, 6]))
-#print(sum13([1, 2, 2, 1, 13]))
-#print(sum13([1, 2, 2, 1, 13, 5, 6]))
+# sum13([1, 2, 2, 1]) → 6
+# sum13([1, 1]) → 2
+# sum13([1, 2, 2, 1, 13]) → 6
+# sum13([1, 2, 2, 1, 13, 5, 6]) → 6
 
 
 # Task 3
@@ -120,9 +110,10 @@ def create_phone_number(nums: list) -> str:
     Write a function that accepts an array of 10 integers (between 0 and 9),
     that returns a string of those numbers in the form of a phone number.
     """
+    # student realization goes here
 
 # Function calls with expected result:
-#print(create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]))
+# create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
 # => returns "(123) 456-7890"
 
 
@@ -141,26 +132,12 @@ def check_exam(correct_answers: list, student_answers: list) -> int:
     If the score < 0, return 0.
     """
     # student realization goes here
-    # score = 0
-    # for i in student_answers:
-    #     if i == correct_answers[student_answers.index(i)]:
-    #         score += 4
-    #     if i != correct_answers[student_answers.index(i)] and i != '':
-    #         score -= 1
-    #     if i == "":
-    #         score += 0
-    # if score < 0:
-    #     return 0
-    # return score
 
-# Function calls with expected result:#
-# print(check_exam(["a", "a", "b", "b"], ["a", "c", "b", "d"]))
-#print(check_exam(["a", "a", "c", "b"], ["a", "a", "b",  ""]))
-# → 7
-# print(check_exam(["a", "a", "b", "c"], ["a", "a", "b", "c"]))
-# #→ 16
-# print(check_exam(["b", "c", "b", "a"], ["",  "a", "a", "c"]))
-# # → 0
+# Function calls with expected result:
+# check_exam(["a", "a", "b", "b"], ["a", "c", "b", "d"]) → 6
+# check_exam(["a", "a", "c", "b"], ["a", "a", "b",  ""]) → 7
+# check_exam(["a", "a", "b", "c"], ["a", "a", "b", "c"]) → 16
+# check_exam(["b", "c", "b", "a"], ["",  "a", "a", "c"]) → 0
 
 
 # Task 6
@@ -172,7 +149,6 @@ def who_likes_it(names: list) -> str:
     We want to create the text that should be displayed next to such an item.
     """
     # student realization goes here
-
 
 # Function calls with expected result:
 # []                                -->  "no one likes this"

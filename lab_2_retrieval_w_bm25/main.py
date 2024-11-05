@@ -108,7 +108,6 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         tf[word] = 0.0
         if word in document_tokens or tf[word] != 0.0:
             tf[word] = document_tokens.count(word) / len(document_tokens)
-            continue
 
     return tf
 

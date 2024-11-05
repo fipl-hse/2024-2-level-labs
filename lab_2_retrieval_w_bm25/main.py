@@ -4,7 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
-
+from math import log
 
 def tokenize(text: str) -> list[str] | None:
     """
@@ -109,7 +109,6 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         if word in document_tokens or tf[word] != 0.0:
             tf[word] = document_tokens.count(word) / len(document_tokens)
 
-
     return tf
 
 
@@ -126,7 +125,24 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab) or not vocab:
+        return None
+    if not isinstance(documents, list) or not all(isinstance(doc, list) for doc in documents) or \
+            not all(isinstance(item, str) for doc in documents for item in doc) or \
+            not documents:
+        return None
 
+
+    num_doc = len(documents)
+    idf = {}
+    for word in vocab:
+        have_word = 0
+        for doc in documents:
+            if word in doc:
+                have_word += 1
+        idf[word] = log((num_doc - have_word + 0.5) / (have_word + 0.5))
+
+    return idf
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
     """
@@ -141,7 +157,17 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
 
     In case of corrupt input arguments, None is returned.
     """
+    if not tf or not isinstance(tf, dict) or not all(isinstance(key, str) for key in tf) or \
+            not all(isinstance(value, float) for value in tf.values()):
+        return None
+    if not idf or not isinstance(idf, dict) or not all(isinstance(key, str) for key in idf) or \
+            not all(isinstance(value, float) for value in idf.values()):
+        return None
 
+    tf_idf = {}
+    for word in tf:
+        tf_idf[word] = tf[word] * idf[word]
+    return tf_idf
 
 def calculate_bm25(
     vocab: list[str],

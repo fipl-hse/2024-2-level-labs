@@ -17,12 +17,12 @@ jobs:
   install-dependencies:
     name: Installing dependencies
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 4
 
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.10
+        uses: fipl-hse/setup-env-action@v0.11
       - name: Confirming everything is OK
         run: |
           ls -la venv
@@ -31,7 +31,7 @@ jobs:
     name: PR name check
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    timeout-minutes: 2
+    timeout-minutes: 4
     needs: [ install-dependencies ]
     env:
       PR_NAME: ${{ github.event.pull_request.title }}
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.10
+        uses: fipl-hse/setup-env-action@v0.11
       - name: PR name check
         run: |
           source venv/bin/activate
@@ -50,7 +50,7 @@ jobs:
   code-style:
     name: Code Style
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 4
     needs: [ install-dependencies ]
     env:
       PR_NAME: ${{ github.event.pull_request.title }}
@@ -59,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.10
+        uses: fipl-hse/setup-env-action@v0.11
       - name: Code Style
         run: |
           source venv/bin/activate
@@ -69,13 +69,13 @@ jobs:
   mypy-checks:
     name: Mypy checks
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 4
     needs: [ install-dependencies ]
 
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.10
+        uses: fipl-hse/setup-env-action@v0.11
       - name: MyPy check
         run: |
           source venv/bin/activate
@@ -85,7 +85,7 @@ jobs:
   unittests:
     name: Unittests
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     needs: [ install-dependencies ]
     env:
       PR_NAME: ${{ github.event.pull_request.title }}
@@ -94,7 +94,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.10
+        uses: fipl-hse/setup-env-action@v0.11
       - name: Run tests
         run: |
           source venv/bin/activate
@@ -104,7 +104,7 @@ jobs:
   start:
     name: Check start.py
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     needs: [ install-dependencies ]
     env:
       PR_NAME: ${{ github.event.pull_request.title }}
@@ -112,7 +112,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.10
+        uses: fipl-hse/setup-env-action@v0.11
       - name: Run start
         run: |
           source venv/bin/activate
@@ -122,13 +122,13 @@ jobs:
   flake8-checks:
     name: Import style checks
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 4
     needs: [ install-dependencies ]
 
     steps:
       - uses: actions/checkout@v3
       - name: Setup FIPL environment
-        uses: fipl-hse/setup-env-action@v0.10
+        uses: fipl-hse/setup-env-action@v0.11
       - name: Flake8 check
         run: |
           source venv/bin/activate

@@ -37,13 +37,16 @@ def main() -> None:
     tokenized_docs = tokenizer.tokenize_documents(documents)
     vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()
-    secret_tokens = text.split(", ")
-    secret_vector = tuple(float(token) for token in secret_tokens)
-    print('secret vector', secret_vector)
+    secret_values = text.replace("\n", "").split(", ")
+    secret_vector = tuple(float(value) for value in secret_values)
+    secret_tokens = vectorizer.vector2tokens(secret_vector)
+    if secret_tokens:
+        print(secret_tokens)
     search_engine = BasicSearchEngine(vectorizer, tokenizer)
     search_engine.index_documents(documents)
     result = search_engine.retrieve_vectorized(secret_vector)
-    print(result)
+    if result:
+        print(result)
     assert result, "Result is None"
 
 

@@ -223,15 +223,13 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
         if not isinstance(vector, (tuple, list)) or not vector \
-                or len(self._token2ind) != len(vector):
+                or len(self._vocabulary) != len(vector):
             return None
 
         tokenized_doc = []
-        for index, score in enumerate(vector):
-            if score > 0.0:
-                for v, i in self._token2ind.items():
-                    if index == i:
-                        tokenized_doc.append(v)
+        for term in self._vocabulary:
+            if vector[self._token2ind[term]] != 0.0:
+                tokenized_doc.append(term)
         return tokenized_doc
 
     def save(self, file_path: str) -> bool:
@@ -337,7 +335,7 @@ class BasicSearchEngine:
 
         self._documents = documents
         self._document_vectors = [self._index_document(doc) for doc in documents]
-        if not self._documents or not self._document_vectors:
+        if None in self._document_vectors:
             return False
         return True
 
@@ -356,7 +354,8 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query, str) or not query or not isinstance(n_neighbours, int):
+        if not isinstance(query, str) or not query or not isinstance(n_neighbours, int) \
+                or n_neighbours <= 0:
             return None
 
         tokenized_query = self._tokenizer.tokenize(query)
@@ -370,7 +369,9 @@ class BasicSearchEngine:
             return None
         relevant_docs = []
         for item in knn:
-            relevant_docs.append((item[-1], self._documents[item[0]]))
+            i, v = item
+            if isinstance(i, int):
+                relevant_docs.append((v, self._documents[i]))
         return relevant_docs
 
     def _calculate_knn(
@@ -395,8 +396,8 @@ class BasicSearchEngine:
 
         sorted_distances = sorted([
             (document_vectors.index(doc_vector), calculate_distance(query_vector, doc_vector))
-            for doc_vector in document_vectors], key=lambda x: x[1])
-        return sorted_distances[:n_neighbours - 1]
+            for doc_vector in document_vectors], key=lambda x: x[-1])
+        return sorted_distances[:n_neighbours]
 
     def _dump_documents(self) -> dict:
         """
@@ -458,7 +459,7 @@ class BasicSearchEngine:
         if not knn:
             return None
 
-        return self._documents[knn[0][0]]
+        return
 
 
 class Node(NodeLike):

@@ -3,10 +3,10 @@ Lab 2.
 
 Text retrieval with BM25
 """
+# pylint:disable=too-many-arguments, unused-argument
+
 from json import dump, load
 from math import log
-
-# pylint:disable=too-many-arguments, unused-argument
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -374,14 +374,14 @@ def load_index(file_path: str) -> list[dict[str, float]] | None:
 
 def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
     """
-    Calculate Superman's rank correlation coefficient between two rankings.
+    Calculate Spearman's rank correlation coefficient between two rankings.
 
     Args:
         rank (list[int]): Ranked list ogit  document indices.
         golden_rank (list[int]): Golden ranked list of document indices.
 
     Returns:
-        float | None: Superman's rank correlation coefficient.
+        float | None: Spearman's rank correlation coefficient.
 
     In case of corrupt input arguments, None is returned.
     """

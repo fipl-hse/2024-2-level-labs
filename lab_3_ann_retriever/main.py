@@ -93,7 +93,7 @@ class Tokenizer:
         if not isinstance(text, str) or not text:
             return None
 
-        return self._remove_stop_words(sub(r'[^а-яё]+', ' ', text.lower()).split())
+        return self._remove_stop_words(sub(r'[^a-zа-яё]+', ' ', text.lower()).split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -166,7 +166,7 @@ class Vectorizer:
         if not idf:
             return None
         self._idf_values = idf
-        self._token2ind = {index: term for term, index in enumerate(self._idf_values)}
+        self._token2ind = {term: index for index, term in enumerate(self._vocabulary)}
         if not self._idf_values or not self._vocabulary or not self._token2ind:
             raise ValueError
 
@@ -205,7 +205,6 @@ class Vectorizer:
         if not isinstance(document, list) or not document \
                 or not all(isinstance(token, str) for token in document):
             return None
-
         tf = calculate_tf(self._vocabulary, document)
         tf_idf = {term: tf[term] * self._idf_values[term] for term in self._idf_values}
         return tuple(tf_idf.values())
@@ -222,14 +221,15 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(vector, (tuple, list)) or not vector \
-                or len(self._vocabulary) != len(vector):
+        if not vector:
             return None
 
         tokenized_doc = []
-        for term in self._vocabulary:
-            if vector[self._token2ind[term]] != 0.0:
-                tokenized_doc.append(term)
+        for index, score in enumerate(vector):
+            if score != 0.0:
+                for term, i in self._token2ind.items():
+                    if index == i:
+                        tokenized_doc.append(term)
         return tokenized_doc
 
     def save(self, file_path: str) -> bool:
@@ -369,9 +369,10 @@ class BasicSearchEngine:
             return None
         relevant_docs = []
         for item in knn:
-            i, v = item
-            if isinstance(i, int):
-                relevant_docs.append((v, self._documents[i]))
+            index = item[0]
+            distance = item[1]
+            if isinstance(index, int):
+                relevant_docs.append((distance, self._documents[index]))
         return relevant_docs
 
     def _calculate_knn(
@@ -459,7 +460,7 @@ class BasicSearchEngine:
         if not knn:
             return None
 
-        return
+        return self._documents[knn[0][0]]
 
 
 class Node(NodeLike):

@@ -21,7 +21,7 @@ def main() -> None:
         "assets/fairytale_9.txt",
         "assets/fairytale_10.txt",
     ]
-    result = None
+#    result = None
     assert result, "Result is None"
     return None
 

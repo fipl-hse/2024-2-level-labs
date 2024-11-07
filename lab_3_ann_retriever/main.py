@@ -186,7 +186,7 @@ class Vectorizer:
             bool: True if built successfully, False in other case
         """
         if self._corpus is None or len(self._corpus) == 0:
-            raise ValueError
+            return False
 
         self._vocabulary = sorted(build_vocabulary(self._corpus))
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)

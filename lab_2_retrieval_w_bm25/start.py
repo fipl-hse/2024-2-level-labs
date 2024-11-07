@@ -53,7 +53,7 @@ def main() -> None:
         assert result, "Result is None"
 
     tf_documents = []
-    for doc in documents_prep:
+    for doc in list(documents_prep):
         if not isinstance(doc, list) or not all(isinstance(item, str) for item in doc):
             result = None
             assert result, "Result is None"

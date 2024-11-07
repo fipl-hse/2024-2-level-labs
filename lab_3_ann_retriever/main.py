@@ -91,6 +91,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -104,6 +105,13 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+
+        for symbol in text:
+            if not symbol.isalpha():
+                text = text.replace(symbol, ' ')
+        return self._remove_stop_words(text.lower().split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -117,6 +125,13 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(documents, list) or not all(isinstance(document, str) for document in documents):
+            return None
+
+        tokenized_documents = []
+        for document in documents:
+            tokenized_documents.append(self.tokenize(document))
+        return tokenized_documents if None not in tokenized_documents else None
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -130,6 +145,13 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not tokens or not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
+            return None
+
+        for token in tokens.copy():
+            if token in self._stop_words:
+                tokens.remove(token)
+        return tokens
 
 
 class Vectorizer:
@@ -255,7 +277,7 @@ class BasicSearchEngine:
         """
 
     def retrieve_relevant_documents(
-        self, query: str, n_neighbours: int
+            self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
@@ -306,7 +328,7 @@ class BasicSearchEngine:
         """
 
     def _calculate_knn(
-        self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
+            self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
         """
         Find nearest neighbours for a query vector.
@@ -366,11 +388,11 @@ class Node(NodeLike):
     right_node: NodeLike | None
 
     def __init__(
-        self,
-        vector: Vector = (),
-        payload: int = -1,
-        left_node: NodeLike | None = None,
-        right_node: NodeLike | None = None,
+            self,
+            vector: Vector = (),
+            payload: int = -1,
+            left_node: NodeLike | None = None,
+            right_node: NodeLike | None = None,
     ) -> None:
         """
         Initialize an instance of the Node class.
@@ -527,7 +549,7 @@ class SearchEngine(BasicSearchEngine):
         """
 
     def retrieve_relevant_documents(
-        self, query: str, n_neighbours: int = 1
+            self, query: str, n_neighbours: int = 1
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.

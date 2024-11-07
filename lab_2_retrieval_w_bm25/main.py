@@ -224,13 +224,14 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    a = [vocab, document, idf_document]
     if not isinstance(vocab, list) or not isinstance(document, list) \
             or not isinstance(idf_document, dict) or \
             not isinstance(k1, float) or not isinstance(b, float):
         return None
     if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) \
-            or isinstance(doc_len, bool) or \
-            len(vocab) == 0 or len(document) == 0 or len(idf_document) == 0:
+            or isinstance(doc_len, bool) \
+            or any(len(i) == 0 for i in a):
         return None
     for word in vocab:
         if not isinstance(word, str):

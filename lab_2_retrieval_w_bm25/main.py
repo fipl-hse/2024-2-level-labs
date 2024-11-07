@@ -28,7 +28,10 @@ def tokenize(text: str) -> list[str] | None:
         else:
             text.replace(token," ")
             tokenized_text_clear.append(token)
-    return " ".join(tokenized_text_clear).split()
+    tokenized_text = " ".join(tokenized_text_clear).split()
+    if tokenized_text = []:
+        return None
+    return tokenized_text
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
     """
     Remove stopwords from the list of tokens.

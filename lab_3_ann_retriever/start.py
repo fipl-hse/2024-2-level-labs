@@ -5,6 +5,8 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
+from lab_3_ann_retriever.main import Tokenizer
+
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -21,16 +23,19 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return (documents, stopwords)
+    return documents, stopwords
 
 
 def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
-        text = text_file.read()
-    result = None
+    #with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
+        #text = text_file.read()
+    documents, stopwords = open_files()
+    tokenize = Tokenizer(stopwords)
+    result = tokenize.tokenize_documents(documents)
+    print(result)
     assert result, "Result is None"
 
 

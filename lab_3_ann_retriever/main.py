@@ -91,6 +91,9 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
+        self.documents = []
+        self.text = ''
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -104,6 +107,21 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(text, str) or not text:
+            return None
+        self.text = text
+        new_text = ''
+        for symbol in self.text.lower():
+            if symbol == ' ':
+                new_text += ' '
+            if not symbol.isalpha():
+                continue
+            new_text += symbol
+        tokens = new_text.split(' ')
+        for index, token in enumerate(tokens):
+            if not token:
+                tokens.pop(index)
+        return self._remove_stop_words(tokens)
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -117,6 +135,18 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(documents, list) or not documents:
+            return None
+        self.documents = documents
+        clean_docs = []
+        for doc in self.documents:
+            if not isinstance(doc, str):
+                return None
+            tokens = self.tokenize(doc)
+            if tokens is None:
+                return None
+            clean_docs.append(tokens)
+        return clean_docs
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -130,6 +160,15 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(tokens, list) or not tokens:
+            return None
+        clean_tokens = []
+        for token in tokens:
+            if not isinstance(token, str):
+                return None
+            if token not in self._stop_words:
+                clean_tokens.append(token)
+        return clean_tokens
 
 
 class Vectorizer:

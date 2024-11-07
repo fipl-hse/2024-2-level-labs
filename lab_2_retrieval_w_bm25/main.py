@@ -23,7 +23,7 @@ def tokenize(text: str) -> list[str] | None:
         return None
     tokenized_text_clear = []
     for word in text:
-        if not word.isalpha():
+        if not word.isalpha() and word != " ":
             text.replace(word," ")
             tokenized_text_clear.append(" ")
     tokenized_text = " ".join(tokenized_text_clear).split()

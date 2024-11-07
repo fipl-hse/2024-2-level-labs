@@ -273,6 +273,7 @@ def rank_documents(
             or not all(isinstance(word, str) for word in stopwords):
         return None
     if not tokenize(query) or not isinstance(tokenize(query), list) \
+            or not all(isinstance(item, str) for item in tokenize(query)) \
             or not remove_stopwords(tokenize(query), stopwords):
         return None
 

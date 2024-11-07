@@ -52,8 +52,8 @@ def main() -> None:
         result = None
         assert result, "Result is None"
 
-    tf_documents = []
-    for doc in list(documents_prep):
+    tf_documents: list[dict[str, float]] = []
+    for doc in documents_prep:
         if not isinstance(doc, list) or not all(isinstance(item, str) for item in doc):
             result = None
             assert result, "Result is None"
@@ -65,7 +65,7 @@ def main() -> None:
         tf_documents.append(tf)
 
     idf_documents = calculate_idf(vocab, documents_prep)
-    tf_idf_documents = []
+    tf_idf_documents: list[dict[str, float]] = []
     for tf in tf_documents:
         if not isinstance(idf_documents, dict) \
                 or not all(isinstance(key, str) for key in idf_documents) \
@@ -78,7 +78,7 @@ def main() -> None:
             assert result, "Result is None"
         tf_idf_documents.append(tf_idf)
 
-    bm25_documents = []
+    bm25_documents: list[dict[str, float]] = []
     avg_doc_len = sum(len(doc) for doc in documents_prep) / len(documents_prep)
     for doc in documents_prep:
         if not isinstance(doc, list) or not all(isinstance(item, str) for item in doc):

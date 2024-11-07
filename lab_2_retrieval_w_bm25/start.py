@@ -30,65 +30,66 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-    documents_prep: list[list[str]] = []
-    for doc in documents:
-        doc_tokenized = tokenize(doc)
-        if doc_tokenized is None:
+    documents_preprocessed = []
+    for document in documents:
+        document_tokenized = tokenize(document)
+        if document_tokenized is None:
             result = None
             assert result, "Result is None"
-        doc_prep = remove_stopwords(doc_tokenized, stopwords)
-        if doc_prep is None:
+        document_preprocessed = remove_stopwords(document_tokenized, stopwords)
+        if document_preprocessed is None:
             result = None
             assert result, "Result is None"
-        documents_prep.append(doc_prep)
-    if not all(isinstance(doc, list) for doc in documents_prep) or \
-            not isinstance(documents_prep, list) or \
-            not all(isinstance(token, str) for doc in documents_prep for token in doc):
+        documents_preprocessed.append(document_preprocessed)
+    if not all(isinstance(doc, list) for doc in documents_preprocessed) or \
+            not isinstance(documents_preprocessed, list) or \
+            not all(isinstance(token, str) for doc in documents_preprocessed for token in doc):
         result = None
         assert result, "Result is None"
 
-    vocab = build_vocabulary(documents_prep)
-    if not isinstance(vocab, list) or not all(isinstance(word, str) for word in vocab):
+    vocabulary = build_vocabulary(documents_preprocessed)
+    if not isinstance(vocabulary, list) or not all(isinstance(word, str) for word in vocabulary):
         result = None
         assert result, "Result is None"
 
-    tf_documents = []
-    for doc in documents_prep:
+    tf_documents: list[dict[str, float]] = []
+    for doc in documents_preprocessed:
         if not isinstance(doc, list) or not all(isinstance(item, str) for item in doc):
             result = None
             assert result, "Result is None"
-        tf = calculate_tf(vocab, doc)
-        if tf is None or not isinstance(tf, dict) or not all(isinstance(key, str) for key in tf) \
-                or not all(isinstance(value, float) for value in tf.values()):
+        tf_ = calculate_tf(vocabulary, doc)
+        if tf_ is None or not isinstance(tf_, dict) or not all(isinstance(key, str) for key in tf_) \
+                or not all(isinstance(value, float) for value in tf_.values()):
             result = None
             assert result, "Result is None"
-        tf_documents.append(tf)
+        tf_documents.append(tf_)
 
-    idf_documents = calculate_idf(vocab, documents_prep)
-    tf_idf_documents = []
-    for tf in tf_documents:
+    idf_documents = calculate_idf(vocabulary, documents_preprocessed)
+    tf_idf_documents: list[dict[str, float]] = []
+    for tf_ in tf_documents:
         if not isinstance(idf_documents, dict) \
                 or not all(isinstance(key, str) for key in idf_documents) \
                 or not all(isinstance(value, float) for value in idf_documents.values()):
             result = None
             assert result, "Result is None"
-        tf_idf = calculate_tf_idf(tf, idf_documents)
+        tf_idf = calculate_tf_idf(tf_, idf_documents)
         if tf_idf is None:
             result = None
             assert result, "Result is None"
         tf_idf_documents.append(tf_idf)
 
-    bm25_documents = []
-    avg_doc_len = sum(len(doc) for doc in documents_prep) / len(documents_prep)
-    for doc in documents_prep:
-        if not isinstance(doc, list) or not all(isinstance(item, str) for item in doc):
+    bm25_documents: list[dict[str, float]] = []
+    avg_doc_len = sum(len(document) for document in documents_preprocessed) / len(
+        documents_preprocessed)
+    for document_ in documents_preprocessed:
+        if not isinstance(document_, list) or not all(isinstance(item, str) for item in document_):
             result = None
             assert result, "Result is None"
         if idf_documents is None:
             result = None
             assert result, "Result is None"
-        bm25 = calculate_bm25(vocab, doc, idf_documents,
-                              avg_doc_len=avg_doc_len, doc_len=len(doc))
+        bm25 = calculate_bm25(vocabulary, document_, idf_documents,
+                              avg_doc_len=avg_doc_len, doc_len=len(document_))
         if bm25 is None:
             result = None
             assert result, "Result is None"

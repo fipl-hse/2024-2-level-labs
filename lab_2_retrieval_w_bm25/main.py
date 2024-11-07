@@ -25,7 +25,7 @@ def tokenize(text: str) -> list[str] | None:
     for word in text:
         if not word.isalpha():
             text.replace(word," ")
-            tokenized_text_clear.append(word)
+            tokenized_text_clear.append()
     tokenized_text = " ".join(tokenized_text_clear).split()
     return tokenized_text
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:

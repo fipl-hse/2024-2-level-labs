@@ -58,7 +58,8 @@ def main() -> None:
             result = None
             assert result, "Result is None"
         tf_ = calculate_tf(vocabulary, doc)
-        if tf_ is None or not isinstance(tf_, dict) or not all(isinstance(key, str) for key in tf_) \
+        if tf_ is None or not isinstance(tf_, dict) \
+                or not all(isinstance(key, str) for key in tf_) \
                 or not all(isinstance(value, float) for value in tf_.values()):
             result = None
             assert result, "Result is None"

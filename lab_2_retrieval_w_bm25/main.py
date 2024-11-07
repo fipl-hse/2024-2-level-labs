@@ -272,16 +272,21 @@ def rank_documents(
             or not isinstance(query, str) or not isinstance(stopwords, list) \
             or not all(isinstance(word, str) for word in stopwords):
         return None
-    if tokenize(query) is None or not isinstance(tokenize(query), list) \
+    if not tokenize(query) or not isinstance(tokenize(query), list) \
             or not all(isinstance(item, str) for item in tokenize(query)) \
-            or remove_stopwords(tokenize(query), stopwords) is None:
+            or not remove_stopwords(tokenize(query), stopwords):
         return None
 
-    tokenized_query = remove_stopwords(tokenize(query), stopwords)
+    tokenized_query = tokenize(query)
+    if tokenized_query is None:
+        return None
+    prep_query = remove_stopwords(tokenized_query, stopwords)
+    if prep_query is None:
+        return None
     answer = []
     for doc_indexes in indexes:
         index = 0.0
-        for word in tokenized_query:
+        for word in prep_query:
             if word in doc_indexes:
                 index += doc_indexes[word]
         answer.append((indexes.index(doc_indexes), index))

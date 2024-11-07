@@ -30,7 +30,7 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-    documents_prep = []
+    documents_prep: list[list[str]] = []
     for doc in documents:
         doc_tokenized = tokenize(doc)
         if doc_tokenized is None:
@@ -52,7 +52,7 @@ def main() -> None:
         result = None
         assert result, "Result is None"
 
-    tf_documents: list[dict[str, float]] = []
+    tf_documents = []
     for doc in documents_prep:
         if not isinstance(doc, list) or not all(isinstance(item, str) for item in doc):
             result = None
@@ -65,7 +65,7 @@ def main() -> None:
         tf_documents.append(tf)
 
     idf_documents = calculate_idf(vocab, documents_prep)
-    tf_idf_documents: list[dict[str, float]] = []
+    tf_idf_documents = []
     for tf in tf_documents:
         if not isinstance(idf_documents, dict) \
                 or not all(isinstance(key, str) for key in idf_documents) \
@@ -78,7 +78,7 @@ def main() -> None:
             assert result, "Result is None"
         tf_idf_documents.append(tf_idf)
 
-    bm25_documents: list[dict[str, float]] = []
+    bm25_documents = []
     avg_doc_len = sum(len(doc) for doc in documents_prep) / len(documents_prep)
     for doc in documents_prep:
         if not isinstance(doc, list) or not all(isinstance(item, str) for item in doc):

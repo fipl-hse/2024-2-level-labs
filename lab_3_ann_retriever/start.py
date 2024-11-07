@@ -40,7 +40,9 @@ def main() -> None:
     print(tokenized_doc)
     tokenized_docs = tokenizer.tokenize_documents(docs)
     print(tokenized_docs)
-    result = tokenizer
+    vectorizer = m.Vectorizer(tokenized_docs)
+    vectorizer.build()
+    result = (tokenizer, vectorizer)
     assert result, "Result is None"
 
 

@@ -6,6 +6,7 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+from lab_2_retrieval_w_bm25.main import build_vocabulary, calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -125,7 +126,8 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(documents, list) or not all(isinstance(document, str) for document in documents):
+        if (not isinstance(documents, list) or
+                not all(isinstance(document, str) for document in documents)):
             return None
 
         tokenized_documents = []
@@ -145,7 +147,9 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not tokens or not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
+        if (not tokens or
+                not isinstance(tokens, list) or
+                not all(isinstance(token, str) for token in tokens)):
             return None
 
         for token in tokens.copy():
@@ -171,6 +175,8 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
+        self._corpus = corpus
+        self.build()
 
     def build(self) -> bool:
         """
@@ -179,19 +185,57 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        if self._corpus is None or len(self._corpus) == 0:
+            raise ValueError
+
+        self._vocabulary = sorted(build_vocabulary(self._corpus))
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        self._token2ind = {token: self._vocabulary.index(token) for token in self._vocabulary}
+        return True if self._vocabulary and self._idf_values and self._token2ind else False
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
         Create a vector for tokenized document.
 
         Args:
-            tokenized_document (list[str]): Tokenized document to vectorize
+            tokenized_document (list[str]): Tokenized document to vectorize.
+
+        Returns:
+            Vector | None: TF-IDF vector for document.
+
+        In case of corrupt input arguments, None is returned.
+        """
+        if (not isinstance(tokenized_document, list) or
+                not all(isinstance(document, str) for document in tokenized_document)):
+            return None
+
+        return self._calculate_tf_idf(tokenized_document)
+
+    def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
+        """
+        Getting TF-IDF for document.
+
+        Args:
+            document (list[str]): Tokenized document to vectorize.
 
         Returns:
             Vector | None: TF-IDF vector for document
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not document or
+                not isinstance(document, list) or
+                not all(isinstance(token, str) for token in document)):
+            return None
+
+        vector = []
+        tf = calculate_tf(self._vocabulary, document)
+        for token in self._vocabulary:
+            if token not in document:
+                vector.append(0.0)
+                continue
+            vector.append(tf[token] * self._idf_values[token])
+        return Vector(vector)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """

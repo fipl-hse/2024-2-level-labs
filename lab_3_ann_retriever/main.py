@@ -5,9 +5,9 @@ Vector search with text retrieving
 """
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
-from lab_2_retrieval_w_bm25.main import (calculate_idf, calculate_tf)
-from re import sub
+from re import findall
 from typing import Protocol
+from lab_2_retrieval_w_bm25.main import (calculate_idf, calculate_tf)
 
 
 class NodeLike(Protocol):
@@ -93,7 +93,7 @@ class Tokenizer:
         if not isinstance(text, str) or not text:
             return None
 
-        return self._remove_stop_words(sub(r'[^a-zа-яё]+', ' ', text.lower()).split())
+        return self._remove_stop_words(findall(r'[a-zа-яё]+', text.lower()))
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -129,7 +129,7 @@ class Tokenizer:
                 or not all(isinstance(token, str) for token in tokens):
             return None
 
-        return list(filter(lambda token: token not in self._stop_words, tokens))
+        return [token for token in tokens if token not in self._stop_words]
 
 
 class Vectorizer:
@@ -161,14 +161,13 @@ class Vectorizer:
         if not self._corpus:
             return None
 
-        self._vocabulary = sorted(list(set([term for doc in self._corpus for term in doc])))
-        idf = calculate_idf(self._vocabulary, self._corpus)
-        if not idf:
-            return None
-        self._idf_values = idf
+        self._vocabulary = sorted(list({term for doc in self._corpus for term in doc}))
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
         self._token2ind = {term: index for index, term in enumerate(self._vocabulary)}
         if not self._idf_values or not self._vocabulary or not self._token2ind:
             raise ValueError
+
+        return None
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -206,6 +205,8 @@ class Vectorizer:
                 or not all(isinstance(token, str) for token in document):
             return None
         tf = calculate_tf(self._vocabulary, document)
+        if not self._idf_values:
+            return None
         tf_idf = {term: tf[term] * self._idf_values[term] for term in self._idf_values}
         return tuple(tf_idf.values())
 
@@ -221,7 +222,8 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not vector:
+        if not isinstance(vector, (tuple, list)) or not vector \
+                or len(vector) != len(self._token2ind):
             return None
 
         tokenized_doc = []
@@ -315,6 +317,9 @@ class BasicSearchEngine:
             return None
 
         tokenized_doc = self._tokenizer.tokenize(document)
+        if not tokenized_doc:
+            return None
+
         return self._vectorizer.vectorize(tokenized_doc)
 
     def index_documents(self, documents: list[str]) -> bool:
@@ -334,7 +339,7 @@ class BasicSearchEngine:
             return False
 
         self._documents = documents
-        self._document_vectors = [self._index_document(doc) for doc in documents]
+        self._document_vectors = [vector for doc in documents if (vector := self._index_document(doc))]
         if None in self._document_vectors:
             return False
         return True
@@ -369,10 +374,7 @@ class BasicSearchEngine:
             return None
         relevant_docs = []
         for item in knn:
-            index = item[0]
-            distance = item[1]
-            if isinstance(index, int):
-                relevant_docs.append((distance, self._documents[index]))
+            relevant_docs.append((item[1], self._documents[item[0]]))
         return relevant_docs
 
     def _calculate_knn(
@@ -397,7 +399,7 @@ class BasicSearchEngine:
 
         sorted_distances = sorted([
             (document_vectors.index(doc_vector), calculate_distance(query_vector, doc_vector))
-            for doc_vector in document_vectors], key=lambda x: x[-1])
+            for doc_vector in document_vectors], key=lambda x: x[1])
         return sorted_distances[:n_neighbours]
 
     def _dump_documents(self) -> dict:

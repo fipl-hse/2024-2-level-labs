@@ -3,8 +3,8 @@ Laboratory Work #3 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from lab_3_ann_retriever.main import (BasicSearchEngine, Tokenizer, Vectorizer)
 from pathlib import Path
+from lab_3_ann_retriever.main import (BasicSearchEngine, Tokenizer, Vectorizer)
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -35,12 +35,12 @@ def main() -> None:
     documents = open_files()[0]
     tokenizer = Tokenizer(stopwords)
     tokenized_docs = tokenizer.tokenize_documents(documents)
+    if not tokenized_docs:
+        return
     vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()
-    secret_values = text.replace("\n", "").split(", ")
-    secret_vector = tuple(float(value) for value in secret_values)
-    secret_tokens = vectorizer.vector2tokens(secret_vector)
-    print(secret_tokens)
+    secret_vector = tuple(float(value) for value in text.split(", "))
+    print(vectorizer.vector2tokens(secret_vector))
     search_engine = BasicSearchEngine(vectorizer, tokenizer)
     search_engine.index_documents(documents)
     result = search_engine.retrieve_vectorized(secret_vector)

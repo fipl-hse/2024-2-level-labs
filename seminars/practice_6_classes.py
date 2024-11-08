@@ -1,14 +1,15 @@
-# pylint: disable=too-few-public-methods
 """
-Programming 2023
-Seminar 5
+Programming 2024
+Seminar 6
 
 
 Introduction to classes
 """
+
+# pylint: disable=too-few-public-methods
 from collections import Counter
 
-counter = Counter('aasalksjdkslaks')
+counter = Counter("aasalksjdkslaks")
 print(counter.most_common())  # [('a', 4), ('s', 4), ('k', 3), ('l', 2), ('j', 1), ('d', 1)]
 print(counter.total())  # 15
 
@@ -20,13 +21,14 @@ print(counter.total())  # 15
 #  2. __init__ - method for instance creation
 #  3. all class methods receive 'self' as the first argument (with few exceptions)
 
+
 class MyClass:
     """
     Just a regular class
     """
 
     def __init__(self) -> None:
-        print(f'I created an instance of a class {self}!')
+        print(f"I created an instance of a class {self}!")
 
 
 # creating class instance:
@@ -47,8 +49,8 @@ instance = IsThereInit()  # instance is created just fine (why?)
 print(type(my_instance))  # <class '__main__.MyClass'>
 print(isinstance(my_instance, MyClass))  # True
 
-print(type('Well, it is a string'))  # <class 'str'>
-print(isinstance('Well, it is a string', str))  # True
+print(type("Well, it is a string"))  # <class 'str'>
+print(isinstance("Well, it is a string", str))  # True
 
 print(type(MyClass))  # <class 'type'>
 print(type(str))  # <class 'type'>
@@ -57,6 +59,7 @@ print(type(type))  # <class 'type'>
 # Even classes are instances of another class -- type
 #  =============================================================
 # Instance attributes and methods
+
 
 class Animal:
     """
@@ -90,27 +93,27 @@ class Animal:
     #     self.bad_practice = 'yeah, we have added an attribute not in __init__... sorry...'
 
 
-dog = Animal(name='Sharick', legs=4, scariness=8)
+dog = Animal(name="Sharick", legs=4, scariness=8)
 print(dog.name, dog.legs, dog.scariness)  # Sharick 4 8
 # we do not pass self when calling a method!!!
 dog.introduce()  #  Hello! My name is Sharick!
 
-spider = Animal('Spidy', 8, 225)  # Spidy 8 225
+spider = Animal("Spidy", 8, 225)  # Spidy 8 225
 print(spider.name, spider.legs, spider.scariness)
 spider.introduce()  #  Hello! My name is Spidy!
 # spider.bad_practice_to_add_attribute_not_in_init()
 
-print(hasattr(dog, 'bad_practice'))  # False
+print(hasattr(dog, "bad_practice"))  # False
 # print(dog.bad_practice)  # Attribute error
 
-print(hasattr(spider, 'bad_practice'))  # True
+print(hasattr(spider, "bad_practice"))  # True
 # print(spider.bad_practice)  # yeah, we have added an attribute not in __init__... sorry..
 
 
 # Arguments can be changed outside the class
 dog.legs = 10
 dog.scariness = 100000
-dog.name = '10-legged Sharick'
+dog.name = "10-legged Sharick"
 print(dog.name, dog.legs, dog.scariness)  # 10-legged Sharick 10 100000
 dog.introduce()  # Hello! My name is 10-legged Sharick!
 
@@ -146,7 +149,7 @@ class Student:
         """
         if self.hours_of_sleep < 4:
             if self.coffee_drunk < 2:
-                print('Cannot do homework, too tired :(')
+                print("Cannot do homework, too tired :(")
                 return
             self.coffee_drunk = self.coffee_drunk - 1
         self.hours_of_sleep = self.hours_of_sleep - 2
@@ -163,15 +166,16 @@ class Student:
         self.drink_coffee(1)
         self.do_homework()
         self.do_homework()  # Cannot do homework, too tired :(
-        print(f'Today I finished {self.assignments_done} assignments')
+        print(f"Today I finished {self.assignments_done} assignments")
         self.sleep(5)
+
 
 student = Student()
 student.live_a_day()
 
 #  ====================================================
 
-print('*' * 15 + ' TASKS ' + '*' * 15)
+print("*" * 15 + " TASKS " + "*" * 15)
 
 # Task 1
 # easy level

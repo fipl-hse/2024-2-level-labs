@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 import lab_3_ann_retriever.main
-from lab_3_ann_retriever.main import NaiveKDTree
+from lab_3_ann_retriever.main import NaiveKDTree, Node
 
 
 class NaiveKDTreeTest(unittest.TestCase):
@@ -194,3 +194,118 @@ class NaiveKDTreeTest(unittest.TestCase):
         with mock.patch.object(lab_3_ann_retriever.main, "calculate_distance", return_value=None):
             actual = self.kdtree._find_closest(self.point)
         self.assertIsNone(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_save_ideal(self):
+        """
+        Ideal scenario for save method
+        """
+        expected = {
+            "root": {
+                "vector": {"elements": {}, "len": 2},
+                "left_node": None,
+                "payload": -1,
+                "right_node": {
+                    "left_node": None,
+                    "payload": 0,
+                    "right_node": None,
+                    "vector": {"elements": {0: 0.1, 1: 0.1}, "len": 2},
+                },
+            }
+        }
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.save()
+        self.assertEqual(expected, actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_save_missing_root(self):
+        """
+        Handles missing root case
+        """
+        self.kdtree._root = None
+        self.assertIsNone(self.kdtree.save())
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_save_return_value(self):
+        """
+        Checks return type for save_method
+        """
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.save()
+        self.assertIsInstance(actual, dict)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_ideal(self):
+        """
+        Ideal scenario for load method
+        """
+        state = {
+            "root": {
+                "vector": {"elements": {}, "len": 2},
+                "left_node": None,
+                "payload": -1,
+                "right_node": {
+                    "left_node": None,
+                    "payload": 0,
+                    "right_node": None,
+                    "vector": {"elements": {0: 0.1, 1: 0.1}, "len": 2},
+                },
+            }
+        }
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.load(state)
+        self.assertTrue(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_missing_root(self):
+        """
+        Handling case with missing root
+        """
+        state = {
+            "vector": {"elements": {}, "len": 2},
+            "left_node": None,
+            "payload": -1,
+            "right_node": {
+                "left_node": None,
+                "payload": 0,
+                "right_node": None,
+                "vector": {"elements": {0: 0.1, 1: 0.1}, "len": 2},
+            },
+        }
+
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.load(state)
+        self.assertFalse(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_return_value(self):
+        """
+        Checks return type for load method
+        """
+        state = {
+            "root": {
+                "vector": {"elements": {}, "len": 2},
+                "left_node": None,
+                "payload": -1,
+                "right_node": {
+                    "left_node": None,
+                    "payload": 0,
+                    "right_node": None,
+                    "vector": {"elements": {0: 0.1, 1: 0.1}, "len": 2},
+                },
+            }
+        }
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.load(state)
+        self.assertIsInstance(actual, bool)

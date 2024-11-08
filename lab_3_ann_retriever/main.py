@@ -224,7 +224,15 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not isinstance(tokenized_document, list)
+                or not all(isinstance(token, str) for token in tokenized_document)):
+            return None
+        for item in self._calculate_tf_idf(tokenized_document):
+            if not isinstance(item, float):
+                return None
+
         return self._calculate_tf_idf(tokenized_document)
+
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """

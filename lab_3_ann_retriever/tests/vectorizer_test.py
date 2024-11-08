@@ -237,7 +237,7 @@ class VectorizerTest(unittest.TestCase):
         """
         Invalid input build_vocabulary scenario
         """
-        bad_inputs = [None, [], {}]
+        bad_inputs = [None, {}, []]
         for bad_input in bad_inputs:
             vectorizer = Vectorizer(bad_input)
             self.assertFalse(vectorizer.build())
@@ -627,6 +627,8 @@ class VectorizerTest(unittest.TestCase):
             self.assertIsInstance(word, str)
 
     @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark6
+    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_save_ideal(self):
         """
@@ -643,6 +645,8 @@ class VectorizerTest(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark6
+    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_save_return_value(self):
         """
@@ -652,6 +656,8 @@ class VectorizerTest(unittest.TestCase):
         self.assertIsInstance(self.vectorizer.save(str(self.test_path)), bool)
 
     @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark6
+    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_load_ideal(self) -> None:
         """
@@ -665,6 +671,8 @@ class VectorizerTest(unittest.TestCase):
         self.assertEqual(self.vectorizer._token2ind, new_vectorizer._token2ind)
 
     @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark6
+    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_load_missing_values(self) -> None:
         """
@@ -702,6 +710,8 @@ class VectorizerTest(unittest.TestCase):
         self.assertFalse(loaded_vectorizer.load(str(self.test_path)))
 
     @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark6
+    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_load_return_value(self) -> None:
         """

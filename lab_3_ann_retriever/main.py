@@ -4,6 +4,8 @@ Lab 3.
 Vector search with text retrieving
 """
 import math
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf, calculate_tf_idf, tokenize
+import math
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
@@ -50,6 +52,12 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    if len(query_vector) != len(document_vector):
+        return None
+    calculation = 0.0
+    for i in range(len(query_vector)):
+        calculation += (query_vector[i] - document_vector[i]) ** 2
+    return math.sqrt(calculation)
 
 
 def save_vector(vector: Vector) -> dict:
@@ -110,10 +118,8 @@ class Tokenizer:
         if not isinstance(text, str):
             return None
 
-        for char in text:
-            if not char.isalpha() and char != ' ':
-                text = text.replace(char, ' ')
-        return text.lower().split()
+        text = tokenize(text)
+        return text
 
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
@@ -132,11 +138,8 @@ class Tokenizer:
             return None
         list_for_tokens = []
         for string in documents:
-            for char in string:
-                if not char.isalpha() and char != ' ':
-                    text = string.replace(char, ' ')
-                    result = text.lower().split()
-                    list_for_tokens.append(result)
+            string = tokenize(string)
+            list_for_tokens.append(string)
         return list_for_tokens
 
 
@@ -155,8 +158,7 @@ class Tokenizer:
         if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or \
                 not tokens:
             return None
-        stopwords = self._stop_words
-        return [token for token in tokens if token not in stopwords]
+        return [token for token in tokens if token not in self._stop_words]
 
 
 class Vectorizer:
@@ -189,8 +191,6 @@ class Vectorizer:
             bool: True if built successfully, False in other case
         """
         main_list = []
-        counter = []
-        total = len(self._corpus)
         for words in self._corpus:
             for word in words:
                 if word not in main_list:
@@ -199,11 +199,7 @@ class Vectorizer:
             self._vocabulary = sorted(main_list)
             self._token2ind = {token: ind for ind, token in enumerate(self._vocabulary)}
 
-            for words in self._corpus:
-                unique = set(words)
-                for word in unique:
-                    counter[word] = words.count(word)
-                    self._idf_values[word] = math.log((total - counter[word] + 0.5) / (counter[word] + 0.5))
+            self._idf_values = calculate_idf(self._vocabulary, self._corpus)
             return True
         return False
 
@@ -220,36 +216,14 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokenized_document, list) or not tokenized_document:
+        if not isinstance(tokenized_document, list) or not tokenized_document \
+                or not all(isinstance(word, str) for word in tokenized_document):
             return None
-        n = len(tokenized_document)
-        for key in self._vocabulary:
-            if key not in self._idf_values:
-                self._idf_values[key] = 0.0
+        if not self._corpus:
+            return None
 
-        tf_idf_vector = Vector()
+        return self._calculate_tf_idf(tokenized_document)
 
-        #how many times?
-        term_count = {}
-        tokenized_document_set = set(tokenized_document)
-        for word in tokenized_document_set:
-            term_count[word] = tokenized_document.count(word)
-
-        tf = {}
-
-        for word in self._vocabulary:
-            tf[word] = 0.0
-            if word in tokenized_document:
-                tf[word] = tokenized_document.count(word) / n
-        for token in tokenized_document:
-            if token in tf:
-                continue
-            tf[token] = tokenized_document.count(token) / n
-
-        for word, count in term_count.items():
-            if word in self._vocabulary:
-                tf_value = tf[word]
-                tf_idf_value = tf_value * self._idf_values[word]
 
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
@@ -264,6 +238,9 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not vector:
+            return None
+
 
 
     def save(self, file_path: str) -> bool:
@@ -302,6 +279,18 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document, list) or not(all(isinstance(i, str) for i in document)):
+            return None
+        #заполнить нулями все??
+        dict_with_zero = {word: 0.0 for word in document}
+        tf = calculate_tf(self._vocabulary, document)
+        tf_idf = calculate_tf_idf(tf, self._idf_values)
+        if not tf or not tf_idf:
+            return None
+
+        for key in dict_with_zero:
+            if key in tf_idf:
+                dict_with_zero[key] = tf_idf[key]
 
 
 class BasicSearchEngine:
@@ -322,6 +311,9 @@ class BasicSearchEngine:
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        self._vectorizer = vectorizer
+        self._tokenizer = tokenizer
+
 
     def index_documents(self, documents: list[str]) -> bool:
         """

@@ -4,7 +4,7 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-from lab_3_ann_retriever.main import Tokenizer, Vectorizer, BasicSearchEngine
+from lab_3_ann_retriever.main import Tokenizer, Vectorizer, BasicSearchEngine, Node, NaiveKDTree
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -29,7 +29,7 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_2.txt", "r", encoding="utf-8") as text_file:
+    with open("assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     secret_vector = tuple(float(item) for item in text.split(', '))
     result = ':('
@@ -41,8 +41,13 @@ def main() -> None:
     vectorizer.build()
     knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
     knn_retriever.index_documents(documents)
-    print(vectorizer.vector2tokens(secret_vector))
-    print(knn_retriever.retrieve_vectorized(secret_vector))
+    # print(vectorizer.vector2tokens(secret_vector))
+    # print(knn_retriever.retrieve_vectorized(secret_vector))
+    # node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+    # naive_tree = NaiveKDTree()
+    # naive_tree.build([(0.0, 0.0, 0.094), (0.061, 0.121, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0, 0.0)])
+    # query_vector = (0.0, 0.0, 0.094)
+    # print(naive_tree.query(query_vector))
     assert result, "Result is None"
 
 

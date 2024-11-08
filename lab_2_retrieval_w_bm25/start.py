@@ -2,9 +2,11 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
-                                         calculate_tf, calculate_tf_idf, rank_documents,
-                                         remove_stopwords, tokenize)
+from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
+                                         calculate_bm25_with_cutoff, calculate_idf,
+                                         calculate_spearman, calculate_tf, calculate_tf_idf,
+                                         load_index, rank_documents, remove_stopwords, save_index,
+                                         tokenize)
 
 
 def main() -> None:
@@ -58,9 +60,8 @@ def main() -> None:
             result = None
             assert result, "Result is None"
         tf_ = calculate_tf(vocabulary, doc)
-        if tf_ is None or not isinstance(tf_, dict) \
-                or not all(isinstance(key, str) for key in tf_) \
-                or not all(isinstance(value, float) for value in tf_.values()):
+        if tf_ is None or not isinstance(tf_, dict) or not all(isinstance(k, str) for k in tf_) \
+                or not all(isinstance(v, float) for v in tf_.values()):
             result = None
             assert result, "Result is None"
         tf_documents.append(tf_)
@@ -96,18 +97,54 @@ def main() -> None:
             assert result, "Result is None"
         bm25_documents.append(bm25)
 
-    tf_idf_ranked = rank_documents(tf_idf_documents, 'Which fairy tale has Fairy Queen?', stopwords)
+    query = 'Which fairy tale has Fairy Queen?'
+    tf_idf_ranked = rank_documents(tf_idf_documents, query, stopwords)
     if tf_idf_ranked is None:
         result = None
         assert result, "Result is None"
-    bm25_ranked = rank_documents(bm25_documents, 'Which fairy tale has Fairy Queen?', stopwords)
+    bm25_ranked = rank_documents(bm25_documents, query, stopwords)
     if bm25_ranked is None:
         result = None
         assert result, "Result is None"
 
-    print(tf_idf_ranked)
-    print(bm25_ranked)
-    result = bm25_ranked
+    bm25_with_cutoff = []
+    for document_1 in documents_preprocessed:
+        if not isinstance(document_1, list) or \
+                not all(isinstance(item, str) for item in document_1):
+            result = None
+            assert result, "Result is None"
+        if idf_documents is None:
+            result = None
+            assert result, "Result is None"
+        result_ = calculate_bm25_with_cutoff(vocabulary, document_1, idf_documents, 0.2,
+                                            avg_doc_len=avg_doc_len, doc_len=len(document_1))
+        if result_ is None:
+            result = None
+            assert result, "Result is None"
+        bm25_with_cutoff.append(result_)
+
+    save_index(bm25_with_cutoff, 'assets/metrics.json')
+    loaded_bm25_with_cutoff = load_index('assets/metrics.json')
+
+    if not isinstance(loaded_bm25_with_cutoff, list):
+        result = None
+        assert result, "Result is None"
+    bm25_cutoff_ranked = rank_documents(loaded_bm25_with_cutoff,
+                                        'Which fairy tale has Fairy Queen?', stopwords)
+
+    tf_idf_ranks_only = [item[0] for item in tf_idf_ranked]
+    bm25_ranks_only = [item[0] for item in bm25_ranked]
+    bm25_cutoff_ranks_only = [item[0] for item in bm25_cutoff_ranked]
+
+    spearman_tf_idf_bm25 = calculate_spearman(tf_idf_ranks_only, bm25_ranks_only)
+    spearman_tf_idf_bm25_cutoff = calculate_spearman(tf_idf_ranks_only, bm25_cutoff_ranks_only)
+    spearman_bm25_bm25_cutoff = calculate_spearman(bm25_cutoff_ranks_only, bm25_ranks_only)
+    print('spearman for tf-idf and bm25:', spearman_tf_idf_bm25)
+    print('spearman for tf-idf and bm25 with cutoff:', spearman_tf_idf_bm25_cutoff)
+    print('spearman for bm25 and bm25 with cutoff:', spearman_bm25_bm25_cutoff)
+
+    result = bm25_cutoff_ranks_only
+    print('golden standard:', result)
     assert result, "Result is None"
 
 

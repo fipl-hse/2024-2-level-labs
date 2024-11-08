@@ -5,6 +5,7 @@ Seminar 3
 
 Data Type: Lists
 """
+
 # pylint: disable=unused-argument
 
 
@@ -54,6 +55,7 @@ first_test = [1, 2, 3, [1, 2, 3]]
 
 # TASKS
 
+
 # Task 1:
 # easy level
 def count_evens(nums: list) -> int:
@@ -68,6 +70,7 @@ def count_evens(nums: list) -> int:
 # count_evens([2, 2, 0]) → 3
 # count_evens([1, 3, 5]) → 0
 
+
 # Task 2:
 # easy level
 def sum13(nums: list) -> int:
@@ -78,6 +81,7 @@ def sum13(nums: list) -> int:
     also do not count.
     """
     # student realization goes here
+
 
 # Function calls with expected result:
 # sum13([1, 2, 2, 1]) → 6
@@ -97,6 +101,7 @@ def sum67(nums: list) -> int:
     """
     # student realization goes here
 
+
 # Function calls with expected result:
 # sum67([1, 2, 2]) → 5
 # sum67([1, 2, 2, 6, 99, 99, 7]) → 5
@@ -111,6 +116,7 @@ def create_phone_number(nums: list) -> str:
     that returns a string of those numbers in the form of a phone number.
     """
     # student realization goes here
+
 
 # Function calls with expected result:
 # create_phone_number([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
@@ -133,6 +139,7 @@ def check_exam(correct_answers: list, student_answers: list) -> int:
     """
     # student realization goes here
 
+
 # Function calls with expected result:
 # check_exam(["a", "a", "b", "b"], ["a", "c", "b", "d"]) → 6
 # check_exam(["a", "a", "c", "b"], ["a", "a", "b",  ""]) → 7
@@ -149,6 +156,7 @@ def who_likes_it(names: list) -> str:
     We want to create the text that should be displayed next to such an item.
     """
     # student realization goes here
+
 
 # Function calls with expected result:
 # []                                -->  "no one likes this"
@@ -172,6 +180,7 @@ def find_anagrams(words: list) -> list:
     """
     # student implementation goes here
 
+
 # Function calls with expected result:
 # find_anagrams('abba') => ['aabb', 'bbaa']
 # find_anagrams('racer') => ['carer', 'racer', ...]
@@ -186,6 +195,7 @@ def scramble(words: list) -> bool:
     otherwise returns false.
     """
     # student implementation goes here
+
 
 # Function calls with expected result:
 # scramble(['rkqodlw', 'world']) ==> True

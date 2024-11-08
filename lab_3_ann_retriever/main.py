@@ -6,6 +6,8 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+from lab_2_retrieval_w_bm25.main import (calculate_tf_idf, calculate_idf, calculate_tf)
+import json
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -179,6 +181,7 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
+        self._corpus = corpus
 
     def build(self) -> bool:
         """
@@ -187,6 +190,27 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        if not self._corpus:
+            return False
+
+        self._vocabulary = []
+        for sublist in self._corpus:
+            for word in set(sublist):
+                self._vocabulary.append(word)
+        self._vocabulary.sort()
+
+        if not self._vocabulary:
+            return False
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+
+        self._token2ind = {}
+        for word in self._vocabulary:
+            self._token2ind[word] = self._vocabulary.index(word)
+
+        if (self._idf_values and self._token2ind
+                and None not in self._idf_values and None not in self._token2ind):
+            return True
+        return False
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -200,6 +224,7 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -250,6 +275,17 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        vector = [0.0 for _ in range(len(self._vocabulary))]
+
+        tf_idf = calculate_tf_idf(calculate_tf(self._vocabulary, document), self._idf_values)
+        for word in tf_idf:
+            vector.pop(self._token2ind[word])
+            vector.insert(self._token2ind[word], tf_idf[word])
+        vector = tuple(vector)
+
+        if vector:
+            return vector
+        return None
 
 
 class BasicSearchEngine:

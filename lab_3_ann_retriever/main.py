@@ -91,6 +91,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -104,6 +105,14 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(text, str) or not isinstance(self, Tokenizer):
+            return None
+        for sign in text.lower():
+            if not sign.isalpha():
+                text = text.lower().replace(sign, ' ')
+        text = text.replace('  ', ' ')
+        text = self._remove_stop_words(text.split())
+        return text
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -117,6 +126,17 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(documents, list) or len(documents) == 0:
+            return None
+        unique_words = []
+        for text in documents:
+            if not isinstance(text, str):
+                return None
+            new_tokens = self.tokenize(text)
+            if new_tokens is None:
+                return None
+            unique_words.append(new_tokens)
+        return unique_words
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -130,7 +150,19 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-
+        if (not isinstance(tokens, list) or not isinstance(self, Tokenizer)
+                or len(tokens) == 0):
+            return None
+        if tokens == [] or self._stop_words == []:
+            return None
+        for data in tokens:
+            if not isinstance(data, str):
+                return None
+        for data in self._stop_words:
+            if not isinstance(data, str):
+                return None
+        tokens_cleared = [elem for elem in tokens if elem not in self._stop_words]
+        return tokens_cleared
 
 class Vectorizer:
     """

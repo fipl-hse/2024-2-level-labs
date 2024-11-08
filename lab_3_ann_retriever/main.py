@@ -129,7 +129,10 @@ class Tokenizer:
 
         if not isinstance(documents, list) or not all(isinstance(doc, str) for doc in documents):
             return None
-        return [self.tokenize(doc) for doc in documents]
+        tokenized_docs = [self.tokenize(doc) for doc in documents]
+        if any(doc is None for doc in tokenized_docs):
+            return None
+        return tokenized_docs or None
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """

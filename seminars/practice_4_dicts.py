@@ -5,7 +5,8 @@ Seminar 4
 
 Data Type: Dictionary
 """
-#pylint: disable=unused-argument
+
+# pylint: disable=unused-argument
 # Common information about dictionaries
 
 # Dictionaries are used to store data values in key:value pairs.
@@ -13,39 +14,31 @@ Data Type: Dictionary
 # Create a dict
 from typing import Union
 
-example = {
-    "brand": "Ford",
-    "model": "Mustang",
-    "year": 1964
-}
+example = {"brand": "Ford", "model": "Mustang", "year": 1964}
 print(example)
-print('*' * 30)
+print("*" * 30)
 
 # Create a dict (second way)
-pair_example = dict([(1, 'Hello'), (2, 'there')])
+pair_example = dict([(1, "Hello"), (2, "there")])
 print("\nDictionary with each item as a pair: ")
 print(pair_example)
-print('*' * 30)
+print("*" * 30)
 
 # Add a key:value pair
-example = {
-    "brand": "Ford",
-    "model": "Mustang",
-    "year": 1964
-}
-example['colour'] = 'black'
+example = {"brand": "Ford", "model": "Mustang", "year": 1964}
+example["colour"] = "black"
 print(example)
-print('*' * 30)
+print("*" * 30)
 
 # Remove a key:value pair
-example.pop('colour')
+example.pop("colour")
 print(example)
-print('*' * 30)
+print("*" * 30)
 
 # Change the value of the given key
-example['year'] = 2000
+example["year"] = 2000
 print(example)
-print('*' * 30)
+print("*" * 30)
 
 # Dict methods (some of them)
 # .get(key, default) -> get the value by the given key
@@ -54,10 +47,11 @@ print('*' * 30)
 # .values() -> returns a list of all the values in the dictionary
 # .keys() -> returns a list of all the keys in the dictionary
 
-print('*' * 15 + ' TASKS ' + '*' * 15)
+print("*" * 15 + " TASKS " + "*" * 15)
 
 
 # TASKS
+
 
 # Task 1:
 # easy level
@@ -73,6 +67,7 @@ def extract_older_people(people: dict[str, int], threshold: int) -> list[str]:
 #                             20) == ['Andrej', 'Alexander']
 # assert extract_older_people({'Hera': 45, 'Zagreus': 25, 'Zeus': 48}, 30) == ['Hera', 'Zeus']
 
+
 # Task 2:
 # easy level
 def sum_values(data: dict[str, int]) -> Union[float, int]:
@@ -86,6 +81,7 @@ def sum_values(data: dict[str, int]) -> Union[float, int]:
 # Function calls with expected result:
 # assert sum_values({'a': 300, 'b': 15, 'c': 430}) == 745
 
+
 # Task 3
 # easy level
 def find_key(data: dict[str, int]) -> str:
@@ -97,6 +93,7 @@ def find_key(data: dict[str, int]) -> str:
 
 # Function calls with expected result:
 # assert find_key({'Andrej': 10000, 'Artyom': 15000, 'Alexander': 100000}) == 'Alexander'
+
 
 # Task 4
 # easy level
@@ -113,6 +110,7 @@ def remove_duplicates(data: dict[str, int]) -> dict[str, int]:
 #     'Yaroslav': 15000,
 #     'Sasha': 10000}) == {'Yaroslav': 15000}
 
+
 # Task 5
 # medium level
 def count_letters(sequence: str) -> dict[str, int]:
@@ -126,6 +124,7 @@ def count_letters(sequence: str) -> dict[str, int]:
 
 # Function calls with expected result:
 # assert count_letters('Hello there') == {'h': 2, 'e': 3, 'l': 2, 'o': 1, 't': 1, 'r': 1}
+
 
 # Task 6
 # medium level
@@ -148,6 +147,7 @@ def decipher(sentence: str, special_characters: dict[int, str]) -> str:
 # character_decoded_dict = {'H': 72, 'g': 103, 'd': 100, 'R': 82, 's': 115}
 # assert decode('72olle 103doo 100ya', character_decoded_dict) == 'Hello good day'
 # assert decode('82yade 115te 103o', character_decoded_dict) == 'Ready set go'
+
 
 # Task 7
 # medium level

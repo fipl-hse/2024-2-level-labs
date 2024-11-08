@@ -140,15 +140,10 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
 
     idf = {}
     document_count = len(documents)
-    docs_with_tok = 0
     for token in vocab:
-        for document in documents:
-            if token in document:
-                docs_with_tok += 1
+        docs_with_tok = sum([1 for document in documents if token in document])
         idf[token] = log((document_count-docs_with_tok+0.5)/(docs_with_tok+0.5))
-        docs_with_tok = 0
     return idf
-
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
     """

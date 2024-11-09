@@ -233,7 +233,7 @@
 # #     """
 # #     Takes 1 integer argument,
 # #     outputs fibonacci sequence of such length, starting from [1, 1,...].
-# #     Fibonacci sequence is the sequence where each element is equal to the sum of the previous two.
+#     Fibonacci sequence is the sequence where each element is equal to the sum of the previous two.
 # #     :return: list[int]
 # #     """
 # #     # student realization goes here

@@ -4,7 +4,7 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-
+from main import Tokenizer
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -30,8 +30,13 @@ def main() -> None:
     """
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    result = None
+    documents, stop_words = open_files()
+    tokenizer = Tokenizer(stop_words)
+    preprocessed_documents = tokenizer.tokenize_documents(documents)
+    result = preprocessed_documents
     assert result, "Result is None"
+
+
 
 
 if __name__ == "__main__":

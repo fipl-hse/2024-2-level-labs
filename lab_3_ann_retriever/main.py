@@ -113,7 +113,6 @@ class Tokenizer:
         text_tokens = text.lower().split()
         return self._remove_stop_words(text_tokens)
 
-
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
         Tokenize the input documents.
@@ -126,12 +125,14 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not documents or not isinstance(documents,list) \
-                or not all(isinstance(doc,str)for doc in documents):
+        if not documents or not isinstance(documents, list) \
+                or not all(isinstance(doc, str)for doc in documents):
             return None
         all_preprocessed_documents = []
         for document in documents:
             preprocessed_document = self.tokenize(document)
+            if preprocessed_document is None:
+                return None
             all_preprocessed_documents.append(preprocessed_document)
         return all_preprocessed_documents
 

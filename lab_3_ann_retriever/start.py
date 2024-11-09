@@ -32,7 +32,7 @@ def main() -> None:
     """
     # with open("assets/secrets/secret_3.txt", "r", encoding="utf-8") as text_file:
     #     text = text_file.read()
-    documents = open_files()[0]
+    documents = open_files()[0][:50]
     stopwords = open_files()[1]
 
     tokenizer = Tokenizer(stopwords)
@@ -45,9 +45,9 @@ def main() -> None:
     new_vectorizer = Vectorizer(tokenized_docs)
     new_vectorizer.load("assets/states/vectorizer_state.json")
 
-    # naive_kdtree_retriever = SearchEngine(vectorizer=new_vectorizer, tokenizer=tokenizer)
-    # naive_kdtree_retriever.index_documents(documents)
-    # naive_kdtree_retriever.save("assets/states/engine_state.json")
+    naive_kdtree_retriever = SearchEngine(vectorizer=new_vectorizer, tokenizer=tokenizer)
+    naive_kdtree_retriever.index_documents(documents)
+    naive_kdtree_retriever.save("assets/states/engine_state.json")
 
     kdtree_retriever = AdvancedSearchEngine(new_vectorizer, tokenizer)
     kdtree_retriever.load("assets/states/engine_state.json")

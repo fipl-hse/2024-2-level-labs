@@ -479,7 +479,7 @@ class BasicSearchEngine:
             return None
         knn: list[tuple[int, float]] | None = self._calculate_knn(query_vector,
                                                                   self._document_vectors, 1)
-        if knn is None:
+        if knn is None or not knn:
             return None
         return self._documents[knn[0][0]]
 
@@ -505,7 +505,7 @@ class BasicSearchEngine:
                 and all(isinstance(vector, (tuple, list))
                         and all(isinstance(cor, float) for cor in vector) for vector in
                         document_vectors)
-                and isinstance(n_neighbours, int)):
+                and isinstance(n_neighbours, int) and document_vectors):
             return None
         distances: list[tuple[int, float]] = []
         for document_vector in document_vectors:
@@ -627,7 +627,6 @@ class Node(NodeLike):
         """
         if not (isinstance(state, dict) and all(key in state for key in
                                                 ["vector", "payload", "left_node", "right_node"])
-                and isinstance(state["left_node"], dict) and isinstance(state["right_node"], dict)
                 and isinstance(state["vector"], dict) and isinstance(state["payload"], int)):
             return False
         loaded_vector = load_vector(state["vector"])
@@ -635,11 +634,11 @@ class Node(NodeLike):
             return False
         self.vector = loaded_vector
         self.payload = state["payload"]
-        if state["left_node"] is not None:
+        if isinstance(state["left_node"], dict):
             left_node = Node()
             if left_node.load(state["left_node"]):
                 self.left_node = left_node
-        if state["right_node"] is not None:
+        if isinstance(state["right_node"], dict):
             right_node = Node()
             if right_node.load(state["right_node"]):
                 self.right_node = right_node
@@ -758,6 +757,8 @@ class NaiveKDTree:
         Returns:
             bool: True is loaded successfully, False in other cases
         """
+        if "root" not in state:
+            return False
         self._root = Node()
         return self._root.load(state["root"])
 
@@ -786,7 +787,7 @@ class NaiveKDTree:
                 if distance is not None:
                     return [(distance, cur_node[0].payload)]
             axis = cur_node[1] % len(cur_node[0].vector)
-            if cur_node[0].vector[axis] > vector[axis]:
+            if cur_node[0].vector[axis] >= vector[axis]:
                 if cur_node[0].left_node is not None and isinstance(cur_node[0].left_node, Node):
                     nodes.append((cur_node[0].left_node, cur_node[1] + 1))
             else:

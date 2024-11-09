@@ -53,8 +53,7 @@ def main() -> None:
     kdtree_retriever.load("assets/states/engine_state.json")
     query = "Нижний Новгород"
     result = kdtree_retriever.retrieve_relevant_documents(query, 3)
-    for i in result:
-        print(i)
+    print(result)
     assert result, "Result is None"
     return None
 

@@ -7,6 +7,7 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 import math
+import json
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
@@ -51,6 +52,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     """
     if not query_vector or not document_vector:
         return None
+    if len(query_vector) != len(document_vector):
+        return None
     sum_ = 0.0
     for ind, value in enumerate(query_vector):
         sum_ += (value - document_vector[ind]) ** 2
@@ -67,6 +70,8 @@ def save_vector(vector: Vector) -> dict:
     Returns:
         dict: A state of the vector to save
     """
+    elements = {ind: value for ind, value in enumerate(vector) if value}
+    return {'len': len(vector), 'elements': elements}
 
 
 def load_vector(state: dict) -> Vector | None:
@@ -81,6 +86,12 @@ def load_vector(state: dict) -> Vector | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not state or 'len' not in state or 'elements' not in state:
+        return None
+    vector = [0.0 * n for n in range(state['len'])]
+    for ind, value in state['elements'].items():
+        vector[int(ind)] = value
+    return tuple(vector)
 
 
 class Tokenizer:
@@ -115,7 +126,7 @@ class Tokenizer:
             return None
         for token in text:
             if not token.isalpha():
-                text = text.replace(token, ' ')
+                text = text.replace(token, " ")
         return self._remove_stop_words(text.lower().split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
@@ -222,7 +233,7 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not vector:
+        if not vector or len(vector) != len(self._token2ind):
             return None
         result = []
         for i, num in enumerate(vector):
@@ -242,6 +253,11 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
+        if not file_path or not isinstance(file_path, str):
+            return False
+        with open(file_path, 'w', encoding='utf-8') as file:
+            json.dump({'vocabulary': self._vocabulary, 'idf_values': self._idf_values, 'token2ind': self._token2ind}, file)
+        return True
 
     def load(self, file_path: str) -> bool:
         """
@@ -255,6 +271,16 @@ class Vectorizer:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not file_path or not isinstance(file_path, str):
+            return False
+        with open(file_path, 'r', encoding='utf-8') as file:
+            info = json.load(file)
+            if 'vocabulary' not in info or 'idf_values' not in info or 'token2ind' not in info:
+                return False
+            self._vocabulary = info['vocabulary']
+            self._idf_values = info['idf_values']
+            self._token2ind = info['token2ind']
+        return True
 
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
         """
@@ -358,6 +384,11 @@ class BasicSearchEngine:
         Returns:
             bool: returns True if save was done correctly, False in another cases
         """
+        if not file_path or not isinstance(file_path, str):
+            return False
+        with open(file_path, 'w', encoding='utf-8') as file:
+            json.dump({'engine': self._dump_documents()}, file)
+        return True
 
     def load(self, file_path: str) -> bool:
         """
@@ -369,6 +400,15 @@ class BasicSearchEngine:
         Returns:
             bool: True if engine was loaded, False in other cases
         """
+        if not file_path or not isinstance(file_path, str):
+            return False
+        with open(file_path, 'r', encoding='utf-8') as file:
+            info = json.load(file)
+            if 'engine' not in info:
+                return False
+            self._documents = info['engine']['documents']
+            self._document_vectors = info['engine']['document_vectors']
+        return True
 
     def retrieve_vectorized(self, query_vector: Vector) -> str | None:
         """
@@ -382,8 +422,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not query_vector:
+        if not query_vector or not isinstance(query_vector, tuple):
             return None
+        for vector in self._document_vectors:
+            if len(vector) < len(query_vector):
+                return None
         document_number = self._calculate_knn(query_vector, self._document_vectors, 1)
         if not document_number:
             return None
@@ -439,6 +482,7 @@ class BasicSearchEngine:
         Returns:
             dict: document and document_vectors states
         """
+        return {'documents': self._documents, 'document_vectors': [save_vector(vector) for vector in self._document_vectors]}
 
     def _load_documents(self, state: dict) -> bool:
         """
@@ -450,6 +494,13 @@ class BasicSearchEngine:
         Returns:
             bool: True if documents were loaded, False in other cases
         """
+        if not state or not isinstance(state, dict):
+            return False
+        self._documents = state['documents']
+        self._document_vectors = [load_vector(vector) for vector in state['document_vectors']]
+        if not self._documents or not self._document_vectors:
+            return False
+        return True
 
 
 class Node(NodeLike):
@@ -553,8 +604,6 @@ class NaiveKDTree:
                         parent.right_node = median_dot_node
                 new_left_space = [space[0][:median_index], depth + 1, median_dot_node, True, dimensions]
                 new_right_space = [space[0][median_index + 1:], depth + 1, median_dot_node, False, dimensions]
-                # space_condition.append(new_left_space)
-                # space_condition.append(new_right_space)
                 space_condition.insert(ind + 1, new_left_space)
                 space_condition.insert(ind + 2, new_right_space)
             return True
@@ -621,7 +670,7 @@ class NaiveKDTree:
                     return None
                 if not pair[0].left_node and not pair[0].right_node:
                     nearest_neighbors.append((calculate_distance(vector, pair[0].vector), pair[0].payload))
-                axis = pair[-1] % len(pair[0].vector)
+                axis = pair[1] % len(pair[0].vector)
                 if vector[axis] < pair[0].vector[axis]:
                     if pair[0].left_node is not None:
                         nodes.append((pair[0].left_node, pair[-1] + 1))
@@ -649,6 +698,34 @@ class KDTree(NaiveKDTree):
 
         In case of corrupt input arguments, None is returned.
         """
+        if not vector or not isinstance(k, int) or not isinstance(vector, tuple):
+            return None
+        nodes = [(self._root, 0)]
+        nearest_neighbors = []
+        while nodes:
+            for node in nodes:
+                pair = nodes.pop(0)
+                if not pair[0]:
+                    return None
+                if not pair[0].left_node and not pair[0].right_node:
+                    nearest_neighbors.append((calculate_distance(vector, pair[0].vector), pair[0].payload))
+                axis = pair[1] % len(pair[0].vector)
+                if vector[axis] < pair[0].vector[axis]:
+                    if pair[0].left_node is not None:
+                        nodes.append((pair[0].left_node, pair[-1] + 1))
+                else:
+                    if pair[0].right_node is not None:
+                        nodes.append((pair[0].right_node, pair[-1] + 1))
+                n = max(sorted([neighbour[0] for neighbour in nearest_neighbors]))
+                if (vector[axis] - pair[0].vector[axis]) ** 2 < n:
+                    if pair[0].left_node is not None:
+                        nodes.append((pair[0].right_node, pair[-1] + 1))
+                    else:
+                        if pair[0].right_node is not None:
+                            nodes.append((pair[0].left_node, pair[-1] + 1))
+        while len(nearest_neighbors) > k:
+            nearest_neighbors.remove(sorted(nearest_neighbors, reverse=True, key=lambda x: x[0])[0])
+        return nearest_neighbors
 
 
 class SearchEngine(BasicSearchEngine):
@@ -707,16 +784,12 @@ class SearchEngine(BasicSearchEngine):
                 or isinstance(n_neighbours, bool)):
             return None
         query_vector = self._index_document(query)
-        if not query_vector:
+        if not query_vector or not self._tree.query(query_vector):
             return None
-        return self._tree.query(query_vector)
-        # knn_list = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        # if not knn_list:
-        #     return None
-        # result = []
-        # for tup in knn_list:
-        #     result.append((tup[-1], self._documents[tup[0]]))
-        # return result
+        result = []
+        for neighbour in self._tree.query(query_vector):
+            result.append((neighbour[0], self._documents[neighbour[1]]))
+        return result
 
     def save(self, file_path: str) -> bool:
         """
@@ -756,3 +829,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)
+        self._tree = KDTree()

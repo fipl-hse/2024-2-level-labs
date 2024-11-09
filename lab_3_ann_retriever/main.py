@@ -58,7 +58,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     if not query_vector or not document_vector:
         return 0.0
 
-    return sqrt(sum((query_vector[i] - document_vector[i]) ** 2 for i in range(len(query_vector))))
+    return sqrt(sum((query_value - document_value) ** 2
+                    for query_value, document_value in zip(query_vector, document_vector)))
 
 
 def save_vector(vector: Vector) -> dict:
@@ -198,23 +199,12 @@ class Vectorizer:
         if not self._corpus:
             return False
 
-        self._vocabulary = []
+        vocabulary = set()
         for doc in self._corpus:
-            for token in doc:
-                if token is None:
-                    raise ValueError
-                if token not in self._vocabulary:
-                    self._vocabulary.append(token)
-        self._vocabulary.sort()
+            vocabulary |= set(doc)
+        self._vocabulary = sorted(list(vocabulary))
 
-        if self._vocabulary is None:
-            raise ValueError
-
-        self._token2ind = {}
-        for i in range(len(self._vocabulary)):
-            if self._vocabulary is None:
-                raise ValueError
-            self._token2ind[self._vocabulary[i]] = i
+        self._token2ind = {value: index for index, value in enumerate(self._vocabulary)}
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
         if self._idf_values is None:
@@ -261,7 +251,6 @@ class Vectorizer:
             if vector[self._token2ind[word]] != 0.0:
                 tokens.append(word)
         return tokens
-
 
     def save(self, file_path: str) -> bool:
         """
@@ -379,8 +368,7 @@ class BasicSearchEngine:
         if knn is None or not knn:
             return None
         relevant_docs = []
-        for pair in knn:
-            index, value = pair
+        for index, value in knn:
             relevant_docs.append((value, self._documents[index]))
         return relevant_docs
 
@@ -442,9 +430,9 @@ class BasicSearchEngine:
             return None
 
         distances = []
-        for i in range(len(document_vectors)):
-            distances.append((i, calculate_distance(query_vector, document_vectors[i])))
-        distances = sorted(distances, key=lambda t: t[1])
+        for index, value in enumerate(document_vectors):
+            distances.append((index, calculate_distance(query_vector, value)))
+        distances = sorted(distances, key=lambda tuple_: tuple_[1])
         return distances[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:

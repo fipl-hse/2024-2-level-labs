@@ -210,8 +210,9 @@ def calculate_bm25(
     """
     if not vocab or not document or not idf_document or not avg_doc_len or not doc_len:
         return None
-    if not isinstance(vocab, list) or not all(isinstance(term, str) for term in vocab) or not isinstance(
-            document, list) or not all(isinstance(token, str) for token in document):
+    if not isinstance(vocab, list) or not all(isinstance(
+            term, str) for term in vocab) or not isinstance(document, list) or not \
+            all(isinstance(token, str) for token in document):
         return None
     if len(vocab) == 0 or len(document) == 0:
         return None
@@ -262,6 +263,8 @@ def rank_documents(
         return None
     if not isinstance(query, str) or not isinstance(
             stopwords, list) or not all(isinstance(token, str) for token in stopwords):
+        return None
+    if tokenize(query) is None:
         return None
     if tokenize(query) is None:
         return None

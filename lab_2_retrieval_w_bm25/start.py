@@ -30,8 +30,8 @@ def main() -> None:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    processed_docs = []
     total_words_count = 0
+    processed_docs = []
 
     for doc in documents:
         tokens = tokenize(doc)
@@ -42,36 +42,31 @@ def main() -> None:
                 processed_docs.append(cleaned_doc)
                 print("Tokens after stopword removal:", cleaned_doc)
 
-        terms_list = build_vocabulary(processed_docs)
-        if terms_list:
-            idf = calculate_idf(terms_list, processed_docs)
-        idf = {}
+    token_list = build_vocabulary(processed_docs)
+    idf = calculate_idf(token_list, processed_docs) if token_list else {}
+    tf_idf_scores = []
+    bm25_scores = []
+    avg_doc_length = total_words_count / len(documents) if documents else 1
 
-        tf_idf_scores = []
-        bm25_scores = []
-        avg_doc_length = total_words_count / len(documents)
+    for processed_doc in processed_docs:
+        if not token_list or not idf:
+            continue
 
-        if idf:
-            for processed_doc in processed_docs:
-                if isinstance(processed_doc, list) and terms_list:
-                    term_frequency = calculate_tf(terms_list, processed_doc)
-                    current_doc_length = len(processed_doc)
+        token_frequency = calculate_tf(token_list, processed_doc)
+        current_doc_length = len(processed_doc)
 
-                    if term_frequency:
-                        tf_idf_values = calculate_tf_idf(term_frequency, idf)
-                        if tf_idf_values:
-                            tf_idf_scores.append(tf_idf_values)
-                            print("TF-IDF scores for this document:", tf_idf_values)
+        if token_frequency:
+            tf_idf_values = calculate_tf_idf(token_frequency, idf)
+            if tf_idf_values:
+                tf_idf_scores.append(tf_idf_values)
+                print(tf_idf_values)
 
-                    bm25_score = calculate_bm25(terms_list, processed_doc, idf, 1.5, 0.75
-                                                , avg_doc_length, current_doc_length)
+        bm25_score = calculate_bm25(token_list, processed_doc, idf, 1.5, 0.75, avg_doc_length, current_doc_length)
+        if bm25_score:
+            bm25_scores.append(bm25_score)
 
-                    if bm25_score:
-                        bm25_scores.append(bm25_score)
-
-        print(rank_documents(tf_idf_scores, 'Which fairy tale has Fairy Queen?', stopwords))
-
-        print(rank_documents(bm25_scores, 'Which fairy tale has Fairy Queen?', stopwords))
+    print(rank_documents(tf_idf_scores, 'Which fairy tale has Fairy Queen?', stopwords))
+    print(rank_documents(bm25_scores, 'Which fairy tale has Fairy Queen?', stopwords))
 
     result = 'result'
     assert result, "Result is None"

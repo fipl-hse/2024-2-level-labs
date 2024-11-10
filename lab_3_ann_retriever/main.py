@@ -137,7 +137,11 @@ class Tokenizer:
 
         for document in documents:
             tokenized_document = self.tokenize(document)
+            if tokenized_document is None:
+                return None
             document_without_stopwords = self._remove_stop_words(tokenized_document)
+            if document_without_stopwords is None:
+                return None
             tokenized_documents.append(document_without_stopwords)
 
         return tokenized_documents

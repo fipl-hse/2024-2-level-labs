@@ -127,7 +127,7 @@ class Tokenizer:
             return None
         for token in text:
             if not token.isalpha():
-                text = text.replace(token, " ")
+                text = text.replace(token, ' ')
         return self._remove_stop_words(text.lower().split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
@@ -257,7 +257,9 @@ class Vectorizer:
         if not file_path or not isinstance(file_path, str):
             return False
         with open(file_path, 'w', encoding='utf-8') as file:
-            json.dump({'vocabulary': self._vocabulary, 'idf_values': self._idf_values, 'token2ind': self._token2ind}, file)
+            json.dump({'vocabulary': self._vocabulary,
+                       'idf_values': self._idf_values,
+                       'token2ind': self._token2ind}, file)
         return True
 
     def load(self, file_path: str) -> bool:
@@ -275,12 +277,12 @@ class Vectorizer:
         if not file_path or not isinstance(file_path, str):
             return False
         with open(file_path, 'r', encoding='utf-8') as file:
-            info = json.load(file)
-            if 'vocabulary' not in info or 'idf_values' not in info or 'token2ind' not in info:
+            data = json.load(file)
+            if 'vocabulary' not in data or 'idf_values' not in data or 'token2ind' not in data:
                 return False
-            self._vocabulary = info['vocabulary']
-            self._idf_values = info['idf_values']
-            self._token2ind = info['token2ind']
+            self._vocabulary = data['vocabulary']
+            self._idf_values = data['idf_values']
+            self._token2ind = data['token2ind']
         return True
 
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
@@ -298,8 +300,7 @@ class Vectorizer:
         if not document or not isinstance(document, list):
             return None
         vector_list = [0.0 * n for n in range(len(self._vocabulary))]
-        unique_words = list(set(self._vocabulary))
-        tf_dict = {token: document.count(token) / len(document) for token in unique_words}
+        tf_dict = {token: document.count(token) / len(document) for token in self._vocabulary}
         for ind, word in enumerate(self._vocabulary):
             vector_list[ind] = tf_dict[word] * self._idf_values[word]
         return tuple(vector_list)
@@ -372,7 +373,7 @@ class BasicSearchEngine:
             return None
         result = []
         for tup in knn_list:
-            result.append((tup[-1], self._documents[tup[0]]))
+            result.append((tup[1], self._documents[tup[0]]))
         return result
 
     def save(self, file_path: str) -> bool:
@@ -404,9 +405,9 @@ class BasicSearchEngine:
         if not file_path or not isinstance(file_path, str):
             return False
         with open(file_path, 'r', encoding='utf-8') as file:
-            info = json.load(file)
-            self._load_documents(info)
-            if not self._load_documents(info):
+            data = json.load(file)
+            self._load_documents(data)
+            if not self._load_documents(data):
                 return False
         return True
 
@@ -453,7 +454,7 @@ class BasicSearchEngine:
             return None
         sorted_vectors = [(document_vectors.index(document_vector), calculate_distance(query_vector, document_vector))
                           for document_vector in document_vectors]
-        sorted_vectors.sort(key=lambda x: x[-1])
+        sorted_vectors.sort(key=lambda x: x[1])
         return [sorted_vectors[ind] for ind in range(0, n_neighbours)]
 
     def _index_document(self, document: str) -> Vector | None:
@@ -504,7 +505,7 @@ class BasicSearchEngine:
         if not state['engine']['documents'] or not state['engine']['document_vectors']:
             return False
         self._documents = state['engine']['documents']
-        self._document_vectors = [load_vector(vector) for vector in state['engine']['document_vectors']]
+        self._document_vectors = [load_vector(doc_vector) for doc_vector in state['engine']['document_vectors']]
         if not self._documents or not self._document_vectors:
             return False
         return True
@@ -866,12 +867,12 @@ class SearchEngine(BasicSearchEngine):
         if not file_path or not isinstance(file_path, str):
             return False
         with (open(file_path, 'r', encoding='utf-8') as file):
-            info = json.load(file)
-            if ('engine' not in info or 'tree' not in info['engine']
-                    or 'documents' not in info['engine'] or 'document_vectors' not in info['engine']):
+            data = json.load(file)
+            if ('engine' not in data or 'tree' not in data['engine']
+                    or 'documents' not in data['engine'] or 'document_vectors' not in data['engine']):
                 return False
-            self._load_documents(info)
-            self._tree.load(info['engine']['tree'])
+            self._load_documents(data)
+            self._tree.load(data['engine']['tree'])
         return True
 
 

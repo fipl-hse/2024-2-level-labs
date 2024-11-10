@@ -316,6 +316,17 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
+        if (not documents or not isinstance(documents, list) or
+                not all(isinstance(doc, str) for doc in documents)):
+            return False
+
+        for doc in documents:
+            indexed_doc = self._index_document(doc)
+            if not indexed_doc:
+                return False
+            self._documents.append(doc)
+            self._document_vectors.append(indexed_doc)
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -332,6 +343,19 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not isinstance(n_neighbours, int):
+            return None
+
+        tokenized_query = self._tokenizer.tokenize(query)
+        vectorized_query = self._vectorizer.vectorize(tokenized_query)
+        nearest_neighbours = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
+        relevant_documents = []
+        for nearest_neighbour in nearest_neighbours:
+            document_index = nearest_neighbour[0]
+            document_distance = nearest_neighbour[1]
+            text = self._documents[document_index]
+            relevant_documents.append((document_distance, text))
+        return relevant_documents
 
     def save(self, file_path: str) -> bool:
         """
@@ -384,6 +408,20 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not isinstance(document_vectors, list) or
+                not isinstance(n_neighbours, int)):
+            return None
+
+        neighbours = []
+        for document_vector in document_vectors:
+            document_distance = calculate_distance(query_vector, document_vector)
+            if not document_distance:
+                return None
+            neighbours.append((document_vector.index(document_vectors), document_distance))
+
+        nearest_neighbours = neighbours[0:n_neighbours]
+        nearest_neighbours = sorted(nearest_neighbours, reverse=True, key=lambda tuple_: tuple_[1])
+        return nearest_neighbours
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -397,6 +435,12 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document, str):
+            return None
+
+        tokenized_document = self._tokenizer.tokenize(document)
+        doc_vector = self._vectorizer.vectorize(tokenized_document)
+        return doc_vector
 
     def _dump_documents(self) -> dict:
         """

@@ -59,6 +59,9 @@ def main() -> None:
         doc_dist.append(dist)
 
     knn_retriever = m.BasicSearchEngine(vectorizer, tokenizer)
+    knn_retriever.index_documents(docs)
+    knn_retriever.retrieve_relevant_documents("Мои кот и собака не дружат!", 2)
+
     result = (tokenizer, vectorizer)
     assert result, "Result is None"
 

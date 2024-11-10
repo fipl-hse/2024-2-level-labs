@@ -321,6 +321,16 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(documents, list) or not all(isinstance(doc, str) for doc in documents):
+            return False
+        self._documents = documents
+        if not self._documents:
+            return False
+        for document in self._documents:
+            self._document_vectors.append(self._index_document(document))
+        if not self._document_vectors:
+            return False
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -389,6 +399,13 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if query_vector is None or not document_vectors:
+            return None
+        knn = []
+        for i, doc in enumerate(document_vectors):
+            knn.append((i, calculate_distance(query_vector, doc)))
+        sorted(knn, key=lambda x: x[1])
+        return knn[:n_neighbours+1]
 
     def _index_document(self, document: str) -> Vector | None:
         """

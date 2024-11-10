@@ -7,7 +7,6 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 from lab_2_retrieval_w_bm25.main import (calculate_tf_idf, calculate_idf, calculate_tf)
-import json
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -182,6 +181,7 @@ class Vectorizer:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
         self._corpus = corpus
+        self.build()
 
     def build(self) -> bool:
         """
@@ -225,14 +225,11 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
         if (not isinstance(tokenized_document, list)
-                or not all(isinstance(token, str) for token in tokenized_document)):
+                or not all(isinstance(token, str) for token in tokenized_document)
+                or not tokenized_document):
             return None
-        for item in self._calculate_tf_idf(tokenized_document):
-            if not isinstance(item, float):
-                return None
 
         return self._calculate_tf_idf(tokenized_document)
-
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -246,6 +243,18 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if len(vector) != len(self._idf_values):
+            return None
+
+        tokens_from_vector = []
+        it_is_already_used = []
+        for every_float in vector:
+            for key_word, value_float in self._idf_values.items():
+                if value_float == every_float and key_word not in it_is_already_used:
+                    tokens_from_vector.append(key_word)
+                    it_is_already_used.append(key_word)
+
+        return tokens_from_vector
 
     def save(self, file_path: str) -> bool:
         """
@@ -283,10 +292,15 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        vector = [0.0 for _ in range(len(self._vocabulary))]
+        if (not isinstance(document, list)
+                or not all(isinstance(token, str) for token in document)
+                or not document):
+            return None
+
+        vector = [0.0 for _ in self._vocabulary]
 
         tf_idf = calculate_tf_idf(calculate_tf(self._vocabulary, document), self._idf_values)
-        for word in tf_idf:
+        for word in tf_idf.keys():
             vector.pop(self._token2ind[word])
             vector.insert(self._token2ind[word], tf_idf[word])
         vector = tuple(vector)

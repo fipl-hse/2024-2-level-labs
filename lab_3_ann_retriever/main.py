@@ -5,8 +5,10 @@ Vector search with text retrieving
 """
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
+
 from typing import Protocol
-from lab_2_retrieval_w_bm25.main import (calculate_tf_idf, calculate_idf, calculate_tf)
+
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf, calculate_tf_idf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -190,7 +192,8 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        if not self._corpus:
+        if (not self._corpus
+                or not all(isinstance(sublist, list) for sublist in self._corpus)):
             return False
 
         self._vocabulary = []

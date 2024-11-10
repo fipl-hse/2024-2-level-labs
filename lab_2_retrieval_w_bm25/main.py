@@ -4,7 +4,7 @@ Lab 2.
 Text retrieval with BM25
 """
 import math
-import re
+
 # pylint:disable=too-many-arguments, unused-argument
 
 
@@ -22,7 +22,10 @@ def tokenize(text: str) -> list[str] | None:
     """
     if not isinstance(text, str):
         return None
-    return re.findall(r'\b[^\d\W]+\b', text.lower())
+    for token in text:
+        if not token.isalpha() and token != ' ':
+            text = text.replace(token, ' ')
+    return text.lower().split()
 
 
 def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | None:
@@ -147,9 +150,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
                 contains_word += 1
         idf = math.log((len(documents) - contains_word + 0.5) / (contains_word + 0.5))
         idf_values[token] = idf
-
     return idf_values
-
 
 
 def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, float] | None:
@@ -211,7 +212,7 @@ def calculate_bm25(
         return None
     if not isinstance(vocab, list) or not all(isinstance(term, str) for term in vocab) or not isinstance(document, list) or not all(isinstance(token, str) for token in document):
         return None
-    if  len(vocab) == 0 or len(document) == 0:
+    if len(vocab) == 0 or len(document) == 0:
         return None
     if not isinstance(idf_document, dict) or len(idf_document) == 0 or any(
             not isinstance(term, str) or not isinstance(

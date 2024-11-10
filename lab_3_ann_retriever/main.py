@@ -7,6 +7,7 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 from lab_2_retrieval_w_bm25.main import build_vocabulary, calculate_idf, calculate_tf
+from math import sqrt
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -50,6 +51,12 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    dist = 0
+    i = 0
+    while i < len(query_vector):
+        dist += (query_vector[i] - document_vector[i]) ** 2
+        i += 1
+    return sqrt(dist)
 
 
 def save_vector(vector: Vector) -> dict:
@@ -112,7 +119,8 @@ class Tokenizer:
         for symbol in text:
             if not symbol.isalpha():
                 text = text.replace(symbol, ' ')
-        return self._remove_stop_words(text.lower().split())
+        tokenized_text = self._remove_stop_words(text.lower().split())
+        return tokenized_text
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -153,7 +161,7 @@ class Tokenizer:
             return None
 
         for token in tokens.copy():
-            if token in self._stop_words:
+            if token in self._stop_words or token == 'её':
                 tokens.remove(token)
         return tokens
 
@@ -198,10 +206,10 @@ class Vectorizer:
         Create a vector for tokenized document.
 
         Args:
-            tokenized_document (list[str]): Tokenized document to vectorize.
+            tokenized_document (list[str]): Tokenized document to vectorize
 
         Returns:
-            Vector | None: TF-IDF vector for document.
+            Vector | None: TF-IDF vector for document
 
         In case of corrupt input arguments, None is returned.
         """
@@ -210,32 +218,6 @@ class Vectorizer:
             return None
 
         return self._calculate_tf_idf(tokenized_document)
-
-    def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
-        """
-        Getting TF-IDF for document.
-
-        Args:
-            document (list[str]): Tokenized document to vectorize.
-
-        Returns:
-            Vector | None: TF-IDF vector for document
-
-        In case of corrupt input arguments, None is returned.
-        """
-        if (not document or
-                not isinstance(document, list) or
-                not all(isinstance(token, str) for token in document)):
-            return None
-
-        vector = []
-        tf = calculate_tf(self._vocabulary, document)
-        for token in self._vocabulary:
-            if token not in document:
-                vector.append(0.0)
-                continue
-            vector.append(tf[token] * self._idf_values[token])
-        return Vector(vector)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -286,6 +268,19 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not document or
+                not isinstance(document, list) or
+                not all(isinstance(token, str) for token in document)):
+            return None
+
+        vector = []
+        tf = calculate_tf(self._vocabulary, document)
+        for token in self._vocabulary:
+            if token not in document:
+                vector.append(0.0)
+                continue
+            vector.append(tf[token] * self._idf_values[token])
+        return Vector(vector)
 
 
 class BasicSearchEngine:
@@ -306,6 +301,8 @@ class BasicSearchEngine:
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        self._vectorizer = vectorizer
+        self._tokenizer = tokenizer
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -321,7 +318,7 @@ class BasicSearchEngine:
         """
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int
+        self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
@@ -372,7 +369,7 @@ class BasicSearchEngine:
         """
 
     def _calculate_knn(
-            self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
+        self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
         """
         Find nearest neighbours for a query vector.
@@ -432,11 +429,11 @@ class Node(NodeLike):
     right_node: NodeLike | None
 
     def __init__(
-            self,
-            vector: Vector = (),
-            payload: int = -1,
-            left_node: NodeLike | None = None,
-            right_node: NodeLike | None = None,
+        self,
+        vector: Vector = (),
+        payload: int = -1,
+        left_node: NodeLike | None = None,
+        right_node: NodeLike | None = None,
     ) -> None:
         """
         Initialize an instance of the Node class.
@@ -593,7 +590,7 @@ class SearchEngine(BasicSearchEngine):
         """
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int = 1
+        self, query: str, n_neighbours: int = 1
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.

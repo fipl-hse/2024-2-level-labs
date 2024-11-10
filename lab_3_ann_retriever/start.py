@@ -32,16 +32,33 @@ def main() -> None:
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     tuple_file = open_files()
-    stopwords = tuple_file[1]
-    tokenizer = m.Tokenizer(stopwords)
     docs = tuple_file[0]
     doc = docs[0]
+    stopwords = tuple_file[1]
+
+    tokenizer = m.Tokenizer(stopwords)
+
     tokenized_doc = tokenizer.tokenize(doc)
+    if not tokenized_doc:
+        return None
     print(tokenized_doc)
+
     tokenized_docs = tokenizer.tokenize_documents(docs)
+    if not tokenized_docs:
+        return None
     print(tokenized_docs)
+
     vectorizer = m.Vectorizer(tokenized_docs)
     vectorizer.build()
+
+    query_vector = vectorizer.vectorize(tokenized_doc)
+    doc_dist = []
+    for doc in tokenized_docs:
+        doc_vector = vectorizer.vectorize(doc)
+        dist = m.calculate_distance(query_vector, doc_vector)
+        doc_dist.append(dist)
+
+    knn_retriever = m.BasicSearchEngine(vectorizer, tokenizer)
     result = (tokenizer, vectorizer)
     assert result, "Result is None"
 

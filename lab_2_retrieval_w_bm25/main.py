@@ -267,14 +267,15 @@ def rank_documents(
     if not tokenize(query):
         return None
     doc_scores = []
-    if isinstance(tokenize(query), list) and all(isinstance(
-            token, str) for token in tokenize(query)) and tokenize(query) is not None:
-        query_tokens = remove_stopwords(tokenize(query), stopwords)
-        if query_tokens is None:
-            return None
-        for doc_idx, doc in enumerate(indexes):
-            score = sum(doc.get(token, 0) for token in query_tokens)
-            doc_scores.append((doc_idx, score))
+    tokenized_query = tokenize(query)
+    if tokenized_query is None:
+        return None
+    query_tokens = remove_stopwords(tokenized_query, stopwords)
+    if query_tokens is None:
+        return None
+    for doc_idx, doc in enumerate(indexes):
+        score = sum(doc.get(token, 0) for token in query_tokens)
+        doc_scores.append((doc_idx, score))
     return sorted(doc_scores, key=lambda x: x[1], reverse=True)
 
 

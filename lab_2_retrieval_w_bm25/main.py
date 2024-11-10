@@ -114,7 +114,7 @@ def calculate_tf(vocab: list[str], document_tokens: list[str]) -> dict[str, floa
         return {token: 0.0 for token in vocab}
 
     return {token: count / total_tokens for token, count in tf_dict.items()} if len(
-        document_tokens) > 0 else 0.0
+        document_tokens) > 0 else None
 
 
 def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, float] | None:
@@ -210,7 +210,8 @@ def calculate_bm25(
     """
     if not vocab or not document or not idf_document or not avg_doc_len or not doc_len:
         return None
-    if not isinstance(vocab, list) or not all(isinstance(term, str) for term in vocab) or not isinstance(document, list) or not all(isinstance(token, str) for token in document):
+    if not isinstance(vocab, list) or not all(isinstance(term, str) for term in vocab) or not isinstance(
+            document, list) or not all(isinstance(token, str) for token in document):
         return None
     if len(vocab) == 0 or len(document) == 0:
         return None

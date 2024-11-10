@@ -4,6 +4,7 @@ Laboratory Work #2 starter
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25, calculate_idf,
                                          calculate_tf, calculate_tf_idf, rank_documents,
                                          remove_stopwords, tokenize)
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
 
 
@@ -44,8 +45,7 @@ def main() -> None:
         terms_list = build_vocabulary(processed_docs)
         if terms_list:
             idf = calculate_idf(terms_list, processed_docs)
-        else:
-            idf = {}
+        idf = {}
 
         tf_idf_scores = []
         bm25_scores = []
@@ -63,9 +63,8 @@ def main() -> None:
                             tf_idf_scores.append(tf_idf_values)
                             print("TF-IDF scores for this document:", tf_idf_values)
 
-                    bm25_score = calculate_bm25(
-                        terms_list, processed_doc, idf, 1.5, 0.75, avg_doc_length, current_doc_length
-                    )
+                    bm25_score = calculate_bm25(terms_list, processed_doc, idf, 1.5, 0.75
+                                                , avg_doc_length, current_doc_length)
 
                     if bm25_score:
                         bm25_scores.append(bm25_score)

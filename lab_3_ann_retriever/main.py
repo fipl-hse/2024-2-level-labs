@@ -129,7 +129,8 @@ class Tokenizer:
         In case of corrupt input arguments, None is returned.
         """
 
-        if not isinstance(documents, list) or not all(isinstance(document, str) for document in documents):
+        if not isinstance(documents, list) or not all(isinstance(document, str) for document in documents) \
+                or not documents:
             return None
 
         tokenized_documents = []
@@ -154,7 +155,7 @@ class Tokenizer:
         In case of corrupt input arguments, None is returned.
         """
 
-        if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens):
+        if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or not tokens:
             return None
 
         clear_text = []

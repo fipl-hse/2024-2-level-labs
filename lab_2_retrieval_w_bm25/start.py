@@ -61,7 +61,8 @@ def main() -> None:
                 tf_idf_scores.append(tf_idf_values)
                 print(tf_idf_values)
 
-        bm25_score = calculate_bm25(token_list, processed_doc, idf, 1.5, 0.75, avg_doc_length, current_doc_length)
+        bm25_score = calculate_bm25(token_list, processed_doc, idf,
+                                    1.5, 0.75, avg_doc_length, current_doc_length)
         if bm25_score:
             bm25_scores.append(bm25_score)
 

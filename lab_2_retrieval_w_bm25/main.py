@@ -264,10 +264,12 @@ def rank_documents(
     if not isinstance(query, str) or not isinstance(
             stopwords, list) or not all(isinstance(token, str) for token in stopwords):
         return None
-    if tokenize(query) is None:
+    if not tokenize(query):
         return None
-    if tokenize(query) is None:
+    tokenized_query = tokenize(query)
+    if tokenized_query is None:
         return None
+    assert tokenized_query is not None
     query_tokens = remove_stopwords(tokenize(query), stopwords)
     if query_tokens is None:
         return None

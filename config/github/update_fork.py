@@ -41,8 +41,8 @@ class RemoteBranches(Enum):
     """
     Remote branches.
     """
-    ORIGIN = "upstream/main"
-    UPSTREAM = "origin/main"
+    UPSTREAM = "upstream/main"
+    ORIGIN = "origin/main"
 
 
 def create_fork_url_with_auth(fork_url: str, authentication_token: str) -> str:
@@ -329,10 +329,8 @@ def main(
 
         stdout, stderr, exit_code = git_status(fork_path=fork_path)
         skip_commit_message = 'nothing to commit, working tree clean'
-        if skip_commit_message in stdout:
-            return
-
-        git_commit(fork_path, merge_commit_message)
+        if skip_commit_message not in stdout:
+            git_commit(fork_path, merge_commit_message)
         push_head_to_origin(fork_path)
 
 

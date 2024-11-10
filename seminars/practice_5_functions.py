@@ -1,5 +1,5 @@
 """
-Programming 2023
+Programming 2024
 Seminar 5
 
 
@@ -22,7 +22,7 @@ def function() -> None:
     """
     Sample function, prints a string when called
     """
-    print('Function is called!')
+    print("Function is called!")
 
 
 # Call a function
@@ -35,7 +35,7 @@ def return_hello_world() -> str:
     Function returns a string 'Hello world'
     :return: str
     """
-    return 'Hello world!'
+    return "Hello world!"
 
 
 RETURN_VALUE = return_hello_world()
@@ -47,7 +47,7 @@ def print_hello_world() -> None:
     Function prints a string 'Hello world'
     :return: None
     """
-    print('Hello world!')
+    print("Hello world!")
 
 
 # RETURN_VALUE = print_hello_world()
@@ -59,7 +59,7 @@ def function_with_two_arguments(arg1: int, arg2: int) -> None:
     """
     Receives and prints 2 arguments
     """
-    print(f'I received two arguments: {arg1} and {arg2}')
+    print(f"I received two arguments: {arg1} and {arg2}")
 
 
 # fail: TypeError: function_with_two_arguments() missing 1 required positional argument: 'arg2'
@@ -73,15 +73,15 @@ function_with_two_arguments(1, 2)
 
 
 # Default arguments may or may not be passed
-def print_all_arguments(arg1: str, arg2: str, arg3: str = 'Argument 3') -> None:
+def print_all_arguments(arg1: str, arg2: str, arg3: str = "Argument 3") -> None:
     """
     Receives 2 or 3 arguments, prints 3 arguments
     """
-    print(f'I received these arguments: {arg1, arg2, arg3}')
+    print(f"I received these arguments: {arg1, arg2, arg3}")
 
 
-print_all_arguments('Argument 1', 'Argument 2')
-print_all_arguments('Argument 1', 'Argument 2', 'Argument 4')
+print_all_arguments("Argument 1", "Argument 2")
+print_all_arguments("Argument 1", "Argument 2", "Argument 4")
 
 
 # Positional vs Keyword arguments
@@ -89,12 +89,12 @@ def who_loves_whom(who: str, whom: str) -> None:
     """
     Receives two arguments, order is critical!
     """
-    print(f'{who} loves {whom}')
+    print(f"{who} loves {whom}")
 
 
-who_loves_whom('mother', 'daughter')  # mother loves daughter
+who_loves_whom("mother", "daughter")  # mother loves daughter
 
-who_loves_whom(whom='mother', who='daughter')  # daughter loves mother
+who_loves_whom(whom="mother", who="daughter")  # daughter loves mother
 
 
 # Local variables vs global variables
@@ -102,16 +102,16 @@ def knowing_function(local_variable: str) -> None:
     """
     Prints both local and global variables
     """
-    print(f'I know the following variables: {local_variable}, {GLOBAL_VARIABLE}')
+    print(f"I know the following variables: {local_variable}, {GLOBAL_VARIABLE}")
 
 
-GLOBAL_VARIABLE = 'global variable'
+GLOBAL_VARIABLE = "global variable"
 
 # success: 'I know the following variables: local_variable, global variable'
-knowing_function('local_variable')
+knowing_function("local_variable")
 
 
-print('*' * 15 + ' TASKS ' + '*' * 15)
+print("*" * 15 + " TASKS " + "*" * 15)
 
 
 # Task 1:

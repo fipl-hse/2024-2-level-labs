@@ -4,6 +4,7 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
+from main import Tokenizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -32,6 +33,15 @@ def main() -> None:
         text = text_file.read()
     result = None
     assert result, "Result is None"
+
+    stopwords = open_files()[1]
+    tokenizer = Tokenizer(stopwords)
+
+    doc = 'Был снят сюжет о многодетной семье...'
+    tokenized_doc = tokenizer.tokenize(doc)
+
+    docs = ['Был снят сюжет...',  'о многодетной семье...']
+    tokenized_docs = tokenizer.tokenize_documents(docs)
 
 
 if __name__ == "__main__":

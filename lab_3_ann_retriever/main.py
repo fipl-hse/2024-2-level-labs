@@ -91,6 +91,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -105,6 +106,14 @@ class Tokenizer:
         In case of corrupt input arguments, None is returned.
         """
 
+        if any((not isinstance(text, str), not text)):
+            return None
+
+        for sym in text:
+            if all((not sym.isalpha(), sym != ' ')):
+                text = text.replace(sym, ' ')
+        return self._remove_stop_words(text.lower().split())
+
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
         Tokenize the input documents.
@@ -118,6 +127,25 @@ class Tokenizer:
         In case of corrupt input arguments, None is returned.
         """
 
+        if (not isinstance(documents, list) or not documents or
+                not all(isinstance(document, str) for document in documents)):
+            return None
+
+        tokenized_docs = []
+
+        for doc in documents:
+            tok_doc = self.tokenize(doc)
+            if not tok_doc:
+                return None
+            clean_doc = self._remove_stop_words(tok_doc)
+            if not clean_doc:
+                return None
+            tokenized_docs.append(clean_doc)
+
+        return tokenized_docs
+
+
+
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
         Remove stopwords from the list of tokens.
@@ -130,7 +158,11 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not isinstance(tokens, list) or not tokens
+                or not all(isinstance(token, str) for token in tokens)):
+            return None
 
+        return [word for word in tokens if word not in self._stop_words]
 
 class Vectorizer:
     """
@@ -255,7 +287,7 @@ class BasicSearchEngine:
         """
 
     def retrieve_relevant_documents(
-        self, query: str, n_neighbours: int
+            self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
@@ -306,7 +338,7 @@ class BasicSearchEngine:
         """
 
     def _calculate_knn(
-        self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
+            self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
         """
         Find nearest neighbours for a query vector.
@@ -366,11 +398,11 @@ class Node(NodeLike):
     right_node: NodeLike | None
 
     def __init__(
-        self,
-        vector: Vector = (),
-        payload: int = -1,
-        left_node: NodeLike | None = None,
-        right_node: NodeLike | None = None,
+            self,
+            vector: Vector = (),
+            payload: int = -1,
+            left_node: NodeLike | None = None,
+            right_node: NodeLike | None = None,
     ) -> None:
         """
         Initialize an instance of the Node class.
@@ -527,7 +559,7 @@ class SearchEngine(BasicSearchEngine):
         """
 
     def retrieve_relevant_documents(
-        self, query: str, n_neighbours: int = 1
+            self, query: str, n_neighbours: int = 1
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.

@@ -267,7 +267,7 @@ def rank_documents(
     if not tokenize(query):
         return None
     doc_scores = []
-    if tokenize(query):
+    if isinstance(tokenize(query), list) and all(isinstance(token, str) for token in tokenize(query)):
         query_tokens = remove_stopwords(tokenize(query), stopwords)
         if query_tokens is None:
             return None

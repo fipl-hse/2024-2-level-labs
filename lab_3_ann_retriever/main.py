@@ -6,6 +6,7 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -160,8 +161,7 @@ class Tokenizer:
         """
         if not (tokens and isinstance(tokens, list) and all(isinstance(elem, str) for elem in tokens)):
             return None
-        tokens_without_stopwords = [token for token in tokens if token not in self._stop_words]
-        return tokens_without_stopwords
+        return [token for token in tokens if token not in self._stop_words]
 
 
 class Vectorizer:
@@ -181,6 +181,10 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
+        self._corpus = corpus
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
 
     def build(self) -> bool:
         """
@@ -189,6 +193,14 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        if not self._corpus:
+            return False
+
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if not self._idf_values:
+            return False
+
+        return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """

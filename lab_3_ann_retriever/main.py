@@ -91,7 +91,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
-        self.stopwords = stop_words
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -157,12 +157,11 @@ class Tokenizer:
             if not isinstance(elem, str):
                 return None
 
-        tokens_cleared = []
-        for elem in tokens:
-            if elem in self._stop_words:
-                tokens_cleared.remove(elem)
+        for elem in self._stop_words:
+            if elem in tokens:
+                tokens.remove(elem)
 
-        return tokens_cleared
+        return tokens
 
 
 class Vectorizer:

@@ -347,6 +347,17 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        relevant_documents = []
+        vectorized_query = self._index_document(query)
+        if vectorized_query is None:
+            return None
+        self.index_documents(self._documents)
+        knn = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
+        if knn is None or not knn:
+            return None
+        for value in knn:
+            relevant_documents.append((value[1], self._documents[value[0]]))
+        return relevant_documents
 
     def save(self, file_path: str) -> bool:
         """

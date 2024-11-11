@@ -51,10 +51,10 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    if query_vector is None or document_vector is None:
+        return None
     if not query_vector or not document_vector:
-        return None
-    if len(query_vector) != len(document_vector):
-        return None
+        return 0.0
     sum_ = 0.0
     for ind, value in enumerate(query_vector):
         sum_ += (value - document_vector[ind]) ** 2
@@ -371,10 +371,7 @@ class BasicSearchEngine:
         knn_list = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
         if not knn_list:
             return None
-        result = []
-        for tup in knn_list:
-            result.append((tup[1], self._documents[tup[0]]))
-        return result
+        return [(tup[1], self._documents[tup[0]]) for tup in knn_list]
 
     def save(self, file_path: str) -> bool:
         """
@@ -611,31 +608,29 @@ class NaiveKDTree:
         """
         if not vectors:
             return False
-        depth = 0
-        parent = Node()
-        is_left = True
+        vectors_copy = vectors[:]
         dimensions = len(vectors[0])
-        space_condition = [[vectors, depth, parent, is_left, dimensions]]
+        space_condition = [[vectors, 0, Node(), True, dimensions]]
         while space_condition:
-            for ind, space in enumerate(space_condition):
+            for space in space_condition:
                 if not space[0]:
                     continue
-                axis = depth % dimensions
-                space[0].sort(key=lambda x: x[axis])
+                axis = space[1] % dimensions
+                space[0] = sorted(space[0], key=lambda x: x[axis])
                 median_index = len(space[0]) // 2
                 median_dot = space[0][median_index]
-                median_dot_node = Node(median_dot)
+                median_dot_node = Node(space[0][median_index], vectors_copy.index(median_dot))
                 if space[2].payload == -1:
                     self._root = median_dot_node
                 else:
                     if space[3]:
-                        parent.left_node = median_dot_node
+                        space[2].left_node = median_dot_node
                     else:
-                        parent.right_node = median_dot_node
-                new_left_space = [space[0][:median_index], depth + 1, median_dot_node, True, dimensions]
-                new_right_space = [space[0][median_index + 1:], depth + 1, median_dot_node, False, dimensions]
-                space_condition.insert(ind + 1, new_left_space)
-                space_condition.insert(ind + 2, new_right_space)
+                        space[2].right_node = median_dot_node
+                new_left_space = [space[0][:median_index], space[1] + 1, median_dot_node, True, dimensions]
+                new_right_space = [space[0][median_index + 1:], space[1] + 1, median_dot_node, False, dimensions]
+                space_condition.append(new_left_space)
+                space_condition.append(new_right_space)
             return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
@@ -711,7 +706,7 @@ class NaiveKDTree:
                 if not pair[0].left_node and not pair[0].right_node:
                     nearest_neighbors.append((calculate_distance(vector, pair[0].vector), pair[0].payload))
                 axis = pair[1] % len(pair[0].vector)
-                if vector[axis] < pair[0].vector[axis]:
+                if not vector[axis] > pair[0].vector[axis]:
                     if pair[0].left_node is not None:
                         nodes.append((pair[0].left_node, pair[-1] + 1))
                 else:
@@ -756,7 +751,12 @@ class KDTree(NaiveKDTree):
                 else:
                     if pair[0].right_node is not None:
                         nodes.append((pair[0].right_node, pair[-1] + 1))
-                n = max(sorted([neighbour[0] for neighbour in nearest_neighbors]))
+                if len(nearest_neighbors) > 1:
+                    n = max(sorted([neighbour[0] for neighbour in nearest_neighbors]))
+                elif len(nearest_neighbors) == 1:
+                    n = nearest_neighbors[0][0]
+                else:
+                    continue
                 if (vector[axis] - pair[0].vector[axis]) ** 2 < n:
                     if pair[0].left_node is not None:
                         nodes.append((pair[0].right_node, pair[-1] + 1))
@@ -826,10 +826,7 @@ class SearchEngine(BasicSearchEngine):
         query_vector = self._index_document(query)
         if not query_vector or not self._tree.query(query_vector):
             return None
-        result = []
-        for neighbour in self._tree.query(query_vector):
-            result.append((neighbour[0], self._documents[neighbour[1]]))
-        return result
+        return [(neighbour[0], self._documents[neighbour[1]]) for neighbour in self._tree.query(query_vector)]
 
     def save(self, file_path: str) -> bool:
         """

@@ -4,7 +4,9 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-from lab_3_ann_retriever.main import Tokenizer, Vectorizer, BasicSearchEngine, Node, NaiveKDTree, SearchEngine, KDTree
+
+from lab_3_ann_retriever.main import (AdvancedSearchEngine, BasicSearchEngine, KDTree, NaiveKDTree,
+                                      SearchEngine, Tokenizer, Vectorizer)
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -33,35 +35,31 @@ def main() -> None:
         text = text_file.read()
     secret_vector = tuple(float(item) for item in text.split(', '))
     result = ':('
-    query = 'русскому языку ЕГэ 11 классов'
+    query = 'Нижний Новгород'
     stopwords = open_files()[1]
     tokenizer = Tokenizer(stopwords)
-    # documents = open_files()[0]
-    documents = ['Векторы используются для поиска релевантного документа. Давайте научимся, как их создавать и использовать!', 'Мой кот Вектор по утрам приносит мне тапочки, а по вечерам мы гуляем с ним на шлейке во дворе. Вектор забавный и храбрый. Он не боится собак!', 'Котёнок, которого мы нашли во дворе, очень забавный и пушистый. По утрам я играю с ним в догонялки перед работой.', 'Моя собака думает, что её любимый плед — это кошка. Просто он очень пушистый и мягкий. Забавно наблюдать, как они спят вместе!']
+    documents = open_files()[0]
     tokenized_documents = tokenizer.tokenize_documents(documents)
+    print(tokenized_documents)
     vectorizer = Vectorizer(tokenized_documents)
     vectorizer.build()
     knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
     knn_retriever.index_documents(documents)
-    print(knn_retriever._document_vectors)
-    # print(knn_retriever.retrieve_relevant_documents("Мои кот и собака не дружат!", 2))
-    # print(vectorizer.vector2tokens(secret_vector))
-    # # print(knn_retriever.retrieve_vectorized(secret_vector))
-    # node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
-    # naive_tree = NaiveKDTree()
-    # vectors = knn_retriever._document_vectors
-    # naive_tree.build(vectors)
-    # query_vector = vectorizer.vectorize(tokenizer.tokenize(query))
-    # naive_tree.query(query_vector)
-    # naive_kdtree_retriever = SearchEngine(vectorizer, tokenizer)
-    # naive_kdtree_retriever.index_documents(documents)
-    # print(naive_kdtree_retriever.retrieve_relevant_documents(query))
-    # print(knn_retriever.retrieve_relevant_documents(query, 3))
-    # tree = KDTree()
-    # vs = [(0.0, 0.0, 0.094), (0.061, 0.121, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0, 0.0)]
-    # tree.build(vs)
-    # query_vector = (0.0, 0.0, 0.094)
-    # print(tree.query(query_vector, 4))
+    print(vectorizer.vector2tokens(secret_vector))
+    print(knn_retriever.retrieve_vectorized(secret_vector))
+    naive_tree = NaiveKDTree()
+    vectors = knn_retriever._document_vectors
+    naive_tree.build(vectors)
+    query_vector = vectorizer.vectorize(tokenizer.tokenize(query))
+    naive_tree.query(query_vector)
+    naive_kdtree_retriever = SearchEngine(vectorizer, tokenizer)
+    naive_kdtree_retriever.index_documents(documents)
+    print(naive_kdtree_retriever.retrieve_relevant_documents(query))
+    tree = KDTree()
+    tree.build(vectors)
+    kdtree_retriever = AdvancedSearchEngine(vectorizer, tokenizer)
+    kdtree_retriever.index_documents(documents)
+    print(kdtree_retriever.retrieve_relevant_documents(query, 3))
     assert result, "Result is None"
 
 

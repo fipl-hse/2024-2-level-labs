@@ -23,7 +23,6 @@ def open_files() -> tuple[list[str], list[str]]:
         stopwords = file.read().split("\n")
     return (documents, stopwords)
 
-
 def main() -> None:
     """
     Launch an implementation.

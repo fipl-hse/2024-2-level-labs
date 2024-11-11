@@ -190,15 +190,14 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        main_list = []
+        if not self._corpus:
+            return False
+        unique_words = set()
         for words in self._corpus:
-            for word in words:
-                if word not in main_list:
-                    main_list.append(word)
-        if main_list:
-            self._vocabulary = sorted(main_list)
+            unique_words.update(words)
+        if unique_words:
+            self._vocabulary = sorted(unique_words)
             self._token2ind = {token: ind for ind, token in enumerate(self._vocabulary)}
-
             self._idf_values = calculate_idf(self._vocabulary, self._corpus)
             return True
         return False
@@ -219,11 +218,9 @@ class Vectorizer:
         if not isinstance(tokenized_document, list) or not tokenized_document \
                 or not all(isinstance(word, str) for word in tokenized_document):
             return None
-        if not self._corpus:
-            return None
-
-        return self._calculate_tf_idf(tokenized_document)
-
+        if self._calculate_tf_idf(tokenized_document):
+            return self._calculate_tf_idf(tokenized_document)
+        return None
 
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
@@ -238,9 +235,19 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not vector:
+        if vector is None or not isinstance(vector, (list, tuple)):
+            return None
+        if len(vector) != len(self._token2ind):
             return None
 
+        index_to_token = {index: token for pair in self._token2ind for index, token in pair}
+        tokens = []
+        for index, value in enumerate(vector):
+            if value > 0:
+                token = index_to_token.get(index)
+                if token:
+                    tokens.append(token)
+        return tokens
 
 
     def save(self, file_path: str) -> bool:
@@ -281,16 +288,19 @@ class Vectorizer:
         """
         if not isinstance(document, list) or not(all(isinstance(i, str) for i in document)):
             return None
-        #заполнить нулями все??
-        dict_with_zero = {word: 0.0 for word in document}
+        dict_with_zero = dict.fromkeys(self._vocabulary, 0.0)
         tf = calculate_tf(self._vocabulary, document)
-        tf_idf = calculate_tf_idf(tf, self._idf_values)
-        if not tf or not tf_idf:
+        if tf is None:
             return None
+        tf_idf = calculate_tf_idf(tf, self._idf_values)
 
-        for key in dict_with_zero:
-            if key in tf_idf:
-                dict_with_zero[key] = tf_idf[key]
+        numbers = []
+        for token in dict_with_zero:
+            if token in tf_idf:
+                dict_with_zero[token] = tf_idf[token]
+        for key, value in dict_with_zero.items():
+            numbers.append(value)
+        return tuple(numbers)
 
 
 class BasicSearchEngine:
@@ -327,6 +337,20 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(documents, list) or not all(isinstance(doc, str) for doc in documents):
+            return False
+        self._documents = documents
+        list_with_vectorized_documents = []
+        for doc in documents:
+            vectorized_doc = self._index_document(doc)
+            if not vectorized_doc:
+                return False
+            list_with_vectorized_documents.append(vectorized_doc)
+        if list_with_vectorized_documents:
+            self._document_vectors = list_with_vectorized_documents
+            return True
+        return False
+
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -343,6 +367,21 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not isinstance(n_neighbours, int)\
+                or isinstance(n_neighbours, bool):
+            return None
+
+        vector = self._index_document(query)
+        if not vector:
+            return None
+        knn = self._calculate_knn(vector, self._document_vectors, n_neighbours)
+        if not knn:
+            return None
+        result = []
+        for tup in knn:
+            result.append((tup[-1], self._documents[tup[0]]))
+        return result
+
 
     def save(self, file_path: str) -> bool:
         """
@@ -378,6 +417,8 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        #retrieve = self._vectorizer.vector2tokens(query_vector)
+
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
@@ -395,6 +436,20 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not document_vectors or not query_vector or not n_neighbours:
+            return None
+        if (document_vectors is None or n_neighbours <= 0 or
+                n_neighbours > len(document_vectors) or not document_vectors or
+                any(not isinstance(doc, (list, tuple)) for doc in document_vectors)):
+            return None
+        list_of_values = []
+        for index, document_vector in enumerate(document_vectors):
+            distance = calculate_distance(query_vector, document_vector)
+            if distance is not None:
+                list_of_values.append((index, distance))
+        sorted_tuples = sorted(list_of_values, key=lambda number: number[1])
+        return sorted_tuples[:n_neighbours]
+
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -408,6 +463,12 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        tokenized_doc = self._tokenizer.tokenize(document)
+        if not tokenized_doc:
+            return None
+        vectorized_doc = self._vectorizer.vectorize(tokenized_doc)
+        return vectorized_doc
+
 
     def _dump_documents(self) -> dict:
         """
@@ -428,6 +489,76 @@ class BasicSearchEngine:
             bool: True if documents were loaded, False in other cases
         """
 
+vectorizer = Vectorizer([
+            [
+                "вектора",
+                "используются",
+                "поиска",
+                "релевантного",
+                "документа",
+                "давайте",
+                "научимся",
+                "создавать",
+                "использовать",
+            ],[
+                "кот",
+                "вектор",
+                "утрам",
+                "приносит",
+                "тапочки",
+                "вечерам",
+                "гуляем",
+                "шлейке",
+                "дворе",
+                "вектор",
+                "забавный",
+                "храбрый",
+                "боится",
+                "собак",
+            ],
+            [
+                "котёнок",
+                "которого",
+                "нашли",
+                "дворе",
+                "очень",
+                "забавный",
+                "пушистый",
+                "утрам",
+                "играю",
+                "догонялки",
+                "работой",
+            ],
+            [
+                "собака",
+                "думает",
+                "любимый",
+                "плед",
+                "это",
+                "кошка",
+                "просто",
+                "очень",
+                "пушистый",
+                "мягкий",
+                "забавно",
+                "наблюдать",
+                "спят",
+                "вместе"]])
+tokenizer = Tokenizer(['и', 'в', 'во', 'не', 'что', 'он', 'на', 'я', 'с', 'со',
+                       'как', 'а', 'то', 'все', 'она', 'так', 'его', 'но', 'да', 'ты', 'к', 'у', 'же',
+                       'вы', 'за', 'бы', 'по', 'только', 'ее', 'мне', 'было', 'вот',
+                       'от', 'меня', 'еще', 'нет', 'о', 'из', 'ему', 'теперь', 'когда',
+                       'даже', 'ну', 'вдруг', 'ли', 'если', 'уже', 'или', 'ни',
+                       'быть', 'был','него', 'до', 'вас', 'нибудь', 'опять', 'уж',
+                       'вам', 'ведь', 'там', 'потом', 'себя', 'ничего','ей', 'может',
+                       'они', 'тут', 'где', 'есть', 'надо', 'ней',  'для', 'мы', 'тебя',
+                       'их', 'чем', 'была', 'сам', 'чтоб', 'без', 'моя', 'это', 'очень', 'как'])
+a = BasicSearchEngine(vectorizer, tokenizer)
+print(a._index_document((
+            "Моя собака думает, что ее любимый плед - это кошка. "
+            "Просто он очень пушистый и мягкий. "
+            "Забавно наблюдать, как они спят вместе! "
+        )))
 
 class Node(NodeLike):
     """
@@ -654,3 +785,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+

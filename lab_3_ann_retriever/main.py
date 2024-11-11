@@ -227,9 +227,12 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if (not isinstance(tokenized_document, list) or
+        if (not tokenized_document or
+                not isinstance(tokenized_document, list) or
                 not all(isinstance(elem, str) for elem in tokenized_document)):
             return None
+
+        return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -243,6 +246,15 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if len(vector) != len(self._vocabulary):
+            return None
+
+        result_tok = []
+        for word in self._vocabulary:
+            if vector[self._token2ind[word]] != 0.0:
+                result_tok.append(word)
+
+        return result_tok
 
     def save(self, file_path: str) -> bool:
         """
@@ -280,9 +292,18 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(document, list) or not all(isinstance(elem, str) for elem in document):
+        if (not isinstance(document, list)
+                or not all(isinstance(elem, str) for elem in document)
+                or not document):
             return None
         vector_with_nulls = [0 for i in self._vocabulary]
+        tf = calculate_tf(self._vocabulary, document)
+        idf = self._idf_values
+        for index, word in enumerate(self._vocabulary):
+            vector_with_nulls[index] = tf.get(word, 0) * idf.get(word, 0)
+        vector = tuple(vector_with_nulls)
+
+        return vector
 
 
 class BasicSearchEngine:

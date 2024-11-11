@@ -43,6 +43,9 @@ def main() -> None:
     docs = ['Был снят сюжет...',  'о многодетной семье...']
     tokenized_docs = tokenizer.tokenize_documents(docs)
 
+    result = tokenized_docs
+    assert result, "Result is None"
+
 
 if __name__ == "__main__":
     main()

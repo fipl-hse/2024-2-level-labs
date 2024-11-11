@@ -198,8 +198,19 @@ class Vectorizer:
         if not self._corpus:
             return False
 
+        vocab = set()
+        for doc in self._corpus:
+            vocab |= set(doc)
+        self._vocabulary = sorted(list(vocab))
+        if not self._vocabulary:
+            return False
+
+        self._token2ind = {word: index for index, word in enumerate(self._vocabulary)}
+        if self._token2ind is None:
+            return False
+
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if not self._idf_values:
+        if self._idf_values is None:
             return False
 
         return True
@@ -216,6 +227,9 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not isinstance(tokenized_document, list) or
+                not all(isinstance(elem, str) for elem in tokenized_document)):
+            return None
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -266,6 +280,9 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document, list) or not all(isinstance(elem, str) for elem in document):
+            return None
+        vector_with_nulls = [0 for i in self._vocabulary]
 
 
 class BasicSearchEngine:

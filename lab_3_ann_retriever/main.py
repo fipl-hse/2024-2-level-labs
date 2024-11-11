@@ -196,11 +196,12 @@ class Vectorizer:
                 or not all(isinstance(sublist, list) for sublist in self._corpus)):
             return False
 
-        self._vocabulary = []
+        vocabulary = set()
         for sublist in self._corpus:
-            for word in set(sublist):
-                self._vocabulary.append(word)
-        self._vocabulary.sort()
+            if sublist is None:
+                return False
+            vocabulary |= set(sublist)
+        self._vocabulary = sorted(list(vocabulary))
 
         if not self._vocabulary:
             return False
@@ -249,15 +250,17 @@ class Vectorizer:
         if len(vector) != len(self._idf_values):
             return None
 
-        tokens_from_vector = []
-        it_is_already_used = []
-        for every_float in vector:
-            for key_word, value_float in self._idf_values.items():
-                if value_float == every_float and key_word not in it_is_already_used:
-                    tokens_from_vector.append(key_word)
-                    it_is_already_used.append(key_word)
+        """vector = list(vector)
+        for key_word in self._idf_values:
+            key_word_ind = self._token2ind.get(key_word)
+            vector[key_word_ind] = key_word"""
 
-        return tokens_from_vector
+        result = []
+        for every_word in self._vocabulary:
+            if vector[self._token2ind[every_word]] != 0.0:
+                result.append(every_word)
+
+        return result
 
     def save(self, file_path: str) -> bool:
         """

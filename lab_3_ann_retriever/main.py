@@ -106,11 +106,11 @@ class Tokenizer:
         In case of corrupt input arguments, None is returned.
         """
 
-        if any((not isinstance(text, str), not text)):
+        if any((not isinstance(text, str), text is None)):
             return None
 
         for sym in text:
-            if all((not sym.isalpha(), sym != ' ')):
+            if not sym.isalpha() and sym != ' ':
                 text = text.replace(sym, ' ')
         return self._remove_stop_words(text.lower().split())
 
@@ -287,7 +287,7 @@ class BasicSearchEngine:
         """
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int
+        self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
@@ -338,7 +338,7 @@ class BasicSearchEngine:
         """
 
     def _calculate_knn(
-            self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
+        self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
         """
         Find nearest neighbours for a query vector.
@@ -398,7 +398,7 @@ class Node(NodeLike):
     right_node: NodeLike | None
 
     def __init__(
-            self,
+        self,
             vector: Vector = (),
             payload: int = -1,
             left_node: NodeLike | None = None,
@@ -559,7 +559,7 @@ class SearchEngine(BasicSearchEngine):
         """
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int = 1
+        self, query: str, n_neighbours: int = 1
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.

@@ -437,7 +437,7 @@ class BasicSearchEngine:
                 not query_vector or not document_vectors:
             return None
 
-        distances: list[tuple[int, float]] = []
+        distances = []
         for index, value in enumerate(document_vectors):
             distance = calculate_distance(query_vector, value)
             if distance is None:
@@ -588,13 +588,12 @@ class NaiveKDTree:
                 median_node = Node(current_vectors[median_index][0],
                                    current_vectors[median_index][1])
 
-                if parent.payload == -1:
+                if parent.payload != -1 and is_left:
+                    parent.left_node = median_node
+                elif parent.payload == -1:
                     self._root = median_node
                 else:
-                    if is_left:
-                        parent.left_node = median_node
-                    else:
-                        parent.right_node = median_node
+                    parent.right_node = median_node
 
                 states_info.append(
                     {
@@ -679,7 +678,7 @@ class NaiveKDTree:
                 return [(distance, node.payload)] if distance is not None else None
             axis = depth % len(node.vector)
             new_depth = depth + 1
-            if vector[axis] < node.vector[axis]:
+            if vector[axis] <= node.vector[axis]:
                 subspaces.append((node.left_node, new_depth))
             else:
                 subspaces.append((node.right_node, new_depth))
@@ -765,7 +764,7 @@ class SearchEngine(BasicSearchEngine):
         result = self._tree.query(query_indexed)
         if result is None:
             return None
-        return [(neighbour[0], self._documents[neighbour[1]]) for neighbour in result]
+        return [(distance, self._documents[document]) for distance, document in result]
 
     def save(self, file_path: str) -> bool:
         """

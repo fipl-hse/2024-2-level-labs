@@ -6,6 +6,7 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
@@ -210,7 +211,7 @@ class Vectorizer:
 
         for i, word in enumerate(self._vocabulary):
             self._token2ind[word] = i
-        if not self._token2ind or (k is None or v is None for k, v in self._token2ind.items()):
+        if not self._token2ind or (None in (k, v) for k, v in self._token2ind.items()):
             return False
         return True
 
@@ -240,6 +241,15 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if len(vector) != len(self._vocabulary):
+            return None
+        text = []
+        for i, value in enumerate(vector):
+            if value != 0.0:
+                for word, ind in self._token2ind:
+                    if i == ind:
+                        text.append(word)
+        return text
 
     def save(self, file_path: str) -> bool:
         """
@@ -281,9 +291,9 @@ class Vectorizer:
             return None
         vector = [0.0] * len(self._vocabulary)
         tf = calculate_tf(self._vocabulary, document)
-        for i, word in self._vocabulary:
+        for i, word in enumerate(self._vocabulary):
             vector[i] = tf[word] * self._idf_values[word]
-        return Vector(vector)
+        return tuple(vector)
 
 
 class BasicSearchEngine:
@@ -393,6 +403,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if query_vector is not Vector:
+            return None
+        doc = self._calculate_knn(query_vector, self._document_vectors, 1)
+        return self._documents[doc[0][0]]
+
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int

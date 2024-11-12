@@ -8,7 +8,7 @@ from json import dump, load
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
-from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf, calculate_tf_idf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -104,8 +104,6 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
-        self.documents = []
-        self.text = ''
         self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
@@ -122,9 +120,8 @@ class Tokenizer:
         """
         if not isinstance(text, str) or not text:
             return None
-        self.text = text
         new_text = ''
-        for symbol in self.text.lower():
+        for symbol in text.lower():
             if symbol == ' ':
                 new_text += ' '
             if not symbol.isalpha():
@@ -150,9 +147,8 @@ class Tokenizer:
         """
         if not isinstance(documents, list) or not documents:
             return None
-        self.documents = documents
         clean_docs = []
-        for doc in self.documents:
+        for doc in documents:
             if not isinstance(doc, str):
                 return None
             tokens = self.tokenize(doc)
@@ -220,9 +216,8 @@ class Vectorizer:
             if not isinstance(doc, list) or not doc:
                 return False
             vocab |= set(doc)
-        vocab_list = list(vocab)
-        vocab_list.sort()
-        self._vocabulary = vocab_list
+        sorted_vocab = sorted(vocab)
+        self._vocabulary = sorted_vocab
         for i, token in enumerate(self._vocabulary):
             self._token2ind[token] = i
         idf = calculate_idf(self._vocabulary, self._corpus)
@@ -247,8 +242,7 @@ class Vectorizer:
         """
         if not isinstance(tokenized_document, list):
             return None
-        vector = self._calculate_tf_idf(tokenized_document)
-        return vector
+        return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -264,9 +258,8 @@ class Vectorizer:
         """
         if len(vector) != len(self._vocabulary):
             return None
-        list_vector = vector
         word_vector = []
-        for i, value in enumerate(list_vector):
+        for i, value in enumerate(vector):
             if value == 0:
                 continue
             word_vector.append(self._vocabulary[i])
@@ -307,8 +300,8 @@ class Vectorizer:
         """
         with open(file_path, 'r', encoding='utf-8') as file:
             state = load(file)
-            if not 'idf_values' in state.keys() or not 'vocabulary' in state.keys()\
-                or not 'token2ind' in state.keys():
+            if 'idf_values' not in state or 'vocabulary' not in state\
+                or 'token2ind' not in state:
                 return False
             self._idf_values = state['idf_values']
             self._vocabulary = state['vocabulary']
@@ -343,8 +336,7 @@ class Vectorizer:
         list_zero_vector = list(zero_vector)
         for i, value in enumerate(values_tf_idf):
             list_zero_vector[i] = value
-        tf_idf_vector = tuple(list_zero_vector)
-        return tf_idf_vector
+        return tuple(list_zero_vector)
 
 
 
@@ -419,7 +411,7 @@ class BasicSearchEngine:
         if not isinstance(vector_query, tuple):
             return None
         relevant_doc = self._calculate_knn(vector_query, self._document_vectors, 2)
-        if not isinstance(relevant_doc, list):
+        if not isinstance(relevant_doc, list) or not relevant_doc:
             return None
         text_rel_doc = []
         for couple in relevant_doc:
@@ -466,7 +458,7 @@ class BasicSearchEngine:
         if len(query_vector) != len(self._document_vectors[0]):
             return None
         retrieve_doc = self._calculate_knn(query_vector, self._document_vectors, 1)
-        if not isinstance(retrieve_doc, list):
+        if not isinstance(retrieve_doc, list) or not retrieve_doc:
             return None
         index, value = retrieve_doc[0]
         doc = self._documents[index]
@@ -567,6 +559,10 @@ class Node(NodeLike):
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+        self.vector = vector
+        self.payload = payload
+        self.left_node = left_node
+        self.right_node = right_node
 
     def save(self) -> dict:
         """
@@ -599,6 +595,7 @@ class NaiveKDTree:
         """
         Initialize an instance of the KDTree class.
         """
+        self._root = None
 
     def build(self, vectors: list[Vector]) -> bool:
         """

@@ -38,9 +38,10 @@ def main() -> None:
     vectorize.build()
     knn_retriever = BasicSearchEngine(vectorize, tokenize)
     knn_retriever.index_documents(documents)
-    tokenize.tokenize(documents[0])
     vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
-    print(vectorize.vector2tokens(vector))
+    print(vector)
+    token_vector = vectorize.vector2tokens(vector)
+    print(token_vector)
     result = knn_retriever.retrieve_vectorized(vector)
     print(result)
     assert result, "Result is None"

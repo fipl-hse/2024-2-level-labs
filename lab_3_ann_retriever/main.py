@@ -205,7 +205,7 @@ class Vectorizer:
             return False
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if not self._idf_values or (k is None or v is None for k, v in self._idf_values.items()):
+        if not self._idf_values or (None in (k, v) for k, v in self._idf_values.items()):
             return False
 
         for i, word in enumerate(self._vocabulary):

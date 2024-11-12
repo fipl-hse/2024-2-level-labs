@@ -167,10 +167,9 @@ def calculate_tf_idf(tf: dict[str, float], idf: dict[str, float]) -> dict[str, f
     In case of corrupt input arguments, None is returned.
     """
     if not isinstance(tf, dict) or any(
-            not isinstance(term, str) or not isinstance(freq, float) for term, freq in tf.items()):
-        return None
-    if not isinstance(idf, dict) or any(
-            not isinstance(term, str) or not isinstance(freq, float) for term, freq in idf.items()):
+            not isinstance(term, str) or not isinstance(freq, float) for term, freq in tf.items()) \
+            or not isinstance(idf, dict) or any(not isinstance(term, str) or not isinstance(
+            freq, float) for term, freq in idf.items()):
         return None
 
     tf_idf_values = {}

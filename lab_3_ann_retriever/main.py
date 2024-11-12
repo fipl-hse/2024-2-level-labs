@@ -53,8 +53,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     """
     dist = 0
     i = 0
-    while i < len(query_vector):
-        dist += (query_vector[i] - document_vector[i]) ** 2
+    for que_vec, doc_vec in zip(query_vector, document_vector):
+        dist += (que_vec - doc_vec) ** 2
         i += 1
     return sqrt(dist)
 
@@ -119,8 +119,7 @@ class Tokenizer:
         for symbol in text:
             if not symbol.isalpha():
                 text = text.replace(symbol, ' ')
-        tokenized_text = self._remove_stop_words(text.lower().split())
-        return tokenized_text
+        return self._remove_stop_words(text.lower().split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -161,7 +160,7 @@ class Tokenizer:
             return None
 
         for token in tokens.copy():
-            if token in self._stop_words or token == 'её':
+            if token in self._stop_words:
                 tokens.remove(token)
         return tokens
 
@@ -184,7 +183,6 @@ class Vectorizer:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
         self._corpus = corpus
-        self.build()
 
     def build(self) -> bool:
         """
@@ -199,7 +197,7 @@ class Vectorizer:
         self._vocabulary = sorted(build_vocabulary(self._corpus))
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
         self._token2ind = {token: self._vocabulary.index(token) for token in self._vocabulary}
-        return True if self._vocabulary and self._idf_values and self._token2ind else False
+        return bool(self._vocabulary and self._idf_values and self._token2ind)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """

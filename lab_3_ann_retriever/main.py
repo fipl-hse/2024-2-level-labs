@@ -739,14 +739,9 @@ class SearchEngine(BasicSearchEngine):
         if not isinstance(documents, list) or not all(isinstance(item, str) for item in documents):
             return False
 
-        vectorized_documents = []
-        for document in documents:
-            vectorized_document = self._index_document(document)
-            if vectorized_document is not None:
-                vectorized_documents.append(vectorized_document)
-            else:
-                return False
-        return self._tree.build(vectorized_documents)
+        if super().index_documents(documents) is False:
+            return False
+        return self._tree.build(self._document_vectors)
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1

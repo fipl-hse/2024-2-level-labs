@@ -52,6 +52,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    if query_vector is None or document_vector is None:
+        return None
 
 
 def save_vector(vector: Vector) -> dict:
@@ -206,12 +208,8 @@ class Vectorizer:
             return False
 
         self._token2ind = {word: index for index, word in enumerate(self._vocabulary)}
-        if self._token2ind is None:
-            return False
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if self._idf_values is None:
-            return False
 
         return True
 
@@ -301,9 +299,8 @@ class Vectorizer:
         idf = self._idf_values
         for index, word in enumerate(self._vocabulary):
             vector_with_nulls[index] = tf.get(word, 0) * idf.get(word, 0)
-        vector = tuple(vector_with_nulls)
 
-        return vector
+        return tuple(vector_with_nulls)
 
 
 class BasicSearchEngine:

@@ -30,8 +30,8 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    # with open("assets/secrets/secret_3.txt", "r", encoding="utf-8") as text_file:
-    #     text = text_file.read()
+    with open("assets/secrets/secret_3.txt", "r", encoding="utf-8") as text_file:
+        text = text_file.read()
     documents = open_files()[0][:50]
     stopwords = open_files()[1]
 
@@ -54,6 +54,7 @@ def main() -> None:
     query = "Нижний Новгород"
     result = kdtree_retriever.retrieve_relevant_documents(query, 3)
     print(result)
+    print(text)
     assert result, "Result is None"
     return None
 

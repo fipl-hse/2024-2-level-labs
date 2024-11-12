@@ -76,14 +76,13 @@ def save_vector(vector: Vector) -> dict:
     Returns:
         dict: A state of the vector to save
     """
-    state: dict[str, int | dict] = {
+    state: dict = {
         "len": len(vector),
-        "elements": {}
+        "elements": dict()
     }
     for idx, element in enumerate(vector):
         if element != 0:
-            if isinstance(state["elements"], dict):
-                state["elements"][idx] = element
+            state["elements"][idx] = element
     return state
 
 
@@ -103,8 +102,8 @@ def load_vector(state: dict) -> Vector | None:
             state["len"], int) and isinstance(state["elements"], dict)):
         return None
     vector = list(0.0 for _ in range(state["len"]))
-    for idx, value in state["elements"].items():
-        vector[int(idx)] = value
+    for idx in state["elements"]:
+        vector[int(idx)] = state["elements"][idx]
     return Vector(vector)
 
 
@@ -201,12 +200,7 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
-        if not (isinstance(corpus, list) and all(
-                isinstance(tokens, list) and all(isinstance(token, str) for token in tokens) for
-                tokens in corpus)):
-            self._corpus = []
-        else:
-            self._corpus = corpus
+        self._corpus = corpus
         self._idf_values = {}
         self._vocabulary = []
         self._token2ind = {}
@@ -218,6 +212,9 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        if not (isinstance(self._corpus, list) and self._corpus):
+            return False
+
         for tokenized_document in self._corpus:
             for token in tokenized_document:
                 if token not in self._vocabulary:
@@ -227,7 +224,7 @@ class Vectorizer:
         for token in self._vocabulary:
             self._token2ind[token] = self._vocabulary.index(token)
 
-        idf: dict[str, float] | None = calculate_idf(self._vocabulary, self._corpus)
+        idf = calculate_idf(self._vocabulary, self._corpus)
         if idf is None or self._vocabulary is None:
             return False
         self._idf_values = idf
@@ -267,7 +264,7 @@ class Vectorizer:
             return None
         tokenized_doc = []
         for token in self._vocabulary:
-            if vector[self._token2ind[token]] != 0:
+            if vector[self._token2ind[token]]:
                 tokenized_doc.append(token)
         return tokenized_doc
 
@@ -387,13 +384,10 @@ class BasicSearchEngine:
                 self._document_vectors.append(indexed_document)
             else:
                 return False
-
-        if None in self._document_vectors:
-            return False
-        return True
+        return None not in self._document_vectors
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int
+        self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
@@ -409,10 +403,10 @@ class BasicSearchEngine:
         """
         if not (isinstance(query, str) and isinstance(n_neighbours, int)):
             return None
-        tokenized_query: list[str] | None = self._tokenizer.tokenize(query)
+        tokenized_query = self._tokenizer.tokenize(query)
         if tokenized_query is None:
             return None
-        vector_query: tuple[float, ...] | None = self._vectorizer.vectorize(tokenized_query)
+        vector_query = self._vectorizer.vectorize(tokenized_query)
         if vector_query is None:
             return None
         n_distances = self._calculate_knn(vector_query, self._document_vectors, n_neighbours)
@@ -484,7 +478,7 @@ class BasicSearchEngine:
         return self._documents[knn[0][0]]
 
     def _calculate_knn(
-            self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
+        self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
         """
         Find nearest neighbours for a query vector.
@@ -581,11 +575,11 @@ class Node(NodeLike):
     right_node: NodeLike | None
 
     def __init__(
-            self,
-            vector: Vector = (),
-            payload: int = -1,
-            left_node: NodeLike | None = None,
-            right_node: NodeLike | None = None,
+        self,
+        vector: Vector = (),
+        payload: int = -1,
+        left_node: NodeLike | None = None,
+        right_node: NodeLike | None = None,
     ) -> None:
         """
         Initialize an instance of the Node class.
@@ -711,8 +705,6 @@ class NaiveKDTree:
                 right_dim["isLeftSubDim"] = False
                 dimensions_info.append(left_dim)
                 dimensions_info.append(right_dim)
-            else:
-                continue
         if self._root is None:
             return False
         return True
@@ -880,18 +872,17 @@ class SearchEngine(BasicSearchEngine):
         self._documents = documents
 
         for document in documents:
-            indexed_document: tuple[float, ...] | None = self._index_document(document)
-            if indexed_document is not None:
-                self._document_vectors.append(indexed_document)
-            else:
+            indexed_document = self._index_document(document)
+            if indexed_document is None:
                 return False
+            self._document_vectors.append(indexed_document)
 
         if None in self._document_vectors or not self._tree.build(self._document_vectors):
             return False
         return True
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int = 1
+        self, query: str, n_neighbours: int = 1
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.

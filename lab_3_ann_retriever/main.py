@@ -6,10 +6,10 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 
+from math import sqrt
 from typing import Protocol
 
-from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf, calculate_tf_idf
-from math import sqrt
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -192,7 +192,9 @@ class Vectorizer:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
         self._corpus = corpus
-        self.build()
+        self._vocabulary = []
+        self._token2ind = {}
+        self._idf_values = {}
 
     def build(self) -> bool:
         """
@@ -216,7 +218,6 @@ class Vectorizer:
             return False
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
 
-        self._token2ind = {}
         for word in self._vocabulary:
             self._token2ind[word] = self._vocabulary.index(word)
 
@@ -309,15 +310,11 @@ class Vectorizer:
 
         vector = [0.0 for _ in self._vocabulary]
 
-        tf_idf = calculate_tf_idf(calculate_tf(self._vocabulary, document), self._idf_values)
-        for word in tf_idf.keys():
-            vector.pop(self._token2ind[word])
-            vector.insert(self._token2ind[word], tf_idf[word])
-        vector = tuple(vector)
+        tf = calculate_tf(self._vocabulary, document)
+        for index, word in enumerate(self._vocabulary):
+            vector[index] = tf.get(word, 0) * self._idf_values.get(word, 0)
 
-        if vector:
-            return vector
-        return None
+        return tuple(vector)
 
 
 class BasicSearchEngine:

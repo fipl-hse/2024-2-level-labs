@@ -91,6 +91,8 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
+        self.stop_words = _stop_words
+
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -130,6 +132,10 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (isinstance(tokens, list) and tokens and all(isinstance(word, str) for word in tokens)):
+            return None
+
+        return [token for token in tokens if token not in self._stop_words]
 
 
 class Vectorizer:

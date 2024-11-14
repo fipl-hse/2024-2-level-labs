@@ -283,7 +283,7 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
 
-        if not isinstance(document, list) and not document or not all(isinstance(token, str) for token in document):
+        if not isinstance(document, list) or not document or not all(isinstance(token, str) for token in document):
             return None
         tf_idf_vector = [0.0] * len(self._vocabulary)
         for token in document:
@@ -368,8 +368,8 @@ class BasicSearchEngine:
         if query_vector is None:
             return None
         knn_results = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        if not knn_results:
-            return None
+        if knn_results is None:
+            return []
         return [(distance[1], self._documents[distance[0]]) for distance in knn_results]
 
     def save(self, file_path: str) -> bool:
@@ -410,9 +410,12 @@ class BasicSearchEngine:
         if not isinstance(query_vector, tuple) or not all(isinstance(val, (int, float)) for val in query_vector):
             return None
         nearest_neighbors = self._calculate_knn(query_vector, self._document_vectors, 1)
-        if nearest_neighbors is None or not nearest_neighbors:
+        if not nearest_neighbors:
             return None
-        return self._documents[nearest_neighbors[0][0]]
+        nearest_index = nearest_neighbors[0][0]
+        if nearest_index < 0 or nearest_index >= len(self._documents):
+            return None
+        return self._documents[nearest_index]
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int

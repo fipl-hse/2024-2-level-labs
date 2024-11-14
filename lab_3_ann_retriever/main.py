@@ -290,7 +290,7 @@ class Vectorizer:
             if self._token2ind.get(token) is not None:
                 tf_values = calculate_tf(self._vocabulary, document)
                 if tf_values is not None:
-                    tf_idf_vector[self._token2ind[token]] = tf_values[token] * self._idf_values[token]
+                    tf_idf_vector[self._token2ind[token]] = tf_values [token] * self._idf_values[token]
         return Vector(tf_idf_vector)
 
 class BasicSearchEngine:
@@ -368,8 +368,8 @@ class BasicSearchEngine:
         if query_vector is None:
             return None
         knn_results = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        if knn_results is None:
-            return []
+        if knn_results is None or not knn_results:
+            return None
         return [(distance[1], self._documents[distance[0]]) for distance in knn_results]
 
     def save(self, file_path: str) -> bool:
@@ -410,12 +410,9 @@ class BasicSearchEngine:
         if not isinstance(query_vector, tuple) or not all(isinstance(val, (int, float)) for val in query_vector):
             return None
         nearest_neighbors = self._calculate_knn(query_vector, self._document_vectors, 1)
-        if not nearest_neighbors:
+        if nearest_neighbors is None or not nearest_neighbors:
             return None
-        nearest_index = nearest_neighbors[0][0]
-        if nearest_index < 0 or nearest_index >= len(self._documents):
-            return None
-        return self._documents[nearest_index]
+        return self._documents[nearest_neighbors[0][0]]
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int

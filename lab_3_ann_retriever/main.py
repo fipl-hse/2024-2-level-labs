@@ -195,24 +195,21 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        if not self._corpus or (doc is None for doc in self._corpus):
+        if not self._corpus:
             return False
 
         unique_vocab = set()
         for doc in self._corpus:
             unique_vocab |= set(doc)
         self._vocabulary = sorted(list(unique_vocab))
-        if not self._vocabulary or (word is None for word in self._vocabulary):
+        if not self._vocabulary:
             return False
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if not self._idf_values or (None in (k, v) for k, v in self._idf_values.items()):
-            return False
 
         for i, word in enumerate(self._vocabulary):
             self._token2ind[word] = i
-        if not self._token2ind or (None in (k, v) for k, v in self._token2ind.items()):
-            return False
+
         return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
@@ -243,12 +240,11 @@ class Vectorizer:
         """
         if len(vector) != len(self._vocabulary):
             return None
+
         text = []
-        for i, value in enumerate(vector):
-            if value != 0.0:
-                for word, ind in self._token2ind:
-                    if i == ind:
-                        text.append(word)
+        for word in self._vocabulary:
+            if vector[self._token2ind[word]] != 0.0:
+                text.append(word)
         return text
 
     def save(self, file_path: str) -> bool:

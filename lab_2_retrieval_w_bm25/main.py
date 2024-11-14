@@ -255,7 +255,7 @@ def rank_documents(
 
     result = []
     for i, document in enumerate(indexes):
-        count = 0
+        count = 0.0
         for word in ready_query:
             if word in document:
                 count += document[word]
@@ -293,12 +293,12 @@ def calculate_bm25_with_cutoff(
     """
 
 
-def save_index(index: list[dict[str, float]], file_path: str) -> None:
+def save_index(indexes: list[dict[str, float]], file_path: str) -> None:
     """
     Save the index to a file.
 
     Args:
-        index (list[dict[str, float]]): The index to save.
+        indexes (list[dict[str, float]]): The index to save.
         file_path (str): The path to the file where the index will be saved.
     """
 

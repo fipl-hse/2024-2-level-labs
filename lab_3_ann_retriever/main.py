@@ -360,7 +360,11 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
 
+        if not (isinstance(query, str) and isinstance(n_neighbours, int)):
+            return None
         tokenized_query = self._tokenizer.tokenize(query)
+        if tokenized_query is None:
+            return None
         query_vector = self._vectorizer.vectorize(tokenized_query)
         if query_vector is None:
             return None
@@ -433,18 +437,17 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
 
-        if (not isinstance(query_vector, tuple) or not query_vector or not isinstance(document_vectors, list)
-                or not document_vectors or not isinstance(n_neighbours, int) or n_neighbours <= 0):
+        if (not isinstance(query_vector, (list, tuple)) or not query_vector
+                or not isinstance(document_vectors, list) or not document_vectors
+                or not isinstance(n_neighbours, int) or n_neighbours <= 0):
             return None
         distances = []
-        for index, doc_vector in enumerate(document_vectors):
-            if isinstance(doc_vector, list):
-                doc_vector = tuple(doc_vector)
+        for doc_vector in document_vectors:
             distance = calculate_distance(query_vector, doc_vector)
             if distance is not None:
-                distances.append((index, distance))
-        distances.sort(key=lambda x: x[1])
-        return distances[:n_neighbours] or None
+                distances.append((document_vectors.index(doc_vector), distance))
+        distances.sort(key=lambda dist: dist[1])
+        return distances[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """

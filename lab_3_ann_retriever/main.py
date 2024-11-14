@@ -293,6 +293,7 @@ class Vectorizer:
                     tf_idf_vector[self._token2ind[token]] = tf_values [token] * self._idf_values[token]
         return Vector(tf_idf_vector)
 
+
 class BasicSearchEngine:
     """
     Engine based on KNN algorithm.

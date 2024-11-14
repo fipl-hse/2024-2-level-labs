@@ -60,6 +60,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     if (len(query_vector) != len(document_vector) or
             not all(isinstance(token, (int, float)) for token in query_vector + document_vector)):
         return None
+    if any(value < 0 for value in query_vector + document_vector):
+        return None
     distance = math.sqrt(sum((q - d) ** 2 for q, d in zip(query_vector, document_vector)))
     return distance
 
@@ -183,12 +185,8 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
-        if not (isinstance(corpus, list) and all(isinstance(tokens, list)
-                                                 and all(isinstance(token, str) for token in tokens)
-                                                 for tokens in corpus)):
-            self._corpus = []
-        else:
-            self._corpus = corpus
+
+        self._corpus = corpus
         self._idf_values = {}
         self._vocabulary = []
         self._token2ind = {}
@@ -207,9 +205,9 @@ class Vectorizer:
         self._vocabulary = sorted(unique_terms)
         self._token2ind = {word: index for index, word in enumerate(self._vocabulary)}
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if self._idf_values is not None and self._vocabulary and self._token2ind:
-            return True
-        return False
+        if self._idf_values is None and not self._vocabulary and not self._token2ind:
+            return False
+        return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -246,7 +244,7 @@ class Vectorizer:
         tokens = [self._vocabulary[i] for i, value in enumerate(vector) if value > 0]
         if not tokens:
             return None
-        return sorted(tokens)
+        return tokens
 
     def save(self, file_path: str) -> bool:
         """
@@ -285,7 +283,7 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
 
-        if not isinstance(document, list) or not all(isinstance(token, str) for token in document):
+        if not isinstance(document, list) and not document or not all(isinstance(token, str) for token in document):
             return None
         tf_idf_vector = [0.0] * len(self._vocabulary)
         for token in document:
@@ -370,7 +368,7 @@ class BasicSearchEngine:
         if query_vector is None:
             return None
         knn_results = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        if knn_results is None:
+        if not knn_results:
             return None
         return [(distance[1], self._documents[distance[0]]) for distance in knn_results]
 

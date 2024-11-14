@@ -50,6 +50,7 @@ def main() -> None:
         relevant_document = knn_retriever.retrieve_vectorized(secret_vector)
         print(relevant_document)
 
+
         result = tokenized_docs
     assert result, "Result is None"
 

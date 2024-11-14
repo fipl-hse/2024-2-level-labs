@@ -111,6 +111,7 @@ class Tokenizer:
         for element in text:
             if not element.isalpha() and element != ' ':
                 text = text.replace(element, ' ')
+
         return self._remove_stop_words(text.lower().split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
@@ -152,9 +153,9 @@ class Tokenizer:
                 or not tokens):
             return None
 
-        list_wothout_sw = [token for token in tokens if token not in self.stopwords]
+        list_without_sw = [token for token in tokens if token not in self.stop_words]
 
-        return list_wothout_sw
+        return list_without_sw
 
 
 class Vectorizer:

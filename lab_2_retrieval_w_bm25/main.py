@@ -245,8 +245,11 @@ def rank_documents(
 
     result = []
     for i, document in enumerate(indexes):
-        result.append((i, sum(document[word] if word in document else 0
-                              for word in preprocessed_query)))
+        count = 0
+        for word in preprocessed_query:
+            if word in document:
+                count += document[word]
+        result.append((i, count))
     return sorted(result, reverse=True, key=lambda tuple_: tuple_[1])
 
 

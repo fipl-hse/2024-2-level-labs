@@ -2,16 +2,16 @@
 Laboratory Work #2 starter
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable, too-many-branches, too-many-statements, duplicate-code
-<<<<<<< HEAD
+
 from main import (build_vocabulary, calculate_bm25, calculate_idf, rank_documents, remove_stopwords,
                   tokenize)
-=======
+
 from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
                                          calculate_bm25_with_cutoff, calculate_idf,
                                          calculate_spearman, calculate_tf, calculate_tf_idf,
                                          load_index, rank_documents, remove_stopwords, save_index,
                                          tokenize)
->>>>>>> 6b627bcb929d19ad63a14b64bbbf2b7d4650d679
+
 
 
 def main() -> None:
@@ -37,7 +37,7 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-<<<<<<< HEAD
+
     text_sort = []
     bm25 = []
     docs_len = 0
@@ -71,7 +71,7 @@ def main() -> None:
     rank = rank_documents(bm25, query, stopwords)
     result = rank
     print(result)
-=======
+
     documents_preprocessed = []
     for document in documents:
         document_tokenized = tokenize(document)
@@ -146,7 +146,7 @@ def main() -> None:
     if bm25_ranked is None:
         result = None
         assert result, "Result is None"
->>>>>>> 6b627bcb929d19ad63a14b64bbbf2b7d4650d679
+
 
     bm25_with_cutoff = []
     for document_1 in documents_preprocessed:

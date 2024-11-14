@@ -334,6 +334,9 @@ class BasicSearchEngine:
         In case of corrupt input arguments, False is returned.
         """
 
+        if not (isinstance(documents, list) and documents and all(
+                isinstance(doc, str) for doc in documents)):
+            return False
         self._documents = []
         self._document_vectors = []
         for doc in documents:
@@ -372,10 +375,9 @@ class BasicSearchEngine:
         if knn_results is None:
             return None
         relevant_documents = []
-        for index, distance in knn_results:
-            document_text = self._documents[index]
-            relevant_documents.append((distance, document_text))
-        return relevant_documents
+        for distance in knn_results:
+            relevant_documents.append((distance, self._documents))
+        return relevant_documents or None
 
     def save(self, file_path: str) -> bool:
         """
@@ -415,10 +417,9 @@ class BasicSearchEngine:
         if not isinstance(query_vector, tuple) or not all(isinstance(val, (int, float)) for val in query_vector):
             return None
         nearest_neighbors = self._calculate_knn(query_vector, self._document_vectors, 1)
-        if not nearest_neighbors or len(nearest_neighbors) == 0:
+        if nearest_neighbors is None or not nearest_neighbors:
             return None
-        nearest_document_index = nearest_neighbors[0][0]
-        return self._documents[nearest_document_index]
+        return self._documents[nearest_neighbors[0][0]]
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
@@ -447,7 +448,7 @@ class BasicSearchEngine:
             if distance is not None:
                 distances.append((document_vectors.index(doc_vector), distance))
         distances.sort(key=lambda dist: dist[1])
-        return distances[:n_neighbours]
+        return distances[:n_neighbours] or None
 
     def _index_document(self, document: str) -> Vector | None:
         """

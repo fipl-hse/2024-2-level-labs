@@ -290,7 +290,7 @@ class Vectorizer:
             if self._token2ind.get(token) is not None:
                 tf_values = calculate_tf(self._vocabulary, document)
                 if tf_values is not None:
-                    tf_idf_vector[self._token2ind[token]] = tf_values [token] * self._idf_values[token]
+                    tf_idf_vector[self._token2ind[token]] = tf_values[token] * self._idf_values[token]
         return Vector(tf_idf_vector)
 
 class BasicSearchEngine:

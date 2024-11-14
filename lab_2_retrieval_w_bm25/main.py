@@ -5,6 +5,7 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 from math import log
+from operator import index
 
 
 def tokenize(text: str) -> list[str] | None:
@@ -197,7 +198,28 @@ def calculate_bm25(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not vocab or not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab):
+        return None
+    if not document or not isinstance(document, list) \
+            or not all(isinstance(item, str) for item in document):
+        return None
+    if not idf_document or not isinstance(idf_document, dict) \
+            or not all(isinstance(key, str) for key in idf_document) \
+            or not all(isinstance(value, float) for value in idf_document.values()):
+        return None
+    if not isinstance(avg_doc_len, float) or not isinstance(doc_len, int) \
+            or isinstance(doc_len, bool) or not isinstance(k1, float) or not isinstance(b, float):
+        return None
 
+    bm25 = {}
+    for word in set(vocab) | set(document):
+        if word in idf_document:
+            word_count = document.count(word)
+            bm25[word] = idf_document[word] * ((word_count * (k1 + 1)) / (
+                    word_count + k1 * (1 - b + (b * doc_len/avg_doc_len))))
+        else:
+            bm25[word] = 0.0
+    return bm25
 
 def rank_documents(
     indexes: list[dict[str, float]], query: str, stopwords: list[str]
@@ -215,7 +237,31 @@ def rank_documents(
 
     In case of corrupt input arguments, None is returned.
     """
+    if not indexes or not isinstance(indexes, list) \
+            or not all(isinstance(item, dict) for item in indexes) or \
+            not all(isinstance(key, str) for item in indexes for key in item) or \
+            not all(isinstance(value, float) for item in indexes for value in item.values()):
+        return None
+    if not isinstance(query, str) or not isinstance(stopwords, list) or \
+            not all(isinstance(item, str) for item in stopwords):
+        return None
 
+    tok_query = tokenize(query)
+    if tok_query is None:
+        return None
+    ready_query = remove_stopwords(tok_query, stopwords)
+    if ready_query is None:
+        return None
+
+    result = []
+    for i, document in enumerate(indexes):
+        count = 0
+        for word in ready_query:
+            if word in document:
+                count += document[word]
+        result.append((i, count))
+
+    return sorted(result, reverse=True, key=lambda x: x[1])
 
 def calculate_bm25_with_cutoff(
     vocab: list[str],

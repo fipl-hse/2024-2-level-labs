@@ -369,7 +369,7 @@ class BasicSearchEngine:
         if query_vector is None:
             return None
         nearest_neighbours = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        if nearest_neighbours is None or not nearest_neighbours:
+        if not nearest_neighbours:
             return None
         relevant_documents = []
         for document_index, document_distance in nearest_neighbours:
@@ -416,10 +416,9 @@ class BasicSearchEngine:
                 isinstance(val, (int, float)) for val in query_vector):
             return None
         nearest_neighbors = self._calculate_knn(query_vector, self._document_vectors, 1)
-        if nearest_neighbors and nearest_neighbors[0]:
-            document_index = nearest_neighbors[0][0]
-            return self._documents[document_index]
-        return None
+        if nearest_neighbors is None or not nearest_neighbors:
+            return None
+        return self._documents[nearest_neighbors[0][0]]
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int

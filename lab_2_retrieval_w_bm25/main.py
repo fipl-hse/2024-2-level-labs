@@ -5,8 +5,6 @@ Text retrieval with BM25
 """
 # pylint:disable=too-many-arguments, unused-argument
 from math import log
-from operator import index
-
 
 def tokenize(text: str) -> list[str] | None:
     """

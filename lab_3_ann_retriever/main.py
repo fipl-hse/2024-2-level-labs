@@ -227,10 +227,7 @@ class Vectorizer:
         if not (isinstance(tokenized_document, list) and tokenized_document and
                 all(isinstance(token, str) for token in tokenized_document)):
             return None
-        if not tokenized_document or not all(isinstance(token, str) for token in tokenized_document):
-            return None
-        tf_idf_vector = self._calculate_tf_idf(tokenized_document)
-        return tf_idf_vector or None
+        return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -291,15 +288,12 @@ class Vectorizer:
         if not isinstance(document, list) or not all(isinstance(token, str) for token in document):
             return None
         tf_idf_vector = [0.0] * len(self._vocabulary)
-        tf_values = calculate_tf(self._vocabulary, document)
-        if tf_values is None:
-            return None
-        for token, tf in tf_values.items():
-            if token in self._token2ind and token in self._idf_values:
-                tf_idf_value = tf * self._idf_values[token]
-                tf_idf_vector[self._token2ind[token]] = tf_idf_value
-        return tuple(tf_idf_vector)
-
+        for token in document:
+            if self._token2ind.get(token) is not None:
+                tf_values = calculate_tf(self._vocabulary, document)
+                if tf_values is not None:
+                    tf_idf_vector[self._token2ind[token]] = tf_values [token] * self._idf_values[token]
+        return Vector(tf_idf_vector)
 
 class BasicSearchEngine:
     """

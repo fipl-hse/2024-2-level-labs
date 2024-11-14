@@ -55,6 +55,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     if not isinstance(query_vector, list) or not isinstance(document_vector, list):
         return None
+    if not query_vector or not document_vector:
+        return 0.0
     if (len(query_vector) != len(document_vector) or
             not all(isinstance(token, (int, float)) for token in query_vector + document_vector)):
         return None
@@ -225,6 +227,8 @@ class Vectorizer:
         if not (isinstance(tokenized_document, list) and tokenized_document and
                 all(isinstance(token, str) for token in tokenized_document)):
             return None
+        if not tokenized_document or not all(isinstance(token, str) for token in tokenized_document):
+            return None
         tf_idf_vector = self._calculate_tf_idf(tokenized_document)
         return tf_idf_vector or None
 
@@ -363,7 +367,7 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
 
-        if not (isinstance(query, str) and isinstance(n_neighbours, int)):
+        if not (isinstance(query, str) and isinstance(n_neighbours, int) and n_neighbours > 0):
             return None
         tokenized_query = self._tokenizer.tokenize(query)
         if tokenized_query is None:
@@ -374,10 +378,7 @@ class BasicSearchEngine:
         knn_results = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
         if knn_results is None:
             return None
-        relevant_documents = []
-        for distance in knn_results:
-            relevant_documents.append((distance, self._documents))
-        return relevant_documents or None
+        return [(distance[1], self._documents[distance[0]]) for distance in knn_results]
 
     def save(self, file_path: str) -> bool:
         """

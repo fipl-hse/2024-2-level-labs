@@ -2,9 +2,10 @@
 Laboratory Work #3 starter.
 """
 
+from pathlib import Path
+
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from main import Tokenizer, Vectorizer
-from pathlib import Path
 
 
 def open_files() -> tuple[list[str], list[str]]:

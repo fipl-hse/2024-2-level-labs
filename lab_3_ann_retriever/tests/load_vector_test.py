@@ -12,7 +12,7 @@ from lab_3_ann_retriever.main import load_vector
 
 class LoadVector(unittest.TestCase):
     """
-    Tests vector loading function
+    Tests vector loading function.
     """
 
     def setUp(self) -> None:

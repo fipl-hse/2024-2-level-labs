@@ -76,10 +76,7 @@ def build_vocabulary(documents: list[list[str]]) -> list[str] | None:
 
     unique = []
 
-    for doc in documents:
-        for word in doc:
-            if word not in unique:
-                unique.append(word)
+    [unique.append(word) for doc in documents for word in doc if word not in unique]
 
     return unique
 
@@ -252,13 +249,8 @@ def rank_documents(
     if ready_query is None:
         return None
 
-    result = []
-    for i, document in enumerate(indexes):
-        count = 0.0
-        for word in ready_query:
-            if word in document:
-                count += document[word]
-        result.append((i, count))
+    result = [(i, sum(document[word] for word in ready_query if word in document)) for i, document in
+              enumerate(indexes)]
 
     return sorted(result, reverse=True, key=lambda x: x[1])
 

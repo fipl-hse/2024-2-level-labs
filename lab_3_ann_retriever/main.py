@@ -3,9 +3,10 @@ Lab 3.
 
 Vector search with text retrieving
 """
-
+import math
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -49,6 +50,17 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(query_vector, tuple | list) \
+            or not all(isinstance(elem, float) for elem in query_vector):
+        return None
+    if not isinstance(document_vector, tuple | list) \
+            or not all(isinstance(elem, float) for elem in document_vector) \
+            or len(query_vector) != len(document_vector):
+        return None
+    if not query_vector or not document_vector:
+        return 0.0
+    dist = math.sqrt(sum((value - document_vector[i]) ** 2 for i, value in enumerate(query_vector)))
+    return dist
 
 
 def save_vector(vector: Vector) -> dict:
@@ -173,6 +185,10 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
+        self._corpus = corpus
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
 
     def build(self) -> bool:
         """
@@ -181,6 +197,20 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        if not isinstance(self._corpus, list) or \
+                not all(isinstance(doc, list) for doc in self._corpus) or \
+                not all(isinstance(item, str) for doc in self._corpus for item in doc) or \
+                not self._corpus:
+            return False
+        unique_words = set()
+        for doc in self._corpus:
+            unique_words.update(set(doc))
+        self._vocabulary.extend(sorted(unique_words))
+        self._token2ind = {token: i for i, token in enumerate(self._vocabulary)}
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if None in self._idf_values:
+            return False
+        return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -194,6 +224,14 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(tokenized_document, list) \
+                or not all(isinstance(token, str) for token in tokenized_document) \
+                or not tokenized_document:
+            return None
+        vec = self._calculate_tf_idf(tokenized_document)
+        if vec is None:
+            return None
+        return vec
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -244,6 +282,18 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document, list) or not all(isinstance(token, str) for token in document) \
+                or not document or len(self._vocabulary) != len(document):
+            return None
+        tf_idf = [0.0] * len(document)
+        tf = calculate_tf(self._vocabulary, document)
+        if tf is None:
+            return None
+        for i, token in enumerate(self._vocabulary):
+            tf_idf[i] = tf.get(token, 0) * self._idf_values.get(token, 0)
+        if None in tf_idf:
+            return None
+        return tuple(tf_idf)
 
 
 class BasicSearchEngine:

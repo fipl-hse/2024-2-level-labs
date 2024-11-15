@@ -295,7 +295,7 @@ class BasicSearchEngineTest(unittest.TestCase):
         """
         Ideal scenario for _index_document
         """
-        expected = [
+        expected = (
             0.0,
             0.0,
             0.0,
@@ -338,7 +338,7 @@ class BasicSearchEngineTest(unittest.TestCase):
             0.0,
             0.0,
             0.06052127574194312,
-        ]
+        )
         document = (
             "Моя собака думает, что ее любимый плед - это кошка. "
             "Просто он очень пушистый и мягкий. "
@@ -423,7 +423,7 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_calculate_knn_ideal(self):
         """
-        Ideal calculate_knn scenario
+        Ideal _calculate_knn scenario
         """
         expected = [
             (0, 0.0),
@@ -431,7 +431,7 @@ class BasicSearchEngineTest(unittest.TestCase):
             (3, 0.28819264390334465),
             (1, 0.29341779087165115),
         ]
-        query_vector = [
+        query_vector = (
             0.0,
             0.0,
             0.0,
@@ -474,9 +474,9 @@ class BasicSearchEngineTest(unittest.TestCase):
             0.0,
             0.0,
             0.0,
-        ]
+        )
         documents_vector = [
-            [
+            (
                 0.0,
                 0.0,
                 0.0,
@@ -519,8 +519,8 @@ class BasicSearchEngineTest(unittest.TestCase):
                 0.0,
                 0.0,
                 0.0,
-            ],
-            [
+            ),
+            (
                 0.0,
                 0.049,
                 0.049,
@@ -563,8 +563,8 @@ class BasicSearchEngineTest(unittest.TestCase):
                 0.049,
                 0.0,
                 0.0,
-            ],
-            [
+            ),
+            (
                 0.063,
                 0.0,
                 0.0,
@@ -607,8 +607,8 @@ class BasicSearchEngineTest(unittest.TestCase):
                 0.0,
                 0.063,
                 0.0,
-            ],
-            [
+            ),
+            (
                 0.0,
                 0.0,
                 0.0,
@@ -651,7 +651,7 @@ class BasicSearchEngineTest(unittest.TestCase):
                 0.0,
                 0.0,
                 0.049,
-            ],
+            ),
         ]
         actual = self.retriever._calculate_knn(query_vector, documents_vector, 4)
         self.assertEqual(expected[0][0], actual[0][0])
@@ -663,35 +663,37 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_calculate_knn_invalid_input(self):
         """
-        Invalid input scenario for calculate_knn
+        Invalid input scenario for _calculate_knn
         """
         expected = None
         bad_inputs = [None]
-        good_input_query = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.077, 0.0, 0.0, 0.0, 0.077]
+        good_input_query = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.077, 0.0, 0.0, 0.0, 0.077)
         good_input_docs = [
-            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.077, 0.0, 0.0, 0.0, 0.077],
-            [0.0, 0.049, 0.049, 0.049, 0.0, 0.021, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.063, 0.0, 0.0, 0.0, 0.0, 0.026, 0.0, 0.0, 0.063, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.049, 0.0, 0.0, 0.049, 0.0, 0.049, 0.0],
+            (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.077, 0.0, 0.0, 0.0, 0.077),
+            (0.0, 0.049, 0.049, 0.049, 0.0, 0.021, 0.0, 0.0, 0.0, 0.0, 0.0),
+            (0.063, 0.0, 0.0, 0.0, 0.0, 0.026, 0.0, 0.0, 0.063, 0.0, 0.0),
+            (0.0, 0.0, 0.0, 0.0, 0.049, 0.0, 0.0, 0.049, 0.0, 0.049, 0.0),
         ]
-        good_input_neigbour = 4
+        good_input_neighbour = 4
         for bad_input in bad_inputs:
             actual = self.retriever._calculate_knn(
                 query_vector=bad_input,
                 document_vectors=good_input_docs,
-                n_neighbours=good_input_neigbour,
+                n_neighbours=good_input_neighbour,
             )
             self.assertEqual(expected, actual)
 
             actual = self.retriever._calculate_knn(
                 query_vector=good_input_query,
                 document_vectors=bad_input,
-                n_neighbours=good_input_neigbour,
+                n_neighbours=good_input_neighbour,
             )
             self.assertEqual(expected, actual)
 
             actual = self.retriever._calculate_knn(
-                query_vector=bad_input, document_vectors=bad_input, n_neighbours=good_input_neigbour
+                query_vector=bad_input,
+                document_vectors=bad_input,
+                n_neighbours=good_input_neighbour
             )
             self.assertEqual(expected, actual)
 
@@ -716,9 +718,9 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_calculate_knn_return_value(self):
         """
-        Checks return type for calculate_knn scenario
+        Checks return type for _calculate_knn scenario
         """
-        query_vector = [
+        query_vector = (
             0.0,
             0.0,
             0.0,
@@ -761,9 +763,9 @@ class BasicSearchEngineTest(unittest.TestCase):
             0.0,
             0.0,
             0.0,
-        ]
+        )
         documents_vector = [
-            [
+            (
                 0.0,
                 0.0,
                 0.0,
@@ -806,8 +808,8 @@ class BasicSearchEngineTest(unittest.TestCase):
                 0.0,
                 0.0,
                 0.0,
-            ],
-            [
+            ),
+            (
                 0.0,
                 0.049,
                 0.049,
@@ -850,8 +852,8 @@ class BasicSearchEngineTest(unittest.TestCase):
                 0.049,
                 0.0,
                 0.0,
-            ],
-            [
+            ),
+            (
                 0.063,
                 0.0,
                 0.0,
@@ -894,8 +896,8 @@ class BasicSearchEngineTest(unittest.TestCase):
                 0.0,
                 0.063,
                 0.0,
-            ],
-            [
+            ),
+            (
                 0.0,
                 0.0,
                 0.0,
@@ -938,7 +940,7 @@ class BasicSearchEngineTest(unittest.TestCase):
                 0.0,
                 0.0,
                 0.049,
-            ],
+            ),
         ]
         actual = self.retriever._calculate_knn(query_vector, documents_vector, 4)
         self.assertIsInstance(actual, list)
@@ -1078,9 +1080,13 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_retrieve_relevant_documents_none_calculate_knn(self):
         """
-        Checks return of inner Basic Engine Search functions
+        None _calculate_knn method return scenario
         """
         with mock.patch.object(self.retriever, "_calculate_knn", return_value=None):
+            actual = self.retriever.retrieve_relevant_documents(self.query, 2)
+            self.assertIsNone(actual)
+
+        with mock.patch.object(self.retriever, "_calculate_knn", return_value=[(None, None)]):
             actual = self.retriever.retrieve_relevant_documents(self.query, 2)
             self.assertIsNone(actual)
 
@@ -1090,7 +1096,7 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_index_document_none_tokenizer(self):
         """
-        Checks return of inner Basic Engine Search functions
+        None tokenize method return scenario
         """
         document = (
             "Моя собака думает, что ее любимый плед - это кошка. "
@@ -1107,7 +1113,7 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_index_document_none_vectorizer(self):
         """
-        Checks return of inner Basic Engine Search functions
+        None vectorize method return scenario
         """
         document = (
             "Моя собака думает, что ее любимый плед - это кошка. "
@@ -1124,7 +1130,7 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_retrieve_relevant_documents_none_vectorizer(self):
         """
-        Checks return of inner Basic Engine Search functions
+        None vectorize method return scenario
         """
         with mock.patch.object(self.retriever._vectorizer, "vectorize", return_value=None):
             actual = self.retriever.retrieve_relevant_documents(self.query, 2)
@@ -1136,7 +1142,7 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_empty_knn_results(self):
         """
-        Tests the case where _calculate_knn returns an empty list.
+        Tests the case where _calculate_knn returns an empty list
         """
         self.retriever.index_documents(self.documents)
         with mock.patch.object(self.retriever, "_calculate_knn", return_value=[]):
@@ -1266,7 +1272,7 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_retrieve_vectorized_invalid_input(self) -> None:
         """
-        Invalid input scenario for loading file
+        Invalid input scenario for retrieve_vectorized method
         """
         bad_inputs = [[], {}, 0.7, 7, "", False]
         self.retriever.index_documents(self.documents)
@@ -1280,7 +1286,7 @@ class BasicSearchEngineTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_empty_knn_result_retrieve_vectorized(self):
         """
-        Tests the case for retrieve_vectorized where _calculate_knn returns an empty list.
+        Tests the case for retrieve_vectorized where _calculate_knn returns an empty list
         """
         query_vector = (
             0.0,
@@ -1333,7 +1339,7 @@ class BasicSearchEngineTest(unittest.TestCase):
 
     @pytest.mark.lab_3_ann_retriever
     @pytest.mark.mark10
-    def test_dump_docs_ideal(self):
+    def test_dump_documents_ideal(self):
         """
         Ideal scenario for _dump_documents method
         """
@@ -1343,7 +1349,7 @@ class BasicSearchEngineTest(unittest.TestCase):
 
     @pytest.mark.lab_3_ann_retriever
     @pytest.mark.mark10
-    def test_dump_docs_return_value(self):
+    def test_dump_documents_return_value(self):
         """
         Checks return type for _dump_documents method
         """
@@ -1495,3 +1501,13 @@ class BasicSearchEngineTest(unittest.TestCase):
         actual = self.retriever.load(str(self.exp_path))
         self.assertIsInstance(actual, bool)
         self.assertTrue(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_documents_empty_load_vector(self) -> None:
+        """
+        Empty load_vector scenario for _load_documents
+        """
+        with mock.patch("lab_3_ann_retriever.main.load_vector", return_value=None):
+            actual = self.retriever.load(str(self.exp_path))
+        self.assertFalse(actual)

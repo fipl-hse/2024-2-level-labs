@@ -107,7 +107,7 @@ class Tokenizer:
         """
         if not isinstance(text, str):
             return None
-        punctuation = ("!'\"#$%&()*+,-./:;<=>?@[]^_`{|}~1234567890"
+        punctuation = ("!'\"#$%&()*+,-./:–;—<=>?@[]^_`{|}~1234567890"
                        r'\"'
                        "")
         for p in punctuation:
@@ -129,6 +129,12 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(documents, list):
+            return None
+        for text in documents:
+            if not isinstance(text, str) or len(text) == 0:
+                return None
+
         token_dict = []
         for text in documents:
             token_dict.append(self.tokenize(text))

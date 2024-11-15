@@ -39,7 +39,6 @@ def main() -> None:
         print(tokenized_docs)
 
         vectorizer = Vectorizer(tokenized_docs)
-        vectorizer.build()
         secret_tokenized = tokenizer.tokenize(text)
         secret_vector = vectorizer.vectorize(secret_tokenized)
         tokens_from_vector = vectorizer.vector2tokens(secret_vector)
@@ -49,7 +48,6 @@ def main() -> None:
         knn_retriever.index_documents(documents)
         relevant_document = knn_retriever.retrieve_vectorized(secret_vector)
         print(relevant_document)
-
 
         result = tokenized_docs
     assert result, "Result is None"

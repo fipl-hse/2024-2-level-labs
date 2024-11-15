@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 4
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup FIPL environment
         uses: fipl-hse/setup-env-action@v0.11
       - name: Confirming everything is OK
@@ -38,7 +38,7 @@ jobs:
       PR_AUTHOR: ${{ github.actor }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup FIPL environment
         uses: fipl-hse/setup-env-action@v0.11
       - name: PR name check
@@ -57,7 +57,7 @@ jobs:
       PR_AUTHOR: ${{ github.actor }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup FIPL environment
         uses: fipl-hse/setup-env-action@v0.11
       - name: Code Style
@@ -73,7 +73,7 @@ jobs:
     needs: [ install-dependencies ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup FIPL environment
         uses: fipl-hse/setup-env-action@v0.11
       - name: MyPy check
@@ -92,7 +92,7 @@ jobs:
       PR_AUTHOR: ${{ github.actor }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup FIPL environment
         uses: fipl-hse/setup-env-action@v0.11
       - name: Run tests
@@ -110,7 +110,7 @@ jobs:
       PR_NAME: ${{ github.event.pull_request.title }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup FIPL environment
         uses: fipl-hse/setup-env-action@v0.11
       - name: Run start
@@ -126,7 +126,7 @@ jobs:
     needs: [ install-dependencies ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup FIPL environment
         uses: fipl-hse/setup-env-action@v0.11
       - name: Flake8 check

@@ -13,6 +13,12 @@ Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
 
+def is_valid_vector(vector: any) -> bool:
+    if isinstance(vector, tuple) and all(isinstance(point, float) for point in vector):
+        return True
+    return False
+
+
 class NodeLike(Protocol):
     """
     Type alias for a tree node.
@@ -51,11 +57,12 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    if not is_valid_vector(query_vector) or not is_valid_vector(document_vector):
+        return None
+
     dist = 0
-    i = 0
     for que_vec, doc_vec in zip(query_vector, document_vector):
         dist += (que_vec - doc_vec) ** 2
-        i += 1
     return sqrt(dist)
 
 
@@ -229,6 +236,15 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not is_valid_vector(vector) or len(vector) != len(self._vocabulary):
+            return None
+
+        tokenized_document = []
+        for token in self._vocabulary:
+            token_index = self._token2ind[token]
+            if vector[token_index] != 0.0:
+                tokenized_document.append(token)
+        return tokenized_document
 
     def save(self, file_path: str) -> bool:
         """
@@ -301,6 +317,8 @@ class BasicSearchEngine:
         """
         self._vectorizer = vectorizer
         self._tokenizer = tokenizer
+        self._documents = []
+        self._document_vectors = []
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -327,7 +345,7 @@ class BasicSearchEngine:
         return True
 
     def retrieve_relevant_documents(
-        self, query: str, n_neighbours: int
+            self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
@@ -348,6 +366,8 @@ class BasicSearchEngine:
         vectorized_query = self._vectorizer.vectorize(tokenized_query)
         nearest_neighbours = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
         relevant_documents = []
+        if not tokenized_query or not vectorized_query or not nearest_neighbours:
+            return None
         for nearest_neighbour in nearest_neighbours:
             document_index = nearest_neighbour[0]
             document_distance = nearest_neighbour[1]
@@ -389,9 +409,14 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not is_valid_vector(query_vector):
+            return None
+
+        nearest_neighbors = self._calculate_knn(query_vector, self._document_vectors, 1)
+        return self._documents[nearest_neighbors[0][0]]
 
     def _calculate_knn(
-        self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
+            self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
         """
         Find nearest neighbours for a query vector.
@@ -406,7 +431,9 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if (not isinstance(document_vectors, list) or
+        if (not is_valid_vector(query_vector) or
+                not isinstance(document_vectors, list) or
+                not all(is_valid_vector(doc_vec) for doc_vec in document_vectors) or
                 not isinstance(n_neighbours, int)):
             return None
 
@@ -415,11 +442,10 @@ class BasicSearchEngine:
             document_distance = calculate_distance(query_vector, document_vector)
             if not document_distance:
                 return None
-            neighbours.append((document_vector.index(document_vectors), document_distance))
+            neighbours.append((document_vectors.index(document_vector), document_distance))
 
-        nearest_neighbours = neighbours[0:n_neighbours]
-        nearest_neighbours = sorted(nearest_neighbours, reverse=True, key=lambda tuple_: tuple_[1])
-        return nearest_neighbours
+        neighbours = sorted(neighbours, key=lambda tuple_: tuple_[1])
+        return neighbours[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -471,11 +497,11 @@ class Node(NodeLike):
     right_node: NodeLike | None
 
     def __init__(
-        self,
-        vector: Vector = (),
-        payload: int = -1,
-        left_node: NodeLike | None = None,
-        right_node: NodeLike | None = None,
+            self,
+            vector: Vector = (),
+            payload: int = -1,
+            left_node: NodeLike | None = None,
+            right_node: NodeLike | None = None,
     ) -> None:
         """
         Initialize an instance of the Node class.
@@ -632,7 +658,7 @@ class SearchEngine(BasicSearchEngine):
         """
 
     def retrieve_relevant_documents(
-        self, query: str, n_neighbours: int = 1
+            self, query: str, n_neighbours: int = 1
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.

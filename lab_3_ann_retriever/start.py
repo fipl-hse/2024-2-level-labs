@@ -31,6 +31,7 @@ def main() -> None:
     """
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
+
     tuple_file = open_files()
     docs = tuple_file[0]
     doc = docs[0]
@@ -41,12 +42,10 @@ def main() -> None:
     tokenized_doc = tokenizer.tokenize(doc)
     if not tokenized_doc:
         return None
-    print(tokenized_doc)
 
     tokenized_docs = tokenizer.tokenize_documents(docs)
     if not tokenized_docs:
         return None
-    print(tokenized_docs)
 
     vectorizer = m.Vectorizer(tokenized_docs)
     vectorizer.build()
@@ -61,6 +60,12 @@ def main() -> None:
     knn_retriever = m.BasicSearchEngine(vectorizer, tokenizer)
     knn_retriever.index_documents(docs)
     knn_retriever.retrieve_relevant_documents("Мои кот и собака не дружат!", 2)
+
+    print(vectorizer.vector2tokens(query_vector))
+    print(knn_retriever.retrieve_vectorized(query_vector))
+
+    secret = tuple(text)
+    print(vectorizer.vector2tokens(secret))
 
     result = (tokenizer, vectorizer)
     assert result, "Result is None"

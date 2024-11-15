@@ -179,21 +179,26 @@ print("*" * 15 + " TASKS " + "*" * 15)
 
 # Task 1
 # easy level
-# class ...:
-#
-#     def __init__(...):
-#         ...
+class Deadline:
 
-# fill the gaps so that the next line prints: "Oh, no! It is another deadline!"
-# deadline = Deadline()
+    def __init__(self, phrase):
+        self.oh_no_phrase = phrase
+    def print_phrase(self):
+        print(self.oh_no_phrase)
+
+particular_phrase = "Oh, no! It is another deadline!"
+deadline = Deadline(particular_phrase)
+deadline.print_phrase()
 
 
 #  Task 2
 # easy level
-# class ...:
-#
-#     def ...:
-#         ...
+class Student:
+     def __init__(self,name,year):
+         self.name = name
+         self.year = year
+     def say_hello(self):
+        print( f"Hello! My name is {self.name}, I'm in year {self.year}")
 
 # fill the gaps so that the next lines print the corresponding messages
 # student1 = Student('Marina', 1)  # Hello! My name is Marina, I'm in year 1
@@ -204,7 +209,7 @@ print("*" * 15 + " TASKS " + "*" * 15)
 # easy level
 # class Insect:
 #
-#     def __init__(...):
+#     def __init__(self,name,legs):
 #         ...
 #
 #     def introduce(self):
@@ -219,40 +224,52 @@ print("*" * 15 + " TASKS " + "*" * 15)
 
 # Task 4
 # medium level
-# class Student:
-#     """
-#     If I have less than three deadlines, my mood is Good!
-#     If I have from 3 to 5 deadlines, my mood is So-so...
-#     If I have more than 5 deadlines, my mood is Bad!!!
-#     """
+class Student:
+     """
+     If I have less than three deadlines, my mood is Good!
+     If I have from 3 to 5 deadlines, my mood is So-so...
+     If I have more than 5 deadlines, my mood is Bad!!!
+     """
+     def __init__ (self, deadlines_count:int):
+         self.deadline = deadlines_count
+
+     def mood(self):
+        if self.deadline <3:
+            mood = 'Good'
+        elif self.deadline <=3 and self.deadline <=5:
+            mood = 'So-so'
+        else:
+            mood = 'Bad'
+
+        return mood
 
 
 # implement a class so that the following code works
-# student = Student(2)
-# print(student.mood())  # Good
-# student.deadlines = 4
-# print(student.mood())  # So-so
-# student.deadlines = 1000
-# print(student.mood())  # Bad
+student = Student(2)
+print(student.mood())  # Good
+student.deadlines = 4
+print(student.mood())  # So-so
+student.deadlines = 1000
+print(student.mood())  # Bad
 
 # Task 5
 # medium level
-# class Square:
-#
-#     def __init__(self, side_length: float) -> None:
-#         ...
-#
-#     def get_area(self) -> float:
-#         ...
-#
-#     def get_perimeter(self) -> float:
-#         ...
+class Square:
 
-# square1 = Square(side_length=2)
-# print(square1.get_area(), square1.get_perimeter())  # 4 8
+     def __init__(self, side_length: float) -> None:
+         self.length = side_length
+
+     def get_area(self) -> float:
+         return self.length**2
+
+     def get_perimeter(self) -> float:
+         return self.length*4
+
+square1 = Square(side_length=2)
+print(square1.get_area(), square1.get_perimeter())  # 4 8
 #
-# square2 = Square(side_length=5.12)
-# print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
+square2 = Square(side_length=5.12)
+print(square2.get_area(), square2.get_perimeter())  # 26.2144 20.48
 
 
 # Task 6
@@ -263,7 +280,33 @@ print("*" * 15 + " TASKS " + "*" * 15)
 # What methods should be present? What attributes should be added?
 # Create such a class and demonstrate its instantiating for at least two different subjects.
 
-# class ???:
-#     """
-#     A class to represent a learning discipline studied in HSE
-#     """
+class Discipline:
+     """
+     A class to represent a learning discipline studied in HSE
+     """
+     def __init__(self, name_subject, name_teacher, credits, hours, tasks):
+         self.name_subject = name_subject
+         self.name_teacher = name_teacher
+         self.credits = credits
+         self.hours = hours
+         self.tasks = tasks
+         self.stud
+
+     def introduce(self):
+         print(f'Your new discipline is {self.name_subject}, teacher is {self.name_teacher}. Additional info: credits = {self.credits}, tasks ={self.tasks}, hours = {self.hours}')
+
+     def get_task(self):
+         for task in self.tasks:
+            print(task)
+
+     def het_best_stud(self):
+         sorted_dict = sorted(self.stud_grades.values(), key = lambda x:x)
+         best_stud = self.stud_grades
+         print(sorted_dict)
+
+vvl = Discipline(name_subject= 'Введение в лингвистику', name_teacher= 'Маргарита Андреевна', credits=100, hours= 100, tasks= 'реферирование, самостоятельная')
+vvl.introduce()
+vvl.get_task()
+vvl.get_best_stud()
+
+

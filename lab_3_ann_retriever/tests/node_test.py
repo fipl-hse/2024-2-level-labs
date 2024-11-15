@@ -149,3 +149,42 @@ class NodeTest(unittest.TestCase):
         with mock.patch("lab_3_ann_retriever.main.load_vector", return_value=None):
             result = self.node.load(self.state)
         self.assertFalse(result)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_invalid_left(self):
+        """
+        Handling cases where left_node is wrong
+        """
+        invalid_left_node_values = [[None], (None,), 7, 0.7, "you meant noTe?"]
+        for invalid_value in invalid_left_node_values:
+            state = {
+                "left_node": invalid_value,
+                "payload": -1,
+                "right_node": {
+                    "left_node": None,
+                    "payload": 0,
+                    "right_node": None,
+                    "vector": {"elements": {0: 0.1, 1: 0.1}, "len": 2},
+                },
+                "vector": {"elements": {}, "len": 2},
+            }
+            actual = self.node.load(state)
+            self.assertFalse(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_invalid_right_type(self):
+        """
+        Handling cases where right_node is wrong
+        """
+        invalid_right_node_values = [[None], (None,), 7, 0.7, "you meant noTe?"]
+        for invalid_value in invalid_right_node_values:
+            state = {
+                "left_node": None,
+                "payload": -1,
+                "right_node": invalid_value,
+                "vector": {"elements": {}, "len": 2},
+            }
+            actual = self.node.load(state)
+            self.assertFalse(actual)

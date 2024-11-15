@@ -1,10 +1,11 @@
 # pylint: disable=duplicate-code, protected-access
 """
-Checks the third lab's Basic Search Engine class.
+Checks the third lab's Search Engine class.
 """
 import json
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import numpy as np
 import pytest
@@ -133,6 +134,35 @@ class SearchEngineTest(unittest.TestCase):
             self.assertIsInstance(doc[1], str)
 
     @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_retrieve_relevant_documents_none_vectorize(self):
+        """
+        Handles the case where vectorizer returns None
+        """
+        self.retriever.index_documents(self.documents)
+        with mock.patch.object(self.retriever._vectorizer, "vectorize", return_value=None):
+            actual = self.retriever.retrieve_relevant_documents(self.query)
+            self.assertIsNone(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_retrieve_relevant_documents_none_query(self):
+        """
+        None query method return scenario
+        """
+        self.retriever.index_documents(self.documents)
+        with mock.patch.object(self.retriever._tree, "query", return_value=[(None, None)]):
+            actual = self.retriever.retrieve_relevant_documents(self.query)
+            self.assertIsNone(actual)
+
+        self.retriever.index_documents(self.documents)
+        with mock.patch.object(self.retriever._tree, "query", return_value=[]):
+            actual = self.retriever.retrieve_relevant_documents(self.query)
+            self.assertIsNone(actual)
+
+    @pytest.mark.lab_3_ann_retriever
     @pytest.mark.mark10
     def test_save_ideal(self):
         """
@@ -168,6 +198,18 @@ class SearchEngineTest(unittest.TestCase):
         """
         self.retriever.index_documents(self.documents)
         self.assertIsInstance(self.retriever.save(str(self.test_path)), bool)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_save_empty_tree(self):
+        """
+        Empty tree for save method scenario
+        """
+        self.retriever.index_documents(self.documents)
+        self.retriever._tree._root = None
+        self.retriever._tree.save()
+        actual = self.retriever.save(str(self.test_path))
+        self.assertFalse(actual)
 
     @pytest.mark.lab_3_ann_retriever
     @pytest.mark.mark10
@@ -241,3 +283,15 @@ class SearchEngineTest(unittest.TestCase):
         actual = self.retriever.load(str(self.exp_path))
         self.assertIsInstance(actual, bool)
         self.assertTrue(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_empty_tree_save(self):
+        """
+        Empty tree for load method scenario
+        """
+        self.retriever.index_documents(self.documents)
+        self.retriever._tree._root = None
+        with mock.patch.object(self.retriever._tree, "load", return_value=None):
+            actual = self.retriever.load(str(self.exp_path))
+        self.assertFalse(actual)

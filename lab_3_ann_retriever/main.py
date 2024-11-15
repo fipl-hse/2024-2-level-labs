@@ -193,6 +193,7 @@ class Vectorizer:
         self._vocabulary = []
         self._idf_values = {}
         self._token2ind = {}
+        self.build()
 
     def build(self) -> bool:
         """
@@ -205,14 +206,14 @@ class Vectorizer:
                 or not all(isinstance(tokens, list) for tokens in self._corpus)
                 or not all(isinstance(word, str) for tokens in self._corpus for word in tokens)):
             return False
-        # self._vocabulary = [word for tokens in self._corpus for word in tokens if word not in self._vocabulary]
+        self._vocabulary = sorted(list(set(sum(self._corpus, []))))
         for tokens in self._corpus:
             for word in tokens:
                 if word in self._vocabulary:
                     continue
                 self._vocabulary.append(word)
-        sorted(self._vocabulary)
-        if not isinstance(self._vocabulary, dict):
+        self._vocabulary.sort()
+        if not isinstance(self._vocabulary, list):
             return False
         self._idf_values = lab_2.calculate_idf(self._vocabulary, self._corpus)
         for token in self._vocabulary:
@@ -268,6 +269,7 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
+        return False
 
     def load(self, file_path: str) -> bool:
         """
@@ -281,6 +283,7 @@ class Vectorizer:
 
         In case of corrupt input arguments, False is returned.
         """
+
 
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
         """
@@ -297,24 +300,11 @@ class Vectorizer:
         if (not isinstance(document, list) or len(document) == 0
                 or not all(isinstance(word, str) for word in document)):
             return None
-        self.build()
         tf = lab_2.calculate_tf(self._vocabulary, document)
         if not isinstance(tf, dict):
             return None
-        tf_idf = {}
-        vector = [0.0 for elem in self._vocabulary]
-        for word in document:
-            if word not in self._idf_values:
-                continue
-            tf_idf_word = tf[word] * self._idf_values[word]
-            if word not in self._vocabulary:
-                continue
-            tf_idf[word] = tf_idf_word
-        for token in tf_idf.items():
-            if token in self._token2ind:
-                index = self._token2ind[token[0]]
-                vector[index] = tf_idf[token[0]]
-        return tuple(vector)
+        return tuple((tf[word] * self._idf_values[word] if word in document else 0.0
+                      for word in self._vocabulary))
 
 
 class BasicSearchEngine:
@@ -337,6 +327,8 @@ class BasicSearchEngine:
         """
         self._tokenizer = tokenizer
         self._vectorizer = vectorizer
+        self._document_vectors = []
+        self._documents = []
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -354,12 +346,7 @@ class BasicSearchEngine:
                 or not all(isinstance(text, str) for text in documents)):
             return False
         self._documents = documents
-        self._document_vectors = []
-        for text in documents:
-            vector = self._index_document(text)
-            if not vector:
-                return False
-            self._document_vectors.append(vector)
+        self._document_vectors = [self._index_document(text) for text in documents]
         if not self._document_vectors or self._document_vectors is None:
             return False
         return True
@@ -482,10 +469,9 @@ class BasicSearchEngine:
         if not isinstance(document, str):
             return None
         tokens = self._tokenizer.tokenize(document)
-        if not isinstance(tokens, list):
+        if not tokens:
             return None
-        vector = self._vectorizer.vectorize(tokens)
-        return vector
+        return self._vectorizer.vectorize(tokens)
 
     def _dump_documents(self) -> dict:
         """
@@ -584,10 +570,10 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not isinstance(vectors, list) or not vectors:
+        if not vectors:
             return False
         depth = 0
-        parent = Node(vector=(), payload=-1)
+        parent = Node()
         left = True
         spaces = []
         indexes = list(range(len(vectors)))
@@ -599,30 +585,31 @@ class NaiveKDTree:
         while spaces:
             space = spaces.pop()
             space_vectors = space["vectors"]
-            if not space_vectors:
+            current_parent = space["parent node"]
+            if not space_vectors or not current_parent:
                 continue
-            if not isinstance(space_vectors, list):
-                return False
             axis = depth % len(vectors[0])
-            space_vectors.sort(key=lambda x: [axis])
+            space_vectors.sort(key=lambda x: x[axis])
             median_index = len(space_vectors) // 2
-            if space["parent node"] == -1:
-                self._root = space_vectors[median_index]
+            median_dot = space_vectors[median_index]
+            node_median_dot = Node(median_dot, payload=vectors.index(median_dot))
+            if current_parent.payload == -1:
+                self._root = node_median_dot
             else:
                 if space["space is left"]:
-                    Node.left_node = space_vectors[median_index]
+                    current_parent.left_node = node_median_dot
                 else:
-                    Node.right_node = space_vectors[median_index]
-            indexes =  list(range(len(space_vectors)))
+                    current_parent.right_node = node_median_dot
+            indexes = list(range(len(space_vectors)))
             spaces.append({"vectors": space_vectors[:median_index],
                            "indexes": indexes[:median_index],
                            "depth": (depth + 1),
-                           "parent node": space_vectors[median_index],
+                           "parent node": node_median_dot,
                            "space is left": True})
             spaces.append({"vectors": space_vectors[median_index + 1:],
                            "indexes": indexes[median_index + 1:],
                            "depth": (depth + 1),
-                           "parent node": space_vectors[median_index],
+                           "parent node": node_median_dot,
                            "space is left": False})
         return True
 
@@ -652,9 +639,7 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not self._root:
-            return None
-        return {'root': self._root.save()}
+
 
     def load(self, state: dict) -> bool:
         """
@@ -666,13 +651,6 @@ class NaiveKDTree:
         Returns:
             bool: True is loaded successfully, False in other cases
         """
-        if not isinstance(state, dict) or not state:
-            return False
-        self._root = Node()
-        self._root.load(state)
-        if not self._root:
-            return False
-        return True
 
     def _find_closest(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
@@ -687,7 +665,7 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not vector or not k:
+        if not vector or not isinstance(k, int) or not isinstance(vector, tuple):
             return None
         space = [(self._root, 0)]
         result = []
@@ -695,7 +673,7 @@ class NaiveKDTree:
             node, depth = space.pop()
             if not node or not isinstance(node.payload, int):
                 return None
-            if not node.left_node and not node.right_node:
+            if node.left_node is None and node.right_node is None:
                 distance = calculate_distance(vector, node.vector)
                 if not isinstance(distance, float):
                     return None

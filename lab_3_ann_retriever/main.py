@@ -53,17 +53,11 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     In case of corrupt input arguments, None is returned.
     """
 
-    if not isinstance(query_vector, list) or not isinstance(document_vector, list):
+    if query_vector is None or document_vector is None:
         return None
     if not query_vector or not document_vector:
         return 0.0
-    if (len(query_vector) != len(document_vector) or
-            not all(isinstance(token, (int, float)) for token in query_vector + document_vector)):
-        return None
-    if any(value < 0 for value in query_vector + document_vector):
-        return None
-    distance = math.sqrt(sum((q - d) ** 2 for q, d in zip(query_vector, document_vector)))
-    return distance
+    return math.sqrt(sum((q - d) ** 2 for q, d in zip(query_vector, document_vector)))
 
 
 def save_vector(vector: Vector) -> dict:

@@ -183,7 +183,7 @@ def main() -> None:
                 check_is_failed = True
 
     if check_is_failed:
-        print('Some of checks were failed. Fix it.')
+        print('Some of checks failed. Fix it.')
         sys.exit(1)
 
 

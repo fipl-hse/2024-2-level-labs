@@ -51,6 +51,9 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     for elem in tokens:
         if elem not in stopwords:
             result.append(elem)
+
+    result = [elem for elem in tokens if elem not in stopwords]
+
     return result
 
 

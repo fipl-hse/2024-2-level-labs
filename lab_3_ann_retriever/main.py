@@ -199,7 +199,7 @@ class Vectorizer:
         self._vocabulary = sorted(unique_terms)
         self._token2ind = {word: index for index, word in enumerate(self._vocabulary)}
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if self._idf_values is None and not self._vocabulary and not self._token2ind:
+        if self._idf_values is None:
             return False
         return True
 

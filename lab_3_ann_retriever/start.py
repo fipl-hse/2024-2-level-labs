@@ -40,13 +40,13 @@ def main() -> None:
     tokenizer = Tokenizer(stopwords)
     documents = open_files()[0]
     tokenized_documents = tokenizer.tokenize_documents(documents)
-    print(tokenized_documents)
+    # print(tokenized_documents)
     vectorizer = Vectorizer(tokenized_documents)
     vectorizer.build()
     knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
     knn_retriever.index_documents(documents)
-    print(vectorizer.vector2tokens(secret_vector))
-    print(knn_retriever.retrieve_vectorized(secret_vector))
+    # print(vectorizer.vector2tokens(secret_vector))
+    # print(knn_retriever.retrieve_vectorized(secret_vector))
     naive_tree = NaiveKDTree()
     vectors = knn_retriever._document_vectors
     naive_tree.build(vectors)
@@ -55,10 +55,12 @@ def main() -> None:
     naive_kdtree_retriever = SearchEngine(vectorizer, tokenizer)
     naive_kdtree_retriever.index_documents(documents)
     print(naive_kdtree_retriever.retrieve_relevant_documents(query))
-    tree = KDTree()
-    tree.build(vectors)
     kdtree_retriever = AdvancedSearchEngine(vectorizer, tokenizer)
     kdtree_retriever.index_documents(documents)
+    vectors = kdtree_retriever._document_vectors
+    tree = KDTree()
+    tree.build(vectors)
+    tree.query(query_vector)
     print(kdtree_retriever.retrieve_relevant_documents(query, 3))
     assert result, "Result is None"
 

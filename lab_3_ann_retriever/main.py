@@ -238,10 +238,11 @@ class Vectorizer:
             return None
         result = []
         for i, num in enumerate(vector):
-            if num != 0.0:
-                for token, ind in self._token2ind.items():
-                    if i == ind:
-                        result.append(token)
+            if num == 0.0:
+                continue
+            for token, ind in self._token2ind.items():
+                if i == ind:
+                    result.append(token)
         return result
 
     def save(self, file_path: str) -> bool:
@@ -259,7 +260,7 @@ class Vectorizer:
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump({'vocabulary': self._vocabulary,
                        'idf_values': self._idf_values,
-                       'token2ind': self._token2ind}, file)
+                       'token2ind': self._token2ind}, file, ensure_ascii=False)
         return True
 
     def load(self, file_path: str) -> bool:
@@ -386,7 +387,7 @@ class BasicSearchEngine:
         if not file_path or not isinstance(file_path, str):
             return False
         with open(file_path, 'w', encoding='utf-8') as file:
-            json.dump({'engine': self._dump_documents()}, file)
+            json.dump({'engine': self._dump_documents()}, file, ensure_ascii=False)
         return True
 
     def load(self, file_path: str) -> bool:
@@ -848,7 +849,7 @@ class SearchEngine(BasicSearchEngine):
             }
         }
         with open(file_path, 'w', encoding='utf-8') as file:
-            json.dump(state, file)
+            json.dump(state, file, ensure_ascii=False)
         return True
 
     def load(self, file_path: str) -> bool:

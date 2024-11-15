@@ -7,6 +7,8 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
+
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
@@ -130,11 +132,13 @@ class Tokenizer:
             return None
 
         tokenized_docs = []
+
         for doc in documents:
             tokenized_doc = self.tokenize(doc)
             if tokenized_doc is None:
                 return None
             tokenized_docs.append(tokenized_doc)
+
         return tokenized_docs
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
@@ -175,6 +179,11 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
+        self._corpus = corpus
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
+
 
     def build(self) -> bool:
         """
@@ -183,6 +192,23 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        if not self._corpus:
+            return False
+
+        unique_words = set()
+
+        for doc in self._corpus:
+            unique_words |= set(doc)
+        self._vocabulary = sorted(list(unique_words))
+        if not self._vocabulary:
+            return False
+
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+
+        for index, word in enumerate(self._vocabulary):
+            self._token2ind[word] = index
+
+        return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -196,6 +222,7 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -209,6 +236,16 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if len(vector) != len(self._vocabulary):
+            return None
+
+        text = []
+
+        for word in self._vocabulary:
+            if vector[self._token2ind[word]] != 0:
+                text.append(word)
+
+        return text
 
     def save(self, file_path: str) -> bool:
         """
@@ -246,6 +283,16 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document, list) or not document:
+            return None
+
+        vector = [0.0] * len(self._vocabulary)
+        tf = calculate_tf(self._vocabulary, document)
+
+        for i, word in enumerate(self._vocabulary):
+            vector[i] = tf[word] * self._idf_values[word]
+
+        return tuple(vector)
 
 
 class BasicSearchEngine:
@@ -266,6 +313,10 @@ class BasicSearchEngine:
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        self._vectorizer = vectorizer
+        self._tokenizer = tokenizer
+        self._documents = []
+        self._document_vectors = []
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -279,6 +330,19 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(documents, list) or not all(isinstance(doc, str) for doc in documents):
+            return False
+
+        self._documents = documents
+        if not self._documents:
+            return False
+
+        for document in self._documents:
+            self._document_vectors.append(self.index_document(document))
+        if not self._document_vectors:
+            return False
+
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int

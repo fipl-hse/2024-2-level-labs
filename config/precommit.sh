@@ -5,13 +5,14 @@ if [[ "$1" == "smoke" ]]; then
   DIRS_TO_CHECK=(
     "config"
     "seminars"
-    "lab_5_scrapper"
     "lab_3_ann_retriever"
   )
 else
   DIRS_TO_CHECK=(
     "config"
     "seminars"
+    "lab_1_classify_by_unigrams"
+    "lab_2_retrieval_w_bm25"
     "lab_3_ann_retriever"
   )
 fi

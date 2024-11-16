@@ -771,7 +771,7 @@ class SearchEngine(BasicSearchEngine):
         if nearest_neighbors is None:
             return None
         relevant_documents = []
-        for i, (distance, index) in enumerate(nearest_neighbors):
+        for _, (distance, index) in enumerate(nearest_neighbors):
             if index is not None and index < len(self._documents):
                 relevant_documents.append((distance, self._documents[index]))
         return relevant_documents or None

@@ -517,6 +517,11 @@ class Node(NodeLike):
             right_node (NodeLike | None): Right node
         """
 
+        self.vector = vector
+        self.payload = payload
+        self.left_node = left_node
+        self.right_node = right_node
+
     def save(self) -> dict:
         """
         Save Node instance to state.
@@ -549,6 +554,8 @@ class NaiveKDTree:
         Initialize an instance of the KDTree class.
         """
 
+        self._root = None
+
     def build(self, vectors: list[Vector]) -> bool:
         """
         Build tree.
@@ -561,6 +568,30 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
+
+        if not vectors or not all(isinstance(vec, tuple) and len(vec) > 0 for vec in vectors):
+            return False
+        dimensions = len(vectors[0])
+        nodes = [(vectors, 0, None, True)]
+        while nodes:
+            points, depth, parent, is_left = nodes.pop()
+            if not points:
+                continue
+            axis = depth % dimensions
+            points.sort(key=lambda v: v[axis])
+            median_index = len(points) // 2
+            median_point = points[median_index]
+            node = Node(median_point, median_index)
+            if parent is None:
+                self._root = node
+            else:
+                if is_left:
+                    parent.left_node = node
+                else:
+                    parent.right_node = node
+            nodes.append((points[:median_index], depth + 1, node, True))
+            nodes.append((points[median_index + 1:], depth + 1, node, False))
+        return self._root is not None
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
@@ -575,6 +606,11 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+
+        if not isinstance(vector, tuple) or len(vector) == 0 or k <= 0:
+            return None
+        nearest_neighbors = self._find_closest(vector, k)
+        return nearest_neighbors or None
 
     def save(self) -> dict | None:
         """
@@ -610,6 +646,31 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+
+        if not (isinstance(vector, tuple) and isinstance(k, int) and vector
+                and self._root is not None and isinstance(self._root, Node)):
+            return None
+        best = []
+        nodes = [(self._root, 0)]
+        while nodes:
+            node, depth = nodes.pop()
+            if node is None:
+                continue
+            dist = calculate_distance(vector, node.vector)
+            if dist is None:
+                continue
+            best.append((dist, node.payload))
+            best = best[:k]
+            axis = depth % len(vector)
+            if vector[axis] < node.vector[axis]:
+                nodes.append((node.left_node, depth + 1))
+                if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
+                    nodes.append((node.right_node, depth + 1))
+            else:
+                nodes.append((node.right_node, depth + 1))
+                if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
+                    nodes.append((node.left_node, depth + 1))
+        return best or None
 
 
 class KDTree(NaiveKDTree):
@@ -648,6 +709,9 @@ class SearchEngine(BasicSearchEngine):
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
 
+        super().__init__(vectorizer, tokenizer)
+        self._tree = NaiveKDTree()
+
     def index_documents(self, documents: list[str]) -> bool:
         """
         Index documents for retriever.
@@ -660,6 +724,20 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
+
+        if not (isinstance(documents, list) and documents and all(isinstance(doc, str) for doc in documents)):
+            return False
+        self._documents = []
+        self._document_vectors = []
+        for doc in documents:
+            vector = self._index_document(doc)
+            if vector is None:
+                return False
+            self._documents.append(doc)
+            self._document_vectors.append(vector)
+        if not self._tree.build(self._document_vectors):
+            return False
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -676,6 +754,23 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
+
+        if not isinstance(query, str) or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+            return None
+        tokenized_query = self._tokenizer.tokenize(query)
+        if tokenized_query is None:
+            return None
+        query_vector = self._vectorizer.vectorize(tokenized_query)
+        if query_vector is None:
+            return None
+        nearest_neighbors = self._tree.query(query_vector, k=n_neighbours)
+        if nearest_neighbors is None:
+            return None
+        relevant_documents = []
+        for distance, index in nearest_neighbors:
+            if index is not None and index < len(self._documents):
+                relevant_documents.append((distance, self._documents[index]))
+        return relevant_documents or None
 
     def save(self, file_path: str) -> bool:
         """

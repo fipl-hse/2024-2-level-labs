@@ -767,12 +767,11 @@ class SearchEngine(BasicSearchEngine):
         query_vector = self._vectorizer.vectorize(tokenized_query)
         if query_vector is None:
             return None
-        nearest_neighbors = self._tree.query(query_vector, k=n_neighbours)
+        nearest_neighbors = self._tree.query(query_vector, n_neighbours)
         if nearest_neighbors is None:
             return None
-        distances, indexes = nearest_neighbors
         relevant_documents = []
-        for distance, index in zip(distances, indexes):
+        for distance, index in nearest_neighbors:
             if index is not None and index < len(self._documents):
                 relevant_documents.append((distance, self._documents[index]))
         return relevant_documents or None
@@ -816,4 +815,4 @@ class AdvancedSearchEngine(SearchEngine):
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
 
-        super().__init__()
+        super().__init__(vectorizer, tokenizer)

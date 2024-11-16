@@ -277,14 +277,16 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
 
-        if not isinstance(document, list) or not document or not all(isinstance(token, str) for token in document):
+        if (not isinstance(document, list) or not document or
+                not all(isinstance(token, str) for token in document)):
             return None
         tf_idf_vector = [0.0] * len(self._vocabulary)
         for token in document:
             if self._token2ind.get(token) is not None:
                 tf_values = calculate_tf(self._vocabulary, document)
                 if tf_values is not None:
-                    tf_idf_vector[self._token2ind[token]] = tf_values [token] * self._idf_values[token]
+                    tf_idf_vector[self._token2ind[token]] = (
+                            tf_values[token] * self._idf_values[token])
         return Vector(tf_idf_vector)
 
 
@@ -435,9 +437,10 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
 
-        if (not isinstance(query_vector, (list, tuple)) or not query_vector
-                or not isinstance(document_vectors, list) or not document_vectors
-                or not isinstance(n_neighbours, int) or n_neighbours <= 0):
+        bad_input = (not isinstance(query_vector, (list, tuple)) or not query_vector
+                     or not isinstance(document_vectors, list) or not document_vectors
+                     or not isinstance(n_neighbours, int) or n_neighbours <= 0)
+        if bad_input:
             return None
         distances = []
         for doc_vector in document_vectors:
@@ -725,7 +728,8 @@ class SearchEngine(BasicSearchEngine):
         In case of corrupt input arguments, False is returned.
         """
 
-        if not (isinstance(documents, list) and documents and all(isinstance(doc, str) for doc in documents)):
+        if not (isinstance(documents, list) and documents
+                and all(isinstance(doc, str) for doc in documents)):
             return False
         self._documents = []
         self._document_vectors = []
@@ -766,8 +770,9 @@ class SearchEngine(BasicSearchEngine):
         nearest_neighbors = self._tree.query(query_vector, k=n_neighbours)
         if nearest_neighbors is None:
             return None
+        distances, indexes = nearest_neighbors
         relevant_documents = []
-        for distance, index in nearest_neighbors:
+        for distance, index in zip(distances, indexes):
             if index is not None and index < len(self._documents):
                 relevant_documents.append((distance, self._documents[index]))
         return relevant_documents or None
@@ -810,3 +815,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+
+        super().__init__()

@@ -433,7 +433,9 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query_vector, (list, tuple)) or not query_vector:
+        if (not isinstance(query_vector, (list, tuple))
+                or not query_vector
+                or not self._document_vectors):
             return None
         if (not isinstance(query_vector, tuple)
                 or len(query_vector) != len(self._document_vectors[0])):

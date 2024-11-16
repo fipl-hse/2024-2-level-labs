@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from lab_3_ann_retriever.main import Tokenizer, Vectorizer
+from lab_3_ann_retriever.main import Tokenizer, Vectorizer, BasicSearchEngine
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -36,8 +36,11 @@ def main() -> None:
     tokenizer = Tokenizer(open_files()[1])
     tokenized_docs = [tokenizer.tokenize(doc) for doc in open_files()[1]]
     vectorizer = Vectorizer(tokenized_docs)
+    vectorizer.build()
 
-    result = vectorizer
+    knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
+
+    result = knn_retriever
     assert result, "Result is None"
 
 

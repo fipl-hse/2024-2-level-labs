@@ -339,7 +339,6 @@ class BasicSearchEngine:
         self._tokenizer = tokenizer
         self._document_vectors = []
         self._documents = []
-        self.node_like = NodeLike()
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -394,8 +393,11 @@ class BasicSearchEngine:
 
         relevant_docs = []
         for index, float_as_value in knn_list_of_tuples:
-            relevant_docs.append((float_as_value, self._documents[index]))
-        return relevant_docs
+            if float_as_value is not None:
+                relevant_docs.append((float_as_value, self._documents[index]))
+        if relevant_docs:
+            return relevant_docs
+        return None
 
     def save(self, file_path: str) -> bool:
         """
@@ -458,17 +460,17 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(document_vectors, list) or not isinstance(n_neighbours, int) or \
-                not query_vector or not document_vectors:
+        if (not isinstance(document_vectors, list) or not isinstance(n_neighbours, int)
+                or not query_vector or not document_vectors):
             return None
 
         distances = []
-        for index_from_tuple, value_from_tuple in enumerate(self._document_vectors):
-            distance = calculate_distance(query_vector, value_from_tuple)
+        for value_in_tuple in document_vectors:
+            distance = calculate_distance(query_vector, value_in_tuple)
             if distance is None:
                 return None
-            distances.append((index_from_tuple, distance))
-        distances = sorted(distances, key=lambda x: x[1])
+            distances.append((document_vectors.index(value_in_tuple), distance))
+        distances = sorted(distances, key=lambda x: x[1], reverse=False)
 
         return distances[:n_neighbours]
 

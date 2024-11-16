@@ -57,8 +57,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         return 0.0
     euclidean_distance = 0.0
     for i, number in enumerate(query_vector):
-        step_1 = (number - document_vector[i])**2
-        euclidean_distance += step_1
+        euclidean_distance += (number - document_vector[i])**2
     return euclidean_distance**0.5
 
 
@@ -206,6 +205,8 @@ class Vectorizer:
             return False
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if not self._idf_values:
+            return False
 
         for i, word in enumerate(self._vocabulary):
             self._token2ind[word] = i
@@ -355,13 +356,12 @@ class BasicSearchEngine:
         """
         relevant_documents = []
         vectorized_query = self._index_document(query)
-        if vectorized_query is None:
-            return None
-        self.index_documents(self._documents)
         knn = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
         if knn is None or not knn:
             return None
         for value in knn:
+            if not isinstance(value[0], int):
+                return None
             relevant_documents.append((value[1], self._documents[value[0]]))
         return relevant_documents
 
@@ -399,11 +399,15 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if query_vector is not Vector:
+        if not isinstance(query_vector, tuple):
             return None
+        for vector in self._document_vectors:
+            if len(vector) < len(query_vector):
+                return None
         doc = self._calculate_knn(query_vector, self._document_vectors, 1)
+        if not doc:
+            return None
         return self._documents[doc[0][0]]
-
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
@@ -424,9 +428,9 @@ class BasicSearchEngine:
         if query_vector is None or not document_vectors:
             return None
         knn = []
-        for i, doc in enumerate(document_vectors):
-            knn.append((i, calculate_distance(query_vector, doc)))
-        sorted(knn, key=lambda x: x[1])
+        for doc in document_vectors:
+            knn.append((document_vectors.index(doc), calculate_distance(query_vector, doc)))
+        knn = sorted(knn, key=lambda x: x[1])
         return knn[:n_neighbours+1]
 
     def _index_document(self, document: str) -> Vector | None:

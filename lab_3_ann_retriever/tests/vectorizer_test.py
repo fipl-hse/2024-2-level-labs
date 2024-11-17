@@ -2,8 +2,10 @@
 """
 Checks the third lab's Vectorizer class.
 """
-
+import json
 import unittest
+from pathlib import Path
+from unittest import mock
 
 import numpy as np
 import pytest
@@ -62,7 +64,7 @@ class VectorizerTest(unittest.TestCase):
             "шлейке",
             "это",
         ]
-        corpus = [
+        self.corpus = [
             [
                 "вектора",
                 "используются",
@@ -209,15 +211,18 @@ class VectorizerTest(unittest.TestCase):
             "шлейке": 40,
             "это": 41,
         }
-        self.vectorizer = Vectorizer(corpus)
+        self.vectorizer = Vectorizer(self.corpus)
+        self.exp_path = Path(__file__).parent.parent / "tests" / "assets" / "vectorizer_data.json"
+        self.test_path = Path(__file__).parent.parent / "test_tmp" / "vectorizer_state.json"
+        self.test_path.parent.mkdir(parents=True, exist_ok=True)
 
     @pytest.mark.lab_3_ann_retriever
     @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
-    def test_build_vocabulary_ideal(self):
+    def test_build_ideal(self):
         """
-        Ideal build_vocabulary scenario
+        Ideal build scenario
         """
         self.vectorizer.build()
 
@@ -229,14 +234,25 @@ class VectorizerTest(unittest.TestCase):
     @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
-    def test_build_vocabulary_invalid_input(self):
+    def test_build_invalid_input(self):
         """
-        Invalid input build_vocabulary scenario
+        Invalid input build scenario
         """
-        bad_inputs = [None, {}, []]
+        bad_inputs = [None, [], {}]
         for bad_input in bad_inputs:
             vectorizer = Vectorizer(bad_input)
-            self.assertRaises(ValueError, vectorizer.build)
+            self.assertFalse(vectorizer.build())
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark6
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_build_empty_calculate_idf(self):
+        """
+        Empty calculate_idf scenario
+        """
+        with mock.patch("lab_3_ann_retriever.main.calculate_idf", return_value=None):
+            self.assertFalse(self.vectorizer.build())
 
     @pytest.mark.lab_3_ann_retriever
     @pytest.mark.mark6
@@ -248,7 +264,7 @@ class VectorizerTest(unittest.TestCase):
         """
         self.vectorizer.build()
         document = ["кот", "вектор", "кот"]
-        expected = [
+        expected = (
             0.0,
             0.2824326201290679,
             0.0,
@@ -291,7 +307,7 @@ class VectorizerTest(unittest.TestCase):
             0.0,
             0.0,
             0.0,
-        ]
+        )
         actual = self.vectorizer._calculate_tf_idf(document)
         np.testing.assert_almost_equal(actual, expected)
 
@@ -348,7 +364,7 @@ class VectorizerTest(unittest.TestCase):
             "боится",
             "собак",
         ]
-        expected = [
+        expected = (
             0.06052127574194312,
             0.12104255148388623,
             0.0,
@@ -391,7 +407,7 @@ class VectorizerTest(unittest.TestCase):
             0.06052127574194312,
             0.06052127574194312,
             0.0,
-        ]
+        )
         self.vectorizer.build()
         actual = self.vectorizer.vectorize(tokenized_document)
         np.testing.assert_almost_equal(actual, expected)
@@ -438,3 +454,272 @@ class VectorizerTest(unittest.TestCase):
         self.assertIsInstance(actual, tuple)
         for freq in actual:
             self.assertIsInstance(freq, float)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark6
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_vector2tokens_ideal(self):
+        """
+        Ideal scenario for vector2tokens method
+        """
+        expected = [
+            "вместе",
+            "думает",
+            "забавно",
+            "кошка",
+            "любимый",
+            "мягкий",
+            "наблюдать",
+            "плед",
+            "просто",
+            "собака",
+            "спят",
+            "это",
+        ]
+        vector = (
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.061,
+            0.061,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+        )
+        self.vectorizer.build()
+        actual = self.vectorizer.vector2tokens(vector)
+        self.assertEqual(expected, actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark6
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_vector2tokens_wrong_length(self):
+        """
+        Wrong length scenario for vector2tokens method
+        """
+        vector = (
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.061,
+            0.061,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        )
+        self.vectorizer.build()
+        actual = self.vectorizer.vector2tokens(vector)
+        self.assertIsNone(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark6
+    @pytest.mark.mark8
+    @pytest.mark.mark10
+    def test_vector2tokens_return_value(self):
+        """
+        Checks return type for vector2tokens method
+        """
+        vector = (
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.061,
+            0.061,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+            0.0,
+            0.061,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.061,
+        )
+        self.vectorizer.build()
+        actual = self.vectorizer.vector2tokens(vector)
+        self.assertIsInstance(actual, list)
+        for word in actual:
+            self.assertIsInstance(word, str)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_save_ideal(self):
+        """
+        Ideal scenario for save method
+        """
+        self.vectorizer.build()
+        self.vectorizer.save(str(self.test_path))
+
+        with open(str(self.test_path), "r", encoding="utf-8") as f:
+            actual = json.load(f)
+
+        with open(str(self.exp_path), "r", encoding="utf-8") as f:
+            expected = json.load(f)
+        self.assertEqual(actual, expected)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_save_return_value(self):
+        """
+        Checks return type for save method
+        """
+        self.vectorizer.build()
+        self.assertIsInstance(self.vectorizer.save(str(self.test_path)), bool)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_ideal(self) -> None:
+        """
+        Ideal scenario for loading file
+        """
+        self.vectorizer.build()
+        new_vectorizer = Vectorizer(self.corpus)
+        new_vectorizer.load(str(self.exp_path))
+        self.assertEqual(self.vectorizer._idf_values, new_vectorizer._idf_values)
+        self.assertEqual(self.vectorizer._vocabulary, new_vectorizer._vocabulary)
+        self.assertEqual(self.vectorizer._token2ind, new_vectorizer._token2ind)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_missing_values(self) -> None:
+        """
+        Missing values scenario for loading file
+        """
+        self.vectorizer.build()
+        with open(str(self.test_path), "w", encoding="utf-8") as f:
+            state = {
+                "vocabulary": self.vectorizer._vocabulary,
+                "token2ind": self.vectorizer._token2ind,
+            }
+            json.dump(state, f)
+
+        loaded_vectorizer = Vectorizer(self.corpus)
+        self.assertFalse(loaded_vectorizer.load(str(self.test_path)))
+
+        with open(str(self.test_path), "w", encoding="utf-8") as f:
+            state = {
+                "vocabulary": self.vectorizer._vocabulary,
+                "idf_values": self.vectorizer._idf_values,
+            }
+            json.dump(state, f)
+
+        loaded_vectorizer = Vectorizer(self.corpus)
+        self.assertFalse(loaded_vectorizer.load(str(self.test_path)))
+
+        with open(str(self.test_path), "w", encoding="utf-8") as f:
+            state = {
+                "idf_values": self.vectorizer._idf_values,
+                "token2ind": self.vectorizer._token2ind,
+            }
+            json.dump(state, f)
+
+        loaded_vectorizer = Vectorizer(self.corpus)
+        self.assertFalse(loaded_vectorizer.load(str(self.test_path)))
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_return_value(self) -> None:
+        """
+        Checks return type for load method
+        """
+        self.vectorizer.build()
+        actual = self.vectorizer.load(str(self.exp_path))
+        self.assertIsInstance(actual, bool)
+        self.assertTrue(actual)

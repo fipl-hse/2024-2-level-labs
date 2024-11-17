@@ -1,6 +1,6 @@
 # pylint: disable=duplicate-code, protected-access
 """
-Checks the third lab's Priority КD Tree Retriever class.
+Checks the third lab's AdvancedSearchEngine class.
 """
 
 import json
@@ -15,7 +15,7 @@ from lab_3_ann_retriever.tests.tokenizer_test import get_documents_assets
 
 class AdvancedSearchEngineTest(unittest.TestCase):
     """
-    Tests PriorityKDTreeRetriever class functionality.
+    Tests Advanced Search Engine class functionality.
     """
 
     def setUp(self) -> None:
@@ -59,7 +59,7 @@ class AdvancedSearchEngineTest(unittest.TestCase):
         """
         bad_inputs = [{}, [], (), 7, 0.7, False]
         for bad_input in bad_inputs:
-            actual = self.retriever.save(bad_input)  # type: ignore
+            actual = self.retriever.save(bad_input)
             self.assertFalse(actual)
 
     @pytest.mark.lab_3_ann_retriever

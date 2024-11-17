@@ -1,5 +1,5 @@
 """
-Checks the third lab's calculate_distance method.
+Checks the third lab's calculate_distance function.
 """
 
 import unittest
@@ -16,8 +16,8 @@ class CalculateDistance(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        self.query_vector = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.0]
-        self.document_vector = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+        self.query_vector = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.0)
+        self.document_vector = (0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5)
 
     @pytest.mark.lab_3_ann_retriever
     @pytest.mark.mark6
@@ -68,11 +68,11 @@ class CalculateDistance(unittest.TestCase):
     @pytest.mark.mark10
     def test_calculate_distance_for_empty_vectors(self):
         """
-        Checks return type for calculate_distance
+        Empty vectors scenario for calculate_distance
         """
-        actual = calculate_distance([], self.document_vector)
+        actual = calculate_distance((), self.document_vector)
         self.assertEqual(actual, 0.0)
-        actual = calculate_distance(self.query_vector, [])
+        actual = calculate_distance(self.query_vector, ())
         self.assertEqual(actual, 0.0)
-        actual = calculate_distance([], [])
+        actual = calculate_distance((), ())
         self.assertEqual(actual, 0.0)

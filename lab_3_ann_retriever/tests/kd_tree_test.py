@@ -4,6 +4,7 @@ Checks the third lab's КD Tree class.
 """
 
 import unittest
+from unittest import mock
 
 import numpy as np
 import pytest
@@ -34,7 +35,6 @@ class KDTreeTest(unittest.TestCase):
         self.point = (953.58398, 382.63101)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_ideal(self):
         """
@@ -46,7 +46,6 @@ class KDTreeTest(unittest.TestCase):
         np.testing.assert_almost_equal(actual, expected)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_invalid_input(self):
         """
@@ -66,7 +65,6 @@ class KDTreeTest(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_return_value(self):
         """
@@ -75,7 +73,32 @@ class KDTreeTest(unittest.TestCase):
         self.kdtree.build(self.points)
         actual = self.kdtree._find_closest(self.point)
         self.assertIsInstance(actual, list)
-        for neigbour in actual:
-            self.assertIsInstance(neigbour, tuple)
-            self.assertIsInstance(neigbour[0], float)
-            self.assertIsInstance(neigbour[1], int)
+        for neighbour in actual:
+            self.assertIsInstance(neighbour, tuple)
+            self.assertIsInstance(neighbour[0], float)
+            self.assertIsInstance(neighbour[1], int)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_find_closest_empty_distances(self):
+        """
+        Empty distance scenario
+        """
+        self.kdtree.build(self.points)
+        with mock.patch("lab_3_ann_retriever.main.calculate_distance", return_value=None):
+            result = self.kdtree._find_closest(self.point)
+        self.assertIsNone(result)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_find_closest_away_node_is_worthy(self):
+        """
+        Away node is worth considering as the closest neighbour scenario
+        """
+        query = (-0.1, -0.2)
+        vectors = [(-0.26, -0.26), (0.0, -0.51), (-0.51, 0.0), (0.0, -0.26), (0.0, 0.0)]
+
+        self.kdtree.build(vectors)
+        actual = self.kdtree._find_closest(query)
+
+        np.testing.assert_almost_equal(actual, [(0.11661903789690602, 3)])

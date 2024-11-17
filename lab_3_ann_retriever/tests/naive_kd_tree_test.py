@@ -1,6 +1,6 @@
 # pylint: disable=protected-access
 """
-Checks the third lab's Naive КD Tree class.
+Checks the third lab's Naive KDTree class.
 """
 
 import unittest
@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 import lab_3_ann_retriever.main
-from lab_3_ann_retriever.main import NaiveKDTree
+from lab_3_ann_retriever.main import NaiveKDTree, Node
 
 
 class NaiveKDTreeTest(unittest.TestCase):
@@ -21,22 +21,21 @@ class NaiveKDTreeTest(unittest.TestCase):
     def setUp(self) -> None:
         self.kdtree = NaiveKDTree()
         self.points = [
-            [63.63961, 144.23502],
-            [222.23357, 385.66147],
-            [545.48236, 146.25533],
-            [645.48749, 502.83917],
-            [1043.4875, 168.47868],
-            [1494.0156, 590.72247],
-            [1096.0155, 661.43311],
-            [803.07129, 323.03201],
-            [358.60416, 654.36206],
-            [510.12704, 321.01172],
-            [852.56873, 677.59558],
+            (63.63961, 144.23502),
+            (222.23357, 385.66147),
+            (545.48236, 146.25533),
+            (645.48749, 502.83917),
+            (1043.4875, 168.47868),
+            (1494.0156, 590.72247),
+            (1096.0155, 661.43311),
+            (803.07129, 323.03201),
+            (358.60416, 654.36206),
+            (510.12704, 321.01172),
+            (852.56873, 677.59558),
         ]
         self.point = (953.58398, 382.63101)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_fields(self):
@@ -46,7 +45,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertIsNone(NaiveKDTree()._root)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_build_ideal(self):
@@ -58,7 +56,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_build_invalid_input(self):
@@ -72,7 +69,6 @@ class NaiveKDTreeTest(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_build_return_value(self):
@@ -83,7 +79,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertIsInstance(actual, bool)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_query_ideal(self):
@@ -97,7 +92,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertEqual(expected_neighbor, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_query_invalid_input(self):
@@ -117,7 +111,6 @@ class NaiveKDTreeTest(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_query_return_value(self):
@@ -133,7 +126,6 @@ class NaiveKDTreeTest(unittest.TestCase):
             self.assertIsInstance(ind[1], int)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_ideal(self):
@@ -147,7 +139,6 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.assertEqual(actual[0][1], expected[0][1])
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_invalid_input(self):
@@ -168,7 +159,6 @@ class NaiveKDTreeTest(unittest.TestCase):
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_return_value(self):
@@ -178,31 +168,145 @@ class NaiveKDTreeTest(unittest.TestCase):
         self.kdtree.build(self.points)
         actual = self.kdtree._find_closest(self.point)
         self.assertIsInstance(actual, list)
-        for neigbour in actual:
-            self.assertIsInstance(neigbour, tuple)
-            self.assertIsInstance(neigbour[0], float)
-            self.assertIsInstance(neigbour[1], int)
+        for neighbour in actual:
+            self.assertIsInstance(neighbour, tuple)
+            self.assertIsInstance(neighbour[0], float)
+            self.assertIsInstance(neighbour[1], int)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_query_none_knn(self):
         """
-        Checks return of inner Naive KD Tree functions
+        Scenario of _find_closest returning None
         """
         with mock.patch.object(self.kdtree, "_find_closest", return_value=None):
             actual = self.kdtree.query(self.point)
         self.assertIsNone(actual)
 
     @pytest.mark.lab_3_ann_retriever
-    @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
     def test_find_closest_none_distance(self):
         """
-        Checks return of _find_closest method with None in calculating distance
+        Checks return of _find_closest method with None calculate_distance
         """
+        self.kdtree.build(self.points)
         with mock.patch.object(lab_3_ann_retriever.main, "calculate_distance", return_value=None):
             actual = self.kdtree._find_closest(self.point)
         self.assertIsNone(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_save_ideal(self):
+        """
+        Ideal scenario for save method
+        """
+        expected = {
+            "root": {
+                "vector": {"elements": {}, "len": 2},
+                "left_node": None,
+                "payload": -1,
+                "right_node": {
+                    "left_node": None,
+                    "payload": 0,
+                    "right_node": None,
+                    "vector": {"elements": {0: 0.1, 1: 0.1}, "len": 2},
+                },
+            }
+        }
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.save()
+        self.assertEqual(expected, actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_save_missing_root(self):
+        """
+        Handles missing root case
+        """
+        self.kdtree._root = None
+        self.assertIsNone(self.kdtree.save())
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_save_return_value(self):
+        """
+        Checks return type for save_method
+        """
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.save()
+        self.assertIsInstance(actual, dict)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_ideal(self):
+        """
+        Ideal scenario for load method
+        """
+        state = {
+            "root": {
+                "vector": {"elements": {}, "len": 2},
+                "left_node": None,
+                "payload": -1,
+                "right_node": {
+                    "left_node": None,
+                    "payload": 0,
+                    "right_node": None,
+                    "vector": {"elements": {0: 0.1, 1: 0.1}, "len": 2},
+                },
+            }
+        }
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.load(state)
+        self.assertTrue(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_missing_root(self):
+        """
+        Handling case with missing root
+        """
+        state = {
+            "vector": {"elements": {}, "len": 2},
+            "left_node": None,
+            "payload": -1,
+            "right_node": {
+                "left_node": None,
+                "payload": 0,
+                "right_node": None,
+                "vector": {"elements": {0: 0.1, 1: 0.1}, "len": 2},
+            },
+        }
+
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.load(state)
+        self.assertFalse(actual)
+
+    @pytest.mark.lab_3_ann_retriever
+    @pytest.mark.mark10
+    def test_load_return_value(self):
+        """
+        Checks return type for load method
+        """
+        state = {
+            "root": {
+                "vector": {"elements": {}, "len": 2},
+                "left_node": None,
+                "payload": -1,
+                "right_node": {
+                    "left_node": None,
+                    "payload": 0,
+                    "right_node": None,
+                    "vector": {"elements": {0: 0.1, 1: 0.1}, "len": 2},
+                },
+            }
+        }
+        node = Node((0.0, 0.0), -1, None, Node((0.1, 0.1), 0))
+        self.kdtree._root = node
+        actual = self.kdtree.load(state)
+        self.assertIsInstance(actual, bool)

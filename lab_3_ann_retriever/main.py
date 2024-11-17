@@ -662,23 +662,25 @@ class NaiveKDTree:
                 and self._root is not None and isinstance(self._root, Node)):
             return None
         nearest_neighbors = []
-        nodes = [(self._root, 0)]
+        nodes: list[tuple[Node, int]] = [(self._root, 0)]
         while nodes:
             node = nodes.pop(0)
-            if not node[0]:
+            current_node, depth = node
+            if not isinstance(current_node, Node):
                 return None
-            if not node[0].left_node and not node[0].right_node:
-                dist = calculate_distance(vector, node[0].vector)
-                if not dist or not isinstance(dist, float) or not isinstance(node[0].payload, int):
+            if not current_node.left_node and not current_node.right_node:
+                dist = calculate_distance(vector, current_node.vector)
+                if not dist or not isinstance(dist, float) or not isinstance(current_node.payload, int):
                     return None
-                nearest_neighbors.append((dist, node[0].payload))
-            axis = node[1] % len(node[0].vector)
-            if not vector[axis] > node[0].vector[axis]:
-                if node[0].left_node is not None:
-                    nodes.append((node[0].left_node, node[-1] + 1))
+                nearest_neighbors.append((dist, current_node.payload))
             else:
-                if node[0].right_node is not None:
-                    nodes.append((node[0].right_node, node[-1] + 1))
+                axis = depth % len(current_node.vector)
+                if not vector[axis] > current_node.vector[axis]:
+                    if isinstance(current_node.left_node, Node):
+                        nodes.append((current_node.left_node, depth + 1))
+                else:
+                    if isinstance(current_node.right_node, Node):
+                        nodes.append((current_node.right_node, depth + 1))
         return nearest_neighbors
 
 

@@ -130,6 +130,8 @@ class Tokenizer:
         tokenized_doc = []
         for doc in documents:
             tokens = self.tokenize(doc)
+            if tokens is None:
+                return None
             tokenized_doc.append(tokens)
         return tokenized_doc
 

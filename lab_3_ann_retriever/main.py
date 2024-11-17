@@ -4,9 +4,9 @@ Lab 3.
 Vector search with text retrieving
 """
 import math
-# pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
-from lab_2_retrieval_w_bm25 import main as lab_2
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
+# pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 
 
 Vector = tuple[float, ...]
@@ -215,7 +215,10 @@ class Vectorizer:
         self._vocabulary.sort()
         if not isinstance(self._vocabulary, list):
             return False
-        self._idf_values = lab_2.calculate_idf(self._vocabulary, self._corpus)
+        idf = calculate_idf(self._vocabulary, self._corpus)
+        if idf is None or not isinstance(idf, dict):
+            return False
+        self._idf_values = idf
         for token in self._vocabulary:
             self._token2ind[token] = self._vocabulary.index(token)
         return True
@@ -300,7 +303,7 @@ class Vectorizer:
         if (not isinstance(document, list) or len(document) == 0
                 or not all(isinstance(word, str) for word in document)):
             return None
-        tf = lab_2.calculate_tf(self._vocabulary, document)
+        tf = calculate_tf(self._vocabulary, document)
         if not isinstance(tf, dict):
             return None
         return tuple((tf[word] * self._idf_values[word] if word in document else 0.0
@@ -342,11 +345,15 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
-        if (not isinstance(documents, list)
+        if (not isinstance(documents, list) or not documents
                 or not all(isinstance(text, str) for text in documents)):
             return False
         self._documents = documents
-        self._document_vectors = [self._index_document(text) for text in documents]
+        for text in documents:
+            vector = self._index_document(text)
+            if not isinstance(vector, tuple):
+                return False
+            self._document_vectors.append(vector)
         if not self._document_vectors or self._document_vectors is None:
             return False
         return True
@@ -377,6 +384,8 @@ class BasicSearchEngine:
             return None
         result = []
         for distance in distances:
+            if not isinstance(distance, tuple) or not isinstance(distance[0], int):
+                return None
             result.append((distance[1], self._documents[distance[0]]))
         return result
 
@@ -414,6 +423,9 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not query_vector or not isinstance(query_vector, tuple)\
+                or len(query_vector) != len(self._document_vectors[0]):
+            return None
         document = self._calculate_knn(query_vector, self._document_vectors, 1)
         if not document or document is None:
             return None
@@ -572,27 +584,29 @@ class NaiveKDTree:
         """
         if not vectors:
             return False
+        dimensions = len(vectors[0])
         depth = 0
         parent = Node()
         left = True
-        spaces = []
-        indexes = list(range(len(vectors)))
+        spaces = list()
+        vectors_copy = vectors[:]
         spaces.append({"vectors": vectors,
-                       "indexes": indexes,
                        "depth": depth,
                        "parent node": parent,
                        "space is left": left})
         while spaces:
             space = spaces.pop()
-            space_vectors = space["vectors"]
-            current_parent = space["parent node"]
-            if not space_vectors or not current_parent:
+            space_vectors = space.get("vectors")
+            current_parent = space.get("parent node")
+            current_depth = space.get("depth")
+            if (not isinstance(space_vectors, list) or not space_vectors
+                    or not current_parent):
                 continue
-            axis = depth % len(vectors[0])
-            space_vectors.sort(key=lambda x: x[axis])
+            axis = current_depth % dimensions
+            space_vectors = sorted(space_vectors, key=lambda vector: vector[axis])
             median_index = len(space_vectors) // 2
             median_dot = space_vectors[median_index]
-            node_median_dot = Node(median_dot, payload=vectors.index(median_dot))
+            node_median_dot = Node(median_dot, vectors_copy.index(median_dot))
             if current_parent.payload == -1:
                 self._root = node_median_dot
             else:
@@ -600,17 +614,16 @@ class NaiveKDTree:
                     current_parent.left_node = node_median_dot
                 else:
                     current_parent.right_node = node_median_dot
-            indexes = list(range(len(space_vectors)))
-            spaces.append({"vectors": space_vectors[:median_index],
-                           "indexes": indexes[:median_index],
+            left_space = {"vectors": space_vectors[:median_index],
+                          "depth": (depth + 1),
+                          "parent node": node_median_dot,
+                          "space is left": True}
+            right_space = {"vectors": space_vectors[median_index + 1:],
                            "depth": (depth + 1),
                            "parent node": node_median_dot,
-                           "space is left": True})
-            spaces.append({"vectors": space_vectors[median_index + 1:],
-                           "indexes": indexes[median_index + 1:],
-                           "depth": (depth + 1),
-                           "parent node": node_median_dot,
-                           "space is left": False})
+                           "space is left": False}
+            spaces.append(left_space)
+            spaces.append(right_space)
         return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
@@ -671,23 +684,23 @@ class NaiveKDTree:
         result = []
         while space:
             node, depth = space.pop()
-            if not node or not isinstance(node.payload, int):
+            if node is None or not isinstance(node.payload, int):
                 return None
-            if node.left_node is None and node.right_node is None:
+            if not node.left_node and not node.right_node:
                 distance = calculate_distance(vector, node.vector)
                 if not isinstance(distance, float):
                     return None
                 result.append((distance, node.payload))
+                if len(result) == k:
+                    return result
             axis = depth % len(node.vector)
-            if vector[axis] < node.vector[axis]:
+            if vector[axis] <= node.vector[axis]:
                 if node.left_node is not None:
                     space.append((node.left_node, depth + 1))
             else:
                 if node.right_node is not None:
                     space.append((node.right_node, depth + 1))
-        if not result or result is None:
-            return None
-        return result
+        return None
 
 
 class KDTree(NaiveKDTree):
@@ -771,16 +784,18 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query, str) or not isinstance(n_neighbours, int):
+        if not isinstance(query, str) or not isinstance(n_neighbours, int) or query is None:
             return None
         result = []
         query_vector = self._index_document(query)
-        if not isinstance(query_vector, tuple):
+        if not isinstance(query_vector, tuple) or query_vector is None:
             return None
         neighbours = self._tree.query(query_vector, n_neighbours)
-        if not neighbours or neighbours is None:
+        if not neighbours or None in neighbours:
             return None
         for neighbour in neighbours:
+            if not neighbour or not isinstance(neighbour, tuple) or None in neighbour:
+                return None
             result.append((neighbour[0], self._documents[neighbour[1]]))
         return result
 

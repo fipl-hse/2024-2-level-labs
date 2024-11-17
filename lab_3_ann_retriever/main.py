@@ -581,12 +581,14 @@ class NaiveKDTree:
         nodes = [[vectors, 0, Node(), True, dimensions]]
         while nodes:
             for node in nodes:
-                if not isinstance(node, list) or not isinstance(node[0], list) or not isinstance(node[1], int):
+                if (not isinstance(node, list) or not isinstance(node[0], list)
+                        or not isinstance(node[1], int)):
                     return False
                 if not node[0]:
                     continue
                 axis = node[1] % dimensions
-                if not isinstance(axis, int) or not all(isinstance(vector, tuple) for vector in node[0]):
+                if not isinstance(axis, int) or not all(isinstance(vector, tuple)
+                                                        for vector in node[0]):
                     continue
                 node[0] = sorted(node[0], key=lambda x: x[axis])
                 median_index = len(node[0]) // 2
@@ -599,8 +601,10 @@ class NaiveKDTree:
                         node[2].left_node = node_median
                     else:
                         node[2].right_node = node_median
-                nodes_left = [node[0][:median_index], node[1] + 1, node_median, True, dimensions]
-                nodes_right = [node[0][median_index + 1:], node[1] + 1, node_median, False, dimensions]
+                nodes_left = [node[0][:median_index], node[1] + 1,
+                              node_median, True, dimensions]
+                nodes_right = [node[0][median_index + 1:], node[1] + 1,
+                               node_median, False, dimensions]
                 nodes.append(nodes_left)
                 nodes.append(nodes_right)
             return True

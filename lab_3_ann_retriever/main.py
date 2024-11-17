@@ -6,7 +6,7 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
-import math
+from lab_2_retrieval_w_bm25.main import calculate_idf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -50,14 +50,17 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
-    if not query_vector or not document_vector:
+    if query_vector is None or document_vector is None:
         return None
+    if not query_vector or not document_vector:
+        return 0.0
     distance = 0.0
     for index, value in enumerate(query_vector):
         distance += (value - document_vector[index]) ** 2
-    if not distance:
+    distance = distance ** 0.5
+    if not isinstance(distance,float):
         return None
-    return math.sqrt(distance)
+    return distance
 
 
 def save_vector(vector: Vector) -> dict:
@@ -158,7 +161,7 @@ class Tokenizer:
         """
         if not tokens or not isinstance(tokens, list):
             return None
-        return list(word for word in tokens if not word in self._stop_words)
+        return [word for word in tokens if not word in self._stop_words]
 
 
 class Vectorizer:
@@ -194,11 +197,10 @@ class Vectorizer:
             return False
         self._vocabulary = sorted(list({word for text in self._corpus for word in text}))
         for word in self._vocabulary:
-            word_instances = 0
-            for text in self._corpus:
-                if word in text:
-                    word_instances += 1
-            self._idf_values[word] = math.log((len(self._corpus) - word_instances + 0.5) / (word_instances + 0.5))
+            idf = calculate_idf(self._vocabulary, self._corpus)
+            if not idf:
+                return False
+            self._idf_values = idf
             self._token2ind[word] = self._vocabulary.index(word)
         if not self._vocabulary or not self._idf_values or not self._token2ind:
             return False
@@ -238,11 +240,9 @@ class Vectorizer:
         if not vector or len(self._token2ind) != len(vector):
             return None
         tokens = []
-        for pose, index in enumerate(vector):
-            if index != 0.0:
-                for token, place in self._token2ind.items():
-                    if place == pose:
-                        tokens.append(token)
+        for word in self._vocabulary:
+            if vector[self._token2ind[word]] != 0.0:
+                tokens.append(word)
         return tokens
 
 
@@ -357,11 +357,9 @@ class BasicSearchEngine:
         if not queryVector:
             return None
         knn = self._calculate_knn(queryVector, self._document_vectors, n_neighbours)
-        if not knn:
+        if not knn or any(pair[1] is None for pair in knn):
             return None
-        relevant_documents = []
-        for pair in knn:
-            relevant_documents.append((pair[-1],self._documents[pair[0]]))
+        relevant_documents = [(pair[1],self._documents[pair[0]]) for pair in knn]
         return relevant_documents
 
 
@@ -399,8 +397,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not query_vector:
+        if not query_vector or not isinstance(query_vector,tuple):
             return None
+        for vector in self._document_vectors:
+            if len(query_vector) != len(vector):
+                return None
         doc_num = self._calculate_knn(query_vector, self._document_vectors, 1)
         if not doc_num:
             return None

@@ -209,6 +209,8 @@ class Vectorizer:
 
         vocab = set()
         for doc in self._corpus:
+            if doc is None:
+                return False
             vocab |= set(doc)
         self._vocabulary = sorted(list(vocab))
         if not self._vocabulary:
@@ -376,7 +378,16 @@ class BasicSearchEngine:
             return None
 
         vectorized_query = self._index_document(query)
-        
+        knn_calc = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
+        if not knn_calc or knn_calc is None:
+            return None
+
+        relevant_documents = []
+        for index, value in knn_calc:
+            if value is not None:
+                relevant_documents.append((value, self._documents[index]))
+
+        return relevant_documents if relevant_documents else None
 
     def save(self, file_path: str) -> bool:
         """
@@ -412,6 +423,13 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query_vector, tuple) or len(query_vector) != len(self._document_vectors[0]):
+            return None
+
+        knn_calc = self._calculate_knn(query_vector, self._document_vectors, 1)
+        if not knn_calc or knn_calc is None:
+            return None
+        return self._documents[knn_calc[0][0]]
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int

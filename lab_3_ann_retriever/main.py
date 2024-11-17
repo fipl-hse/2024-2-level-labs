@@ -5,10 +5,10 @@ Vector search with text retrieving
 """
 
 import json
-import math
-from lab_2_retrieval_w_bm25.main import calculate_idf
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+
+from lab_2_retrieval_w_bm25.main import calculate_idf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -59,7 +59,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     sum_ = 0.0
     for ind, value in enumerate(query_vector):
         sum_ += (value - document_vector[ind]) ** 2
-    return sum_ ** 0.5
+    sum_ = sum_ ** 0.5
+    return sum_ if isinstance(sum_, float) else None
 
 
 def save_vector(vector: Vector) -> dict:
@@ -146,7 +147,7 @@ class Tokenizer:
 
         if not documents or not isinstance(documents, list):
             return None
-        return [self.tokenize(document) for document in documents if self.tokenize(document)] or None
+        return [tokenized_doc for document in documents if (tokenized_doc := self.tokenize(document))] or None
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -345,11 +346,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not documents or not isinstance(documents, list):
+        if not documents or not isinstance(documents, list) or not all(isinstance(doc, str) for doc in documents):
             return False
         self._documents = documents
-        self._document_vectors = [self._index_document(document) for document in documents]
-        return False if None in self._document_vectors else True
+        self._document_vectors = [vector for document in documents if (vector := self._index_document(document))]
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -453,8 +454,7 @@ class BasicSearchEngine:
         if (not query_vector or None in query_vector or not document_vectors
                 or not isinstance(n_neighbours, int) or isinstance(n_neighbours, bool)):
             return None
-        sorted_vectors = [(document_vectors.index(document_vector), calculate_distance(query_vector, document_vector))
-                          for document_vector in document_vectors]
+        sorted_vectors = [(document_vectors.index(document_vector), distance) for document_vector in document_vectors if isinstance(distance := calculate_distance(query_vector, document_vector), float)]
         sorted_vectors.sort(key=lambda x: x[1])
         return [sorted_vectors[ind] for ind in range(0, n_neighbours)]
 
@@ -506,7 +506,7 @@ class BasicSearchEngine:
         if not state['engine']['documents'] or not state['engine']['document_vectors']:
             return False
         self._documents = state['engine']['documents']
-        self._document_vectors = [load_vector(doc_vector) for doc_vector in state['engine']['document_vectors'] if load_vector(doc_vector)]
+        self._document_vectors = [vector for doc_vector in state['engine']['document_vectors'] if (vector := load_vector(doc_vector))]
         if not self._documents or not self._document_vectors:
             return False
         return True
@@ -629,6 +629,8 @@ class NaiveKDTree:
                 if not space[0]:
                     continue
                 axis = space[1] % dimensions
+                if not isinstance(axis, int) or not all(isinstance(vector, tuple) for vector in space[0]):
+                    continue
                 space[0] = sorted(space[0], key=lambda x: x[axis])
                 median_index = len(space[0]) // 2
                 median_dot = space[0][median_index]
@@ -713,21 +715,21 @@ class NaiveKDTree:
         nodes = [(self._root, 0)]
         nearest_neighbors = []
         while nodes:
-            for node in nodes:
-                pair = nodes.pop(0)
-                if not pair[0]:
+            pair = nodes.pop(0)
+            if not pair[0]:
+                return None
+            if not pair[0].left_node and not pair[0].right_node:
+                distance = calculate_distance(vector, pair[0].vector)
+                if not distance or not isinstance(distance, float) or not isinstance(pair[0].payload, int):
                     return None
-                if not pair[0].left_node and not pair[0].right_node:
-                    if not calculate_distance(vector, pair[0].vector):
-                        return None
-                    nearest_neighbors.append((calculate_distance(vector, pair[0].vector), pair[0].payload))
-                axis = pair[1] % len(pair[0].vector)
-                if not vector[axis] > pair[0].vector[axis]:
-                    if pair[0].left_node is not None:
-                        nodes.append((pair[0].left_node, pair[-1] + 1))
-                else:
-                    if pair[0].right_node is not None:
-                        nodes.append((pair[0].right_node, pair[-1] + 1))
+                nearest_neighbors.append((distance, pair[0].payload))
+            axis = pair[1] % len(pair[0].vector)
+            if not vector[axis] > pair[0].vector[axis]:
+                if pair[0].left_node is not None:
+                    nodes.append((pair[0].left_node, pair[-1] + 1))
+            else:
+                if pair[0].right_node is not None:
+                    nodes.append((pair[0].right_node, pair[-1] + 1))
         return nearest_neighbors
 
 
@@ -754,30 +756,29 @@ class KDTree(NaiveKDTree):
         nodes = [(self._root, 0)]
         nearest_neighbors = []
         while nodes:
-            for node in nodes:
-                pair = nodes.pop(0)
-                if not pair[0]:
-                    continue
-                distance = calculate_distance(vector, pair[0].vector)
-                if not distance:
-                    return None
-                if len(nearest_neighbors) < k or distance < max(nearest_neighbors, key=lambda x: x[0])[0]:
-                    nearest_neighbors.append((distance, pair[0].payload))
-                    if len(nearest_neighbors) > k:
-                        nearest_neighbors.remove(sorted(nearest_neighbors, reverse=True, key=lambda x: x[0])[0])
-                axis = pair[1] % len(vector)
-                if vector[axis] < pair[0].vector[axis]:
-                    if pair[0].left_node:
-                        nodes.append((pair[0].left_node, pair[-1] + 1))
+            pair = nodes.pop(0)
+            if not pair[0]:
+                continue
+            distance = calculate_distance(vector, pair[0].vector)
+            if not distance:
+                return None
+            if len(nearest_neighbors) < k or distance < max(nearest_neighbors, key=lambda x: x[0])[0]:
+                nearest_neighbors.append((distance, pair[0].payload))
+                if len(nearest_neighbors) > k:
+                    nearest_neighbors.remove(sorted(nearest_neighbors, reverse=True, key=lambda x: x[0])[0])
+            axis = pair[1] % len(vector)
+            if vector[axis] < pair[0].vector[axis]:
+                if pair[0].left_node:
+                    nodes.append((pair[0].left_node, pair[-1] + 1))
+            else:
+                if pair[0].right_node:
+                    nodes.append((pair[0].right_node, pair[-1] + 1))
+            if (vector[axis] - pair[0].vector[axis]) ** 2 < max(nearest_neighbors, key=lambda x: x[0])[0]:
+                if pair[0].left_node:
+                    nodes.append((pair[0].right_node, pair[-1] + 1))
                 else:
                     if pair[0].right_node:
-                        nodes.append((pair[0].right_node, pair[-1] + 1))
-                if (vector[axis] - pair[0].vector[axis]) ** 2 < max(nearest_neighbors, key=lambda x: x[0])[0]:
-                    if pair[0].left_node:
-                        nodes.append((pair[0].right_node, pair[-1] + 1))
-                    else:
-                        if pair[0].right_node:
-                            nodes.append((pair[0].left_node, pair[-1] + 1))
+                        nodes.append((pair[0].left_node, pair[-1] + 1))
         return nearest_neighbors
 
 
@@ -814,9 +815,9 @@ class SearchEngine(BasicSearchEngine):
         if not documents or not isinstance(documents, list) or not all(isinstance(text, str) for text in documents):
             return False
         self._documents = documents
-        self._document_vectors = [self._index_document(document) for document in documents]
+        self._document_vectors = [vector for document in documents if (vector := self._index_document(document))]
         self._tree.build(self._document_vectors)
-        return False if None in self._document_vectors else True
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1

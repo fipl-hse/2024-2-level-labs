@@ -199,7 +199,7 @@ class Vectorizer:
         self._vocabulary = sorted(unique_terms)
         self._token2ind = {word: index for index, word in enumerate(self._vocabulary)}
         self._idf_values = calculate_idf(self._vocabulary, self._corpus) or {}
-        if self._idf_values is None:
+        if self._idf_values is None or not self._idf_values:
             return False
         return True
 
@@ -612,10 +612,9 @@ class NaiveKDTree:
         In case of corrupt input arguments, None is returned.
         """
 
-        if not isinstance(vector, tuple) or len(vector) == 0 or k <= 0:
+        if not vector or not k:
             return None
-        nearest_neighbors = self._find_closest(vector, k)
-        return nearest_neighbors or None
+        return self._find_closest(vector, k)
 
     def save(self) -> dict | None:
         """

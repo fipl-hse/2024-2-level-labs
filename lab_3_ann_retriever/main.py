@@ -149,7 +149,8 @@ class Tokenizer:
         """
         if not tokens or not isinstance(tokens, list) or not all(isinstance(word, str) for word in tokens):
             return None
-        return [token for token in tokens if token not in self._stop_words]
+        stopwords = self.stop_words
+        return [token for token in tokens if token not in stopwords]
 
 
 class Vectorizer:

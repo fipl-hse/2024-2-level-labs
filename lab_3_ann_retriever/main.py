@@ -581,11 +581,14 @@ class NaiveKDTree:
         nodes = [[vectors, 0, None, True]]
         while nodes:
             current_node = nodes.pop()
+            if (not isinstance(current_node, list) or len(current_node) != 4
+                    or not isinstance(current_node[0], list) or not isinstance(current_node[1], int)):
+                return False
             current_vectors, depth, parent, is_left = current_node
+            assert isinstance(current_vectors, list)
             if not current_vectors:
                 continue
-            if not isinstance(depth, int):
-                return False
+            assert isinstance(depth, int)
             axis = depth % dimensions
             current_vectors.sort(key=lambda x: x[axis])
             median_index = len(current_vectors) // 2

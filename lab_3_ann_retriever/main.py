@@ -578,22 +578,22 @@ class NaiveKDTree:
             return False
         dimensions = len(vectors[0])
         another_vec = vectors[:]
-        nodes = [[vectors, 0, None, True]]
+        nodes = [(vectors, 0, None, True)]
         while nodes:
-            current_node = nodes.pop()
-            if (not isinstance(current_node, list) or len(current_node) != 4
-                    or not isinstance(current_node[0], list) or not isinstance(current_node[1], int)):
-                return False
-            current_vectors, depth, parent, is_left = current_node
-            assert isinstance(current_vectors, list)
+            current_vectors, depth, parent, is_left = nodes.pop()
             if not current_vectors:
                 continue
-            assert isinstance(depth, int)
             axis = depth % dimensions
-            current_vectors.sort(key=lambda x: x[axis])
+            try:
+                current_vectors.sort(key=lambda x: x[axis])
+            except (IndexError, TypeError):
+                return False
             median_index = len(current_vectors) // 2
             median_point = current_vectors[median_index]
-            node_median = Node(median_point, another_vec.index(median_point))
+            try:
+                node_median = Node(median_point, another_vec.index(median_point))
+            except ValueError:
+                return False
             if parent is None:
                 self._root = node_median
             else:
@@ -601,8 +601,8 @@ class NaiveKDTree:
                     parent.left_node = node_median
                 else:
                     parent.right_node = node_median
-            nodes.append([current_vectors[:median_index], depth + 1, node_median, True])
-            nodes.append([current_vectors[median_index + 1:], depth + 1, node_median, False])
+            nodes.append((current_vectors[:median_index], depth + 1, node_median, True))
+            nodes.append((current_vectors[median_index + 1:], depth + 1, node_median, False))
         return self._root is not None
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:

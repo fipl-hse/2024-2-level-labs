@@ -372,6 +372,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not isinstance(n_neighbours, int):
+            return None
+
+        vectorized_query = self._index_document(query)
+        
 
     def save(self, file_path: str) -> bool:
         """
@@ -424,6 +429,18 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not query_vector or not document_vectors or
+                not isinstance(document_vectors, list) or
+                not isinstance(n_neighbours, int)):
+            return None
+
+        doc_distances = []
+        for vector in document_vectors:
+            distance = calculate_distance(query_vector, vector)
+            doc_distances.append((document_vectors.index(vector), distance))
+
+        distances = sorted(doc_distances, key=lambda x: x[1], reverse=False)
+        return distances[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """

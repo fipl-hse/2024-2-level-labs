@@ -670,7 +670,8 @@ class NaiveKDTree:
                 return None
             if not current_node.left_node and not current_node.right_node:
                 dist = calculate_distance(vector, current_node.vector)
-                if not dist or not isinstance(dist, float) or not isinstance(current_node.payload, int):
+                if (not dist or not isinstance(dist, float)
+                        or not isinstance(current_node.payload, int)):
                     return None
                 nearest_neighbors.append((dist, current_node.payload))
             else:

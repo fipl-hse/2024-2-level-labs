@@ -198,7 +198,7 @@ class Vectorizer:
         unique_terms = set(token for doc in self._corpus for token in doc)
         self._vocabulary = sorted(unique_terms)
         self._token2ind = {word: index for index, word in enumerate(self._vocabulary)}
-        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus) or {}
         if self._idf_values is None:
             return False
         return True
@@ -594,8 +594,8 @@ class NaiveKDTree:
                     parent.left_node = node
                 else:
                     parent.right_node = node
-            nodes.append((points[:median_index], depth + 1, node, True))
-            nodes.append((points[median_index + 1:], depth + 1, node, False))
+            nodes.append((points[:median_index], depth + 1, None, True))
+            nodes.append((points[median_index + 1:], depth + 1, None, False))
         return self._root is not None
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
@@ -668,13 +668,17 @@ class NaiveKDTree:
             best = best[:k]
             axis = depth % len(vector)
             if vector[axis] < node.vector[axis]:
-                nodes.append((node.left_node, depth + 1))
-                if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
-                    nodes.append((node.right_node, depth + 1))
-            else:
-                nodes.append((node.right_node, depth + 1))
-                if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
+                if node.left_node is not None:
                     nodes.append((node.left_node, depth + 1))
+                if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
+                    if node.right_node is not None:
+                        nodes.append((node.right_node, depth + 1))
+            else:
+                if node.right_node is not None:
+                    nodes.append((node.right_node, depth + 1))
+                if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
+                    if node.left_node is not None:
+                        nodes.append((node.left_node, depth + 1))
         return best or None
 
 

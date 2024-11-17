@@ -5,7 +5,9 @@ Vector search with text retrieving
 """
 import math
 from typing import Protocol
+
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
+
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 
 
@@ -585,27 +587,24 @@ class NaiveKDTree:
         if not vectors:
             return False
         dimensions = len(vectors[0])
-        depth = 0
-        parent = Node()
-        left = True
-        spaces = list()
+        spaces = []
         vectors_copy = vectors[:]
         spaces.append({"vectors": vectors,
-                       "depth": depth,
-                       "parent node": parent,
-                       "space is left": left})
+                       "depth": 0,
+                       "parent node": Node(),
+                       "space is left": True})
         while spaces:
             space = spaces.pop()
             space_vectors = space.get("vectors")
             current_parent = space.get("parent node")
             current_depth = space.get("depth")
             if (not isinstance(space_vectors, list) or not space_vectors
-                    or not current_parent):
+                    or not current_parent or not isinstance(current_depth, int)):
                 continue
             axis = current_depth % dimensions
-            space_vectors = sorted(space_vectors, key=lambda vector: vector[axis])
-            median_index = len(space_vectors) // 2
-            median_dot = space_vectors[median_index]
+            space_vectors_sorted = sorted(space_vectors, key=lambda vector: vector[axis])
+            median_index = len(space_vectors_sorted) // 2
+            median_dot = space_vectors_sorted[median_index]
             node_median_dot = Node(median_dot, vectors_copy.index(median_dot))
             if current_parent.payload == -1:
                 self._root = node_median_dot
@@ -614,12 +613,12 @@ class NaiveKDTree:
                     current_parent.left_node = node_median_dot
                 else:
                     current_parent.right_node = node_median_dot
-            left_space = {"vectors": space_vectors[:median_index],
-                          "depth": (depth + 1),
+            left_space = {"vectors": space_vectors_sorted[:median_index],
+                          "depth": (current_depth + 1),
                           "parent node": node_median_dot,
                           "space is left": True}
-            right_space = {"vectors": space_vectors[median_index + 1:],
-                           "depth": (depth + 1),
+            right_space = {"vectors": space_vectors_sorted[median_index + 1:],
+                           "depth": (current_depth + 1),
                            "parent node": node_median_dot,
                            "space is left": False}
             spaces.append(left_space)
@@ -837,3 +836,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        self._tree = KDTree()
+        super().__init__(vectorizer, tokenizer)

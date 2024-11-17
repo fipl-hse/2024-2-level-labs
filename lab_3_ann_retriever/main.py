@@ -500,6 +500,10 @@ class Node(NodeLike):
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+        self.vector = vector
+        self.payload = payload
+        self.left_node = left_node
+        self.right_node = right_node
 
     def save(self) -> dict:
         """
@@ -532,6 +536,7 @@ class NaiveKDTree:
         """
         Initialize an instance of the KDTree class.
         """
+        self._root = None
 
     def build(self, vectors: list[Vector]) -> bool:
         """
@@ -545,6 +550,38 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(vectors, list) or not vectors or not\
+                all(isinstance(tuples,tuple) for tuples in vectors):
+            return False
+        if len(vectors) == 0:
+            return False
+        start = [(vectors,0,Node(),True)]
+        while start:
+            used_vectors = start[0][0]
+            depth = start[0][1]
+            parent = start[0][2]
+            left_side = start.pop(0)[3]
+            if not used_vectors:
+                continue
+            axis = depth % len(used_vectors[0])
+            used_vectors.sort(key=lambda x:x[axis])
+            median_index = len(used_vectors) // 2
+            new_node = Node(used_vectors[median_index],median_index)
+
+            if parent.payload == -1:
+                self._root = new_node
+            else:
+                if left_side:
+                    parent.left_node = new_node
+                else:
+                    parent.right_node = new_node
+            start.append((used_vectors[:median_index],depth+1,new_node,True))
+            start.append((used_vectors[median_index+1:],depth+1,new_node,False))
+        if self._root is None:
+            return False
+        return True
+
+
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """

@@ -6,6 +6,8 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+from lab_2_retrieval_w_bm25.main import calculate_tf_idf, calculate_tf, calculate_idf
+from math import sqrt
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -49,7 +51,21 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    # input validation
 
+    if query_vector is None or document_vector is None:
+        return None
+
+    sum_of_squares = 0
+
+    for query_value, document_value in zip(query_vector, document_vector):
+        difference = query_value - document_value
+        squared_difference = difference ** 2
+        sum_of_squares += squared_difference
+
+    euclidean_distance = sqrt(sum_of_squares)
+
+    return euclidean_distance
 
 def save_vector(vector: Vector) -> dict:
     """
@@ -92,6 +108,7 @@ class Tokenizer:
             stop_words (list[str]): List with stop words
         """
         self._stop_words = stop_words
+
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -182,6 +199,12 @@ class Vectorizer:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
 
+        self._corpus = corpus
+        self._idf_values = dict()
+        self._vocabulary = list()
+        self._token2ind = dict()
+
+    @property
     def build(self) -> bool:
         """
         Build vocabulary with tokenized_documents.
@@ -189,6 +212,36 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        # checks
+
+        if self._corpus is None:
+            return False
+
+        # create vocab
+        for doc in self._corpus:
+            for token in doc:
+                if token not in self._vocabulary:
+                    self._vocabulary.append(token)
+
+        self._vocabulary = sorted(self._vocabulary)
+
+        if self._vocabulary is None:
+            return False
+
+        # create ranged tokens
+
+        self._token2ind = {token: index for index, token in enumerate(self._vocabulary)}
+
+        if self._token2ind is None:
+            return False
+
+        # create idf_values
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+
+        if self._idf_values is None:
+            return False
+        else:
+            return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -202,6 +255,16 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        # input validation:
+        if not isinstance(tokenized_document, list) or \
+                not all(isinstance(token, str) for token in tokenized_document) or \
+                not tokenized_document:
+            return None
+
+        vec_doc = self._calculate_tf_idf(tokenized_document)
+
+        return vec_doc
+
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -252,6 +315,33 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        # input validation
+        if (not isinstance(document, list)
+            or not all(isinstance(token, str) for token in document)
+            or not document):
+            return None
+
+        tf_mapping = calculate_tf(self._vocabulary, document)
+
+        # check for fail:
+        if tf_mapping is None:
+            return None
+
+        # should I shorten?
+        tf_idf_vector = []
+        for word in self._vocabulary:
+            if word in document:
+                tf_value = tf_mapping.get(word)
+                idf_value = self._idf_values.get(word)
+                tf_idf_value = tf_value * idf_value
+            else:
+                tf_idf_value = 0.0
+            tf_idf_vector.append(tf_idf_value)
+
+        if tf_idf_vector is None:
+            return None
+
+        return tuple(tf_idf_vector)
 
 
 class BasicSearchEngine:
@@ -273,6 +363,13 @@ class BasicSearchEngine:
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
 
+        self._vectorizer = vectorizer
+        self._tokenizer = tokenizer
+        self._documents = list()
+        self._document_vectors = list()
+
+
+
     def index_documents(self, documents: list[str]) -> bool:
         """
         Index documents for engine.
@@ -285,6 +382,25 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
+        # input validation
+
+        if not isinstance(documents, list) or not all(isinstance(doc, str) for doc in documents) \
+                or not documents:
+            return False
+
+        # vectorize the docs
+
+        vectorized_doc = []
+
+        for doc in documents:
+            doc_vec = self._index_document(doc)
+            if doc_vec is None:
+                return False
+            vectorized_doc.append(doc_vec)
+
+        self._document_vectors = vectorized_doc
+
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int

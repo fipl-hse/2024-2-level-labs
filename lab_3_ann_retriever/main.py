@@ -587,12 +587,10 @@ class NaiveKDTree:
         if not vectors:
             return False
         dimensions = len(vectors[0])
-        spaces = []
-        vectors_copy = vectors[:]
-        spaces.append({"vectors": vectors,
-                       "depth": 0,
-                       "parent node": Node(),
-                       "space is left": True})
+        spaces = [{"vectors": vectors,
+                   "depth": 0,
+                   "parent node": Node(),
+                   "space is left": True}]
         while spaces:
             space = spaces.pop()
             space_vectors = space.get("vectors")
@@ -605,7 +603,7 @@ class NaiveKDTree:
             space_vectors_sorted = sorted(space_vectors, key=lambda vector: vector[axis])
             median_index = len(space_vectors_sorted) // 2
             median_dot = space_vectors_sorted[median_index]
-            node_median_dot = Node(median_dot, vectors_copy.index(median_dot))
+            node_median_dot = Node(median_dot, vectors.index(median_dot))
             if current_parent.payload == -1:
                 self._root = node_median_dot
             else:

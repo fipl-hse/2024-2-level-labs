@@ -33,17 +33,15 @@ def main() -> None:
         text = text_file.read()
 
     tuple_file = open_files()
-    docs = tuple_file[0]
-    doc = docs[0]
+    documents = tuple_file[0]
+    doc = documents[0]
     stopwords = tuple_file[1]
 
     tokenizer = m.Tokenizer(stopwords)
-
     tokenized_doc = tokenizer.tokenize(doc)
     if not tokenized_doc:
         return None
-
-    tokenized_docs = tokenizer.tokenize_documents(docs)
+    tokenized_docs = tokenizer.tokenize_documents(documents)
     if not tokenized_docs:
         return None
 
@@ -58,8 +56,8 @@ def main() -> None:
         doc_dist.append(dist)
 
     knn_retriever = m.BasicSearchEngine(vectorizer, tokenizer)
-    knn_retriever.index_documents(docs)
-    knn_retriever.retrieve_relevant_documents("Мои кот и собака не дружат!", 2)
+    knn_retriever.index_documents(documents)
+    knn_result = knn_retriever.retrieve_relevant_documents("Нижний Новгород", 1)
 
     print(vectorizer.vector2tokens(query_vector))
     print(knn_retriever.retrieve_vectorized(query_vector))
@@ -67,7 +65,18 @@ def main() -> None:
     secret = tuple(text)
     print(vectorizer.vector2tokens(secret))
 
-    result = (tokenizer, vectorizer)
+    naive_tree = m.NaiveKDTree()
+    vectors = [(0.0, 0.0, 0.094), (0.061, 0.121, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0, 0.0)]
+
+    naive_tree.build(vectors)
+    query_vector = (0.0, 0.0, 0.094)
+    naive_tree.query(query_vector)
+
+    naive_kdtree_retriever = m.SearchEngine(vectorizer, tokenizer)
+    naive_kdtree_retriever.index_documents(documents)
+    naive_kdtree_result = naive_kdtree_retriever.retrieve_relevant_documents("Нижний Новгород")
+
+    result = (knn_result, naive_kdtree_result)
     assert result, "Result is None"
 
 

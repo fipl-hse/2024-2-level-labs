@@ -661,31 +661,25 @@ class NaiveKDTree:
         if not (isinstance(vector, tuple) and isinstance(k, int) and vector
                 and self._root is not None and isinstance(self._root, Node)):
             return None
-        best = []
+        nearest_neighbors = []
         nodes = [(self._root, 0)]
         while nodes:
-            node, depth = nodes.pop()
-            if node is None:
-                continue
-            dist = calculate_distance(vector, node.vector)
-            if dist is None:
-                continue
-            best.append((dist, node.payload))
-            best = sorted(best, key=lambda x: x[0])[:k]
-            axis = depth % len(vector)
-            if vector[axis] < node.vector[axis]:
-                if node.left_node is not None and isinstance(node.left_node, Node):
-                    nodes.append((node.left_node, depth + 1))
-                if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
-                    if node.right_node is not None and isinstance(node.right_node, Node):
-                        nodes.append((node.right_node, depth + 1))
+            node = nodes.pop(0)
+            if not node[0]:
+                return None
+            if not node[0].left_node and not node[0].right_node:
+                dist = calculate_distance(vector, node[0].vector)
+                if not dist or not isinstance(dist, float) or not isinstance(node[0].payload, int):
+                    return None
+                nearest_neighbors.append((dist, node[0].payload))
+            axis = node[1] % len(node[0].vector)
+            if not vector[axis] > node[0].vector[axis]:
+                if node[0].left_node is not None:
+                    nodes.append((node[0].left_node, node[-1] + 1))
             else:
-                if node.right_node is not None and isinstance(node.right_node, Node):
-                    nodes.append((node.right_node, depth + 1))
-                if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
-                    if node.left_node is not None and isinstance(node.left_node, Node):
-                        nodes.append((node.left_node, depth + 1))
-        return best or None
+                if node[0].right_node is not None:
+                    nodes.append((node[0].right_node, node[-1] + 1))
+        return nearest_neighbors
 
 
 class KDTree(NaiveKDTree):

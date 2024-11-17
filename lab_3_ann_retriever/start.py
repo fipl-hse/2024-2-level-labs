@@ -3,8 +3,8 @@ Laboratory Work #3 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from pathlib import Path
 import lab_3_ann_retriever.main as m
+from pathlib import Path
 
 
 def open_files() -> tuple[list[str], list[str]]:

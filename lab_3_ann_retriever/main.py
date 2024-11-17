@@ -6,6 +6,7 @@ Vector search with text retrieving
 
 import json
 import math
+from lab_2_retrieval_w_bm25.main import calculate_idf
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
@@ -199,8 +200,10 @@ class Vectorizer:
             return False
         self._vocabulary = sorted(list(set(sum(self._corpus, []))))
         for word in self._vocabulary:
-            word_count = sum(1 for document in self._corpus if word in document)
-            self._idf_values[word] = math.log((len(self._corpus) - word_count + 0.5) / (word_count + 0.5))
+            idf = calculate_idf(self._vocabulary, self._corpus)
+            if not idf:
+                return False
+            self._idf_values = idf
             self._token2ind[word] = self._vocabulary.index(word)
         if not self._vocabulary or not self._idf_values or not self._token2ind:
             return False
@@ -370,7 +373,7 @@ class BasicSearchEngine:
         if not query_vector:
             return None
         knn_list = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        if not knn_list:
+        if not knn_list or any(tup[1] is None for tup in knn_list):
             return None
         return [(tup[1], self._documents[tup[0]]) for tup in knn_list]
 
@@ -503,7 +506,7 @@ class BasicSearchEngine:
         if not state['engine']['documents'] or not state['engine']['document_vectors']:
             return False
         self._documents = state['engine']['documents']
-        self._document_vectors = [load_vector(doc_vector) for doc_vector in state['engine']['document_vectors']]
+        self._document_vectors = [load_vector(doc_vector) for doc_vector in state['engine']['document_vectors'] if load_vector(doc_vector)]
         if not self._documents or not self._document_vectors:
             return False
         return True
@@ -567,14 +570,21 @@ class Node(NodeLike):
         if not state or not isinstance(state, dict):
             return False
         if ('vector' not in state or 'payload' not in state or
-                'left_node' not in state or 'right_node' not in state):
+                'left_node' not in state or 'right_node' not in state or not isinstance(state['vector'], dict)):
             return False
-        if not isinstance(state['vector'], dict):
+        vector = load_vector(state['vector'])
+        if not vector:
             return False
-        self.vector = load_vector(state['vector'])
-        self.payload = state['payload']
+        self.vector = vector
+        payload = state['payload']
+        if payload and isinstance(payload, int):
+            self.payload = payload
         left_node = Node()
         right_node = Node()
+        if state['left_node'] and not isinstance(state['left_node'], dict):
+            return False
+        if state['right_node'] and not isinstance(state['right_node'], dict):
+            return False
         self.left_node = left_node.load(state['left_node']) if state['left_node'] else None
         self.right_node = right_node.load(state['right_node']) if state['right_node'] else None
         if not self.vector or not self.payload:
@@ -614,6 +624,8 @@ class NaiveKDTree:
         space_condition = [[vectors, 0, Node(), True, dimensions]]
         while space_condition:
             for space in space_condition:
+                if not isinstance(space, list) or not isinstance(space[0], list) or not isinstance(space[1], int):
+                    return False
                 if not space[0]:
                     continue
                 axis = space[1] % dimensions
@@ -633,6 +645,7 @@ class NaiveKDTree:
                 space_condition.append(new_left_space)
                 space_condition.append(new_right_space)
             return True
+        return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
@@ -705,6 +718,8 @@ class NaiveKDTree:
                 if not pair[0]:
                     return None
                 if not pair[0].left_node and not pair[0].right_node:
+                    if not calculate_distance(vector, pair[0].vector):
+                        return None
                     nearest_neighbors.append((calculate_distance(vector, pair[0].vector), pair[0].payload))
                 axis = pair[1] % len(pair[0].vector)
                 if not vector[axis] > pair[0].vector[axis]:
@@ -742,30 +757,27 @@ class KDTree(NaiveKDTree):
             for node in nodes:
                 pair = nodes.pop(0)
                 if not pair[0]:
+                    continue
+                distance = calculate_distance(vector, pair[0].vector)
+                if not distance:
                     return None
-                if not pair[0].left_node and not pair[0].right_node:
-                    nearest_neighbors.append((calculate_distance(vector, pair[0].vector), pair[0].payload))
-                axis = pair[1] % len(pair[0].vector)
+                if len(nearest_neighbors) < k or distance < max(nearest_neighbors, key=lambda x: x[0])[0]:
+                    nearest_neighbors.append((distance, pair[0].payload))
+                    if len(nearest_neighbors) > k:
+                        nearest_neighbors.remove(sorted(nearest_neighbors, reverse=True, key=lambda x: x[0])[0])
+                axis = pair[1] % len(vector)
                 if vector[axis] < pair[0].vector[axis]:
-                    if pair[0].left_node is not None:
+                    if pair[0].left_node:
                         nodes.append((pair[0].left_node, pair[-1] + 1))
                 else:
-                    if pair[0].right_node is not None:
+                    if pair[0].right_node:
                         nodes.append((pair[0].right_node, pair[-1] + 1))
-                if len(nearest_neighbors) > 1:
-                    n = max(sorted([neighbour[0] for neighbour in nearest_neighbors]))
-                elif len(nearest_neighbors) == 1:
-                    n = nearest_neighbors[0][0]
-                else:
-                    continue
-                if (vector[axis] - pair[0].vector[axis]) ** 2 < n:
-                    if pair[0].left_node is not None:
+                if (vector[axis] - pair[0].vector[axis]) ** 2 < max(nearest_neighbors, key=lambda x: x[0])[0]:
+                    if pair[0].left_node:
                         nodes.append((pair[0].right_node, pair[-1] + 1))
                     else:
-                        if pair[0].right_node is not None:
+                        if pair[0].right_node:
                             nodes.append((pair[0].left_node, pair[-1] + 1))
-        while len(nearest_neighbors) > k:
-            nearest_neighbors.remove(sorted(nearest_neighbors, reverse=True, key=lambda x: x[0])[0])
         return nearest_neighbors
 
 
@@ -825,9 +837,17 @@ class SearchEngine(BasicSearchEngine):
                 or isinstance(n_neighbours, bool)):
             return None
         query_vector = self._index_document(query)
-        if not query_vector or not self._tree.query(query_vector):
+        if not query_vector:
             return None
-        return [(neighbour[0], self._documents[neighbour[1]]) for neighbour in self._tree.query(query_vector)]
+        nearest = self._tree.query(query_vector)
+        if not nearest:
+            return None
+        result = []
+        for neighbour in nearest:
+            if not isinstance(neighbour[1], int):
+                return None
+            result.append((neighbour[0], self._documents[neighbour[1]]))
+        return result
 
     def save(self, file_path: str) -> bool:
         """
@@ -848,6 +868,8 @@ class SearchEngine(BasicSearchEngine):
                 'document_vectors': self._dump_documents()['document_vectors']
             }
         }
+        if not self._tree.save():
+            return False
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump(state, file, ensure_ascii=False)
         return True
@@ -870,6 +892,8 @@ class SearchEngine(BasicSearchEngine):
                     or 'documents' not in data['engine'] or 'document_vectors' not in data['engine']):
                 return False
             self._load_documents(data)
+            if not self._tree.load(data['engine']['tree']):
+                return False
             self._tree.load(data['engine']['tree'])
         return True
 

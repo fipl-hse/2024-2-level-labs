@@ -628,42 +628,41 @@ class NaiveKDTree:
         dimensions = len(vectors[0])
         space_condition = [[vectors, 0, Node(), True, dimensions]]
         while space_condition:
-            for space in space_condition:
-                if not isinstance(space, list) or not isinstance(space[0], list) or not isinstance(space[1], int):
-                    return False
-                if not space[0]:
-                    continue
-                axis = space[1] % dimensions
-                if not isinstance(axis, int) or not all(isinstance(vector, tuple) for vector in space[0]):
-                    continue
-                space[0] = sorted(space[0], key=lambda x, sk=axis: x[axis])
-                median_index = len(space[0]) // 2
-                median_dot = space[0][median_index]
-                median_dot_node = Node(space[0][median_index], vectors_copy.index(median_dot))
-                if space[2].payload == -1:
-                    self._root = median_dot_node
+            space = space_condition.pop(0)
+            if not isinstance(space, list) or not isinstance(space[0], list) or not isinstance(space[1], int):
+                return False
+            if not space[0]:
+                continue
+            axis = space[1] % dimensions
+            if not isinstance(axis, int) or not all(isinstance(vector, tuple) for vector in space[0]):
+                continue
+            space[0] = sorted(space[0], key=lambda x: x[axis])
+            median_index = len(space[0]) // 2
+            median_dot = space[0][median_index]
+            median_dot_node = Node(space[0][median_index], vectors_copy.index(median_dot))
+            if space[2].payload == -1:
+                self._root = median_dot_node
+            else:
+                if space[3]:
+                    space[2].left_node = median_dot_node
                 else:
-                    if space[3]:
-                        space[2].left_node = median_dot_node
-                    else:
-                        space[2].right_node = median_dot_node
-                new_left_space = [
-                    space[0][:median_index],
-                    space[1] + 1,
-                    median_dot_node,
-                    True,
-                    dimensions
-                ]
-                new_right_space = [
-                    space[0][median_index + 1:],
-                    space[1] + 1,
-                    median_dot_node,
-                    False,
-                    dimensions
-                ]
-                space_condition.append(new_left_space)
-                space_condition.append(new_right_space)
-            return True
+                    space[2].right_node = median_dot_node
+            new_left_space = [
+                space[0][:median_index],
+                space[1] + 1,
+                median_dot_node,
+                True,
+                dimensions
+            ]
+            new_right_space = [
+                space[0][median_index + 1:],
+                space[1] + 1,
+                median_dot_node,
+                False,
+                dimensions
+            ]
+            space_condition.append(new_left_space)
+            space_condition.append(new_right_space)
         return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:

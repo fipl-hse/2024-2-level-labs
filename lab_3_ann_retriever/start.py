@@ -50,7 +50,6 @@ def main() -> None:
 
     tokenized_docs = tokenizer.tokenize_documents(documents)
     vectorizer = Vectorizer(tokenized_docs)
-    vectorizer.build()
     searchengine = BasicSearchEngine(vectorizer,tokenizer)
     searchengine.index_documents(documents)
     secret_tokens = text.split(', ')

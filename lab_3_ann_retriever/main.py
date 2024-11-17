@@ -668,16 +668,16 @@ class NaiveKDTree:
             best = best[:k]
             axis = depth % len(vector)
             if vector[axis] < node.vector[axis]:
-                if node.left_node is not None:
+                if node.left_node is not None and isinstance(node.left_node, Node):
                     nodes.append((node.left_node, depth + 1))
                 if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
-                    if node.right_node is not None:
+                    if node.right_node is not None and isinstance(node.right_node, Node):
                         nodes.append((node.right_node, depth + 1))
             else:
-                if node.right_node is not None:
+                if node.right_node is not None and isinstance(node.right_node, Node):
                     nodes.append((node.right_node, depth + 1))
                 if len(best) < k or abs(vector[axis] - node.vector[axis]) < best[-1][0]:
-                    if node.left_node is not None:
+                    if node.left_node is not None and isinstance(node.left_node, Node):
                         nodes.append((node.left_node, depth + 1))
         return best or None
 

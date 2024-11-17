@@ -141,7 +141,7 @@ class Tokenizer:
         tokenized_docs = [self.tokenize(doc) for doc in documents]
         if any(doc is None for doc in tokenized_docs):
             return None
-        return tokenized_docs or None
+        return [doc for doc in tokenized_docs if doc]
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -279,6 +279,8 @@ class Vectorizer:
 
         if (not isinstance(document, list) or not document or
                 not all(isinstance(token, str) for token in document)):
+            return None
+        if self._idf_values is None:
             return None
         tf_idf_vector = [0.0] * len(self._vocabulary)
         for token in document:

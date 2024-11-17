@@ -36,17 +36,29 @@ def main() -> None:
 
         tokenizer = Tokenizer(stopwords)
         tokenized_docs = tokenizer.tokenize_documents(documents)
+        if tokenized_docs is None:
+            tokenized_docs = []
         print(tokenized_docs)
+
         vectorizer = Vectorizer(tokenized_docs)
 
         secret_tokenized = tokenizer.tokenize(text)
+        if secret_tokenized is None:
+            secret_tokenized = []
+
         secret_vector = vectorizer.vectorize(secret_tokenized)
+        if secret_vector is None:
+            secret_vector = ()
+
         tokens_from_vector = vectorizer.vector2tokens(secret_vector)
         print(tokens_from_vector)
 
         knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
         knn_retriever.index_documents(documents)
+
         relevant_document = knn_retriever.retrieve_vectorized(secret_vector)
+        if relevant_document is None:
+            relevant_document = "None"
         print(relevant_document)
 
         basic_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)

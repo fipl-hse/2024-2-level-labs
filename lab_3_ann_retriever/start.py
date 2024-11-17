@@ -6,8 +6,8 @@ import time
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from lab_3_ann_retriever.main import (AdvancedSearchEngine, BasicSearchEngine,
-                                      SearchEngine, Tokenizer, Vectorizer)
+from lab_3_ann_retriever.main import (AdvancedSearchEngine, BasicSearchEngine, SearchEngine,
+                                      Tokenizer, Vectorizer)
 
 
 def open_files() -> tuple[list[str], list[str]]:

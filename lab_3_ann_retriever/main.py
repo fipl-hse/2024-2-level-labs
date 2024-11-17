@@ -636,7 +636,7 @@ class NaiveKDTree:
                 axis = space[1] % dimensions
                 if not isinstance(axis, int) or not all(isinstance(vector, tuple) for vector in space[0]):
                     continue
-                space[0] = sorted(space[0], key=lambda x: x[axis])
+                space[0] = sorted(space[0], key=lambda x, sk=axis: x[axis])
                 median_index = len(space[0]) // 2
                 median_dot = space[0][median_index]
                 median_dot_node = Node(space[0][median_index], vectors_copy.index(median_dot))
@@ -907,7 +907,7 @@ class SearchEngine(BasicSearchEngine):
         """
         if not file_path or not isinstance(file_path, str):
             return False
-        with (open(file_path, 'r', encoding='utf-8') as file):
+        with open(file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
             if ('engine' not in data
                     or 'tree' not in data['engine']

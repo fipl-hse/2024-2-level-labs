@@ -580,9 +580,12 @@ class NaiveKDTree:
         another_vec = vectors[:]
         nodes = [[vectors, 0, None, True]]
         while nodes:
-            current_vectors, depth, parent, is_left = nodes.pop()
+            current_node = nodes.pop()
+            current_vectors, depth, parent, is_left = current_node
             if not current_vectors:
                 continue
+            if not isinstance(depth, int):
+                return False
             axis = depth % dimensions
             current_vectors.sort(key=lambda x: x[axis])
             median_index = len(current_vectors) // 2

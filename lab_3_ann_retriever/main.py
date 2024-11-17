@@ -240,8 +240,10 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokenized_document, list):
+        if not isinstance(tokenized_document, list) or not tokenized_document:
             return None
+        if not self._vocabulary:
+            return ()
         return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
@@ -416,6 +418,8 @@ class BasicSearchEngine:
         text_rel_doc = []
         for couple in relevant_doc:
             index, value = couple
+            if value is None:
+                return None
             text_rel_doc.append((value, self._documents[index]))
         return text_rel_doc
 
@@ -609,6 +613,9 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
+        depth = 0
+        node = Node(Node.vector, Node.payload)
+        space = [vectors, depth, node]
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """

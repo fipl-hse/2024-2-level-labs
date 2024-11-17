@@ -450,7 +450,6 @@ class VectorizerTest(unittest.TestCase):
             "боится",
             "собак",
         ]
-        self.vectorizer.build()
         actual = self.vectorizer.vectorize(tokenized_document)
         self.assertIsInstance(actual, tuple)
         for freq in actual:

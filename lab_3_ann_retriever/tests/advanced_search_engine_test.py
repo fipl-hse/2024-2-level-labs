@@ -1,6 +1,6 @@
 # pylint: disable=duplicate-code, protected-access
 """
-Checks the third lab's AdvancedSearchEngine class.
+Checks the third lab's Priority КD Tree Retriever class.
 """
 
 import json
@@ -15,7 +15,7 @@ from lab_3_ann_retriever.tests.tokenizer_test import get_documents_assets
 
 class AdvancedSearchEngineTest(unittest.TestCase):
     """
-    Tests Advanced Search Engine class functionality.
+    Tests PriorityKDTreeRetriever class functionality.
     """
 
     def setUp(self) -> None:

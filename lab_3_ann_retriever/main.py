@@ -578,37 +578,26 @@ class NaiveKDTree:
             return False
         dimensions = len(vectors[0])
         another_vec = vectors[:]
-        nodes = [[vectors, 0, Node(), True, dimensions]]
+        nodes = [[vectors, 0, None, True]]
         while nodes:
-            for node in nodes:
-                if (not isinstance(node, list) or not isinstance(node[0], list)
-                        or not isinstance(node[1], int)):
-                    return False
-                if not node[0]:
-                    continue
-                axis = node[1] % dimensions
-                if not isinstance(axis, int) or not all(isinstance(vector, tuple)
-                                                        for vector in node[0]):
-                    continue
-                node[0] = sorted(node[0], key=lambda x: x[axis])
-                median_index = len(node[0]) // 2
-                median_point = node[0][median_index]
-                node_median = Node(node[0][median_index], another_vec.index(median_point))
-                if node[2].payload == -1:
-                    self._root = node_median
+            current_vectors, depth, parent, is_left = nodes.pop()
+            if not current_vectors:
+                continue
+            axis = depth % dimensions
+            current_vectors.sort(key=lambda x: x[axis])
+            median_index = len(current_vectors) // 2
+            median_point = current_vectors[median_index]
+            node_median = Node(median_point, another_vec.index(median_point))
+            if parent is None:
+                self._root = node_median
+            else:
+                if is_left:
+                    parent.left_node = node_median
                 else:
-                    if node[3]:
-                        node[2].left_node = node_median
-                    else:
-                        node[2].right_node = node_median
-                nodes_left = [node[0][:median_index], node[1] + 1,
-                              node_median, True, dimensions]
-                nodes_right = [node[0][median_index + 1:], node[1] + 1,
-                               node_median, False, dimensions]
-                nodes.append(nodes_left)
-                nodes.append(nodes_right)
-            return True
-        return True
+                    parent.right_node = node_median
+            nodes.append([current_vectors[:median_index], depth + 1, node_median, True])
+            nodes.append([current_vectors[median_index + 1:], depth + 1, node_median, False])
+        return self._root is not None
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """

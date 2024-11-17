@@ -3,7 +3,7 @@ Lab 3.
 
 Vector search with text retrieving
 """
-
+from json import dump, load
 from math import sqrt
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
@@ -188,6 +188,9 @@ class Vectorizer:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
         self._corpus = corpus
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
 
     def build(self) -> bool:
         """
@@ -208,7 +211,7 @@ class Vectorizer:
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
         if self._idf_values is None:
-            raise ValueError
+            return False
 
         return True
 
@@ -229,8 +232,7 @@ class Vectorizer:
                 not tokenized_document:
             return None
 
-        vectorized_document = self._calculate_tf_idf(tokenized_document)
-        return vectorized_document
+        return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -292,11 +294,10 @@ class Vectorizer:
                 or not document:
             return None
 
-        self.build()
         tf = calculate_tf(self._vocabulary, document)
         if tf is None:
             return None
-        return tuple((tf.get(word) * self._idf_values.get(word) if word in document else 0.0
+        return tuple((tf[word] * self._idf_values[word] if word in document else 0.0
                       for word in self._vocabulary))
 
 
@@ -367,7 +368,8 @@ class BasicSearchEngine:
             return None
         self.index_documents(self._documents)
         knn = self._calculate_knn(query_vectorized, self._document_vectors, n_neighbours)
-        if knn is None or not knn:
+        if knn is None or not knn or not all(isinstance(index, int) or isinstance(distance, float)
+                                             for index, distance in knn):
             return None
         relevant_docs = []
         for index, value in knn:
@@ -703,6 +705,26 @@ class KDTree(NaiveKDTree):
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(vector, (list, tuple)) or not isinstance(k, int) or not vector:
+            return None
+
+        nodes = [(self._root, 0)]
+        nearest_nodes = []
+        while nodes:
+            node, depth = nodes.pop(0)
+            distance = calculate_distance(vector, node.vector)
+            if distance is not None:
+                nearest_nodes.append((distance, node))
+            if len(nearest_nodes) > k:
+                nearest_nodes.sort(key=lambda pair: pair[0])
+                nearest_nodes.pop(-1)
+            axis = depth % len(node.vector)
+            new_depth = depth + 1
+            if vector[axis] < node.vector[axis]:
+                nodes.append((node.left_node, new_depth))
+            elif (vector[axis] - node.vector[axis]) ** 2 < nearest_nodes[0][0]:
+                nodes.append((node.right_node, new_depth))
+        return sorted(nearest_nodes)
 
 
 class SearchEngine(BasicSearchEngine):
@@ -762,7 +784,9 @@ class SearchEngine(BasicSearchEngine):
 
         query_indexed = self._index_document(query)
         result = self._tree.query(query_indexed)
-        if result is None:
+        if result is None or not result or not \
+                all(isinstance(distance, float) or isinstance(index, int)
+                    for distance, index in result):
             return None
         return [(distance, self._documents[document]) for distance, document in result]
 
@@ -804,3 +828,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        BasicSearchEngine.__init__(self, vectorizer, tokenizer)
+        self._tree = KDTree()

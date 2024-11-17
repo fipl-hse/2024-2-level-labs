@@ -587,14 +587,21 @@ class Node(NodeLike):
             self.payload = payload
         left_node = Node()
         right_node = Node()
-        if ((state['left_node'] and not isinstance(state['left_node'], dict))
-                or (state['right_node'] and not isinstance(state['right_node'], dict))):
-            return False
-        self.left_node = left_node.load(state['left_node']) if state['left_node'] else None
-        self.right_node = right_node.load(state['right_node']) if state['right_node'] else None
-        if not self.vector or not self.payload:
-            return False
-        return True
+        if state['left_node']:
+            if (not isinstance(state['left_node'], dict)
+                    or not left_node.load(state['left_node'])):
+                return False
+            self.left_node = left_node
+        else:
+            self.left_node = None
+        if state['right_node']:
+            if (not isinstance(state['right_node'], dict)
+                    or not right_node.load(state['right_node'])):
+                return False
+            self.right_node = right_node
+        else:
+            self.right_node = None
+        return True if self.vector and self.payload else False
 
 
 class NaiveKDTree:

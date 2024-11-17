@@ -51,6 +51,14 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    if query_vector is None or document_vector is None:
+        return None
+    if not query_vector or not document_vector:
+        return 0.0
+    euclidean_distance = 0.0
+    for i, number in enumerate(query_vector):
+        euclidean_distance += (number - document_vector[i]) ** 2
+    return euclidean_distance ** 0.5
 
 
 def save_vector(vector: Vector) -> dict:
@@ -204,6 +212,8 @@ class Vectorizer:
             return False
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if not self._idf_values:
+            return False
 
         for index, word in enumerate(self._vocabulary):
             self._token2ind[word] = index
@@ -338,7 +348,7 @@ class BasicSearchEngine:
             return False
 
         for document in self._documents:
-            self._document_vectors.append(self.index_document(document))
+            self._document_vectors.append(self._index_document(document))
         if not self._document_vectors:
             return False
 
@@ -359,6 +369,17 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        relevant_documents = []
+        vectorized_query = self._index_document(query)
+        if vectorized_query is None:
+            return None
+        self.index_documents(self._documents)
+        knn = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
+        if knn is None or not knn:
+            return None
+        for value in knn:
+            relevant_documents.append((value[1], self._documents[value[0]]))
+        return relevant_documents
 
     def save(self, file_path: str) -> bool:
         """
@@ -394,6 +415,15 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query_vector, tuple):
+            return None
+        for vector in self._document_vectors:
+            if len(vector) < len(query_vector):
+                return None
+        doc = self._calculate_knn(query_vector, self._document_vectors, 1)
+        if not doc:
+            return None
+        return self._documents[doc[0][0]]
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
@@ -411,6 +441,13 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if query_vector is None or not document_vectors:
+            return None
+        knn = []
+        for i, doc in enumerate(document_vectors):
+            knn.append((i, calculate_distance(query_vector, doc)))
+        sorted(knn, key=lambda x: x[1])
+        return knn[:n_neighbours + 1]
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -424,6 +461,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document, str):
+            return None
+        tokenized_doc = self._tokenizer.tokenize(document)
+        vectorized_doc = self._vectorizer.vectorize(tokenized_doc)
+        return vectorized_doc
 
     def _dump_documents(self) -> dict:
         """

@@ -601,10 +601,11 @@ class NaiveKDTree:
                     parent.left_node = node_median
                 else:
                     parent.right_node = node_median
-            temp_node_1 = (current_vectors[:median_index], depth + 1, node_median, True)
-            temp_node_2 = (current_vectors[median_index + 1:], depth + 1, node_median, False)
-            nodes.append(temp_node_1)
-            nodes.append(temp_node_2)
+            if isinstance(node_median, Node) or node_median is None:
+                temp_node_1 = (current_vectors[:median_index], depth + 1, node_median, True)
+                temp_node_2 = (current_vectors[median_index + 1:], depth + 1, node_median, False)
+                nodes.append(temp_node_1)
+                nodes.append(temp_node_2)
         return self._root is not None
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:

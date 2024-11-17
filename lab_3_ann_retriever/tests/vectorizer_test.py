@@ -632,6 +632,7 @@ class VectorizerTest(unittest.TestCase):
             0.0,
             0.061,
         )
+        self.vectorizer.build()
         actual = self.vectorizer.vector2tokens(vector)
         self.assertIsInstance(actual, list)
         for word in actual:

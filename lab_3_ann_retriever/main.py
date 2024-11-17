@@ -8,7 +8,7 @@ from math import sqrt
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
-from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
+from lab_2_retrieval_w_bm25.main import calculate_idf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -72,6 +72,14 @@ def save_vector(vector: Vector) -> dict:
     Returns:
         dict: A state of the vector to save
     """
+    result = {
+        'len': len(vector),
+        'elements': {}
+    }
+    for index, value in enumerate(vector):
+        if value != 0.0:
+            result['elements'][index] = value
+    return result
 
 
 def load_vector(state: dict) -> Vector | None:
@@ -86,6 +94,16 @@ def load_vector(state: dict) -> Vector | None:
 
     In case of corrupt input arguments, None is returned.
     """
+    if not isinstance(state, dict) or 'len' not in state or 'elements' not in state:
+        return None
+
+    vector = []
+    for i in range(state['len']):
+        if str(i) not in state['elements']:
+            vector.append(0.0)
+        else:
+            vector.append(state['elements'][str(i)])
+    return tuple(vector)
 
 
 class Tokenizer:
@@ -264,6 +282,18 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
+        if not isinstance(file_path, str) or not file_path:
+            return False
+
+        state = {
+            'idf_values': self._idf_values,
+            'vocabulary': self._vocabulary,
+            'token2ind': self._token2ind
+        }
+
+        with open(file_path, 'w', encoding='utf-8') as file:
+            dump(state, file)
+        return True
 
     def load(self, file_path: str) -> bool:
         """
@@ -277,6 +307,20 @@ class Vectorizer:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(file_path, str) or not file_path:
+            return False
+
+        with open(file_path, 'r', encoding='utf-8') as file:
+            state = load(file)
+
+        for attribute in ('vocabulary', 'token2ind', 'idf_values'):
+            if attribute not in state:
+                return False
+
+        self._vocabulary = state['vocabulary']
+        self._token2ind = state['token2ind']
+        self._idf_values = state['idf_values']
+        return True
 
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
         """
@@ -294,9 +338,10 @@ class Vectorizer:
                 or not document:
             return None
 
-        tf = calculate_tf(self._vocabulary, document)
-        if tf is None:
-            return None
+        tf = {}
+        for word in set(self._vocabulary) | set(document):
+            tf[word] = document.count(word) / len(document)
+
         return tuple((tf[word] * self._idf_values[word] if word in document else 0.0
                       for word in self._vocabulary))
 
@@ -386,6 +431,15 @@ class BasicSearchEngine:
         Returns:
             bool: returns True if save was done correctly, False in another cases
         """
+        if not isinstance(file_path, str) or not file_path:
+            return False
+
+        result = {
+            'engine': self._dump_documents()
+        }
+        with open(file_path, 'w', encoding='utf-8') as file:
+            dump(result, file)
+        return True
 
     def load(self, file_path: str) -> bool:
         """
@@ -397,6 +451,13 @@ class BasicSearchEngine:
         Returns:
             bool: True if engine was loaded, False in other cases
         """
+        if not isinstance(file_path, str) or not file_path:
+            return False
+
+        with open(file_path, 'r', encoding='utf-8') as file:
+            state = load(file)
+
+        return self._load_documents(state)
 
     def retrieve_vectorized(self, query_vector: Vector) -> str | None:
         """
@@ -478,6 +539,10 @@ class BasicSearchEngine:
         Returns:
             dict: document and document_vectors states
         """
+        return {
+            'documents': self._documents,
+            'document_vectors': [save_vector(document) for document in self._document_vectors]
+        }
 
     def _load_documents(self, state: dict) -> bool:
         """
@@ -489,6 +554,23 @@ class BasicSearchEngine:
         Returns:
             bool: True if documents were loaded, False in other cases
         """
+        if not isinstance(state, dict) or 'engine' not in state or \
+                'documents' not in state['engine'] or 'document_vectors' not in state['engine']:
+            return False
+
+        if not state['engine'] or not state['engine']['documents'] or \
+                not state['engine']['document_vectors']:
+            return False
+
+        self._documents = state['engine']['documents']
+        if not self._documents:
+            return False
+        for vector in state['engine']['document_vectors']:
+            loaded_vector = load_vector(vector)
+            if not loaded_vector:
+                return False
+            self._document_vectors.append(loaded_vector)
+        return True
 
 
 class Node(NodeLike):
@@ -529,6 +611,12 @@ class Node(NodeLike):
         Returns:
             dict: state of the Node instance
         """
+        return {
+            'vector': save_vector(self.vector),
+            'payload': self.payload,
+            'left_node': self.left_node.save() if self.left_node else None,
+            'right_node': self.right_node.save() if self.right_node else None
+        }
 
     def load(self, state: dict[str, dict | int]) -> bool:
         """
@@ -540,7 +628,37 @@ class Node(NodeLike):
         Returns:
             bool: True if Node was loaded successfully, False in other cases.
         """
+        if not isinstance(state, dict) or 'vector' not in state or 'payload' not in state:
+            return False
+        if not isinstance(state['vector'], dict) or \
+                not isinstance(state['payload'], int) or isinstance(state['payload'], bool):
+            return False
 
+        self.vector = load_vector(state['vector'])
+        if self.vector is None:
+            return False
+        self.payload = state['payload']
+
+        left_node = Node()
+        right_node = Node()
+
+        if state['left_node']:
+            if left_node.load(state['left_node']):
+                self.left_node = left_node
+            else:
+                return False
+        else:
+            self.left_node = None
+
+        if state['right_node']:
+            if right_node.load(state['right_node']):
+                self.right_node = right_node
+            else:
+                return False
+        else:
+            self.right_node = None
+
+        return True
 
 class NaiveKDTree:
     """
@@ -712,19 +830,29 @@ class KDTree(NaiveKDTree):
         nearest_nodes = []
         while nodes:
             node, depth = nodes.pop(0)
+            if not node:
+                continue
             distance = calculate_distance(vector, node.vector)
-            if distance is not None:
-                nearest_nodes.append((distance, node))
-            if len(nearest_nodes) > k:
-                nearest_nodes.sort(key=lambda pair: pair[0])
-                nearest_nodes.pop(-1)
-            axis = depth % len(node.vector)
+            if distance is None:
+                return None
+            if len(nearest_nodes) < k or distance < max(nearest_nodes)[0]:
+                nearest_nodes.append((distance, node.payload))
+                if len(nearest_nodes) > k:
+                    nearest_nodes.sort(key=lambda pair: pair[0])
+                    nearest_nodes.pop(-1)
+            axis = depth % len(vector)
             new_depth = depth + 1
             if vector[axis] < node.vector[axis]:
-                nodes.append((node.left_node, new_depth))
-            elif (vector[axis] - node.vector[axis]) ** 2 < nearest_nodes[0][0]:
+                if node.left_node is not None:
+                    nodes.append((node.left_node, new_depth))
+            elif node.right_node is not None:
                 nodes.append((node.right_node, new_depth))
-        return sorted(nearest_nodes)
+            if (vector[axis] - node.vector[axis]) ** 2 < max(nearest_nodes)[0]:
+                if node.left_node is not None:
+                    nodes.append((node.right_node, new_depth))
+                elif node.right_node is not None:
+                    nodes.append((node.left_node, new_depth))
+        return nearest_nodes
 
 
 class SearchEngine(BasicSearchEngine):

@@ -4,10 +4,11 @@ Lab 3.
 Vector search with text retrieving
 """
 
-# pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
-from typing import Protocol
-from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 from math import sqrt
+
+from typing import Protocol
+
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."

@@ -52,8 +52,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
-    if not (query_vector is Vector and
-            document_vector is Vector):
+    if not (isinstance(query_vector, tuple) and
+            isinstance(document_vector, tuple)):
         return None
     if not (len(query_vector) > 0 and
             len(query_vector) == len(document_vector)):
@@ -239,11 +239,16 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokenized_document, list):
+        if not (isinstance(tokenized_document, list) and
+                len(tokenized_document) > 0):
             return None
+        if (len(self._vocabulary) == 0 or
+            len(self._idf_values) == 0 or
+            len(self._token2ind) == 0):
+            return ()
 
-        vector: Vector = self._calculate_tf_idf(tokenized_document)
-        if vector is None:
+        vector = self._calculate_tf_idf(tokenized_document)
+        if not isinstance(vector, tuple):
             return None
         return vector
 
@@ -259,6 +264,20 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (isinstance(vector, tuple) and
+                len(vector) == len(self._token2ind)):
+            return None
+
+        tokens = []
+        for token in self._token2ind:
+            token_index = self._token2ind[token]
+            vector_value = vector[token_index]
+            if not isinstance(vector_value, float):
+                return None
+            if vector_value != 0:
+                tokens.append(token)
+        return tokens
+
 
     def save(self, file_path: str) -> bool:
         """
@@ -340,12 +359,11 @@ class Vectorizer:
 
         vector_to_fill = [0] * len(self._vocabulary)
         for word in tf:
-            if not word in self._token2ind:
-                return None
-            vec_ind = self._token2ind[word]
-            if not isinstance(vec_ind, int):
-                return None
-            vector_to_fill[vec_ind] = tf[word] * self._idf_values[word]
+            if word in self._token2ind:
+                vec_ind = self._token2ind[word]
+                if not isinstance(vec_ind, int):
+                    return None
+                vector_to_fill[vec_ind] = tf[word] * self._idf_values[word]
 
         return tuple(vector_to_fill)
 
@@ -392,7 +410,7 @@ class BasicSearchEngine:
         temp_vector_docs = []
         for doc in self._documents:
             vector_doc = self._index_document(doc)
-            if not vector_doc is Vector:
+            if not isinstance(vector_doc, tuple):
                 return False
             temp_vector_docs.append(vector_doc)
         self._document_vectors = temp_vector_docs
@@ -418,7 +436,7 @@ class BasicSearchEngine:
             return None
 
         query_vector = self._index_document(query)
-        if not query_vector is Vector:
+        if not isinstance(query_vector, tuple):
             return None
 
         nearest_docs = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
@@ -469,6 +487,16 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query_vector, tuple):
+            return None
+
+        closest = self._calculate_knn(query_vector, self._document_vectors, 1)
+        if not isinstance(closest, list):
+            return None
+        doc_index = closest[0][0]
+        vec_doc = self._documents[doc_index]
+        return vec_doc
+
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
@@ -486,7 +514,7 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (query_vector is Vector and
+        if not (isinstance(query_vector, tuple) and
                 isinstance(document_vectors, list) and
                 isinstance(n_neighbours, int)):
             return None
@@ -497,7 +525,7 @@ class BasicSearchEngine:
             if not isinstance(distance, float):
                 return None
             distances.append((ind, distance))
-        distances.sort(key=lambda a: a[1])
+        distances.sort(key=lambda a: (a[1], a[0]))
         return distances[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
@@ -519,7 +547,7 @@ class BasicSearchEngine:
         if not isinstance(token_doc, list):
             return None
         doc_vector = self._vectorizer.vectorize(token_doc)
-        if not doc_vector is Vector:
+        if not isinstance(doc_vector, tuple):
             return None
         return doc_vector
 
@@ -570,6 +598,10 @@ class Node(NodeLike):
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+        self.vector = vector
+        self.payload = payload
+        self.left_node = left_node
+        self.right_node = right_node
 
     def save(self) -> dict:
         """
@@ -602,6 +634,7 @@ class NaiveKDTree:
         """
         Initialize an instance of the KDTree class.
         """
+        self._root = None
 
     def build(self, vectors: list[Vector]) -> bool:
         """
@@ -615,6 +648,77 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not (isinstance(vectors, list) and
+                len(vectors) > 0):
+            return False
+
+        indexed_vecs = [(ind, vec) for ind, vec in enumerate(vectors)]
+        info_list = [{"vectors": indexed_vecs,
+                      "depth": 0,
+                      "parent_node": Node(),
+                      "is_left": True}]
+        dimensions = len(vectors[0])
+
+        while len(info_list) > 0:
+            current_space = info_list[0]
+            #print("Working with", current_space)
+            if len(current_space["vectors"]) == 0:
+                info_list.pop(0)
+                #print("Skipped")
+                continue
+
+            axis = current_space["depth"] % dimensions
+            current_space["vectors"].sort(key=lambda a: a[1][axis])
+            median_index = len(current_space["vectors"]) // 2
+            median_ind_vec = current_space["vectors"][median_index]
+            node_to_assign = Node(median_ind_vec[1], median_ind_vec[0])
+            """print("Axis and median:", axis, median_index)
+            print("Sorted vectors", current_space["vectors"])
+            print("My node is", node_to_assign, "with index", node_to_assign.payload)"""
+
+            if current_space["parent_node"].payload == -1:
+                self._root = node_to_assign
+                #print("Wrote as root")
+                info_list.append({"vectors": current_space["vectors"][:median_index],
+                                  "depth": current_space["depth"] + 1,
+                                  "parent_node": self._root,
+                                  "is_left": True})
+
+                info_list.append({"vectors": current_space["vectors"][median_index + 1:],
+                                  "depth": current_space["depth"] + 1,
+                                  "parent_node": self._root,
+                                  "is_left": False})
+
+            elif current_space["is_left"]:
+                current_space["parent_node"].left_node = node_to_assign
+                #print("Wrote as left")
+                info_list.append({"vectors": current_space["vectors"][:median_index],
+                                  "depth": current_space["depth"] + 1,
+                                  "parent_node": current_space["parent_node"].left_node,
+                                  "is_left": True})
+
+                info_list.append({"vectors": current_space["vectors"][median_index + 1:],
+                                  "depth": current_space["depth"] + 1,
+                                  "parent_node": current_space["parent_node"].left_node,
+                                  "is_left": False})
+
+            elif not current_space["is_left"]:
+                current_space["parent_node"].right_node = node_to_assign
+                #print("Wrote as right")
+                info_list.append({"vectors": current_space["vectors"][:median_index],
+                                  "depth": current_space["depth"] + 1,
+                                  "parent_node": current_space["parent_node"].right_node,
+                                  "is_left": True})
+
+                info_list.append({"vectors": current_space["vectors"][median_index + 1:],
+                                  "depth": current_space["depth"] + 1,
+                                  "parent_node": current_space["parent_node"].right_node,
+                                  "is_left": False})
+
+            info_list.pop(0)
+            #print()
+
+        return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
@@ -629,6 +733,14 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (isinstance(vector, tuple) and
+                isinstance(k, int)):
+            return None
+
+        results = self._find_closest(vector, k)
+        if not isinstance(results, list):
+            return None
+        return results
 
     def save(self) -> dict | None:
         """
@@ -664,6 +776,42 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (isinstance(vector, tuple) and
+                isinstance(k, int) and
+                len(vector) > 0):
+            return None
+
+        distance_list = []
+        info_list = [{"node": self._root,
+                      "depth": 0}]
+        dimensions = len(vector)
+
+        while len(info_list) > 0:
+            current_node = info_list[0]
+            distance = calculate_distance(vector, current_node["node"].vector)
+            if not isinstance(distance, float):
+                return None
+            distance_list.append((distance, current_node["node"].payload))
+
+            if (current_node["node"].left_node is None and
+                current_node["node"].right_node is None):
+                break
+
+            axis = current_node["depth"] % dimensions
+            if current_node["node"].right_node is None:
+                new_node = current_node["node"].left_node
+            elif current_node["node"].left_node is None:
+                new_node = current_node["node"].right_node
+            elif vector[axis] < current_node["node"].vector[axis]:
+                new_node = current_node["node"].left_node
+            else:
+                new_node = current_node["node"].right_node
+            info_list.append({"node": new_node,
+                              "depth": current_node["depth"] + 1})
+
+            info_list.pop(0)
+
+        return sorted(distance_list)[:k]
 
 
 class KDTree(NaiveKDTree):

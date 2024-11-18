@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 from pathlib import Path
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from main import Tokenizer, Vectorizer
+from main import BasicSearchEngine, NaiveKDTree, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -33,14 +33,33 @@ def main() -> None:
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     docs, stops = open_files()
+
     tokenizer = Tokenizer(stops)
     token_docs_list = tokenizer.tokenize_documents(docs)
+
     vectorizer = Vectorizer(token_docs_list)
     vectorizer.build()
-    result = vectorizer.vectorize(token_docs_list[0])
-    vectorizer.load("tests/assets/vectorizer_data.json")
+    vector = vectorizer.vectorize(token_docs_list[0])
+    tokens_from_vec = vectorizer.vector2tokens(vector)
+
+    searcher = BasicSearchEngine(vectorizer, tokenizer)
+    searcher.index_documents(docs)
+    relevant_docs = searcher.retrieve_relevant_documents("Нижний Новгород", 5)
+    best_doc = searcher.retrieve_vectorized(vectorizer.vectorize(tokenizer.tokenize("Нижний Новгород")))
+
+    naive_tree = NaiveKDTree()
+    naive_tree.build([
+        (0.0, 0.0, 0.094),
+        (0.061, 0.121, 0.0),
+        (0.0, 0.0, 0.0),
+        (0.0, 0.0, 0.0)])
+    print(naive_tree.query((-0.01, 0.0, 0.094), 11))
+
+    result = tokens_from_vec
+    print(result, best_doc, sep="\n")
+    for doc in relevant_docs:
+        print(doc)
     assert result, "Result is None"
-    print(result)
 
 
 if __name__ == "__main__":

@@ -60,7 +60,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         return None
     if not query_vector or not document_vector:
         return 0.0
-    distance: float = 0.0
+    distance = 0.0
     for idx, query_cor in enumerate(query_vector):
         distance += (query_cor - document_vector[idx]) ** 2
     return sqrt(distance)
@@ -332,7 +332,7 @@ class Vectorizer:
         vector = list(0.0 for _ in range(len(self._vocabulary)))
         for token in document:
             if self._token2ind.get(token) is not None:
-                tf: dict[str, float] | None = calculate_tf(self._vocabulary, document)
+                tf = calculate_tf(self._vocabulary, document)
                 if tf is not None:
                     vector[self._token2ind[token]] = tf[token] * self._idf_values[token]
         return Vector(vector)
@@ -379,7 +379,7 @@ class BasicSearchEngine:
         self._documents = documents
 
         for document in documents:
-            indexed_document: tuple[float, ...] | None = self._index_document(document)
+            indexed_document = self._index_document(document)
             if indexed_document is not None:
                 self._document_vectors.append(indexed_document)
             else:
@@ -471,7 +471,7 @@ class BasicSearchEngine:
         if not (isinstance(query_vector, tuple) and all(
                 isinstance(cor, float) for cor in query_vector)):
             return None
-        knn: list[tuple[int, float]] | None = self._calculate_knn(query_vector,
+        knn = self._calculate_knn(query_vector,
                                                                   self._document_vectors, 1)
         if knn is None or not knn:
             return None
@@ -524,7 +524,7 @@ class BasicSearchEngine:
         """
         if not isinstance(document, str):
             return None
-        tokenized_document: list[str] | None = self._tokenizer.tokenize(document)
+        tokenized_document = self._tokenizer.tokenize(document)
         if tokenized_document is None:
             return None
         return self._vectorizer.vectorize(tokenized_document)

@@ -34,11 +34,13 @@ def main() -> None:
         text = text_file.read()
     documents = open_files()[0][:50]
     stopwords = open_files()[1]
+    result = None
 
     tokenizer = Tokenizer(stopwords)
     tokenized_docs = tokenizer.tokenize_documents(documents)
-    if tokenized_docs is None:
-        return None
+
+    assert tokenized_docs, "tokenized_docs is None"
+
     vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()
     vectorizer.save("assets/states/vectorizer_state.json")
@@ -56,7 +58,6 @@ def main() -> None:
     print(result)
     print(text)
     assert result, "Result is None"
-    return None
 
 
 if __name__ == "__main__":

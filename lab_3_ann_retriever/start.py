@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 from pathlib import Path
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from main import BasicSearchEngine, NaiveKDTree, Tokenizer, Vectorizer
+from main import BasicSearchEngine, NaiveKDTree, SearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -44,8 +44,8 @@ def main() -> None:
 
     searcher = BasicSearchEngine(vectorizer, tokenizer)
     searcher.index_documents(docs)
-    relevant_docs = searcher.retrieve_relevant_documents("Нижний Новгород", 5)
-    best_doc = searcher.retrieve_vectorized(vectorizer.vectorize(tokenizer.tokenize("Нижний Новгород")))
+    relevant_docs = searcher.retrieve_relevant_documents("Нижний Новгород", 3)
+    closest_doc = searcher.retrieve_vectorized(vectorizer.vectorize(tokenizer.tokenize("Нижний Новгород")))
 
     naive_tree = NaiveKDTree()
     naive_tree.build([
@@ -55,10 +55,17 @@ def main() -> None:
         (0.0, 0.0, 0.0)])
     print(naive_tree.query((-0.01, 0.0, 0.094), 11))
 
+    better_searcher = SearchEngine(vectorizer, tokenizer)
+    better_searcher.index_documents(docs)
+    more_relevant_docs = better_searcher.retrieve_relevant_documents("Нижний Новгород")
+
     result = tokens_from_vec
-    print(result, best_doc, sep="\n")
+    print(result, closest_doc, sep="\n")
     for doc in relevant_docs:
         print(doc)
+    print()
+    for doc_tree in more_relevant_docs:
+        print(doc_tree)
     assert result, "Result is None"
 
 

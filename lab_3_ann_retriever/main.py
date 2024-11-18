@@ -845,6 +845,9 @@ class SearchEngine(BasicSearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        BasicSearchEngine.__init__(self, vectorizer, tokenizer)
+        self._tree = NaiveKDTree()
+
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -858,6 +861,20 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(documents, list):
+            return False
+
+        self._documents = documents
+        temp_vector_docs = []
+        for doc in self._documents:
+            vector_doc = self._index_document(doc)
+            if not isinstance(vector_doc, tuple):
+                return False
+            temp_vector_docs.append(vector_doc)
+        self._document_vectors = temp_vector_docs
+
+        return self._tree.build(self._document_vectors)
+
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -874,6 +891,28 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (isinstance(query, str) and
+                isinstance(n_neighbours, int)):
+            return None
+
+        query_vector = self._index_document(query)
+        if not isinstance(query_vector, tuple):
+            return None
+
+        search_results = self._tree.query(query_vector, n_neighbours)
+        if not isinstance(search_results, list):
+            return None
+        output_values = []
+        for pair in search_results:
+            value = pair[0]
+            ind = pair[1]
+            if not (isinstance(ind, int) and
+                    isinstance(value, float)):
+                return None
+            doc = self._documents[ind]
+            output_values.append((value, doc))
+        return output_values
+
 
     def save(self, file_path: str) -> bool:
         """

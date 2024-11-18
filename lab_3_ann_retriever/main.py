@@ -652,7 +652,9 @@ class NaiveKDTree:
                 len(vectors) > 0):
             return False
 
-        indexed_vecs = [(ind, vec) for ind, vec in enumerate(vectors)]
+        indexed_vecs = []
+        for ind, vec in enumerate(vectors):
+            indexed_vecs.append((ind, vec))
         info_list = [{"vectors": indexed_vecs,
                       "depth": 0,
                       "parent_node": Node(),
@@ -661,10 +663,8 @@ class NaiveKDTree:
 
         while len(info_list) > 0:
             current_space = info_list[0]
-            #print("Working with", current_space)
             if len(current_space["vectors"]) == 0:
                 info_list.pop(0)
-                #print("Skipped")
                 continue
 
             axis = current_space["depth"] % dimensions
@@ -678,7 +678,6 @@ class NaiveKDTree:
 
             if current_space["parent_node"].payload == -1:
                 self._root = node_to_assign
-                #print("Wrote as root")
                 info_list.append({"vectors": current_space["vectors"][:median_index],
                                   "depth": current_space["depth"] + 1,
                                   "parent_node": self._root,
@@ -691,7 +690,6 @@ class NaiveKDTree:
 
             elif current_space["is_left"]:
                 current_space["parent_node"].left_node = node_to_assign
-                #print("Wrote as left")
                 info_list.append({"vectors": current_space["vectors"][:median_index],
                                   "depth": current_space["depth"] + 1,
                                   "parent_node": current_space["parent_node"].left_node,
@@ -704,7 +702,6 @@ class NaiveKDTree:
 
             elif not current_space["is_left"]:
                 current_space["parent_node"].right_node = node_to_assign
-                #print("Wrote as right")
                 info_list.append({"vectors": current_space["vectors"][:median_index],
                                   "depth": current_space["depth"] + 1,
                                   "parent_node": current_space["parent_node"].right_node,
@@ -716,7 +713,6 @@ class NaiveKDTree:
                                   "is_left": False})
 
             info_list.pop(0)
-            #print()
 
         return True
 

@@ -5,7 +5,8 @@ Laboratory Work #3 starter.
 from pathlib import Path
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from main import BasicSearchEngine, NaiveKDTree, SearchEngine, Tokenizer, Vectorizer
+from lab_3_ann_retriever.main import (BasicSearchEngine, NaiveKDTree, SearchEngine,
+                                      Tokenizer, Vectorizer)
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -45,7 +46,8 @@ def main() -> None:
     searcher = BasicSearchEngine(vectorizer, tokenizer)
     searcher.index_documents(docs)
     relevant_docs = searcher.retrieve_relevant_documents("Нижний Новгород", 3)
-    closest_doc = searcher.retrieve_vectorized(vectorizer.vectorize(tokenizer.tokenize("Нижний Новгород")))
+    vectorized_query = vectorizer.vectorize(tokenizer.tokenize("Нижний Новгород"))
+    closest_doc = searcher.retrieve_vectorized(vectorized_query)
 
     naive_tree = NaiveKDTree()
     naive_tree.build([

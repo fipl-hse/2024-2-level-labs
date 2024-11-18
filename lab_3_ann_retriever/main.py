@@ -582,19 +582,19 @@ class NaiveKDTree:
         if not vectors:
             return False
         dimensions = len(vectors[0])
-        spaces = [{"vectors": vectors,
-                   "depth": 0,
-                   "parent node": Node(),
-                   "space is left": True}]
+        spaces = [(vectors, 0, Node(), True)]
         while spaces:
             space = spaces.pop()
-            space_vectors = space.get("vectors")
-            current_parent = space.get("parent node")
-            current_depth = space.get("depth")
+            space_vectors = space[0]
+            current_parent = space[2]
+            current_depth = space[1]
             if (not isinstance(space_vectors, list) or not space_vectors
-                    or not current_parent or not isinstance(current_depth, int)):
+                    or not current_parent or not isinstance(current_depth, int)
+                    or not isinstance(dimensions, int)):
                 continue
             axis = current_depth % dimensions
+            if not isinstance(axis, int) or not all(isinstance(vector, tuple) for vector in space_vectors):
+                continue
             space_vectors_sorted = sorted(space_vectors, key=lambda vector: vector[axis])
             median_index = len(space_vectors_sorted) // 2
             median_dot = space_vectors_sorted[median_index]
@@ -602,18 +602,14 @@ class NaiveKDTree:
             if current_parent.payload == -1:
                 self._root = node_median_dot
             else:
-                if space["space is left"]:
+                if space[3]:
                     current_parent.left_node = node_median_dot
                 else:
                     current_parent.right_node = node_median_dot
-            left_space = {"vectors": space_vectors_sorted[:median_index],
-                          "depth": (current_depth + 1),
-                          "parent node": node_median_dot,
-                          "space is left": True}
-            right_space = {"vectors": space_vectors_sorted[median_index + 1:],
-                           "depth": (current_depth + 1),
-                           "parent node": node_median_dot,
-                           "space is left": False}
+            left_space = (space_vectors_sorted[:median_index], (current_depth + 1),
+                          node_median_dot, True)
+            right_space = (space_vectors_sorted[median_index + 1:], (current_depth + 1),
+                           node_median_dot, False)
             spaces.append(left_space)
             spaces.append(right_space)
         return True

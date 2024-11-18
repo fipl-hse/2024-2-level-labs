@@ -416,6 +416,8 @@ class BasicSearchEngine:
         relevant_docs = []
 
         for distance in n_distances:
+            if None in distance:
+                return None
             relevant_docs.append((distance[1], self._documents[distance[0]]))
         return relevant_docs
 
@@ -628,14 +630,19 @@ class Node(NodeLike):
             return False
         self.vector = loaded_vector
         self.payload = state["payload"]
-        if isinstance(state["left_node"], dict):
-            left_node = Node()
-            if left_node.load(state["left_node"]):
-                self.left_node = left_node
-        if isinstance(state["right_node"], dict):
-            right_node = Node()
-            if right_node.load(state["right_node"]):
-                self.right_node = right_node
+
+        if not(isinstance(state["left_node"], dict) or state["left_node"] is None):
+            return False
+        left_node = Node()
+        if left_node.load(state["left_node"]):
+            self.left_node = left_node
+
+        if not (isinstance(state["right_node"], dict) or state["right_node"] is None):
+            return False
+        right_node = Node()
+        if right_node.load(state["right_node"]):
+            self.right_node = right_node
+
         return True
 
 
@@ -904,9 +911,12 @@ class SearchEngine(BasicSearchEngine):
         query_vector = self._vectorizer.vectorize(query_tokens)
         if query_vector is None:
             return None
+
         relevant_vectors = self._tree.query(query_vector, n_neighbours)
-        if relevant_vectors is None:
+        if (relevant_vectors is None or any(None in vector for vector in relevant_vectors)
+                or not relevant_vectors):
             return None
+
         return [(relevant_vectors[i][0], self._documents[relevant_vectors[i][1]]) for i in
                 range(len(relevant_vectors))]
 
@@ -929,6 +939,8 @@ class SearchEngine(BasicSearchEngine):
                 "document_vectors": self._dump_documents()["document_vectors"],
             }
         }
+        if None in state["engine"].values():
+            return False
         with open(file_path, 'w', encoding="UTF-8") as file:
             json.dump(state, file, ensure_ascii=False, indent=4)
         return True

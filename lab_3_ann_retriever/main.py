@@ -672,9 +672,6 @@ class NaiveKDTree:
             median_index = len(current_space["vectors"]) // 2
             median_ind_vec = current_space["vectors"][median_index]
             node_to_assign = Node(median_ind_vec[1], median_ind_vec[0])
-            """print("Axis and median:", axis, median_index)
-            print("Sorted vectors", current_space["vectors"])
-            print("My node is", node_to_assign, "with index", node_to_assign.payload)"""
 
             if current_space["parent_node"].payload == -1:
                 self._root = node_to_assign
@@ -952,3 +949,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        SearchEngine.__init__(self, vectorizer, tokenizer)

@@ -52,10 +52,10 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
-    if not (isinstance(query_vector, (list, tuple)) and isinstance(document_vector, (list, tuple))
-            and all(isinstance(cor, float) for cor in query_vector) and
-            all(isinstance(cor, float) for cor in document_vector) and
-            (len(query_vector) == len(document_vector) or len(query_vector) == 0 or len(
+    if not (isinstance(query_vector, tuple) and isinstance(document_vector, tuple)
+            and all(isinstance(cor, float) for cor in query_vector)
+            and all(isinstance(cor, float) for cor in document_vector)
+            and (len(query_vector) == len(document_vector) or len(query_vector) == 0 or len(
                 document_vector) == 0)):
         return None
     if not query_vector or not document_vector:

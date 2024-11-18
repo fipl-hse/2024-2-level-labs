@@ -43,9 +43,5 @@ def main() -> None:
     result = knn_retriever
     assert result, "Result is None"
 
-
-
-
-
 if __name__ == "__main__":
     main()

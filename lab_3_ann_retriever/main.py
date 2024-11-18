@@ -59,13 +59,9 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     sum_of_squares = 0
 
     for query_value, document_value in zip(query_vector, document_vector):
-        difference = query_value - document_value
-        squared_difference = difference ** 2
-        sum_of_squares += squared_difference
+        sum_of_squares += (query_value - document_value) ** 2
 
-    euclidean_distance = sqrt(sum_of_squares)
-
-    return euclidean_distance
+    return sqrt(sum_of_squares)
 
 
 def save_vector(vector: Vector) -> dict:
@@ -220,12 +216,11 @@ class Vectorizer:
         self._vocabulary = sorted(list(set(sum(self._corpus, []))))
 
         # create vocab
+        unique_tokens = set()
         for doc in self._corpus:
-            for token in doc:
-                if token not in self._vocabulary:
-                    self._vocabulary.append(token)
+            unique_tokens.update(doc)
 
-        self._vocabulary.sort()
+        self._vocabulary = sorted(unique_tokens)
 
         if not isinstance(self._vocabulary, list):
             return False
@@ -260,9 +255,7 @@ class Vectorizer:
                 not tokenized_document:
             return None
 
-        vec_doc = self._calculate_tf_idf(tokenized_document)
-
-        return vec_doc
+        return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -402,7 +395,7 @@ class BasicSearchEngine:
         return True
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int
+        self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
@@ -484,7 +477,7 @@ class BasicSearchEngine:
         return self._documents[match[0]]
 
     def _calculate_knn(
-            self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
+        self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
         """
         Find nearest neighbours for a query vector.
@@ -565,11 +558,11 @@ class Node(NodeLike):
     right_node: NodeLike | None
 
     def __init__(
-            self,
-            vector: Vector = (),
-            payload: int = -1,
-            left_node: NodeLike | None = None,
-            right_node: NodeLike | None = None,
+        self,
+        vector: Vector = (),
+        payload: int = -1,
+        left_node: NodeLike | None = None,
+        right_node: NodeLike | None = None,
     ) -> None:
         """
         Initialize an instance of the Node class.

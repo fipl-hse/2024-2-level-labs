@@ -3,12 +3,12 @@ Lab 3.
 
 Vector search with text retrieving
 """
+
+# pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import math
 from typing import Protocol
 
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
-
-# pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 
 
 Vector = tuple[float, ...]
@@ -593,8 +593,6 @@ class NaiveKDTree:
                     or not isinstance(dimensions, int)):
                 continue
             axis = current_depth % dimensions
-            if not isinstance(axis, int) or not all(isinstance(vector, tuple) for vector in space_vectors):
-                continue
             space_vectors_sorted = sorted(space_vectors, key=lambda vector: vector[axis])
             median_index = len(space_vectors_sorted) // 2
             median_dot = space_vectors_sorted[median_index]

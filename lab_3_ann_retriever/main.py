@@ -503,18 +503,16 @@ class BasicSearchEngine:
                 not query_vector or not document_vectors:
             return None
 
-        vector_distances = [calculate_distance(query_vector, vector) for vector in document_vectors]
-
-        map_sorted_distances = []
-
-        for vec_distance in vector_distances:
-            if not isinstance(vec_distance, float):
+        vector_distances = []
+        for index, vector in enumerate(document_vectors):
+            distance = calculate_distance(query_vector, vector)
+            if not isinstance(distance, float):
                 return None
-            map_sorted_distances.append((vector_distances.index(vec_distance), vec_distance))
+            vector_distances.append((index, distance))
 
-        sorted_distances = sorted(map_sorted_distances, key=lambda x: x[1], reverse=True)
+        sorted_distances = sorted(vector_distances, key=lambda x: x[1])
 
-        return sorted_distances
+        return sorted_distances[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """

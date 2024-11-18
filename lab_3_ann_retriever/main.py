@@ -403,7 +403,8 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not isinstance(documents, list):
+        if not (isinstance(documents, list) and
+                len(documents) > 0):
             return False
 
         self._documents = documents
@@ -440,7 +441,8 @@ class BasicSearchEngine:
             return None
 
         nearest_docs = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        if not isinstance(nearest_docs, list):
+        if not (isinstance(nearest_docs, list) and
+                len(nearest_docs) > 0):
             return None
         output_values = []
         for pair in nearest_docs:
@@ -487,11 +489,13 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query_vector, tuple):
+        if not (isinstance(query_vector, tuple) and
+                len(query_vector) == len(self._document_vectors[0])):
             return None
 
         closest = self._calculate_knn(query_vector, self._document_vectors, 1)
-        if not isinstance(closest, list):
+        if not (isinstance(closest, list) and
+                len(closest) > 0):
             return None
         doc_index = closest[0][0]
         vec_doc = self._documents[doc_index]
@@ -516,7 +520,8 @@ class BasicSearchEngine:
         """
         if not (isinstance(query_vector, tuple) and
                 isinstance(document_vectors, list) and
-                isinstance(n_neighbours, int)):
+                isinstance(n_neighbours, int) and
+                len(document_vectors) > 0):
             return None
 
         distances = []
@@ -889,7 +894,9 @@ class SearchEngine(BasicSearchEngine):
         In case of corrupt input arguments, None is returned.
         """
         if not (isinstance(query, str) and
-                isinstance(n_neighbours, int)):
+                isinstance(n_neighbours, int) and
+                len(query) > 0 and
+                n_neighbours == 1):
             return None
 
         query_vector = self._index_document(query)
@@ -897,7 +904,10 @@ class SearchEngine(BasicSearchEngine):
             return None
 
         search_results = self._tree.query(query_vector, n_neighbours)
-        if not isinstance(search_results, list):
+        if not (isinstance(search_results, list) and
+                len(search_results) > 0 and
+                all(isinstance(pair[0], float) and
+                    isinstance(pair[1], int) for pair in search_results)):
             return None
         output_values = []
         for pair in search_results:

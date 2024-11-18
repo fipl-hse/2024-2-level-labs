@@ -120,16 +120,11 @@ class Tokenizer:
         """
         if not isinstance(text, str):
             return None
-        tokens = []
         text = text.lower()
         for elem in text:
-            if not elem.isalpha():
-                elem = elem.replace(elem, ' ')
-            tokens.append(elem)
-        tokens = ''.join(tokens).split(' ')
-        while '' in tokens:
-            tokens.remove('')
-        clear_tokens = self._remove_stop_words(tokens)
+            if not elem.isalpha() and elem != ' ':
+                text = text.replace(elem, ' ')
+        clear_tokens = self._remove_stop_words(text.lower().split())
         return clear_tokens
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:

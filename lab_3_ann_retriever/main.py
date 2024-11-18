@@ -107,7 +107,7 @@ class Tokenizer:
         """
         if not isinstance(text, str):
             return None
-        punctuation = ("!'\"#$%&()*+,-./:–;—<=>?@[]^_`{|}~1234567890"
+        punctuation = ("!'\"#$%&()*+,-./:–;—<=>?@[]^_`{|}~"
                        r'\"'
                        "")
         for p in punctuation:
@@ -115,7 +115,7 @@ class Tokenizer:
                 text = text.replace(p, ' ')
         tokens = text.lower().split()
 
-        return tokens
+        return self._remove_stop_words(tokens)
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -132,13 +132,10 @@ class Tokenizer:
         if not isinstance(documents, list):
             return None
         for text in documents:
-            if not isinstance(text, str) or len(text) == 0:
+            if not isinstance(text, str) or len(text) == 0 or self.tokenize(text) is None:
                 return None
 
-        token_dict = []
-        for text in documents:
-            token_dict.append(self.tokenize(text))
-        return token_dict
+        return [self.tokenize(text) for text in documents if self.tokenize(text) is not None]
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -163,11 +160,7 @@ class Tokenizer:
             if not isinstance(elem, str):
                 return None
 
-        for elem in self._stop_words:
-            if elem in tokens:
-                tokens.remove(elem)
-
-        return tokens
+        return [token for token in tokens if token not in self._stop_words]
 
 
 class Vectorizer:

@@ -760,6 +760,12 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if self._root is None:
+            return None
+
+        return {
+            'root': self._root.save()
+        }
 
     def load(self, state: dict) -> bool:
         """
@@ -771,6 +777,14 @@ class NaiveKDTree:
         Returns:
             bool: True is loaded successfully, False in other cases
         """
+        if not isinstance(state, dict) or 'root' not in state:
+            return False
+
+        self._root = Node()
+        self._root.load(state)
+        if not self._root:
+            return False
+        return True
 
     def _find_closest(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
@@ -928,6 +942,27 @@ class SearchEngine(BasicSearchEngine):
         Returns:
             bool: True if saved successfully, False in other case
         """
+        if not isinstance(file_path, str) or not file_path:
+            return False
+
+        tree_state = self._tree.save()
+        if tree_state is None:
+            return False
+
+        documents = super()._dump_documents()['documents']
+        document_vectors = super()._dump_documents()['document_vectors']
+
+        state = {
+            "engine": {
+                "tree": tree_state,
+                "documents": documents,
+                "document_vectors": document_vectors,
+            }
+        }
+
+        with open(file_path, 'w', encoding='utf-8') as file:
+            dump(state, file)
+        return True
 
     def load(self, file_path: str) -> bool:
         """
@@ -939,6 +974,19 @@ class SearchEngine(BasicSearchEngine):
         Returns:
             bool: True if engine was loaded successfully, False in other cases
         """
+        if not isinstance(file_path, str) or not file_path:
+            return False
+
+        with open(file_path, 'r', encoding='utf-8') as file:
+            engine = load(file)
+
+        if 'engine' not in engine or 'tree' not in engine['engine']:
+            return False
+
+        if not self._tree.load(engine['engine']['tree']):
+            return False
+
+        return self._load_documents(engine)
 
 
 class AdvancedSearchEngine(SearchEngine):

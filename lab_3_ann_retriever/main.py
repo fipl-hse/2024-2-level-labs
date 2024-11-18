@@ -6,8 +6,9 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+from math import sqrt
 Vector = tuple[float, ...]
-from lab_2_retrieval_w_bm25.main import calculate_idf, remove_stopwords, tokenize
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 
 class NodeLike(Protocol):
@@ -49,6 +50,18 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    if query_vector is None or document_vector is None:
+        return None
+
+    if not query_vector or not document_vector:
+        return 0.0
+
+    # dist = 0.0
+    # for a, b in enumerate(document_vector):
+    #     dist += (b - document_vector[a]) ** 2
+    # return dist ** 0.5
+
+    return sqrt(sum((query_val - doc_val) ** 2 for query_val, doc_val in zip(query_vector, document_vector)))
 
 
 def save_vector(vector: Vector) -> dict:
@@ -174,9 +187,11 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
-        if not isinstance(corpus, list) or not all(isinstance(item, list) for item in corpus) or not all(isinstance(elem, str) for item in corpus for elem in item):
-            raise ValueError
         self._corpus = corpus
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
+
 
 
     def build(self) -> bool:
@@ -186,9 +201,32 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        self._idf_values = {}
-        self._vocabulary = []
-        self._token2ind = {}
+        if not isinstance(self._corpus, list):
+            return False
+
+        voc = set()
+        for doc in self._corpus:
+            if all(isinstance(elem, str) for elem in doc):
+                voc.update(doc)
+            else:
+                return False
+        self._vocabulary = list(voc)
+        self._vocabulary.sort()
+        # if self._vocabulary is None:
+        #     return False
+
+        idf = calculate_idf(self._vocabulary, self._corpus)
+        if not isinstance(idf, dict):
+            return False
+        self._idf_values = idf
+
+        self._token2ind = {value: ind for ind, value in enumerate(self._vocabulary)}
+
+        return True
+
+        # self._idf_values = {}
+        # self._vocabulary = []
+        # self._token2ind = {}
 
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
@@ -203,6 +241,13 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(tokenized_document, list) or not all(isinstance(item, str) for item in tokenized_document) or not tokenized_document:
+            return None
+
+        vect_doc = self._calculate_tf_idf(tokenized_document)
+        if vect_doc is None:
+            return None
+        return vect_doc
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -216,6 +261,15 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if len(vector) != len(self._vocabulary):
+            return None
+
+        toks = []
+
+        for item in self._vocabulary:
+            if vector[self._token2ind[item]] != 0.0:
+                toks.append(item)
+        return toks
 
     def save(self, file_path: str) -> bool:
         """
@@ -227,6 +281,7 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
+
 
     def load(self, file_path: str) -> bool:
         """
@@ -241,6 +296,7 @@ class Vectorizer:
         In case of corrupt input arguments, False is returned.
         """
 
+
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
         """
         Get TF-IDF for document.
@@ -253,6 +309,39 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document, list) or not all(isinstance(item, str) for item in document) or not document:
+            return None
+
+        tf = {}
+
+        voc = set(self._vocabulary)
+        doc = set(document)
+
+        for elem in voc.union(doc):
+            tf[elem] = document.count(elem) / len(document)
+
+        return tuple((tf[elem] * self._idf_values[elem] if elem in document else 0.0 for elem in self._vocabulary))
+
+
+
+
+
+
+
+        # self.build()
+        #
+        # tf = calculate_tf(self._vocabulary, document)
+        #
+        # if tf is None:
+        #     return None
+        #
+        # tf_idf = []
+        # for word in self._vocabulary:
+        #     tf_value = tf.get(word, 0.0)
+        #     idf_value = self._idf_values.get(word, 0.0)
+        #     tf_idf.append(tf_value + idf_value)
+        #
+        # return tuple(tf_idf)
 
 
 class BasicSearchEngine:
@@ -273,6 +362,10 @@ class BasicSearchEngine:
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        self._vectorizer = vectorizer
+        self._tokenizer = tokenizer
+        self._documents = []
+        self._document_vectors = []
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -286,6 +379,17 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(documents, list) or not all(isinstance(item, str) for item in documents) or not documents:
+            return False
+        self._document_vectors = [self._index_document(elem) for elem in documents]
+        self._documents = documents
+
+        if None not in self._document_vectors:
+            return True
+        else:
+            return False
+
+
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -302,6 +406,10 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not isinstance(n_neighbours, str) or not query or not n_neighbours:
+            return None
+
+
 
     def save(self, file_path: str) -> bool:
         """
@@ -354,6 +462,17 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document_vectors, list) or not isinstance(n_neighbours, int) or not query_vector or not document_vectors:
+            return None
+
+        neighbours = []
+        for ind, val in enumerate(document_vectors):
+            dist = calculate_distance(query_vector, val)
+            if dist is None:
+                return None
+            neighbours.append((ind, dist))
+        neighbours = sorted(neighbours, key=lambda x: x[1])
+        return neighbours[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -367,6 +486,20 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(document, str) or not document:
+            return None
+
+        tok_doc = self._tokenizer.tokenize(document)
+        if tok_doc is None:
+            return None
+
+        vec_doc = self._vectorizer.vectorize(tok_doc)
+        if vec_doc is None:
+            return None
+
+        return vec_doc
+
+
 
     def _dump_documents(self) -> dict:
         """
@@ -375,6 +508,12 @@ class BasicSearchEngine:
         Returns:
             dict: document and document_vectors states
         """
+        dictionary = {
+            'documents': self._documents,
+            'document_vectors': [save_vector(res) for res in self._document_vectors]
+        }
+
+        return dictionary
 
     def _load_documents(self, state: dict) -> bool:
         """
@@ -386,6 +525,8 @@ class BasicSearchEngine:
         Returns:
             bool: True if documents were loaded, False in other cases
         """
+        if not isinstance(state, dict) or not state:
+            return
 
 
 class Node(NodeLike):

@@ -180,6 +180,10 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
+        self._corpus = corpus
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
 
     def build(self) -> bool:
         """
@@ -188,6 +192,25 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        vocab = set()
+
+        if not isinstance(self._corpus, list):
+            return False
+
+        for doc in self._corpus:
+            vocab |= set(doc)
+        self._vocabulary = sorted(vocab)
+        if not self._vocabulary:
+            return False
+
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if not self._idf_values:
+            return False
+
+        for index, word in enumerate(self._vocabulary):
+            self._token2ind[word] = index
+
+        return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -201,6 +224,9 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not tokenized_document or not isinstance(tokenized_document, list)\
+            or not all(isinstance(item, str) for item in tokenized_document):
+            return None
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -251,6 +277,15 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not document or not isinstance(document, list):
+            return None
+
+        vector = [0.0] * len(self._vocabulary)
+        tf = calculate_tf(self._vocabulary, document)
+
+        for i, word in enumerate(self._vocabulary):
+            vector[i] = tf[word] * self._idf_values[word]
+        return tuple(vector)
 
 
 class BasicSearchEngine:

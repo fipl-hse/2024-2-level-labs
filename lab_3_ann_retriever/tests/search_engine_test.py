@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import numpy as np
+
 import pytest
 
 from lab_3_ann_retriever.main import NaiveKDTree, SearchEngine, Tokenizer, Vectorizer

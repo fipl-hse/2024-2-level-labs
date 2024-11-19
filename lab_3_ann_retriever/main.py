@@ -5,8 +5,10 @@ Vector search with text retrieving
 """
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
+from math import sqrt
 from re import findall
 from typing import Protocol
+
 from lab_2_retrieval_w_bm25.main import (calculate_idf, calculate_tf)
 
 
@@ -55,7 +57,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     if query_vector is None or document_vector is None:
         return None
 
-    return sum((query - doc) ** 2 for query, doc in zip(query_vector, document_vector)) ** 0.5
+    return sqrt(sum((query - doc) ** 2 for query, doc in zip(query_vector, document_vector)))
 
 
 def save_vector(vector: Vector) -> dict:
@@ -572,7 +574,7 @@ class NaiveKDTree:
             if not current_vectors:
                 continue
             axis = depth % dimensions
-            current_vectors.sort(key=lambda vector: vector[0][axis])
+            current_vectors.sort(key=lambda vector: float(vector[0][axis]))
             median_index = len(current_vectors) // 2
             median_node = Node(current_vectors[median_index][0], current_vectors[median_index][1])
 
@@ -815,3 +817,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        SearchEngine.__init__(self, vectorizer, tokenizer)

@@ -7,6 +7,9 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
+
+
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
@@ -50,7 +53,6 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     In case of corrupt input arguments, None is returned.
     """
 
-
 def save_vector(vector: Vector) -> dict:
     """
     Prepare a vector for save.
@@ -91,6 +93,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
+        self.stopwords = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -104,6 +107,14 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+
+        for elem in text:
+            if not elem.isalpha() and elem != ' ':
+                text = text.replace(elem, ' ')
+
+        return self._remove_stop_words(text.lower().split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -117,6 +128,22 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not documents or not isinstance(documents, list)\
+                or not all(isinstance(item, str) for item in documents):
+            return None
+
+        tokenized = []
+
+        for doc in documents:
+            tok_doc = self.tokenize(doc)
+            if tok_doc is None:
+                return None
+            no_stopwords_doc = self._remove_stop_words(tok_doc)
+            if no_stopwords_doc is None:
+                return None
+            tokenized.append(no_stopwords_doc)
+
+        return tokenized
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -130,7 +157,11 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not tokens or not isinstance(tokens, list)\
+                or not all(isinstance(token, str) for token in tokens):
+            return None
 
+        return [token for token in tokens if token not in self.stopwords]
 
 class Vectorizer:
     """

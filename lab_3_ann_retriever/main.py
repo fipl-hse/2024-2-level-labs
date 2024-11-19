@@ -156,7 +156,7 @@ class Tokenizer:
                 or not documents:
             return None
 
-        tokenized_documents: list[list[str]] = []
+        tokenized_documents = []
         for doc in documents:
             tokenized_doc = self.tokenize(doc)
             if tokenized_doc is None:

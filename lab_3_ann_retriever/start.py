@@ -4,7 +4,8 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-
+from lab_3_ann_retriever.main import (BasicSearchEngine, NaiveKDTree, SearchEngine,
+                                      Tokenizer, Vectorizer)
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -21,7 +22,7 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return (documents, stopwords)
+    return documents, stopwords
 
 def main() -> None:
     """
@@ -29,7 +30,24 @@ def main() -> None:
     """
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    result = None
+    documents = open_files()[0]
+    stopwords = open_files()[1]
+    tokenizer = Tokenizer(stopwords)
+    tokenized_text = tokenizer.tokenize_documents(documents)
+
+    if not tokenized_text:
+        return None
+
+    vectorizer = Vectorizer(tokenized_text)
+    vectorizer.build()
+
+    search_engine = SearchEngine(vectorizer, tokenizer)
+    search_engine.index_documents(documents)
+
+    result = search_engine.retrieve_relevant_documents("Нижний Новгород")
+
+    print(result)
+
     assert result, "Result is None"
 
 

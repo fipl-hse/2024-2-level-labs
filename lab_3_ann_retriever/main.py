@@ -201,6 +201,7 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        self._vocabulary = []
         if self._corpus is None or len(self._corpus) == 0:
             return False
         for tokenized_text in self._corpus:
@@ -208,8 +209,8 @@ class Vectorizer:
             if text is None:
                 return False
             self._idf_values.update(text)
-        self._vocabulary = sorted([elem for elem in self._idf_values.keys()
-                            if elem not in self._vocabulary])
+        self._vocabulary = sorted([elem for elem in list(self._idf_values.keys()) if
+                            elem not in self._vocabulary])
         for ind, token in enumerate(self._vocabulary):
             self._token2ind[token] = ind
         if (None in self._vocabulary or None in self._idf_values
@@ -293,6 +294,8 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
         if not isinstance(document, list) or len(document) == 0:
+            return None
+        if not self.build():
             return None
         vector = [0 for elem in self._vocabulary]
         text_tf = calculate_tf(self._vocabulary, document)

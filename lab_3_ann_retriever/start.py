@@ -36,13 +36,13 @@ def main() -> None:
     docs_tokenized = tokenizer.tokenize_documents(documents)
     vectorizer = Vectorizer(docs_tokenized)
 
-    knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
-    knn_retriever.index_documents(documents)
-    print(knn_retriever.retrieve_relevant_documents(query, 3))
+    #knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
+    #knn_retriever.index_documents(documents)
+    #print(knn_retriever.retrieve_relevant_documents(query, 3))
 
-    #searcher = SearchEngine(tokenizer= tokenizer, vectorizer= vectorizer)
-    #searcher.index_documents(docs)
-    result = knn_retriever.retrieve_relevant_documents(query, 3)
+    searcher = SearchEngine(tokenizer= tokenizer, vectorizer= vectorizer)
+    searcher.index_documents(documents)
+    result = searcher.retrieve_relevant_documents(query, 3)
     print(result)
     assert result, "Result is None"
 

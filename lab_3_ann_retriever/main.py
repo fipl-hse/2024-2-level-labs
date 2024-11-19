@@ -7,7 +7,6 @@ from json import dump, load
 from math import sqrt
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
-
 from lab_2_retrieval_w_bm25.main import calculate_idf
 
 Vector = tuple[float, ...]
@@ -57,7 +56,6 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     if not query_vector or not document_vector:
         return 0.0
-
     return sqrt(sum((query_value - document_value) ** 2
                     for query_value, document_value in zip(query_vector, document_vector)))
 
@@ -76,7 +74,6 @@ def save_vector(vector: Vector) -> dict:
     for index, value in enumerate(vector):
         if value != 0.0:
             elements[index] = value
-
     return {
         'len': len(vector),
         'elements': elements
@@ -111,7 +108,6 @@ class Tokenizer:
     """
     Tokenizer with removing stop words.
     """
-
     _stop_words: list[str]
 
     def __init__(self, stop_words: list[str]) -> None:
@@ -185,7 +181,6 @@ class Tokenizer:
         if not isinstance(tokens, list) or not all(isinstance(item, str) for item in tokens) or \
                 not tokens:
             return None
-
         return [token for token in tokens if token not in self._stop_words]
 
 
@@ -193,7 +188,6 @@ class Vectorizer:
     """
     TF-IDF Vectorizer.
     """
-
     _corpus: list[list[str]]
     _idf_values: dict[str, float]
     _vocabulary: list[str]
@@ -225,16 +219,13 @@ class Vectorizer:
         for doc in self._corpus:
             vocabulary |= set(doc)
         self._vocabulary = sorted(list(vocabulary))
-
         self._token2ind = {value: index for index, value in enumerate(self._vocabulary)}
-
         idf = calculate_idf(self._vocabulary, self._corpus)
         if idf is None:
             return False
         self._idf_values = idf
         if self._idf_values is None:
             return False
-
         return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
@@ -253,7 +244,6 @@ class Vectorizer:
                 not all(isinstance(item, str) for item in tokenized_document) or \
                 not tokenized_document:
             return None
-
         return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
@@ -294,7 +284,6 @@ class Vectorizer:
             'vocabulary': self._vocabulary,
             'token2ind': self._token2ind
         }
-
         with open(file_path, 'w', encoding='utf-8') as file:
             dump(state, file)
         return True
@@ -316,11 +305,9 @@ class Vectorizer:
 
         with open(file_path, 'r', encoding='utf-8') as file:
             state = load(file)
-
         for attribute in ('vocabulary', 'token2ind', 'idf_values'):
             if attribute not in state:
                 return False
-
         self._vocabulary = state['vocabulary']
         self._token2ind = state['token2ind']
         self._idf_values = state['idf_values']
@@ -345,7 +332,6 @@ class Vectorizer:
         tf = {}
         for word in set(self._vocabulary) | set(document):
             tf[word] = document.count(word) / len(document)
-
         return tuple((tf[word] * self._idf_values[word] if word in document else 0.0
                       for word in self._vocabulary))
 
@@ -354,7 +340,6 @@ class BasicSearchEngine:
     """
     Engine based on KNN algorithm.
     """
-
     _vectorizer: Vectorizer
     _tokenizer: Tokenizer
     _documents: list[str]
@@ -395,7 +380,6 @@ class BasicSearchEngine:
             if indexed is None:
                 return False
             self._document_vectors.append(indexed)
-
         self._documents = documents
         return True
 
@@ -466,7 +450,6 @@ class BasicSearchEngine:
 
         with open(file_path, 'r', encoding='utf-8') as file:
             state = load(file)
-
         return self._load_documents(state)
 
     def retrieve_vectorized(self, query_vector: Vector) -> str | None:
@@ -567,7 +550,6 @@ class BasicSearchEngine:
         if not isinstance(state, dict) or 'engine' not in state or \
                 'documents' not in state['engine'] or 'document_vectors' not in state['engine']:
             return False
-
         if not state['engine'] or not state['engine']['documents'] or \
                 not state['engine']['document_vectors']:
             return False
@@ -587,7 +569,6 @@ class Node(NodeLike):
     """
     Interface definition for Node for KDTree.
     """
-
     vector: Vector
     payload: int
     left_node: NodeLike | None
@@ -648,21 +629,8 @@ class Node(NodeLike):
         if loaded_vector is None:
             return False
         self.vector = loaded_vector
-        if self.vector is None:
-            return False
         self.payload = state['payload']
 
-        left_node = Node()
-        right_node = Node()
-
-        # state_left = state['left_node']
-        # if state_left:
-        #     if left_node.load(state_left):
-        #         self.left_node = left_node
-        #     else:
-        #         return False
-        # else:
-        #     self.left_node = None
         if state['left_node'] is None:
             self.left_node = None
         elif not isinstance(state['left_node'], dict):
@@ -671,7 +639,6 @@ class Node(NodeLike):
             left_node = Node()
             if left_node.load(state['left_node']):
                 self.left_node = left_node
-
         if state['right_node'] is None:
             self.right_node = None
         elif not isinstance(state['right_node'], dict):
@@ -688,7 +655,6 @@ class NaiveKDTree:
     """
     NaiveKDTree.
     """
-
     _root: NodeLike | None
 
     def __init__(self) -> None:
@@ -718,7 +684,6 @@ class NaiveKDTree:
                            'parent': Node(tuple([0.0] * len(vectors[0])), -1),
                            'is_left': True
                        }]
-
         while states_info:
             current_vectors = states_info[0]['vectors']
             depth = states_info[0]['depth']
@@ -731,14 +696,12 @@ class NaiveKDTree:
                 median_index = len(current_vectors) // 2
                 median_node = Node(current_vectors[median_index][0],
                                    current_vectors[median_index][1])
-
                 if parent.payload != -1 and is_left:
                     parent.left_node = median_node
                 elif parent.payload == -1:
                     self._root = median_node
                 else:
                     parent.right_node = median_node
-
                 states_info.append(
                     {
                         'vectors': current_vectors[:median_index],
@@ -772,7 +735,6 @@ class NaiveKDTree:
         """
         if not isinstance(vector, (list, tuple)) or not isinstance(k, int):
             return None
-
         return self._find_closest(vector, k)
 
     def save(self) -> dict | None:
@@ -786,7 +748,6 @@ class NaiveKDTree:
         """
         if self._root is None:
             return None
-
         return {
             'root': self._root.save()
         }
@@ -897,7 +858,6 @@ class SearchEngine(BasicSearchEngine):
     """
     Retriever based on KDTree algorithm.
     """
-
     _tree: NaiveKDTree
 
     def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:
@@ -974,10 +934,8 @@ class SearchEngine(BasicSearchEngine):
         tree_state = self._tree.save()
         if tree_state is None:
             return False
-
         documents = super()._dump_documents()['documents']
         document_vectors = super()._dump_documents()['document_vectors']
-
         state = {
             "engine": {
                 "tree": tree_state,
@@ -985,7 +943,6 @@ class SearchEngine(BasicSearchEngine):
                 "document_vectors": document_vectors,
             }
         }
-
         with open(file_path, 'w', encoding='utf-8') as file:
             dump(state, file)
         return True
@@ -1005,13 +962,10 @@ class SearchEngine(BasicSearchEngine):
 
         with open(file_path, 'r', encoding='utf-8') as file:
             engine = load(file)
-
         if 'engine' not in engine or 'tree' not in engine['engine']:
             return False
-
         if not self._tree.load(engine['engine']['tree']):
             return False
-
         return self._load_documents(engine)
 
 
@@ -1019,7 +973,6 @@ class AdvancedSearchEngine(SearchEngine):
     """
     Retriever based on KDTree algorithm.
     """
-
     _tree: KDTree
 
     def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:
@@ -1030,5 +983,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
-        BasicSearchEngine.__init__(self, vectorizer, tokenizer)
+        super().__init__(self, vectorizer, tokenizer)
         self._tree = KDTree()

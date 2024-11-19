@@ -38,7 +38,7 @@ def main() -> None:
     tokenizer = Tokenizer(stopwords)
     tokenized_documents = tokenizer.tokenize_documents(documents)
     if tokenized_documents is None:
-        return None
+        return
 
     vectorizer = Vectorizer(tokenized_documents)
     vectorizer.build()

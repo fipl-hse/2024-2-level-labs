@@ -198,11 +198,11 @@ class Vectorizer:
         self._vocabulary = sorted(list({word for text in self._corpus for word in text}))
         for word in self._vocabulary:
             idf = calculate_idf(self._vocabulary, self._corpus)
-            if not idf:
+            if idf is None:
                 return False
             self._idf_values = idf
             self._token2ind[word] = self._vocabulary.index(word)
-        if not self._vocabulary or not self._idf_values or not self._token2ind:
+        if self._vocabulary is None or self._idf_values is None or self._token2ind is None:
             return False
         return True
 
@@ -354,7 +354,7 @@ class BasicSearchEngine:
         if not query or not isinstance(query, str) or not isinstance(n_neighbours, int):
             return None
         queryVector = self._index_document(query)
-        if not queryVector:
+        if queryVector is None:
             return None
         knn = self._calculate_knn(queryVector, self._document_vectors, n_neighbours)
         if not knn or any(pair[1] is None for pair in knn):
@@ -596,6 +596,10 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(vector, tuple) or not isinstance(k, int)\
+                or not vector or not k:
+            return None
+        return self._find_closest(vector, k)
 
     def save(self) -> dict | None:
         """
@@ -631,6 +635,31 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(vector, tuple) or not isinstance(k, int)\
+                or not vector:
+            return None
+        subspace = [(self._root, 0)]
+        dimension = len(vector)
+        closest = []
+        while subspace:
+            popped_node = subspace.pop(0)
+            used_node, depth = popped_node
+            if not isinstance(used_node,Node):
+                return None
+            if not used_node.left_node and not used_node.right_node:
+                distance = calculate_distance(vector, used_node.vector)
+                if not isinstance(distance, float):
+                    return None
+                closest.append((distance, used_node.payload))
+            else:
+                axis = depth % dimension
+                if vector[axis] <= used_node.vector[axis]:
+                    if used_node.left_node is not None:
+                        subspace.append((used_node.left_node, depth + 1))
+                else:
+                    if used_node.right_node is not None:
+                        subspace.append((used_node.right_node, depth + 1))
+        return closest
 
 
 class KDTree(NaiveKDTree):
@@ -668,6 +697,8 @@ class SearchEngine(BasicSearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)
+        self._tree = NaiveKDTree()
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -681,6 +712,15 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(documents, list) or not all(isinstance(text,str) for text in documents)\
+                or not documents:
+            return False
+        self._documents = documents
+        self._document_vectors = [self._index_document(document) for document in documents]
+        self._tree.build(self._document_vectors)
+        if not self._documents or not self._document_vectors:
+            return False
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -697,6 +737,24 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not isinstance(n_neighbours,int):
+            return None
+
+        queryVector = self._index_document(query)
+        if queryVector is None:
+            return None
+        answer = self._tree.query(queryVector,n_neighbours)
+        if answer is None:
+            return None
+
+        relevant_documents = []
+        for neighbour, (distance, index) in enumerate(answer):
+            if index is not None and distance is not None:
+                relevant_documents.append((distance,self._documents[index]))
+        if not relevant_documents:
+            return None
+        return relevant_documents
+
 
     def save(self, file_path: str) -> bool:
         """

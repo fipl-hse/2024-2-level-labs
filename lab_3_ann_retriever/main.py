@@ -393,8 +393,12 @@ class BasicSearchEngine:
 
         relevant_docs = []
         for index, float_as_value in knn_list_of_tuples:
+            if float_as_value is None:
+                return None
             if float_as_value is not None:
                 relevant_docs.append((float_as_value, self._documents[index]))
+        if relevant_docs is None:
+            return None
         if relevant_docs:
             return relevant_docs
         return None

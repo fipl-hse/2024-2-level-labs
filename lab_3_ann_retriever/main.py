@@ -60,7 +60,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     for ind, value in enumerate(query_vector):
         sum_ += (value - document_vector[ind]) ** 2
     sum_ = sum_ ** 0.5
-    return sum_ if isinstance(sum_, float) else None
+    return sum_
 
 
 def save_vector(vector: Vector) -> dict:
@@ -601,7 +601,7 @@ class Node(NodeLike):
             self.right_node = right_node
         else:
             self.right_node = None
-        return True if self.vector and self.payload else False
+        return bool(self.vector and self.payload)
 
 
 class NaiveKDTree:
@@ -868,11 +868,9 @@ class SearchEngine(BasicSearchEngine):
         nearest = self._tree.query(query_vector)
         if not nearest:
             return None
-        result = []
-        for neighbour in nearest:
-            if not isinstance(neighbour[1], int):
-                return None
-            result.append((neighbour[0], self._documents[neighbour[1]]))
+        if not all(isinstance(neighbour[1], int) for neighbour in nearest):
+            return None
+        result = [(neighbour[0], self._documents[neighbour[1]]) for neighbour in nearest]
         return result
 
     def save(self, file_path: str) -> bool:

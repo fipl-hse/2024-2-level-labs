@@ -5,6 +5,9 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
+from pyspelling.filters.python import tokenizer
+
+from lab_3_ann_retriever.main import BasicSearchEngine, Vectorizer, Tokenizer
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -31,6 +34,28 @@ def main() -> None:
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     result = None
+
+    documents, stopwords = open_files()
+    tokenize = Tokenizer(stopwords)
+
+    vectorize = Vectorizer(tokenize.tokenize_documents(documents))
+    vectorize.build()
+
+    knn = BasicSearchEngine(vectorize, tokenize)
+    knn.index_documents(documents)
+
+
+
+    vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
+    print(vector)
+
+    pre_vect = vectorize.vector2tokens(vector)
+    print(pre_vect)
+
+    result = knn.retrieve_vectorized(vector)
+    print(result)
+
+
     assert result, "Result is None"
 
 

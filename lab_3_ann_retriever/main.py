@@ -636,14 +636,13 @@ class NaiveKDTree:
         space_condition = [[vectors, 0, Node(), True, dimensions]]
         while space_condition:
             space = space_condition.pop(0)
-            if not isinstance(space, list) or not isinstance(space[0], list) or not isinstance(space[1], int):
+            if (not isinstance(space, list) or not isinstance(space[0], list)
+                    or not isinstance(space[1], int)):
                 return False
             if not space[0]:
                 continue
             axis = space[1] % dimensions
-            if not isinstance(axis, int) or not all(isinstance(vector, tuple) for vector in space[0]):
-                continue
-            space[0] = sorted(space[0], key=lambda x: x[axis])
+            space[0] = sorted(space[0], key=lambda x: float(x[axis]))
             median_index = len(space[0]) // 2
             median_dot = space[0][median_index]
             median_dot_node = Node(space[0][median_index], vectors_copy.index(median_dot))
@@ -785,7 +784,7 @@ class KDTree(NaiveKDTree):
             distance = calculate_distance(vector, pair[0].vector)
             if not distance:
                 return None
-            if len(nearest) < k or distance < max(nearest, key=lambda x: x[0])[0]:
+            if len(nearest) < k or distance < max(nearest, key=lambda x: float(x[0]))[0]:
                 nearest.append((distance, pair[0].payload))
                 if len(nearest) > k:
                     nearest.remove(sorted(nearest, reverse=True, key=lambda x: x[0])[0])

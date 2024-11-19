@@ -341,6 +341,7 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
+        self._document_vectors = []
         if not isinstance(documents, list) or len(documents) == 0:
             return False
         self._documents = documents
@@ -570,7 +571,7 @@ class NaiveKDTree:
         for ind, vector in enumerate(vectors):
             vector_lst.update({vector: ind})
         dimensions = len(vectors[0])
-        node_parent = Node(())
+        node_parent = Node()
         dimension_info = [(vectors,
                            depth,
                            node_parent,
@@ -583,18 +584,16 @@ class NaiveKDTree:
             dimension_vectors = sorted(dimension_info_copy[0], key=lambda x:x[axis])
             median_index = len(dimension_vectors) // 2
             node_vector = dimension_vectors[median_index]
+            new_node = Node(node_vector, int(vector_lst[node_vector]))
             if dimension_info_copy[2].payload == -1:
-                new_node = Node(node_vector, 0)
                 self._root = new_node
             elif dimension_info_copy[-1]:
-                new_node = Node(node_vector, int(vector_lst[node_vector]))
                 dimension_info_copy[2].left_node = new_node
             else:
-                new_node = Node(node_vector, int(vector_lst[node_vector]))
                 dimension_info_copy[2].right_node = new_node
             dimension_info.extend([(dimension_vectors[:median_index], dimension_info_copy[1] + 1, new_node, True),
-                                  (dimension_vectors[median_index:], dimension_info_copy[1] + 1, new_node, False)])
-            return True
+                                  (dimension_vectors[median_index + 1:], dimension_info_copy[1] + 1, new_node, False)])
+        return True
 
 
 
@@ -611,7 +610,10 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
-
+        if not isinstance(vector, tuple) or not isinstance(k, int) or len(vector) == 0 or k != 1:
+            return None
+        result = self._find_closest(vector, k)
+        return result
     def save(self) -> dict | None:
         """
         Save NaiveKDTree instance to state.
@@ -646,29 +648,34 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(vector, tuple) or not isinstance(k, int):
+        if not isinstance(vector, tuple) or not isinstance(k, int) or len(vector) == 0 or k != 1:
             return None
         depth = 0
         dimensions = len(self._root.vector)
-        data = [self._root, depth]
+        data = [[self._root,
+                depth]]
         neighbours = []
         while True:
-            data_copy = data[:]
-            if data_copy[0].left_node is None and data_copy[0].right_node is None:
-                dist = calculate_distance(vector, data_copy[0].vector)
-                for x in range(k):
-                    neighbours.append((dist, data_copy[0].payload))
-                return neighbours
+            data_copy = data.pop(0)
+            current_node = data_copy[0]
+            print(current_node.payload)
+            distance = calculate_distance(vector, current_node.vector)
+            if distance is None:
+                return None
+            if current_node.left_node is None and current_node.right_node is None:
+                neighbours.append((distance, current_node.payload))
+                break
             axis = data_copy[1] % dimensions
-            if data_copy[0].left_node is not None and data_copy[0].right_node is not None:
-                if vector[axis] < data_copy[0].vector[axis]:
-                    data = [data_copy[0].left_node, data_copy[1] + 1]
+            if current_node.left_node is not None and current_node.right_node is not None:
+                if vector[axis] <= current_node.vector[axis]:
+                    data.append([data_copy[0].left_node, data_copy[1] + 1])
                 else:
-                    data = [data_copy[0].right_node, data_copy[1] + 1]
+                    data.append([data_copy[0].right_node, data_copy[1] + 1])
             elif data_copy[0].right_node is None:
-                data = [data_copy[0].left_node, data_copy[1] + 1]
+                data.append([data_copy[0].left_node, data_copy[1] + 1])
             else:
-                data = [data_copy[0].right_node, data_copy[1] + 1]
+                data.append([data_copy[0].right_node, data_copy[1] + 1])
+        return sorted(neighbours)[:k]
 class KDTree(NaiveKDTree):
     """
     KDTree.
@@ -704,7 +711,8 @@ class SearchEngine(BasicSearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
-
+        super().__init__(tokenizer= tokenizer, vectorizer= vectorizer)
+        self._tree = NaiveKDTree()
     def index_documents(self, documents: list[str]) -> bool:
         """
         Index documents for retriever.
@@ -717,6 +725,12 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(documents, list) or len(documents) == 0:
+            return False
+        if not super().index_documents(documents):
+            return False
+        self._tree.build(self._document_vectors)
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -733,6 +747,19 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
+        if (not isinstance(query, str) or len(query) == 0
+                or query is None or not isinstance(n_neighbours, int) or n_neighbours != 1):
+            return None
+        query_vector = super()._index_document(query)
+        result = self._tree.query(query_vector, n_neighbours)
+        if result is None or len(result) == 0:
+            return None
+        if None in result[0]:
+            return None
+        dist = result[0][0]
+        ind = int(result[0][1])
+        final = [(dist, self._documents[ind])]
+        return final
 
     def save(self, file_path: str) -> bool:
         """

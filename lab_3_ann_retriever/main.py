@@ -7,7 +7,7 @@ Vector search with text retrieving
 from typing import Protocol
 import re
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
-from math import log
+
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."

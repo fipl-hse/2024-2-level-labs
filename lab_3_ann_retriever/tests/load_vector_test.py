@@ -4,7 +4,7 @@ Checks the third lab's load_vector function.
 
 import unittest
 
-
+import numpy as np
 import pytest
 
 from lab_3_ann_retriever.main import load_vector

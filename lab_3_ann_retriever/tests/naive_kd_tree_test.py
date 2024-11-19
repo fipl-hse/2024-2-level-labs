@@ -6,7 +6,7 @@ Checks the third lab's Naive KDTree class.
 import unittest
 from unittest import mock
 
-
+import numpy as np
 import pytest
 
 import lab_3_ann_retriever.main

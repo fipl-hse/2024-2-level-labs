@@ -7,6 +7,7 @@ from json import dump, load
 from math import sqrt
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+
 from lab_2_retrieval_w_bm25.main import calculate_idf
 
 Vector = tuple[float, ...]
@@ -983,5 +984,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
-        super().__init__(self, vectorizer, tokenizer)
+        super().__init__(vectorizer, tokenizer)
         self._tree = KDTree()

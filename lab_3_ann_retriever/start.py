@@ -4,8 +4,9 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-from lab_3_ann_retriever.main import (BasicSearchEngine, NaiveKDTree, SearchEngine,
-                                      Tokenizer, Vectorizer)
+
+from lab_3_ann_retriever.main import SearchEngine, Tokenizer, Vectorizer
+
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -30,13 +31,13 @@ def main() -> None:
     """
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    documents = open_files()[0]
-    stopwords = open_files()[1]
+    documents, stopwords = open_files()
+    query = 'Нижний Новгород'
     tokenizer = Tokenizer(stopwords)
     tokenized_text = tokenizer.tokenize_documents(documents)
 
     if not tokenized_text:
-        return None
+        return
 
     vectorizer = Vectorizer(tokenized_text)
     vectorizer.build()
@@ -44,7 +45,7 @@ def main() -> None:
     search_engine = SearchEngine(vectorizer, tokenizer)
     search_engine.index_documents(documents)
 
-    result = search_engine.retrieve_relevant_documents("Нижний Новгород")
+    result = search_engine.retrieve_relevant_documents(query)
 
     print(result)
 

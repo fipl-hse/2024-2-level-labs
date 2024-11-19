@@ -8,7 +8,7 @@ import re
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
-from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf, tokenize
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -58,7 +58,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         return 0.0
     if any(x is None for x in query_vector) or any(x is None for x in document_vector):
         return None
-    if len(query_vector) != len(document_vector) or len(query_vector) == 0 or len(document_vector) == 0:
+    if (len(query_vector) != len(document_vector) or
+            len(query_vector) == 0 or len(document_vector) == 0):
         return None
     if not all(isinstance(i, (int, float)) and i >= 0 for i in query_vector) or \
             not all(isinstance(k, (int, float)) and k >= 0 for k in document_vector):
@@ -298,7 +299,7 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(document, list) or not(all(isinstance(i, str) for i in document)):
+        if not isinstance(document, list) or not all(isinstance(i, str) for i in document):
             return None
         tf = calculate_tf(self._vocabulary, document)
         if tf is None:
@@ -602,8 +603,7 @@ class NaiveKDTree:
             sorted_vectors = sorted(current_vectors, key=lambda vector: vector[axis])
             median_index = len(sorted_vectors) // 2
             median_vector = sorted_vectors[median_index]
-            median_index_value = vectors.index(median_vector)
-            new_node = Node(vector=median_vector, payload=median_index_value)
+            new_node = Node(vector=median_vector, payload=vectors.index(median_vector))
 
             if parent_node.payload == -1:
                 self._root = new_node
@@ -793,9 +793,7 @@ class SearchEngine(BasicSearchEngine):
         for neigh in node:
             if isinstance(neigh, tuple) and len(neigh) >= 2 and isinstance(neigh[1], int):
                 result.append((neigh[0], self._documents[neigh[1]]))
-        if not result:
-            return None
-        return result
+        return result if result else None
 
 
     def save(self, file_path: str) -> bool:
@@ -836,3 +834,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)
+        self._tree = KDTree()

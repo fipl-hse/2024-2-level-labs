@@ -72,14 +72,15 @@ def save_vector(vector: Vector) -> dict:
     Returns:
         dict: A state of the vector to save
     """
-    result = {
-        'len': len(vector),
-        'elements': {}
-    }
+    elements = {}
     for index, value in enumerate(vector):
         if value != 0.0:
-            result['elements'][index] = value
-    return result
+            elements[index] = value
+
+    return {
+        'len': len(vector),
+        'elements': elements
+    }
 
 
 def load_vector(state: dict) -> Vector | None:
@@ -227,7 +228,10 @@ class Vectorizer:
 
         self._token2ind = {value: index for index, value in enumerate(self._vocabulary)}
 
-        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        idf = calculate_idf(self._vocabulary, self._corpus)
+        if idf is None:
+            return False
+        self._idf_values = idf
         if self._idf_values is None:
             return False
 
@@ -385,9 +389,15 @@ class BasicSearchEngine:
                 or not documents:
             return False
 
-        self._document_vectors = [self._index_document(doc) for doc in documents]
+        self._document_vectors = []
+        for doc in documents:
+            indexed = self._index_document(doc)
+            if indexed is None:
+                return False
+            self._document_vectors.append(indexed)
+
         self._documents = documents
-        return True if None not in self._document_vectors else False
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -634,7 +644,10 @@ class Node(NodeLike):
                 not isinstance(state['payload'], int) or isinstance(state['payload'], bool):
             return False
 
-        self.vector = load_vector(state['vector'])
+        loaded_vector = load_vector(state['vector'])
+        if loaded_vector is None:
+            return False
+        self.vector = loaded_vector
         if self.vector is None:
             return False
         self.payload = state['payload']
@@ -642,23 +655,34 @@ class Node(NodeLike):
         left_node = Node()
         right_node = Node()
 
-        if state['left_node']:
+        # state_left = state['left_node']
+        # if state_left:
+        #     if left_node.load(state_left):
+        #         self.left_node = left_node
+        #     else:
+        #         return False
+        # else:
+        #     self.left_node = None
+        if state['left_node'] is None:
+            self.left_node = None
+        elif not isinstance(state['left_node'], dict):
+            return False
+        else:
+            left_node = Node()
             if left_node.load(state['left_node']):
                 self.left_node = left_node
-            else:
-                return False
-        else:
-            self.left_node = None
 
-        if state['right_node']:
+        if state['right_node'] is None:
+            self.right_node = None
+        elif not isinstance(state['right_node'], dict):
+            return False
+        else:
+            right_node = Node()
             if right_node.load(state['right_node']):
                 self.right_node = right_node
-            else:
-                return False
-        else:
-            self.right_node = None
 
         return True
+
 
 class NaiveKDTree:
     """
@@ -688,7 +712,7 @@ class NaiveKDTree:
         if not isinstance(vectors, list) or not vectors:
             return False
 
-        states_info = [{
+        states_info: list[dict] = [{
                            'vectors': [(vector, index) for index, vector in enumerate(vectors)],
                            'depth': 0,
                            'parent': Node(tuple([0.0] * len(vectors[0])), -1),
@@ -696,8 +720,8 @@ class NaiveKDTree:
                        }]
 
         while states_info:
-            current_vectors: list[tuple[tuple[float], int]] = states_info[0]['vectors']
-            depth: int = states_info[0]['depth']
+            current_vectors = states_info[0]['vectors']
+            depth = states_info[0]['depth']
             parent = states_info[0]['parent']
             is_left = states_info[0]['is_left']
             states_info.pop(0)
@@ -925,6 +949,8 @@ class SearchEngine(BasicSearchEngine):
             return None
 
         query_indexed = self._index_document(query)
+        if query_indexed is None:
+            return None
         result = self._tree.query(query_indexed)
         if result is None or not result or not \
                 all(isinstance(distance, float) or isinstance(index, int)

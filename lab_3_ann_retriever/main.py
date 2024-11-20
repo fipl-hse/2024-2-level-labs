@@ -59,6 +59,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     for i, value in enumerate(document_vector):
         summary += (query_vector[i] - value) ** 2
     distance = summary ** 0.5
+    if not isinstance(distance, float):
+        return None
     return distance
 
 def save_vector(vector: Vector) -> dict:
@@ -451,7 +453,7 @@ class BasicSearchEngine:
         retrieve_doc = self._calculate_knn(query_vector, self._document_vectors, 1)
         if not isinstance(retrieve_doc, list) or not retrieve_doc:
             return None
-        index, value = retrieve_doc[0]
+        index = retrieve_doc[0][0]
         doc = self._documents[index]
         return doc
 
@@ -615,6 +617,8 @@ class NaiveKDTree:
             root = space[0][2]
             side_left = space[0][3]
             space.pop(0)
+            if not isinstance(depth, int) or not isinstance(ind_vectors, list):
+                return False
             if ind_vectors:
                 axis = depth % len(ind_vectors[0])
                 ind_vectors.sort(key=lambda x: x[0][axis])
@@ -791,6 +795,8 @@ class SearchEngine(BasicSearchEngine):
             or not n_neighbours:
             return None
         vector_query = super()._index_document(query)
+        if not isinstance(vector_query, tuple):
+            return None
         relev_vectors = self._tree.query(vector_query)
         if relev_vectors is None or not relev_vectors:
             return None
@@ -840,3 +846,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)
+        self._tree = KDTree()

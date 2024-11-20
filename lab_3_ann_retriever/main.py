@@ -6,6 +6,7 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+
 from lab_2_retrieval_w_bm25.main import calculate_idf
 
 Vector = tuple[float, ...]
@@ -353,10 +354,10 @@ class BasicSearchEngine:
         """
         if not query or not isinstance(query, str) or not isinstance(n_neighbours, int):
             return None
-        queryVector = self._index_document(query)
-        if queryVector is None:
+        query_vector = self._index_document(query)
+        if query_vector is None:
             return None
-        knn = self._calculate_knn(queryVector, self._document_vectors, n_neighbours)
+        knn = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
         if not knn or any(pair[1] is None for pair in knn):
             return None
         relevant_documents = [(pair[1],self._documents[pair[0]]) for pair in knn]
@@ -403,7 +404,7 @@ class BasicSearchEngine:
             if len(query_vector) != len(vector):
                 return None
         doc_num = self._calculate_knn(query_vector, self._document_vectors, 1)
-        if not doc_num:
+        if doc_num is None or not doc_num:
             return None
         return self._documents[doc_num[0][0]]
 
@@ -567,7 +568,8 @@ class NaiveKDTree:
             axis = depth % len(used_vectors[0])
             used_vectors.sort(key=lambda x:x[axis])
             median_index = len(used_vectors) // 2
-            new_node = Node(used_vectors[median_index],vectors_copy.index(used_vectors[median_index]))
+            new_node = Node(used_vectors[median_index],
+                            vectors_copy.index(used_vectors[median_index]))
 
             if parent.payload == -1:
                 self._root = new_node
@@ -741,15 +743,15 @@ class SearchEngine(BasicSearchEngine):
         if not isinstance(query, str) or not isinstance(n_neighbours,int):
             return None
 
-        queryVector = self._index_document(query)
-        if queryVector is None:
+        query_vector = self._index_document(query)
+        if query_vector is None:
             return None
-        answer = self._tree.query(queryVector,n_neighbours)
+        answer = self._tree.query(query_vector,n_neighbours)
         if answer is None:
             return None
 
         relevant_documents = []
-        for neighbour, (distance, index) in enumerate(answer):
+        for _, (distance, index) in enumerate(answer):
             if index is not None and distance is not None:
                 relevant_documents.append((distance,self._documents[index]))
         if not relevant_documents:
@@ -795,3 +797,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        SearchEngine.__init__(self,vectorizer,tokenizer)

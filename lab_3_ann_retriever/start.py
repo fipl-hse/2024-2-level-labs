@@ -4,7 +4,8 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-from lab_3_ann_retriever.main import Tokenizer, Vectorizer, BasicSearchEngine
+
+from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -34,16 +35,21 @@ def main() -> None:
     stopwords = open_files()[1]
     documents = open_files()[0]
     tokenizer = Tokenizer(stopwords)
-    test_doc = '"Мой кот Вектор по утрам приносит мне тапочки, а по вечерам мы гуляем с ним на шлейке во дворе.' \
+    test_doc = '"Мой кот Вектор по утрам приносит мне тапочки, а по вечерам' \
+               ' мы гуляем с ним на шлейке во дворе.' \
                ' Вектор забавный и храбрый. Он не боится собак!'
     tokenized_test_doc = tokenizer.tokenize(test_doc)
     print(tokenized_test_doc)
     test_docs = ['Векторы используются для поиска релевантного документа. Давайте научимся,'
                  ' как их создавать и использовать!','Мой кот Вектор по утрам приносит мне тапочки,'
-                 ' а по вечерам мы гуляем с ним на шлейке во дворе. Вектор забавный и храбрый.'
-                 ' Он не боится собак!', 'Котёнок, которого мы нашли во дворе, очень забавный и пушистый.'
-                 ' По утрам я играю с ним в догонялки перед работой.', 'Моя собака думает, что её любимый'
-                 ' плед — это кошка. Просто он очень пушистый и мягкий. Забавно наблюдать, как они спят'
+                 ' а по вечерам мы гуляем с ним на шлейке во дворе.'
+                 ' Вектор забавный и храбрый.'
+                 ' Он не боится собак!', 'Котёнок, которого мы нашли во дворе,'
+                 ' очень забавный и пушистый.'
+                 ' По утрам я играю с ним в догонялки перед работой.',
+                 'Моя собака думает, что её любимый'
+                 ' плед — это кошка. Просто он очень пушистый и мягкий.'
+                 ' Забавно наблюдать, как они спят'
                  ' вместе!']
     tokenized_test_docs = tokenizer.tokenize_documents(test_docs)
     print(tokenized_test_docs)

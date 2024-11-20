@@ -805,41 +805,41 @@ class KDTree(NaiveKDTree):
         if not (isinstance(vector, tuple) and isinstance(k, int) and len(vector) > 0 and k > 0):
             return None
         closest_nodes = []
-        info_list = [{"node": self._root, "depth": 0}]
+        info_list = [(self._root, 0)]
         while len(info_list) > 0:
             current_node = info_list[0]
-            distance = calculate_distance(vector, current_node["node"].vector)
+            distance = calculate_distance(vector, current_node[0].vector)
             if not isinstance(distance, float):
                 return None
             if len(closest_nodes) < k:
-                closest_nodes.append((distance, current_node["node"].payload))
+                closest_nodes.append((distance, current_node[0].payload))
             else:
                 max_closest = max(closest_nodes, key=lambda a: a[0])
                 if distance < max_closest[0]:
                     closest_nodes.remove(max_closest)
-                    closest_nodes.append((distance, current_node["node"].payload))
-            if current_node["node"].left_node is None and current_node["node"].right_node is None:
+                    closest_nodes.append((distance, current_node[0].payload))
+            if current_node[0].left_node is None and current_node[0].right_node is None:
                 info_list.pop(0)
                 continue
-            axis = current_node["depth"] % len(vector)
-            if current_node["node"].right_node is None:
-                near_node = current_node["node"].left_node
+            axis = current_node[1] % len(vector)
+            if current_node[0].right_node is None:
+                near_node = current_node[0].left_node
                 far_node = None
-            elif current_node["node"].left_node is None:
-                near_node = current_node["node"].right_node
+            elif current_node[0].left_node is None:
+                near_node = current_node[0].right_node
                 far_node = None
-            elif vector[axis] < current_node["node"].vector[axis]:
-                near_node = current_node["node"].left_node
-                far_node = current_node["node"].right_node
+            elif vector[axis] < current_node[0].vector[axis]:
+                near_node = current_node[0].left_node
+                far_node = current_node[0].right_node
             else:
-                near_node = current_node["node"].right_node
-                far_node = current_node["node"].left_node
+                near_node = current_node[0].right_node
+                far_node = current_node[0].left_node
             info_list.pop(0)
-            info_list.append({"node": near_node, "depth": current_node["depth"] + 1})
+            info_list.append((near_node, current_node[1] + 1))
             new_max_closest = max(closest_nodes, key=lambda a: a[0])
             if (not far_node is None and
-                (vector[axis] - current_node["node"].vector[axis]) ** 2 < new_max_closest[0]):
-                info_list.append({"node": far_node, "depth": current_node["depth"] + 1})
+                (vector[axis] - current_node[0].vector[axis]) ** 2 < new_max_closest[0]):
+                info_list.append((far_node, current_node[1] + 1))
         return sorted(closest_nodes)
 
 

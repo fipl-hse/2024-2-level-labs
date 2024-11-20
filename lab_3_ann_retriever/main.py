@@ -214,9 +214,8 @@ class Vectorizer:
         """
         if not (isinstance(self._corpus, list) and self._corpus):
             return False
-        self._vocabulary = list(set(token for doc in self._corpus for token in doc))
+        self._vocabulary = sorted(list(set(token for doc in self._corpus for token in doc)))
 
-        self._vocabulary.sort()
         for token in self._vocabulary:
             self._token2ind[token] = self._vocabulary.index(token)
 

@@ -71,7 +71,7 @@ def save_vector(vector: Vector) -> dict:
     """
     return {
         'len': len(vector),
-        'elements': {i: value for i, value in enumerate(vector) if value != 0}
+        'elements': {i: value for i, value in enumerate(vector) if value}
     }
 
 

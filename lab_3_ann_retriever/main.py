@@ -301,15 +301,26 @@ class Vectorizer:
         if not isinstance(document, list) or not all(isinstance(item, str) for item in document) or not document:
             return None
 
-        tf = {}
+        # tf = {}
+        #
+        # voc = set(self._vocabulary)
+        # doc = set(document)
+        #
+        # for elem in voc.union(doc):
+        #     tf[elem] = document.count(elem) / len(document)
+        #
+        # return tuple((tf[elem] * self._idf_values[elem] if elem in document else 0.0 for elem in self._vocabulary))
 
-        voc = set(self._vocabulary)
-        doc = set(document)
+        tf_idf_vector = []
 
-        for elem in voc.union(doc):
-            tf[elem] = document.count(elem) / len(document)
+        for item in self._vocabulary:
+            tf = document.count(item) / len(document)
+            idf = 0.0
+            if item in self._idf_values:
+                idf = self._idf_values[item]
+            tf_idf_vector.append(tf * idf)
 
-        return tuple((tf[elem] * self._idf_values[elem] if elem in document else 0.0 for elem in self._vocabulary))
+        return tuple(tf_idf_vector)
 
 
 class BasicSearchEngine:

@@ -3,6 +3,7 @@ CLI commands.
 """
 import functools
 import platform
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -74,6 +75,28 @@ def prepare_args_for_shell(args: list[object]) -> str:
     return " ".join(map(str, args))
 
 
+def modify_path(path: str) -> str:
+    """
+    Run CLI commands.
+
+    Args:
+        path (str): A path modify
+
+    Returns:
+        str: Modified path in str format
+    """
+    pattern_to_remove = r'/home/runner/work/[^/]+/[^/]+/'
+
+    pattern_python_end = r'python$'
+
+    if re.search(pattern_python_end, path):
+        return 'python'
+
+    modified_path = re.sub(pattern_to_remove, '', path)
+
+    return modified_path
+
+
 def _run_console_tool(
         exe: str, /, args: list[str], **kwargs: Any
 ) -> tuple[str, str, int]:
@@ -103,8 +126,11 @@ def _run_console_tool(
     if kwargs.get('debug', False):
         arguments = []
         for index, option in enumerate(options[1:]):
-            arguments.append(f'"{option}"' if '--' in options[index] else option)
-        print(f'Attempting to run with the following arguments: {" ".join([str(exe), *arguments])}')
+            arguments.append(f'"{modify_path(option)}"'
+                             if '--' in options[index] or '-m' in options[index]
+                             else modify_path(option))
+        print(f"""Attempting to run with the following arguments: {" ".join([modify_path(str(exe)),
+                                                                           *arguments])}""")
 
     env = kwargs.get('env')
     if env:

@@ -333,7 +333,8 @@ class BasicSearchEngine:
             return False
         self._documents = documents
         self._document_vectors = [self._index_document(document) for document in documents
-                                  if self._index_document is not None]
+                                  if self._index_document is not None
+                                  and isinstance(self._index_document(document),tuple)]
         if not self._documents or not self._document_vectors:
             return False
         return True

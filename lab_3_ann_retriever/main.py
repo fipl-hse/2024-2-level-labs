@@ -9,7 +9,6 @@ from typing import Protocol
 
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
-
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
@@ -141,10 +140,7 @@ class Tokenizer:
             or not all(isinstance(doc, str) for doc in documents):
             return None
 
-        tok_documents = []
-        for doc in documents:
-            tok_documents.append(self.tokenize(doc))
-        return tok_documents
+        return [self.tokenize(doc) for doc in documents]
 
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
@@ -210,8 +206,7 @@ class Vectorizer:
                 or not all(token for token in self._vocabulary) \
                 or calculate_idf(self._vocabulary, self._corpus) is None:
             return False
-        else:
-            return True
+        return True
 
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:

@@ -535,6 +535,10 @@ class Node(NodeLike):
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+        self.vector = vector
+        self.payload = payload
+        self.left_node = left_node
+        self.right_node = right_node
 
     def save(self) -> dict:
         """
@@ -567,6 +571,7 @@ class NaiveKDTree:
         """
         Initialize an instance of the KDTree class.
         """
+        self._root = None
 
     def build(self, vectors: list[Vector]) -> bool:
         """
@@ -580,6 +585,44 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
+        if (not vectors or
+                not all(isinstance(vector, tuple) and len(vector) > 0 for vector in vectors)):
+            return False
+
+        space_state = [{'vectors': [(vector, ind) for ind, vector in enumerate(vectors)],
+                        'depth': 0, 'parent node': Node((), -1), 'left dimension': True}]
+        dimensions = len(vectors[0])
+
+        while space_state:
+            current_vectors = space_state[0]['vectors']
+            depth = space_state[0]['depth']
+            parent_node = space_state[0]['parent node']
+            left_dimension = space_state.pop(0)['left dimension']
+
+            if not current_vectors:
+                continue
+
+            axis = depth % dimensions
+            sorted_vectors = sorted(current_vectors, key=lambda vector: vector[axis])
+            median_index = len(sorted_vectors) // 2
+            median_node = Node(vector=sorted_vectors[median_index], payload=vectors.index(sorted_vectors[median_index]))
+
+            if parent_node.payload == -1:
+                self._root = median_node
+            else:
+                if left_dimension:
+                    parent_node.left_node = median_node
+                else:
+                    parent_node.right_node = median_node
+
+            space_state.append({'vectors': sorted_vectors[:median_index], 'depth': depth + 1,
+                                'parent node': median_node, 'left dimension': True})
+            space_state.append({'vectors': sorted_vectors[median_index + 1:], 'depth': depth + 1,
+                                'parent node': median_node, 'left dimension': False})
+
+        if not self._root:
+            return False
+        return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
@@ -594,6 +637,10 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(vector, (tuple, list)) or not isinstance(k, int) or not vector or not k:
+            return None
+
+        return self._find_closest(vector, k) or None
 
     def save(self) -> dict | None:
         """
@@ -629,6 +676,26 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(vector, tuple) or not isinstance(k, int) or not vector:
+            return None
+
+        subspaces = [(self._root, 0)]
+        while subspaces:
+            node, depth = subspaces.pop(0)
+            if node is None:
+                return None
+            if node.left_node is None and node.right_node is None:
+                distance = calculate_distance(vector, node.vector)
+                if distance is None:
+                    return None
+                return [(distance, node.payload)]
+            axis = depth % len(node.vector)
+            current_depth = depth + 1
+            if vector[axis] <= node.vector[axis]:
+                subspaces.append((node.left_node, current_depth))
+            subspaces.append((node.right_node, current_depth))
+
+        return None
 
 
 class KDTree(NaiveKDTree):
@@ -666,6 +733,8 @@ class SearchEngine(BasicSearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)
+        self._tree = NaiveKDTree()
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -679,6 +748,24 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
+        if (not isinstance(documents, list) or not documents
+                or not all(isinstance(doc, str) for doc in documents)):
+            return False
+        self._documents = documents
+
+        for doc in documents:
+            indexed_doc = self._index_document(doc)
+            if indexed_doc is None:
+                return False
+            self._document_vectors.append(indexed_doc)
+
+        if (self._document_vectors is None or not self._document_vectors
+                or len(self._document_vectors) != len(documents)):
+            return False
+        if not self._tree.build(self._document_vectors):
+            return False
+
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -695,6 +782,26 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not isinstance(n_neighbours, int) or n_neighbours < 1:
+            return None
+        tokenized_query = self._tokenizer.tokenize(query)
+        if tokenized_query is None:
+            return None
+        query_vector = self._vectorizer.vectorize(tokenized_query)
+        if query_vector is None:
+            return None
+        nearest_neighbors = self._tree.query(query_vector, n_neighbours)
+        if nearest_neighbors is None:
+            return None
+        relevant_documents = []
+
+        for score, index in nearest_neighbors:
+            if index is None or index < len(self._documents):
+                return None
+            relevant_documents.append((score, self._documents[index]))
+
+        return relevant_documents
+
 
     def save(self, file_path: str) -> bool:
         """

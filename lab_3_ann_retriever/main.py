@@ -578,7 +578,6 @@ class Node(NodeLike):
     """
     Interface definition for Node for KDTree.
     """
-
     vector: Vector
     payload: int
     left_node: NodeLike | None
@@ -702,34 +701,22 @@ class NaiveKDTree:
             median_index = len(current_space["vectors"]) // 2
             median_ind_vec = current_space["vectors"][median_index]
             node_to_assign = Node(median_ind_vec[1], median_ind_vec[0])
+            vectors_value_left = current_space["vectors"][:median_index]
+            vectors_value_right = current_space["vectors"][median_index + 1:]
+            depth_value = current_space["depth"] + 1
             if current_space["parent_node"].payload == -1:
                 self._root = node_to_assign
-                info_list.append({"vectors": current_space["vectors"][:median_index],
-                                  "depth": current_space["depth"] + 1,
-                                  "parent_node": self._root, "is_left": True})
-                info_list.append({"vectors": current_space["vectors"][median_index + 1:],
-                                  "depth": current_space["depth"] + 1,
-                                  "parent_node": self._root, "is_left": False})
+                parent_value = self._root
             elif current_space["is_left"]:
                 current_space["parent_node"].left_node = node_to_assign
-                info_list.append({"vectors": current_space["vectors"][:median_index],
-                                  "depth": current_space["depth"] + 1,
-                                  "parent_node": current_space["parent_node"].left_node,
-                                  "is_left": True})
-                info_list.append({"vectors": current_space["vectors"][median_index + 1:],
-                                  "depth": current_space["depth"] + 1,
-                                  "parent_node": current_space["parent_node"].left_node,
-                                  "is_left": False})
+                parent_value = current_space["parent_node"].left_node
             else:
                 current_space["parent_node"].right_node = node_to_assign
-                info_list.append({"vectors": current_space["vectors"][:median_index],
-                                  "depth": current_space["depth"] + 1,
-                                  "parent_node": current_space["parent_node"].right_node,
-                                  "is_left": True})
-                info_list.append({"vectors": current_space["vectors"][median_index + 1:],
-                                  "depth": current_space["depth"] + 1,
-                                  "parent_node": current_space["parent_node"].right_node,
-                                  "is_left": False})
+                parent_value = current_space["parent_node"].right_node
+            info_list.append({"vectors": vectors_value_left, "depth": depth_value,
+                              "parent_node": parent_value, "is_left": True})
+            info_list.append({"vectors": vectors_value_right, "depth": depth_value,
+                              "parent_node": parent_value, "is_left": False})
         return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:

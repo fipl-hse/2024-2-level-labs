@@ -58,7 +58,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
             and (len(query_vector) == len(document_vector) or len(query_vector) == 0 or len(
                 document_vector) == 0)):
         return None
-    if not query_vector or not document_vector:
+    if not (query_vector and document_vector):
         return 0.0
     distance = 0.0
     for idx, query_cor in enumerate(query_vector):
@@ -214,11 +214,7 @@ class Vectorizer:
         """
         if not (isinstance(self._corpus, list) and self._corpus):
             return False
-
-        for tokenized_document in self._corpus:
-            for token in tokenized_document:
-                if token not in self._vocabulary:
-                    self._vocabulary.append(token)
+        self._vocabulary = list(set(token for doc in self._corpus for token in doc))
 
         self._vocabulary.sort()
         for token in self._vocabulary:
@@ -259,8 +255,8 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (isinstance(vector, tuple) and all(isinstance(cor, float) for cor in vector) and len(
-                vector) == len(self._vocabulary)):
+        if not (isinstance(vector, tuple) and all(isinstance(cor, float) for cor in vector)
+                and len(vector) == len(self._vocabulary)):
             return None
         tokenized_doc = []
         for token in self._vocabulary:
@@ -380,10 +376,9 @@ class BasicSearchEngine:
 
         for document in documents:
             indexed_document = self._index_document(document)
-            if indexed_document is not None:
-                self._document_vectors.append(indexed_document)
-            else:
+            if indexed_document is None:
                 return False
+            self._document_vectors.append(indexed_document)
         return None not in self._document_vectors
 
     def retrieve_relevant_documents(
@@ -473,8 +468,7 @@ class BasicSearchEngine:
         if not (isinstance(query_vector, tuple) and all(
                 isinstance(cor, float) for cor in query_vector)):
             return None
-        knn = self._calculate_knn(query_vector,
-                                                                  self._document_vectors, 1)
+        knn = self._calculate_knn(query_vector, self._document_vectors, 1)
         if knn is None or not knn:
             return None
         return self._documents[knn[0][0]]
@@ -503,9 +497,9 @@ class BasicSearchEngine:
                         document_vectors)
                 and isinstance(n_neighbours, int) and document_vectors):
             return None
-        distances: list[tuple[int, float]] = []
+        distances = []
         for document_vector in document_vectors:
-            distance: float | None = calculate_distance(query_vector, document_vector)
+            distance = calculate_distance(query_vector, document_vector)
             if distance is None:
                 return None
             distances.append((document_vectors.index(document_vector), distance))
@@ -684,10 +678,10 @@ class NaiveKDTree:
         ]
 
         while dimensions_info:
-            cur_vectors: list[tuple[Vector, int]] = dimensions_info[0]["vectors"]
-            depth: int = dimensions_info[0]["depth"]
-            parent_node: Node = dimensions_info[0]["parentNode"]
-            is_left_sub_dim: bool = dimensions_info.pop(0)["isLeftSubDim"]
+            cur_vectors = dimensions_info[0]["vectors"]
+            depth = dimensions_info[0]["depth"]
+            parent_node = dimensions_info[0]["parentNode"]
+            is_left_sub_dim = dimensions_info.pop(0)["isLeftSubDim"]
             if cur_vectors:
                 axis = depth % len(cur_vectors[0])
                 cur_vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
@@ -778,11 +772,11 @@ class NaiveKDTree:
                 isinstance(cor, float) for cor in vector) and isinstance(k, int)
                 and vector and self._root is not None and isinstance(self._root, Node)):
             return None
-        nodes: list[tuple[Node, int]] = [(self._root, 0)]
+        nodes = [(self._root, 0)]
         while nodes:
-            cur_node: tuple[Node, int] = nodes.pop(0)
+            cur_node = nodes.pop(0)
             if cur_node[0].left_node is None and cur_node[0].right_node is None:
-                distance: float | None = calculate_distance(vector, cur_node[0].vector)
+                distance = calculate_distance(vector, cur_node[0].vector)
                 if distance is not None:
                     return [(distance, cur_node[0].payload)]
             axis = cur_node[1] % len(cur_node[0].vector)
@@ -817,7 +811,7 @@ class KDTree(NaiveKDTree):
                 and isinstance(k, int) and vector and isinstance(self._root, Node)):
             return None
         best: list[tuple[float, int]] = []
-        cur_nodes_depth: list[tuple[Node, int]] = [(self._root, 0)]
+        cur_nodes_depth = [(self._root, 0)]
 
         while cur_nodes_depth:
             cur_node_depth = cur_nodes_depth.pop(0)

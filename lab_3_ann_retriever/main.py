@@ -147,7 +147,6 @@ def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
             if not tokenized_doc:
                 return None
             tokenized_documents.append(tokenized_doc)
-
         return tokenized_documents
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:

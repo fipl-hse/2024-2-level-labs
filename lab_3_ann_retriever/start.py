@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 from pathlib import Path
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from lab_3_ann_retriever.main import (BasicSearchEngine, NaiveKDTree, SearchEngine, Tokenizer,
+from lab_3_ann_retriever.main import (BasicSearchEngine, KDTree, NaiveKDTree, SearchEngine, Tokenizer,
                                       Vectorizer)
 
 
@@ -50,16 +50,13 @@ def main() -> None:
     closest_doc = searcher.retrieve_vectorized(vectorized_query)
 
     naive_tree = NaiveKDTree()
-    naive_tree.build([
-        (0.0, 0.0, 0.094),
-        (0.061, 0.121, 0.0),
-        (0.0, 0.0, 0.0),
-        (0.0, 0.0, 0.0)])
-    print(naive_tree.query((-0.01, 0.0, 0.094), 11))
+    naive_tree.build([(-0.26, -0.26), (0.0, -0.51), (-0.51, 0.0), (0.0, -0.26), (0.0, 0.0)
+        ])
+    print(naive_tree.query((-0.1, -0.2), 11))
 
     better_searcher = SearchEngine(vectorizer, tokenizer)
     better_searcher.index_documents(docs)
-    more_relevant_docs = better_searcher.retrieve_relevant_documents("Нижний Новгород", 2)
+    more_relevant_docs = better_searcher.retrieve_relevant_documents("Нижний Новгород")
 
     result = tokens_from_vec
     print(result, closest_doc, sep="\n")
@@ -69,7 +66,6 @@ def main() -> None:
     for doc_tree in more_relevant_docs:
         print(doc_tree)
     assert result, "Result is None"
-
 
 if __name__ == "__main__":
     main()

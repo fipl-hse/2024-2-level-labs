@@ -603,13 +603,13 @@ class NaiveKDTree:
 
             if not current_vectors:
                 continue
-            if depth is None or isinstance(depth, int):
-                return False
+
             axis = depth % len(vectors[0])
             sorted_vectors = sorted(current_vectors, key=lambda vector: vector[axis])
             median_index = len(sorted_vectors) // 2
+            median_vector = sorted_vectors[median_index]
             median_node = Node(vector=sorted_vectors[median_index],
-                               payload=vectors.index(sorted_vectors[median_index]))
+                               payload=vectors.index(median_vector))
 
             if parent_node.payload == -1:
                 self._root = median_node
@@ -619,9 +619,13 @@ class NaiveKDTree:
                 else:
                     parent_node.right_node = median_node
 
-            space_state.append({'vectors': sorted_vectors[:median_index], 'depth': depth + 1,
+            left_vectors = sorted_vectors[:median_index]
+            right_vectors = sorted_vectors[median_index + 1:]
+            depth += 1
+
+            space_state.append({'vectors': left_vectors, 'depth': depth,
                                 'parent node': median_node, 'left dimension': True})
-            space_state.append({'vectors': sorted_vectors[median_index + 1:], 'depth': depth + 1,
+            space_state.append({'vectors': right_vectors, 'depth': depth,
                                 'parent node': median_node, 'left dimension': False})
 
         if not self._root:

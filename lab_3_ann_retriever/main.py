@@ -250,7 +250,7 @@ class Vectorizer:
                 or not all(isinstance(elem, float) for elem in vector) \
                 or len(vector) != len(self._token2ind):
             return None
-        return [token for i, value in enumerate(vector) if value != 0.0 for token, index
+        return [token for i, value in enumerate(vector) if value for token, index
                 in self._token2ind.items() if index == i]
 
     def save(self, file_path: str) -> bool:
@@ -760,6 +760,8 @@ class NaiveKDTree:
                 if distance is None:
                     return None
                 result.append((distance, node.payload))
+                if len(result) == k:
+                    return result
             axis = depth % len(vector)
             if vector[axis] <= node.vector[axis]:
                 if node.left_node is not None:
@@ -767,7 +769,7 @@ class NaiveKDTree:
             else:
                 if node.right_node is not None:
                     nodes.append((node.right_node, depth + 1))
-        return result
+        return None
 
 
 class KDTree(NaiveKDTree):
@@ -804,8 +806,8 @@ class KDTree(NaiveKDTree):
             if len(closest_nodes) < k and distance < max(closest_nodes, key=lambda x: x[0])[0]:
                 closest_nodes.append((distance, node.payload))
             if len(closest_nodes) >= k and distance < max(closest_nodes, key=lambda x: x[0])[0]:
-                closest_nodes.sort(key=lambda x: x[0])
-                closest_nodes.pop()
+                closest_nodes.sort(reverse=True, key=lambda x: x[0])
+                closest_nodes.pop(0)
                 closest_nodes.append((distance, node.payload))
             axis = depth % len(vector)
             if vector[axis] <= node.vector[axis]:

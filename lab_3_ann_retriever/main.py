@@ -118,13 +118,15 @@ class Tokenizer:
         """
         if not isinstance(text, str) or not text:
             return None
-        text = text.lower()
-        tokenized_text = ''
+
         for element in text:
-            if element.isalpha() or element.isspace():
-                tokenized_text += element
-        first_tokens = tokenized_text.split()
-        return self._remove_stop_words(first_tokens)
+            if not element.isalpha() and not element.isspace():
+                text = text.replace(element, ' ')
+        return self._remove_stop_words(text.lower().split())
+
+        # toks = [word for word in ''.join(char for char in text.lower() if char.isalpha() or char.isspace()).split()]
+        # return self._remove_stop_words(toks)
+
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -593,48 +595,73 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not isinstance(vectors, list) or not vectors:
-            return False
+        # if not isinstance(vectors, list) or not vectors or len(vectors) == 0:
+        #     return False
+        #
+        # # ind = 0
+        #
+        # vect_inf = [{
+        #     'pos': [(vect, ind) for vect, ind in enumerate(vectors)],
+        #     'depth': 0,
+        #     'ancestor': Node(tuple([0.0] * len(vectors[0])), -1),
+        #     'Left': True
+        # }]
+        #
+        # while vect_inf:
+        #     state = vect_inf.pop(0)
+        #     cur_vect = state['pos']
+        #     depth = state['depth']
+        #     ancestor = state['ancestor']
+        #     left = state['Left']
+        #
+        #     if cur_vect:
+        #         axis = depth % len(cur_vect[0])
+        #         cur_vect.sort(key=lambda x: x[0][axis])
+        #         med_ind = len(cur_vect) // 2
+        #         med_node = Node(cur_vect[med_ind][0], cur_vect[med_ind][1])
+        #
+        #         if ancestor.payload != -1 and left:
+        #             ancestor.left_node = med_node
+        #         elif ancestor.payload == -1:
+        #             self._root = med_node
+        #         else:
+        #             ancestor.right_node = med_node  # Добавляем информацию о левой части
+        #         if med_ind > 0:
+        #             states_info.append({
+        #                 'pos': cur_vect[:med_ind],
+        #                 'depth': depth + 1,
+        #                 'ancestor': med_node,
+        #                 'is_left': True}
+        #
+        #
+        #         med_node = Node(cur_vect[med_ind][0], cur_vect[med_ind][1])
+        #         if ancestor.payload != -1 and left:
+        #             ancestor.left_node = med_node
+        #         elif ancestor.payload == -1:
+        #             self._root = med_node
+        #         else:
+        #             ancestor.right_node = med_node
+        #
+        #         cur_vect[ind] = {
+        #             'pos': cur_vect[med_ind + 1:],
+        #             'depth': depth + 1,
+        #             'ancestor': med_node,
+        #             'Left': True
+        #         }
+        #
+        # # return True
 
-        ind = 0
 
-        vect_inf = {
-            'pos': [(vect, ind) for vect, ind in enumerate(vectors)],
-            'depth': 0,
-            'ancestor': Node(tuple([0.0] * len(vectors[0])), -1),
-            'Left': True
-        }
 
-        while vect_inf:
-            cur_vect = vect_inf[0]['pos']
-            depth = vect_inf[0]['depth']
-            ancestor = vect_inf[0]['ancestor']
-            left = vect_inf[0]['Left']
 
-            cur_vect.pop(0)
 
-            if cur_vect:
-                axis = depth % len(cur_vect[0])
-                cur_vect.sort(key=lambda x: x[0][axis])
-                med_ind = len(cur_vect) // 2
-                ind += 1
 
-                med_node = Node(cur_vect[med_ind][0], cur_vect[med_ind][1])
-                if ancestor.payload != -1 and left:
-                    ancestor.left_node = med_node
-                elif ancestor.payload == -1:
-                    self._root = med_node
-                else:
-                    ancestor.right_node = med_node
 
-                cur_vect[ind] = {
-                    'pos': cur_vect[med_ind + 1:],
-                    'depth': depth + 1,
-                    'ancestor': med_node,
-                    'Left': True
-                }
 
-        return True
+
+
+
+
 
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:

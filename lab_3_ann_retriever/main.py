@@ -3,11 +3,12 @@ Lab 3.
 
 Vector search with text retrieving
 """
+import math
+import re
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
-import re
+
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
-import math
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -184,12 +185,14 @@ class Vectorizer:
         """
         if not self._corpus:
             return False
+
         unique_words = {word for doc in self._corpus for word in doc}
         if unique_words:
-
             self._vocabulary = sorted(unique_words)
             self._token2ind = {token: ind for ind, token in enumerate(self._vocabulary)}
             self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+            if self._idf_values is None:
+                return False
             return True
         return False
 
@@ -313,6 +316,7 @@ class BasicSearchEngine:
         if not isinstance(documents, list) or not documents:
             return False
         self._documents = documents
+        self._document_vectors = []
         for text in documents:
             if not isinstance(text, str):
                 return False
@@ -320,8 +324,6 @@ class BasicSearchEngine:
             if not isinstance(vector, tuple):
                 return False
             self._document_vectors.append(vector)
-        if not self._document_vectors:
-            return False
         return True
 
     def retrieve_relevant_documents(

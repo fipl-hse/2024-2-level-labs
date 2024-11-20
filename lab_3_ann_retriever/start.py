@@ -4,7 +4,8 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-from main import Tokenizer, Vectorizer, BasicSearchEngine
+
+from main import BasicSearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:

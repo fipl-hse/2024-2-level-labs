@@ -557,10 +557,12 @@ class BasicSearchEngine:
         if not documents:
             return False
         self._documents = documents
-        document_vectors = [load_vector(vector) for vector in state['engine']['document_vectors']]
-        if not document_vectors:
-            return False
-        self._document_vectors = document_vectors
+        self._document_vectors = []
+        for vector in state['engine']['document_vectors']:
+            loaded_vector = load_vector(vector)
+            if not loaded_vector:
+                return False
+            self._document_vectors.append(loaded_vector)
         if not self._documents or not self._document_vectors or None in self._document_vectors:
             return False
         return True
@@ -619,12 +621,10 @@ class Node(NodeLike):
         Returns:
             bool: True if Node was loaded successfully, False in other cases.
         """
-        if not isinstance(state, dict):
-            return False
-        if "vector" not in state or "payload" not in state\
+        if not isinstance(state, dict) or "vector" not in state or "payload" not in state\
                 or "left_node" not in state or "right_node" not in state:
             return False
-        vector = load_vector(state["vector"])
+        vector = load_vector(state["vector"] if isinstance(state["vector"], dict) else False)
         if not isinstance(vector, tuple):
             return False
         self.vector = vector
@@ -634,13 +634,13 @@ class Node(NodeLike):
         self.payload = payload
         left_node = Node()
         right_node = Node()
-        if state["left_node"] is not None:
+        if state["left_node"] is not None or isinstance(state["left_node"], dict):
             if not left_node.load(state["left_node"]):
                 return False
             self.left_node = left_node
         else:
             self.left_node = None
-        if state["right_node"] is not None:
+        if state["right_node"] is not None or isinstance(state["right_node"], dict):
             if not right_node.load(state["right_node"]):
                 return False
             self.right_node = right_node
@@ -833,11 +833,11 @@ class KDTree(NaiveKDTree):
             axis = depth % len(node.vector)
             if vector[axis] <= node.vector[axis]:
                 tree.append((node.left_node, depth + 1))
-                if ((vector[axis] - node.vector[axis]) ** 2) < max([pair[0] for pair in best]):
+                if ((vector[axis] - node.vector[axis]) ** 2) < max(best, key=lambda x: x[0])[0]:
                     tree.append((node.right_node, depth + 1))
             else:
                 tree.append((node.right_node, depth + 1))
-                if ((vector[axis] - node.vector[axis]) ** 2) < max([pair[0] for pair in best]):
+                if ((vector[axis] - node.vector[axis]) ** 2) < max(best, key=lambda x: x[0])[0]:
                     tree.append((node.left_node, depth + 1))
         return best
 
@@ -903,7 +903,8 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query, str) or not isinstance(n_neighbours, int) or query is None:
+        if (not isinstance(query, str) or not isinstance(n_neighbours, int)
+                or query is None or isinstance(n_neighbours, bool)):
             return None
         result = []
         query_vector = self._index_document(query)
@@ -934,8 +935,8 @@ class SearchEngine(BasicSearchEngine):
             return False
         with open(file_path, "w", encoding="utf-8") as document:
             json.dump({"engine": {"tree": self._tree.save(),
-                                      "documents": self._dump_documents()["documents"],
-                                      "document_vectors": self._dump_documents()["document_vectors"]}},
+                                  "documents": self._dump_documents()["documents"],
+                                  "document_vectors": self._dump_documents()["document_vectors"]}},
                       document)
         return True
 

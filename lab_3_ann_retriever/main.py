@@ -332,7 +332,7 @@ class BasicSearchEngine:
                 all(isinstance(word, str) for word in documents):
             return False
         self._documents = documents
-        self._document_vectors = [vector for doc in documents if (vector := self._index_document(doc))]
+        self._document_vectors = [vec for doc in documents if (vec := self._index_document(doc))]
         if not self._documents or not self._document_vectors:
             return False
         return True

@@ -663,8 +663,9 @@ class NaiveKDTree:
             ind_vecs.append((ind, vec))
         info_list = [{"vectors": ind_vecs, "depth": 0, "parent_node": Node(), "is_left": True}]
         while len(info_list) > 0:
-            current_space = info_list[0]
-            info_list.pop(0)
+            current_space = info_list.pop(0)
+            if not isinstance(current_space, dict):
+                return False
             if len(current_space["vectors"]) == 0:
                 continue
             axis = current_space["depth"] % len(vectors[0])

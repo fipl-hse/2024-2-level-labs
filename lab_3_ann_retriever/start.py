@@ -46,6 +46,7 @@ def main() -> None:
         result = None
         assert result, "Result is None"
     vectorizer = Vectorizer(tokenized_docs)
+    vectorizer.build()
     docs_vector = [vectorizer.vectorize(tokens) for tokens in tokenized_docs]
 
     query = 'Нижний Новгород'
@@ -68,7 +69,6 @@ def main() -> None:
 
     file_path_for_search_engine = "assets/states/engine_state.json"
     engine.save(file_path_for_search_engine)
-
     new_engine = AdvancedSearchEngine(new_vectorizer, tokenizer)
     new_engine.load(file_path_for_search_engine)
     start_time_adv = time.time()

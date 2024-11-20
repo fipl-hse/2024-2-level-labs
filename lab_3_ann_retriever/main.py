@@ -217,13 +217,10 @@ class Vectorizer:
                 or not all(isinstance(tokens, list) for tokens in self._corpus)
                 or not all(isinstance(word, str) for tokens in self._corpus for word in tokens)):
             return False
-        self._vocabulary = sorted(list(set(sum(self._corpus, []))))
-        for tokens in self._corpus:
-            for word in tokens:
-                if word in self._vocabulary:
-                    continue
-                self._vocabulary.append(word)
-        self._vocabulary.sort()
+        unique_words = set()
+        for doc in self._corpus:
+            unique_words.update(set(doc))
+        self._vocabulary.extend(sorted(unique_words))
         if not isinstance(self._vocabulary, list):
             return False
         idf = calculate_idf(self._vocabulary, self._corpus)

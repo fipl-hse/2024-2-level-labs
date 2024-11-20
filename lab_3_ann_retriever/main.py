@@ -577,6 +577,8 @@ class NaiveKDTree:
         if not vectors or not all(isinstance(vec, tuple) and len(vec) > 0 for vec in vectors):
             return False
         dimensions = len(vectors[0])
+        if not all(len(vec) == dimensions for vec in vectors):
+            return False
         another_vec = vectors[:]
         nodes: list[tuple[list[Vector], int, Node | None, bool]] = [(vectors, 0, None, True)]
         while nodes:
@@ -584,16 +586,14 @@ class NaiveKDTree:
             if not current_vectors:
                 continue
             axis = depth % dimensions
-            try:
-                current_vectors.sort(key=lambda x: x[axis])
-            except (IndexError, TypeError):
+            if not all(isinstance(vec, tuple) and len(vec) > axis for vec in current_vectors):
                 return False
+            current_vectors.sort(key=lambda x: x[axis])
             median_index = len(current_vectors) // 2
             median_point = current_vectors[median_index]
-            try:
-                node_median = Node(median_point, another_vec.index(median_point))
-            except ValueError:
+            if median_point not in another_vec:
                 return False
+            node_median = Node(median_point, another_vec.index(median_point))
             if parent is None:
                 self._root = node_median
             else:

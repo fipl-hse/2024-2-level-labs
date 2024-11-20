@@ -139,7 +139,7 @@ class Tokenizer:
         """
         if not isinstance(documents, list):
             return None
-        # documents_tokenized = [self.tokenize(document) for document in documents]
+
         documents_tokenized = []
         for document in documents:
             document_tokenized = self.tokenize(document)
@@ -232,8 +232,6 @@ class Vectorizer:
         if not self._vocabulary:
             self.build()
         vector = self._calculate_tf_idf(tokenized_document)
-        if not isinstance(vector, tuple) or vector is None or not all(isinstance(freq, float) for freq in vector):
-            return None
         return vector
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
@@ -299,8 +297,6 @@ class Vectorizer:
             token_index = self._token2ind[token]
             vector[token_index] = tf_idf[token]
         tf_idf_vector = tuple(vector)
-        if tf_idf_vector is None or not isinstance(tf_idf_vector, tuple) or not tf_idf_vector:
-            return None
         return tf_idf_vector
 
 
@@ -369,6 +365,9 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        query_vector = self._index_document(query)
+        relevant_documents = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
+        return relevant_documents
 
     def save(self, file_path: str) -> bool:
         """
@@ -450,8 +449,7 @@ class BasicSearchEngine:
         document_tokenized = self._tokenizer.tokenize(document)
         if not isinstance(document_tokenized, list):
             return None
-        document_vectorized = self._vectorizer.vectorize(document_tokenized)
-        return document_vectorized
+        return self._vectorizer.vectorize(document_tokenized)
 
     def _dump_documents(self) -> dict:
         """

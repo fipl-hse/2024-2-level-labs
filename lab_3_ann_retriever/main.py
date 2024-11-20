@@ -600,26 +600,32 @@ class Node(NodeLike):
         if not state or not isinstance(state, dict):
             return False
         if 'payload' not in state or 'vector' not in state \
-                or 'left_node' not in state or 'right_node' not in state:
+                or not state['vector'] or not isinstance(state['vector'], dict):
             return False
-        if not state['vector'] or not isinstance(state['vector'], dict):
+        vector = load_vector(state['vector'])
+        payload = state['payload']
+        if not vector or not isinstance(vector, tuple) \
+                or not all(isinstance(value, float) for value in vector) \
+                or not isinstance(payload, int):
             return False
-        if not isinstance(state['left_node'], dict | None) \
-                or not isinstance(state['right_node'], dict | None):
-            return False
-        self.vector = load_vector(state['vector'])
-        if not self.vector or not isinstance(self.vector, tuple) \
-                or not all(isinstance(value, float) for value in self.vector):
-            return False
-        self.left_node = Node()
-        self.right_node = Node()
-        self.payload = state['payload']
-        if not isinstance(self.payload, int):
-            return False
-        if state['left_node'] is not None:
-            self.left_node.load(state['left_node'])
-        if state['right_node'] is not None:
-            self.right_node.load(state['right_node'])
+        self.vector = vector
+        self.payload = payload
+        if state['left_node'] is None:
+            self.left_node = None
+        else:
+            if not isinstance(state['left_node'], dict):
+                return False
+            left_node = Node()
+            left_node.load(state['left_node'])
+            self.left_node = left_node
+        if state['right_node'] is None:
+            self.right_node = None
+        else:
+            if not isinstance(state['right_node'], dict):
+                return False
+            right_node = Node()
+            right_node.load(state['right_node'])
+            self.right_node = right_node
         return True
 
 
@@ -724,6 +730,8 @@ class NaiveKDTree:
             return False
         self._root = Node()
         self._root.load(state['root'])
+        if not self._root:
+            return False
         return True
 
     def _find_closest(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
@@ -928,12 +936,11 @@ class SearchEngine(BasicSearchEngine):
             return False
         with open(file_path, 'r', encoding='utf-8') as file_to_read:
             state = json.load(file_to_read)
-        self._load_documents(state)
-        if not self._document_vectors or self._document_vectors is None or not self._documents \
-                or self._document_vectors is None:
+        if not isinstance(state, dict) or 'engine' not in state or 'tree' not in state['engine']:
             return False
-        self._tree.load(state)
-        if self._tree._root is None:
+        if not self._tree.load(state['engine']['tree']):
+            return False
+        if not self._load_documents(state):
             return False
         return True
 

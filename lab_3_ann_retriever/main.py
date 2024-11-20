@@ -169,9 +169,8 @@ class Tokenizer:
                 or not all(isinstance(one_token, str) for one_token in tokens)
                 or not tokens):
             return None
-        tok_text = [word for word in tokens if word not in self._stop_words]
 
-        return tok_text
+        return [word for word in tokens if word not in self._stop_words]
 
 
 class Vectorizer:
@@ -211,7 +210,7 @@ class Vectorizer:
         for sublist in self._corpus:
             if sublist is None:
                 return False
-            vocabulary |= set(sublist)
+            vocabulary.update(set(sublist))
         self._vocabulary = sorted(list(vocabulary))
 
         if not self._vocabulary:
@@ -395,13 +394,10 @@ class BasicSearchEngine:
         for index, float_as_value in knn_list_of_tuples:
             if float_as_value is None:
                 return None
-            if float_as_value is not None:
-                relevant_docs.append((float_as_value, self._documents[index]))
+            relevant_docs.append((float_as_value, self._documents[index]))
         if relevant_docs is None:
             return None
-        if relevant_docs:
-            return relevant_docs
-        return None
+        return relevant_docs
 
     def save(self, file_path: str) -> bool:
         """

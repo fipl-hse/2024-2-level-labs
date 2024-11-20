@@ -55,6 +55,8 @@ def main() -> None:
     print(tokenized_test_docs)
 
     tokenized_docs = tokenizer.tokenize_documents(documents)
+    if not tokenized_docs:
+        return None
     vectorizer = Vectorizer(tokenized_docs)
     searchengine = BasicSearchEngine(vectorizer,tokenizer)
     searchengine.index_documents(documents)

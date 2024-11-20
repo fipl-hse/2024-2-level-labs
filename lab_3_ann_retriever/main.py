@@ -763,25 +763,25 @@ class NaiveKDTree:
                 k > 0 and not self._root is None):
             return None
         distance_list = []
-        info_list = [{"node": self._root, "depth": 0}]
+        info_list = [(self._root, 0)]
         while len(info_list) > 0:
             current_node = info_list.pop(0)
-            if current_node["node"].left_node is None and current_node["node"].right_node is None:
-                distance = calculate_distance(vector, current_node["node"].vector)
+            if current_node[0].left_node is None and current_node[0].right_node is None:
+                distance = calculate_distance(vector, current_node[0].vector)
                 if not isinstance(distance, float):
                     return None
-                distance_list.append((distance, current_node["node"].payload))
+                distance_list.append((distance, current_node[0].payload))
                 break
-            axis = current_node["depth"] % len(vector)
-            if current_node["node"].right_node is None:
-                new_node = current_node["node"].left_node
-            elif current_node["node"].left_node is None:
-                new_node = current_node["node"].right_node
-            elif vector[axis] <= current_node["node"].vector[axis]:
-                new_node = current_node["node"].left_node
+            axis = current_node[1] % len(vector)
+            if current_node[0].right_node is None:
+                new_node = current_node[0].left_node
+            elif current_node[0].left_node is None:
+                new_node = current_node[0].right_node
+            elif vector[axis] <= current_node[0].vector[axis]:
+                new_node = current_node[0].left_node
             else:
-                new_node = current_node["node"].right_node
-            info_list.append({"node": new_node, "depth": current_node["depth"] + 1})
+                new_node = current_node[0].right_node
+            info_list.append((new_node, current_node[1] + 1))
         return sorted(distance_list)[:k]
 
 

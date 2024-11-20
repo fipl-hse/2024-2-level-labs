@@ -33,49 +33,57 @@ def main() -> None:
     Launch an implementation.
     """
     print(time())
+    result = None
     with open("assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     text_elements = text.split(", ")
-    text_elements = tuple([float(element) for element in text_elements])
+    float_elements = []
+    for element in text_elements:
+        float_elements.append(float(element))
+    vector_of_elements = tuple(float_elements)
+
     documents, stopwords = open_files()
 
     tokenizer = Tokenizer(stopwords)
     token_docs_list = tokenizer.tokenize_documents(documents)
 
-    vectorizer = Vectorizer(token_docs_list)
-    vectorizer.build()
-    secret_question = vectorizer.vector2tokens(text_elements)
-    vectorizer.save("assets/states/vectorizer_state.json")
-    vectorizer_again = Vectorizer(token_docs_list)
-    vectorizer_again.load("assets/states/vectorizer_state.json")
+    if isinstance(token_docs_list, list):
+        vectorizer = Vectorizer(token_docs_list)
+        vectorizer.build()
+        secret_question = vectorizer.vector2tokens(vector_of_elements)
+        vectorizer.save("assets/states/vectorizer_state.json")
+        vectorizer_again = Vectorizer(token_docs_list)
+        vectorizer_again.load("assets/states/vectorizer_state.json")
 
-    searcher = BasicSearchEngine(vectorizer, tokenizer)
-    searcher.index_documents(documents)
-    relevant_docs = searcher.retrieve_relevant_documents("Нижний Новгород", 3)
-    print(time())
-    secret_answer = searcher.retrieve_vectorized(text_elements)
+        searcher = BasicSearchEngine(vectorizer, tokenizer)
+        searcher.index_documents(documents)
+        secret_answer = searcher.retrieve_vectorized(vector_of_elements)
+        print(time())
+        print(secret_question, secret_answer, sep="\n")
+        relevant_docs = searcher.retrieve_relevant_documents("Нижний Новгород", 3)
+        print(time())
+        for doc in relevant_docs:
+            print(doc)
+        print()
 
-    better_searcher = SearchEngine(vectorizer, tokenizer)
-    better_searcher.index_documents(documents)
-    more_relevant_docs = better_searcher.retrieve_relevant_documents("Нижний Новгород")
-    print(time())
-    better_searcher.save("assets/states/engine_state.json")
+        better_searcher = SearchEngine(vectorizer, tokenizer)
+        better_searcher.index_documents(documents)
+        more_relevant_docs = better_searcher.retrieve_relevant_documents("Нижний Новгород")
+        print(time())
+        for doc in more_relevant_docs:
+            print(doc)
+        print()
+        better_searcher.save("assets/states/engine_state.json")
 
-    best_searcher = AdvancedSearchEngine(vectorizer, tokenizer)
-    best_searcher.load("assets/states/engine_state.json")
-    most_relevant_docs = best_searcher.retrieve_relevant_documents("Нижний Новгород", 3)
-    print(time())
+        best_searcher = AdvancedSearchEngine(vectorizer, tokenizer)
+        best_searcher.load("assets/states/engine_state.json")
+        most_relevant_docs = best_searcher.retrieve_relevant_documents("Нижний Новгород", 3)
+        print(time())
+        for doc in more_relevant_docs:
+            print(doc)
 
-    result = most_relevant_docs
-    print(secret_question, secret_answer, sep="\n")
-    for doc in relevant_docs:
-        print(doc)
-    print()
-    for doc in more_relevant_docs:
-        print(doc)
-    print()
-    for doc in result:
-        print(doc)
+        result = most_relevant_docs
+
     assert result, "Result is None"
 
 

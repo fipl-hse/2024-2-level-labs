@@ -7,10 +7,8 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
-from pyspelling.filters.python import tokenizer
-
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
-import math
+
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -204,8 +202,8 @@ class Vectorizer:
             result |= set(doc)
         self._vocabulary.extend(list(result))
         self._vocabulary.sort()
-        for token in self._vocabulary:
-            self._token2ind[token] = self._vocabulary.index(token)
+        for index, token in enumerate(self._vocabulary):
+            self._token2ind[token] = index
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
 
         if not self._idf_values or not self._vocabulary or not self._token2ind \

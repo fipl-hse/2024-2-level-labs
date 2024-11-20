@@ -4,7 +4,8 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-from lab_3_ann_retriever.main import Tokenizer, Vectorizer, BasicSearchEngine
+
+from lab_3_ann_retriever.main import Tokenizer, Vectorizer, calculate_distance, BasicSearchEngine
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -32,18 +33,32 @@ def main() -> None:
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
 
-    tokenizer = Tokenizer(open_files()[1])
-    result = tokenizer.tokenize_documents(open_files()[0])
-    assert result, "Result is None"
+    documents = open_files()[0]
+    doc = documents[0]
+    stopwords = open_files()[1]
 
-    tokenizer = Tokenizer(open_files()[0])
-    tok_document = tokenizer.tokenize_documents(open_files()[0])
-    vectorizer = Vectorizer(tok_document)
+    tokenizer = Tokenizer(stopwords)
+    tokenized_doc = tokenizer.tokenize(doc)
+    tokenized_docs = tokenizer.tokenize_documents(documents)
+
+    vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()
-    secret_vector = tuple(float(item) for item in text.split(', '))
-    print(vectorizer.vector2tokens(secret_vector))
-    basic_search = BasicSearchEngine(vectorizer, tokenizer)
-    print(basic_search.retrieve_vectorized(secret_vector))
+
+    query_vector = vectorizer.vectorize(tokenized_doc)
+    doc_dist = []
+    for doc in tokenized_docs:
+        doc_vector = vectorizer.vectorize(doc)
+        dist = calculate_distance(query_vector, doc_vector)
+        doc_dist.append(dist)
+
+    knn_retriever = BasicSearchEngine(vectorizer, tokenizer)
+    knn_retriever.index_documents(documents)
+    result = knn_retriever.retrieve_relevant_documents("Нижний Новгород", 1)
+    assert result, "Result is None"
+    print(vectorizer.vector2tokens(query_vector))
+    print(knn_retriever.retrieve_vectorized(query_vector))
+    print(result)
+
 
 if __name__ == "__main__":
     main()

@@ -39,6 +39,8 @@ def main() -> None:
 
     if not isinstance(tokenized_docs, list):
         result = None
+    if not isinstance(tokenized_docs, list):
+        return None
     vectorizer = Vectorizer(tokenized_docs)
     docs_vector = [vectorizer.vectorize(tokens) for tokens in tokenized_docs]
 

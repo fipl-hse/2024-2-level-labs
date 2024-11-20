@@ -621,34 +621,31 @@ class Node(NodeLike):
         Returns:
             bool: True if Node was loaded successfully, False in other cases.
         """
-        if not isinstance(state, dict) or "vector" not in state or "payload" not in state\
-                or "left_node" not in state or "right_node" not in state:
+        if not isinstance(state, dict) or 'vector' not in state or 'payload' not in state:
             return False
-        if isinstance(state["vector"], dict):
-            vector = load_vector(state["vector"])
-            if not isinstance(vector, tuple):
-                return False
-            self.vector = vector
+        if not isinstance(state['vector'], dict) or \
+                not isinstance(state['payload'], int) or isinstance(state['payload'], bool):
+            return False
+        vector = load_vector(state["vector"])
+        if not isinstance(vector, tuple) or not vector:
+            return False
+        self.vector = vector
         payload = state["payload"]
-        if not isinstance(payload, int):
-            return False
         self.payload = payload
         left_node = Node()
         right_node = Node()
-        if state["left_node"] is not None:
-            if isinstance(state["left_node"], dict):
-                if not left_node.load(state["left_node"]):
-                    return False
-            self.left_node = left_node
-        else:
+        if state['left_node'] is None:
             self.left_node = None
-        if state["right_node"] is not None:
-            if isinstance(state["right_node"], dict):
-                if not right_node.load(state["right_node"]):
-                    return False
-            self.right_node = right_node
+        elif not isinstance(state['left_node'], dict):
+            return False
         else:
+            self.left_node = left_node
+        if state['right_node'] is None:
             self.right_node = None
+        elif not isinstance(state['right_node'], dict):
+            return False
+        else:
+            self.right_node = right_node
         return True
 
 

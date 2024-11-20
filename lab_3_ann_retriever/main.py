@@ -341,6 +341,7 @@ class BasicSearchEngine:
     """
     Engine based on KNN algorithm.
     """
+
     _vectorizer: Vectorizer
     _tokenizer: Tokenizer
     _documents: list[str]
@@ -570,6 +571,7 @@ class Node(NodeLike):
     """
     Interface definition for Node for KDTree.
     """
+
     vector: Vector
     payload: int
     left_node: NodeLike | None
@@ -679,18 +681,15 @@ class NaiveKDTree:
         if not isinstance(vectors, list) or not vectors:
             return False
 
-        states_info: list[dict] = [{
+        states_info = [{}]
+        states_info = [{
                            'vectors': [(vector, index) for index, vector in enumerate(vectors)],
                            'depth': 0,
                            'parent': Node(tuple([0.0] * len(vectors[0])), -1),
                            'is_left': True
                        }]
         while states_info:
-            current_vectors = states_info[0]['vectors']
-            depth = states_info[0]['depth']
-            parent = states_info[0]['parent']
-            is_left = states_info[0]['is_left']
-            states_info.pop(0)
+            current_vectors, depth, parent, is_left = states_info.pop(0).values()
             if current_vectors:
                 axis = depth % len(current_vectors[0])
                 current_vectors.sort(key=lambda vector: vector[0][axis])
@@ -859,6 +858,7 @@ class SearchEngine(BasicSearchEngine):
     """
     Retriever based on KDTree algorithm.
     """
+
     _tree: NaiveKDTree
 
     def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:

@@ -664,17 +664,16 @@ class NaiveKDTree:
         info_list = [{"vectors": ind_vecs, "depth": 0, "parent_node": Node(), "is_left": True}]
         while len(info_list) > 0:
             current_space = info_list.pop(0)
-            if not isinstance(current_space, dict):
-                return False
-            if len(current_space["vectors"]) == 0:
+            current_vectors: list = current_space["vectors"]
+            if len(current_vectors) == 0:
                 continue
             axis = current_space["depth"] % len(vectors[0])
-            current_space["vectors"].sort(key=lambda a: a[1][axis])
-            median_index = len(current_space["vectors"]) // 2
-            median_ind_vec = current_space["vectors"][median_index]
+            current_vectors.sort(key=lambda a: a[1][axis])
+            median_index = len(current_vectors) // 2
+            median_ind_vec = current_vectors[median_index]
             node_to_assign = Node(median_ind_vec[1], median_ind_vec[0])
-            vectors_value_left = current_space["vectors"][:median_index]
-            vectors_value_right = current_space["vectors"][median_index + 1:]
+            vectors_value_left = current_vectors[:median_index]
+            vectors_value_right = current_vectors[median_index + 1:]
             depth_value = current_space["depth"] + 1
             if current_space["parent_node"].payload == -1:
                 self._root = node_to_assign

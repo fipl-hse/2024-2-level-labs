@@ -555,6 +555,7 @@ class NaiveKDTree:
             return False
         if len(vectors) == 0:
             return False
+        vectors_copy = vectors[:]
         start = [(vectors,0,Node(),True)]
         while start:
             used_vectors = start[0][0]
@@ -566,7 +567,7 @@ class NaiveKDTree:
             axis = depth % len(used_vectors[0])
             used_vectors.sort(key=lambda x:x[axis])
             median_index = len(used_vectors) // 2
-            new_node = Node(used_vectors[median_index],median_index)
+            new_node = Node(used_vectors[median_index],vectors_copy.index(used_vectors[median_index]))
 
             if parent.payload == -1:
                 self._root = new_node

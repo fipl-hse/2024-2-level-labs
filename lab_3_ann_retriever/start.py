@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vectorizer
+from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -33,16 +33,20 @@ def main() -> None:
     #with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         #text = text_file.read()
     documents, stopwords = open_files()
+    query = 'Нижний Новгород'
     tokenize = Tokenizer(stopwords)
-    vectorize = Vectorizer(tokenize.tokenize_documents(documents))
+    corpus = tokenize.tokenize_documents(documents)
+    if not isinstance(corpus, list):
+        return None
+    vectorize = Vectorizer(corpus)
     vectorize.build()
     knn_retriever = BasicSearchEngine(vectorize, tokenize)
     knn_retriever.index_documents(documents)
-    vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
-    print(vector)
-    token_vector = vectorize.vector2tokens(vector)
-    print(token_vector)
-    result = knn_retriever.retrieve_vectorized(vector)
+    basic_search = knn_retriever.retrieve_relevant_documents(query, 3)
+    print(basic_search)
+    naive_kd_tree_retriever = SearchEngine(vectorize, tokenize)
+    naive_kd_tree_retriever.index_documents(documents)
+    result = naive_kd_tree_retriever.retrieve_relevant_documents(query, 1)
     print(result)
     assert result, "Result is None"
 

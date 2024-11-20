@@ -222,6 +222,7 @@ class Vectorizer:
 
         if self._idf_values:
             return True
+        return False
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -666,7 +667,6 @@ class NaiveKDTree:
 
         while pairs:
             node, depth = pairs.pop(0)
-
 
         return None
 

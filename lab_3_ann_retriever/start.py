@@ -66,6 +66,7 @@ def main() -> None:
     secret_revealed = searchengine.retrieve_vectorized(secret_vector)
     print(secret_revealed)
 
+    searchengine_pro = SearchEngine(vectorizer, tokenizer)
 
     result = '???'
     assert result, "Result is None"

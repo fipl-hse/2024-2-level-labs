@@ -100,7 +100,6 @@ class Tokenizer:
     """
     Tokenizer with removing stop words.
     """
-
     _stop_words: list[str]
 
     def __init__(self, stop_words: list[str]) -> None:
@@ -179,7 +178,6 @@ class Vectorizer:
     """
     TF-IDF Vectorizer.
     """
-
     _corpus: list[list[str]]
     _idf_values: dict[str, float]
     _vocabulary: list[str]
@@ -336,7 +334,7 @@ class Vectorizer:
         tf = calculate_tf(self._vocabulary, document)
         if not isinstance(tf, dict):
             return None
-        vector_to_fill = [0] * len(self._vocabulary)
+        vector_to_fill = [0.0] * len(self._vocabulary)
         for word in tf:
             if word in self._token2ind:
                 vec_ind = self._token2ind[word]
@@ -350,7 +348,6 @@ class BasicSearchEngine:
     """
     Engine based on KNN algorithm.
     """
-
     _vectorizer: Vectorizer
     _tokenizer: Tokenizer
     _documents: list[str]
@@ -663,7 +660,6 @@ class NaiveKDTree:
     """
     NaiveKDTree.
     """
-
     _root: NodeLike | None
 
     def __init__(self) -> None:
@@ -691,12 +687,11 @@ class NaiveKDTree:
             indexed_vecs.append((ind, vec))
         info_list = [{"vectors": indexed_vecs, "depth": 0,
                       "parent_node": Node(), "is_left": True}]
-        dimensions = len(vectors[0])
         while len(info_list) > 0:
             current_space = info_list.pop(0)
             if len(current_space["vectors"]) == 0:
                 continue
-            axis = current_space["depth"] % dimensions
+            axis = current_space["depth"] % len(vectors[0])
             current_space["vectors"].sort(key=lambda a: a[1][axis])
             median_index = len(current_space["vectors"]) // 2
             median_ind_vec = current_space["vectors"][median_index]
@@ -821,7 +816,6 @@ class KDTree(NaiveKDTree):
     """
     KDTree.
     """
-
     def _find_closest(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
         Get k nearest neighbours for vector by filling best list.
@@ -885,7 +879,6 @@ class SearchEngine(BasicSearchEngine):
     """
     Retriever based on KDTree algorithm.
     """
-
     _tree: NaiveKDTree
 
     def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:
@@ -1016,7 +1009,6 @@ class AdvancedSearchEngine(SearchEngine):
     """
     Retriever based on KDTree algorithm.
     """
-
     _tree: KDTree
 
     def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:

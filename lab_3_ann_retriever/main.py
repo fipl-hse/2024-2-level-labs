@@ -662,7 +662,7 @@ class NaiveKDTree:
                 and self._root is not None and isinstance(self._root, Node)):
             return None
         nearest_neighbors = []
-        nodes: list[tuple[Node, int]] = [(self._root, 0)]
+        nodes = [(self._root, 0)]
         while nodes:
             node = nodes.pop(0)
             current_node, depth = node

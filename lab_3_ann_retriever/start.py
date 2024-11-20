@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 from pathlib import Path
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from lab_3_ann_retriever.main import (BasicSearchEngine, KDTree, NaiveKDTree, SearchEngine, Tokenizer,
+from lab_3_ann_retriever.main import (BasicSearchEngine, NaiveKDTree, SearchEngine, Tokenizer,
                                       Vectorizer)
 
 

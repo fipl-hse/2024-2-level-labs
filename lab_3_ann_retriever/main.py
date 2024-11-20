@@ -216,7 +216,10 @@ class Vectorizer:
 
         self._vocabulary = sorted(set(token for doc in self._corpus for token in doc))
         self._token2ind = {token: index for index, token in enumerate(self._vocabulary)}
-        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if idf_values is None:
+            return False
+        self._idf_values = idf_values
 
         if self._idf_values is None:
             return False
@@ -591,7 +594,6 @@ class NaiveKDTree:
 
         space_state = [{'vectors': [(vector, ind) for ind, vector in enumerate(vectors)],
                         'depth': 0, 'parent node': Node((), -1), 'left dimension': True}]
-        dimensions = len(vectors[0])
 
         while space_state:
             current_vectors = space_state[0]['vectors']
@@ -601,11 +603,13 @@ class NaiveKDTree:
 
             if not current_vectors:
                 continue
-
-            axis = depth % dimensions
+            if depth is None or isinstance(depth, int):
+                return False
+            axis = depth % len(vectors[0])
             sorted_vectors = sorted(current_vectors, key=lambda vector: vector[axis])
             median_index = len(sorted_vectors) // 2
-            median_node = Node(vector=sorted_vectors[median_index], payload=vectors.index(sorted_vectors[median_index]))
+            median_node = Node(vector=sorted_vectors[median_index],
+                               payload=vectors.index(sorted_vectors[median_index]))
 
             if parent_node.payload == -1:
                 self._root = median_node

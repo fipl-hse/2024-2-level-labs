@@ -4,6 +4,7 @@ Lab 3.
 Vector search with text retrieving
 """
 
+# pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from math import sqrt
 from typing import Protocol
 
@@ -327,14 +328,9 @@ class Vectorizer:
 
         tf_idf_vector = []
         for word in self._vocabulary:
-            if word in self._vocabulary:
-                if word in document:
-                    tf_value = tf_mapping.get(word)
-                    idf_value = self._idf_values.get(word)
-                    tf_idf_value = tf_value * idf_value
-                else:
-                    tf_idf_value = 0.0
-                tf_idf_vector.append(tf_idf_value)
+            tf_value = tf_mapping.get(word, 0.0)
+            idf_value = self._idf_values.get(word, 0.0)
+            tf_idf_vector.append(tf_value * idf_value)
         if tf_idf_vector is None:
             return None
 

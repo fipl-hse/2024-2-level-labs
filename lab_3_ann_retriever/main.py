@@ -332,9 +332,7 @@ class BasicSearchEngine:
                 all(isinstance(word, str) for word in documents):
             return False
         self._documents = documents
-        self._document_vectors = [self._index_document(document) for document in documents
-                                  if self._index_document is not None
-                                  and isinstance(self._index_document(document),tuple)]
+        self._document_vectors = [vector for doc in documents if (vector := self._index_document(doc))]
         if not self._documents or not self._document_vectors:
             return False
         return True
@@ -433,9 +431,8 @@ class BasicSearchEngine:
             return None
         if not isinstance(n_neighbours, int):
             return None
-        knn_list = [(document_vectors.index(vector), calculate_distance(query_vector, vector))
-                    for vector in document_vectors if
-                    calculate_distance(query_vector,vector) is not None]
+        knn_list = [(document_vectors.index(vector),distance) for vector in document_vectors
+                    if (distance := calculate_distance(query_vector,vector)) is not None]
         knn_list.sort(key=lambda x: x[-1])
         if not knn_list:
             return None
@@ -725,8 +722,8 @@ class SearchEngine(BasicSearchEngine):
                 or not documents:
             return False
         self._documents = documents
-        self._document_vectors = [self._index_document(document) for document in documents
-                                  if self._index_document(document) is not None]
+        self._document_vectors = [vector for document in documents
+                                  if (vector := self._index_document(document)) is not None]
         self._tree.build(self._document_vectors)
         if not self._documents or not self._document_vectors:
             return False

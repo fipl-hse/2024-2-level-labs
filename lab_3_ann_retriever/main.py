@@ -59,9 +59,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         return None
     if not query_vector or not document_vector:
         return 0.0
-    distance = math.sqrt(sum((query_vector[index] - document_vector[index])**2
+    return math.sqrt(sum((query_vector[index] - document_vector[index])**2
                          for index in range(len(document_vector))))
-    return distance
 
 
 def save_vector(vector: Vector) -> dict:
@@ -79,9 +78,8 @@ def save_vector(vector: Vector) -> dict:
         if value == 0.0:
             continue
         index_value[index] = value
-    result = {"len": len(vector),
+    return {"len": len(vector),
               "elements": index_value}
-    return result
 
 
 def load_vector(state: dict) -> Vector | None:
@@ -142,8 +140,7 @@ class Tokenizer:
         for elem in text:
             if not elem.isalpha() and elem != ' ':
                 text = text.replace(elem, ' ')
-        clear_tokens = self._remove_stop_words(text.lower().split())
-        return clear_tokens
+        return self._remove_stop_words(text.lower().split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -208,7 +205,6 @@ class Vectorizer:
         self._vocabulary = []
         self._idf_values = {}
         self._token2ind = {}
-        self.build()
 
     def build(self) -> bool:
         """
@@ -333,6 +329,8 @@ class Vectorizer:
         if (not isinstance(document, list) or len(document) == 0
                 or not all(isinstance(word, str) for word in document)):
             return None
+        if not self._vocabulary:
+            return ()
         tf = calculate_tf(self._vocabulary, document)
         if not isinstance(tf, dict):
             return None

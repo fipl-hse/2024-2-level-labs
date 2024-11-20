@@ -7,6 +7,11 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
+from pyspelling.filters.python import tokenizer
+
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
+import math
+
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
@@ -49,6 +54,14 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+
+    if not query_vector or not document_vector:
+        return None
+
+    euc_dist = 0.0
+    for index, value in enumerate(query_vector):
+        euc_dist += (value - document_vector[index]) ** 2
+    return euc_dist ** 0.5
 
 
 def save_vector(vector: Vector) -> dict:
@@ -105,11 +118,13 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+
         if not text or not isinstance(text, str):
             return None
 
         tokens = ''.join([symb for symb in text if symb.isalpha() or symb == " "]).split()
-        return Tokenizer._remove_stop_words(self, tokens)
+        return self._remove_stop_words(tokens)
+
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -123,14 +138,16 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+
         if not documents or not isinstance(documents, list) \
             or not all(isinstance(doc, str) for doc in documents):
             return None
 
         tok_documents = []
         for doc in documents:
-            tok_documents.append(Tokenizer.tokenize(self, doc))
+            tok_documents.append(self.tokenize(doc))
         return tok_documents
+
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -144,11 +161,13 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+
         if not tokens or not isinstance(tokens, list) \
             or not all(isinstance(token, str) for token in tokens):
             return None
 
         return [token for token in tokens if token not in self._stop_words]
+
 
 class Vectorizer:
     """
@@ -167,6 +186,10 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
+        self._corpus = corpus
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
 
     def build(self) -> bool:
         """
@@ -175,6 +198,23 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+
+        result = set()
+        for doc in self._corpus:
+            result |= set(doc)
+        self._vocabulary.extend(list(result))
+        self._vocabulary.sort()
+        for token in self._vocabulary:
+            self._token2ind[token] = self._vocabulary.index(token)
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+
+        if not self._idf_values or not self._vocabulary or not self._token2ind \
+                or not all(token for token in self._vocabulary) \
+                or calculate_idf(self._vocabulary, self._corpus) is None:
+            return False
+        else:
+            return True
+
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -189,6 +229,13 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
 
+        if not tokenized_document or not isinstance(tokenized_document, list) \
+            or not all(isinstance(tok, str) for tok in tokenized_document):
+            return None
+
+        return self._calculate_tf_idf(tokenized_document)
+
+
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
         Recreate a tokenized document based on a vector.
@@ -201,6 +248,15 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+
+        if not vector:
+            return None
+
+        tokens = []
+        for word in self._vocabulary:
+            if vector[self._token2ind[word]] != 0.0:
+                tokens.append(word)
+        return tokens.sort()
 
     def save(self, file_path: str) -> bool:
         """
@@ -239,6 +295,18 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
 
+        if not document or not isinstance(document, list) \
+            or not all(isinstance(tok, str) for tok in document):
+            return None
+
+        vector = list(0.0 for _ in range(len(self._vocabulary)))
+        for token in document:
+            if self._token2ind.get(token) is not None:
+                tf = calculate_tf(self._vocabulary, document)
+                if tf is not None:
+                    vector[self._token2ind[token]] = tf[token] * self._idf_values[token]
+        return Vector(vector)
+
 
 class BasicSearchEngine:
     """
@@ -259,6 +327,11 @@ class BasicSearchEngine:
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
 
+        self._tokenizer = tokenizer
+        self._vectorizer = vectorizer
+        self._documents = []
+        self._document_vectors = []
+
     def index_documents(self, documents: list[str]) -> bool:
         """
         Index documents for engine.
@@ -271,6 +344,16 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
+
+        if not documents or not isinstance(documents, list) \
+            or not all(isinstance(doc, str) for doc in documents):
+            return False
+
+        self._documents = documents
+        for doc in documents:
+            self._document_vectors.append(self._index_document(doc))
+        if self._document_vectors is not None:
+            return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -287,6 +370,14 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+
+        if not query or not isinstance(query, str) \
+            or not n_neighbours or not isinstance(n_neighbours, int):
+            return None
+
+        tok_vec_query = self._index_document(query)
+        rel_documents = self._calculate_knn(tok_vec_query, self._document_vectors, n_neighbours)
+        return [(index, self._documents[text]) for text, index in rel_documents]
 
     def save(self, file_path: str) -> bool:
         """
@@ -323,6 +414,13 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
 
+        if not query_vector:
+            return None
+
+        rel_doc = self._calculate_knn(query_vector, self._document_vectors, 1)
+        return self._documents[rel_doc[0][0]]
+
+
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
@@ -340,6 +438,18 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
 
+        if not query_vector or not document_vectors or not n_neighbours:
+            return None
+        if not isinstance(document_vectors, list) \
+            or not isinstance(n_neighbours, int):
+            return None
+
+        ind_knn_neighbours = []
+        for index, value in enumerate(document_vectors):
+            distance = calculate_distance(query_vector, value)
+            ind_knn_neighbours.append((index, distance))
+        return ind_knn_neighbours.sort(key = lambda x: x[1])[:n_neighbours-1]
+
     def _index_document(self, document: str) -> Vector | None:
         """
         Index document.
@@ -352,6 +462,13 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+
+        if not document or not isinstance(document, str):
+            return None
+
+        tok_doc = self._tokenizer.tokenize(document)
+        return self._vectorizer.vectorize(tok_doc)
+
 
     def _dump_documents(self) -> dict:
         """

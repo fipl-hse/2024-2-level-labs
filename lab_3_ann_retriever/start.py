@@ -37,7 +37,7 @@ def main() -> None:
     tokenize = Tokenizer(stopwords)
     corpus = tokenize.tokenize_documents(documents)
     if not isinstance(corpus, list):
-        return None
+        return
     vectorize = Vectorizer(corpus)
     vectorize.build()
     knn_retriever = BasicSearchEngine(vectorize, tokenize)

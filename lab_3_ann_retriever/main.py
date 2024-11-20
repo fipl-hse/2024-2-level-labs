@@ -129,9 +129,7 @@ class Tokenizer:
                 continue
             text = text.replace(symbol, " ")
 
-        processed_text = self._remove_stop_words(text.lower().split())
-
-        return processed_text
+        return self._remove_stop_words(text.lower().split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -463,8 +461,6 @@ class BasicSearchEngine:
                 return None
             distances.append((document_vectors.index(doc_vector), distance))
         distances_sorted = sorted(distances, key=lambda x: x[1])
-        if distances_sorted is None or not isinstance(distances_sorted, list):
-            return None
 
         return distances_sorted[:n_neighbours]
 

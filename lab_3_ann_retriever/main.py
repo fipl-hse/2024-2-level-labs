@@ -7,6 +7,11 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 from math import sqrt
+
+from docutils.parsers.rst.directives import nonnegative_int
+from pyspelling.filters.python import tokenizer
+from sphinx.cmd.quickstart import nonempty
+
 Vector = tuple[float, ...]
 from lab_2_retrieval_w_bm25.main import calculate_idf
 
@@ -138,7 +143,7 @@ class Tokenizer:
         doc = []
         for text in documents:
             processed_text = self.tokenize(text)
-            if processed_text == None:
+            if processed_text is None:
                 return None
             doc.append(processed_text)
         return doc
@@ -575,6 +580,7 @@ class NaiveKDTree:
         """
         self._root = None
 
+
     def build(self, vectors: list[Vector]) -> bool:
         """
         Build tree.
@@ -590,6 +596,8 @@ class NaiveKDTree:
         if not isinstance(vectors, list) or not vectors:
             return False
 
+        ind = 0
+
         vect_inf = {
             'pos': [(vect, ind) for vect, ind in enumerate(vectors)],
             'depth': 0,
@@ -597,8 +605,36 @@ class NaiveKDTree:
             'Left': True
         }
 
+        while vect_inf:
+            cur_vect = vect_inf[0]['pos']
+            depth = vect_inf[0]['depth']
+            ancestor = vect_inf[0]['ancestor']
+            left = vect_inf[0]['Left']
 
+            cur_vect.pop(0)
 
+            if cur_vect:
+                axis = depth % len(cur_vect[0])
+                cur_vect.sort(key=lambda x: x[0][axis])
+                med_ind = len(cur_vect) // 2
+                ind += 1
+
+                med_node = Node(cur_vect[med_ind][0], cur_vect[med_ind][1])
+                if ancestor.payload != -1 and left:
+                    ancestor.left_node = med_node
+                elif ancestor.payload == -1:
+                    self._root = med_node
+                else:
+                    ancestor.right_node = med_node
+
+                cur_vect[ind] = {
+                    'pos': cur_vect[med_ind + 1:],
+                    'depth': depth + 1,
+                    'ancestor': med_node,
+                    'Left': True
+                }
+
+        return True
 
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
@@ -614,6 +650,11 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(vector, tuple) or not isinstance(k, int):
+            return None
+
+        return self._find_closest(vector, k)
+
 
     def save(self) -> dict | None:
         """
@@ -636,6 +677,7 @@ class NaiveKDTree:
             bool: True is loaded successfully, False in other cases
         """
 
+
     def _find_closest(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
         Get k nearest neighbours for vector by filling best list.
@@ -649,7 +691,27 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(vector, tuple) or not isinstance(k, int):
+            return None
 
+        space = [self._root, 0]
+        while space:
+            node, depth = space.pop(0)
+            if node is None:
+                return None
+            if node.right_node is None and node.left_node is None:
+                dist = calculate_distance(vector, node.vector)
+                return [(dist, node.payload)] if dist is None else None
+
+            axis = depth % len(node.vector)
+            upd_depth = depth + 1
+
+            if vector[axis] <= node.vector[axis]:
+                space.append((node.left_node, upd_depth))
+            else:
+                space.append((node.right_node, upd_depth))
+
+        return None
 
 
 class KDTree(NaiveKDTree):
@@ -687,6 +749,9 @@ class SearchEngine(BasicSearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        self._tree = NaiveKDTree()
+        BasicSearchEngine.__init__(self, vectorizer = vectorizer, tokenizer = tokenizer)
+
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -700,6 +765,14 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(documents, list) or not all(isinstance(item, str) for item in documents) or not documents:
+            return False
+
+        if super().index_documents(documents) is False:
+            return False
+
+        return self._tree.build(self._document_vectors)
+
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -716,6 +789,21 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not isinstance(n_neighbours, int) or not query:
+            return None
+
+        pre_query = self._index_document(query)
+
+        if pre_query is None:
+            return None
+
+        res = self._tree.query(pre_query)
+
+        if res is None or not res:
+            return None
+
+        return [(dist, self._documents[doc]) for dist, doc in res]
+
 
     def save(self, file_path: str) -> bool:
         """

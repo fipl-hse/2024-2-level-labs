@@ -7,7 +7,9 @@ from pathlib import Path
 
 from pyspelling.filters.python import tokenizer
 
-from lab_3_ann_retriever.main import BasicSearchEngine, Vectorizer, Tokenizer
+from lab_3_ann_retriever.main import BasicSearchEngine, Vectorizer, Tokenizer, SearchEngine
+from seminars.practice_5_functions import return_hello_world
+
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -36,6 +38,7 @@ def main() -> None:
     result = None
 
     documents, stopwords = open_files()
+    query = 'Нижний Новгород'
     tokenize = Tokenizer(stopwords)
 
     vectorize = Vectorizer(tokenize.tokenize_documents(documents))
@@ -43,17 +46,29 @@ def main() -> None:
 
     knn = BasicSearchEngine(vectorize, tokenize)
     knn.index_documents(documents)
+    res1 = knn.retrieve_relevant_documents(query, 1)
+    print(res1)
 
 
 
-    vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
-    print(vector)
+    # vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
+    #
+    # pre_vect = vectorize.vector2tokens(vector)
+    # print(pre_vect)
+    #
+    # res = knn.retrieve_vectorized(vector)
+    # print(result)
+    # knn1 = SearchEngine(vectorize, tokenize)
+    # knn1.index_documents(documents)
+    # result = knn1.retrieve_vectorized(vector)
+    # print(result)
 
-    pre_vect = vectorize.vector2tokens(vector)
-    print(pre_vect)
+    better_engine = SearchEngine(vectorize, tokenize)
+    better_engine.index_documents(documents)
+    res2 = better_engine.retrieve_relevant_documents(query, 1)
+    print(res2)
 
-    result = knn.retrieve_vectorized(vector)
-    print(result)
+    res2 = result
 
 
     assert result, "Result is None"

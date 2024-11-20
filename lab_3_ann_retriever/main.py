@@ -624,25 +624,28 @@ class Node(NodeLike):
         if not isinstance(state, dict) or "vector" not in state or "payload" not in state\
                 or "left_node" not in state or "right_node" not in state:
             return False
-        vector = load_vector(state["vector"] if isinstance(state["vector"], dict) else False)
-        if not isinstance(vector, tuple):
-            return False
-        self.vector = vector
+        if isinstance(state["vector"], dict):
+            vector = load_vector(state["vector"])
+            if not isinstance(vector, tuple):
+                return False
+            self.vector = vector
         payload = state["payload"]
         if not isinstance(payload, int):
             return False
         self.payload = payload
         left_node = Node()
         right_node = Node()
-        if state["left_node"] is not None or isinstance(state["left_node"], dict):
-            if not left_node.load(state["left_node"]):
-                return False
+        if state["left_node"] is not None:
+            if isinstance(state["left_node"], dict):
+                if not left_node.load(state["left_node"]):
+                    return False
             self.left_node = left_node
         else:
             self.left_node = None
-        if state["right_node"] is not None or isinstance(state["right_node"], dict):
-            if not right_node.load(state["right_node"]):
-                return False
+        if state["right_node"] is not None:
+            if isinstance(state["right_node"], dict):
+                if not right_node.load(state["right_node"]):
+                    return False
             self.right_node = right_node
         else:
             self.right_node = None

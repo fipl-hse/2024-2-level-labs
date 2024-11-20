@@ -526,6 +526,10 @@ class Node(NodeLike):
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+        self.vector = vector
+        self.left_node = left_node
+        self.right_node = right_node
+        self.payload = payload
 
     def save(self) -> dict:
         """
@@ -558,6 +562,7 @@ class NaiveKDTree:
         """
         Initialize an instance of the KDTree class.
         """
+        self._root = None
 
     def build(self, vectors: list[Vector]) -> bool:
         """
@@ -571,6 +576,40 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not vectors or not isinstance(vectors, list):
+            return False
+
+        depth = 0
+        states_of_space = [(vectors, depth, Node(), True)]
+
+        while states_of_space:
+            space_vector, depth, parent_node, left_node = states_of_space.pop()
+            if not space_vector:
+                continue
+
+            dimensions = len(vectors[0])
+            axis = depth % dimensions
+            depth += 1
+            sorted_vectors = sorted(space_vector, key=lambda vector: vector[axis])
+            median_index = len(sorted_vectors) // 2
+            median_dot = sorted_vectors[median_index]
+            new_space_node = Node(median_dot, vectors.index(median_dot))
+
+            if parent_node.payload == -1:
+                self._root = new_space_node
+            else:
+                if left_node:
+                    parent_node.left_node = new_space_node
+                else:
+                    parent_node.right_node = new_space_node
+
+            left_vectors = sorted_vectors[:median_index]
+            right_vectors = sorted_vectors[median_index + 1:]
+
+            states_of_space.append((left_vectors, depth, new_space_node, True))
+            states_of_space.append((right_vectors, depth, new_space_node, False))
+
+        return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
@@ -620,6 +659,16 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not vector or not isinstance(vector, tuple) or not isinstance(k, int):
+            return None
+
+        pairs = [(self._root, 0)]
+
+        while pairs:
+            node, depth = pairs.pop(0)
+
+
+        return None
 
 
 class KDTree(NaiveKDTree):

@@ -416,7 +416,8 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
         if (not isinstance(query_vector, tuple) or
-                any(len(document_vector) != len(query_vector) for document_vector in self._document_vectors)):
+                any(len(document_vector) != len(query_vector)
+                    for document_vector in self._document_vectors)):
             return None
         knn = self._calculate_knn(query_vector, self._document_vectors, 1)
         if not knn or any(index is None for index, distance in knn):
@@ -647,6 +648,7 @@ class SearchEngine(BasicSearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        BasicSearchEngine.__init__(self, vectorizer, tokenizer)
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -715,3 +717,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        SearchEngine.__init__(self, vectorizer, tokenizer)

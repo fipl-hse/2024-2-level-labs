@@ -463,6 +463,9 @@ class BasicSearchEngine:
                 return None
             distances.append((document_vectors.index(doc_vector), distance))
         distances_sorted = sorted(distances, key=lambda x: x[1])
+        if distances_sorted is None or not isinstance(distances_sorted, list):
+            return None
+
         return distances_sorted[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:

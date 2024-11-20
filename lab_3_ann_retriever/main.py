@@ -639,6 +639,7 @@ class Node(NodeLike):
         elif not isinstance(state['left_node'], dict):
             return False
         else:
+            left_node.load(state["left_node"])
             self.left_node = left_node
         if state['right_node'] is None:
             self.right_node = None

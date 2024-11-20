@@ -608,8 +608,7 @@ class Node(NodeLike):
         if not (isinstance(state, dict) and "vector" in state and "payload" in state and
                 "left_node" in state and "right_node" in state):
             return False
-        if not (isinstance(state["vector"], dict) and isinstance(state["payload"], int) and
-                isinstance(state["left_node"], dict) and isinstance(state["right_node"], dict)):
+        if not (isinstance(state["vector"], dict) and isinstance(state["payload"], int)):
             return False
         normal_vector = load_vector(state["vector"])
         if not isinstance(normal_vector, tuple):

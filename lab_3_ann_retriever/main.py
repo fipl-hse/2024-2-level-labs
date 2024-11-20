@@ -688,7 +688,6 @@ class NaiveKDTree:
             return None
 
         pairs = [(self._root, 0)]
-        result = []
         while pairs:
             node, depth = pairs.pop(0)
             if node is None or not isinstance(node.payload, int):

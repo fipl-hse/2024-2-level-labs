@@ -70,8 +70,8 @@ def save_vector(vector: Vector) -> dict:
     Returns:
         dict: A state of the vector to save
     """
-    no_null_vec = {ind: value for ind, value in enumerate(vector) if value != 0.0}
-    return {"len": len(vector),"elements": no_null_vec}
+    return {"len": len(vector),
+            "elements": {ind: value for ind, value in enumerate(vector) if value != 0.0}}
 
 
 def load_vector(state: dict) -> Vector | None:
@@ -128,9 +128,9 @@ class Tokenizer:
                 continue
             text = text.replace(symbol, " ")
         no_stops_text = self._remove_stop_words(text.lower().split())
-        if isinstance(no_stops_text, list):
-            return no_stops_text
-        return None
+        if not isinstance(no_stops_text, list):
+            return None
+        return no_stops_text
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -299,12 +299,12 @@ class Vectorizer:
         vocab = objects["vocabulary"]
         idfs = objects["idf_values"]
         token2ind = objects["token2ind"]
-        if isinstance(vocab, list) and isinstance(idfs, dict) and isinstance(token2ind, dict):
-            self._idf_values = idfs
-            self._vocabulary = vocab
-            self._token2ind = token2ind
-            return True
-        return False
+        if not isinstance(vocab, list) and isinstance(idfs, dict) and isinstance(token2ind, dict):
+            return False
+        self._idf_values = idfs
+        self._vocabulary = vocab
+        self._token2ind = token2ind
+        return True
 
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
         """
@@ -607,6 +607,9 @@ class Node(NodeLike):
         """
         if not (isinstance(state, dict) and "vector" in state and "payload" in state and
                 "left_node" in state and "right_node" in state):
+            return False
+        if not (isinstance(state["vector"], dict) and isinstance(state["payload"], int) and
+                isinstance(state["left_node"], dict) and isinstance(state["right_node"], dict)):
             return False
         normal_vector = load_vector(state["vector"])
         if not isinstance(normal_vector, tuple):

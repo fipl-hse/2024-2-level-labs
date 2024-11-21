@@ -487,8 +487,11 @@ class BasicSearchEngine:
             return None
 
         tokenized_document = self._tokenizer.tokenize(document)
+        if tokenized_document is None:
+            return None
         vectorized_document = self._vectorizer.vectorize(tokenized_document)
-
+        if vectorized_document is None:
+            return None
         return vectorized_document
 
     def _dump_documents(self) -> dict:

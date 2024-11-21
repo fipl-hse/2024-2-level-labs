@@ -386,6 +386,8 @@ class BasicSearchEngine:
             return None
         result = []
         vector_query = self._index_document(query)
+        if vector_query is None:
+            return None
         search_result = self._calculate_knn(vector_query,
         self._document_vectors, n_neighbours)
         if search_result is None or len(search_result) == 0:
@@ -461,6 +463,8 @@ class BasicSearchEngine:
             if not isinstance(doc, tuple) or len(doc) == 0:
                 return None
             distance = calculate_distance(query_vector, doc)
+            if distance is None:
+                return None
             docs.append((int(ind), distance))
         return sorted(docs, key= lambda x:x[1])[:n_neighbours]
 

@@ -139,6 +139,7 @@ class Tokenizer:
             return None
         if token not in self._stop_words:
             return(token for token in tokens)
+
 class Vectorizer:
     """
     TF-IDF Vectorizer.

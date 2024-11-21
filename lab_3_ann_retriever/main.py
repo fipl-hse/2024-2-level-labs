@@ -135,10 +135,10 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or not tokens:
+        if (not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens)
+                or not tokens):
             return None
-        if token not in self._stop_words:
-            return(token for token in tokens)
+        return [token for token in tokens if token not in self._stop_words]
 
 class Vectorizer:
     """

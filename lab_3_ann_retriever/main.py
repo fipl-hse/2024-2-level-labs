@@ -591,9 +591,9 @@ class NaiveKDTree:
             if not vectors:
                 return False
 
-            axis: int = int(depth % len(vectors[0]))
+            axis: int = depth % len(vectors[0])
             vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
-            median_index = len(vectors) // 2
+            median_index: int = len(vectors) // 2
             median_node = Node(tuple(vectors[median_index][0]), int(vectors[median_index][1]))
 
             if parent_node.payload == -1:
@@ -692,15 +692,15 @@ class NaiveKDTree:
             axis = depth % len(vector)
 
             if vector[axis] < node.vector[axis]:
-                nodes.append((Node(node.left_node), depth + 1))
+                nodes.append((node.left_node, depth + 1))
                 if len(neighbours_list) < k or abs(vector[axis] -
                                                    node.vector[axis]) < neighbours_list[-1][0]:
-                    nodes.append((Node(node.right_node), depth + 1))
+                    nodes.append((node.right_node, depth + 1))
             else:
-                nodes.append((Node(node.right_node), depth + 1))
+                nodes.append((node.right_node, depth + 1))
                 if len(neighbours_list) < k or abs(vector[axis] -
                                                    node.vector[axis]) < neighbours_list[-1][0]:
-                    nodes.append((Node(node.left_node), depth + 1))
+                    nodes.append((node.left_node, depth + 1))
         return neighbours_list
 
 

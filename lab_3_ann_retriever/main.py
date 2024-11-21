@@ -201,7 +201,6 @@ class Vectorizer:
         self._idf_values = {}
         self._vocabulary = []
         self._token2ind = {}
-        self.build()
 
     def build(self) -> bool:
         """

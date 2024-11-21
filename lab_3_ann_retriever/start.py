@@ -33,8 +33,7 @@ def main() -> None:
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
 
-    documents = open_files()[0]
-    stopwords = open_files()[1]
+    documents, stopwords = open_files()
 
     tokenizer = Tokenizer(stopwords)
     tokenized_docs = tokenizer.tokenize_documents(documents)

@@ -358,7 +358,10 @@ class BasicSearchEngine:
                 or not documents:
             return False
 
-        self._document_vectors = [self._index_document(doc) for doc in documents]
+        document_vectors = [self._index_document(doc) for doc in documents]
+        if document_vectors is None:
+            return False
+        self._document_vectors = document_vectors
         self._documents = documents
 
         if self._document_vectors and None not in self._document_vectors:

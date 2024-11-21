@@ -816,5 +816,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        SearchEngine.__init__(self, vectorizer, tokenizer)
         self._tree = KDTree()
-        super().init(vectorizer, tokenizer)

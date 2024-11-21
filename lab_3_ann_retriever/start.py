@@ -51,24 +51,19 @@ def main() -> None:
 
 
 
-    # vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
-    #
-    # pre_vect = vectorize.vector2tokens(vector)
-    # print(pre_vect)
-    #
-    # res = knn.retrieve_vectorized(vector)
-    # print(result)
-    # knn1 = SearchEngine(vectorize, tokenize)
-    # knn1.index_documents(documents)
-    # result = knn1.retrieve_vectorized(vector)
-    # print(result)
+    vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
 
-    better_engine = SearchEngine(vectorize, tokenize)
-    better_engine.index_documents(documents)
-    res2 = better_engine.retrieve_relevant_documents(query, 1)
-    print(res2)
+    pre_vect = vectorize.vector2tokens(vector)
+    print(pre_vect)
 
-    res2 = result
+    res = knn.retrieve_vectorized(vector)
+    print(res)
+
+    search = SearchEngine(vectorize, tokenize)
+    search.index_documents(documents)
+    search_res = search.retrieve_relevant_documents(query)
+    result = search_res
+    print(result)
 
 
     assert result, "Result is None"

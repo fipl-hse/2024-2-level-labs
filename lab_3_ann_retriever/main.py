@@ -8,9 +8,7 @@ Vector search with text retrieving
 from typing import Protocol
 from math import sqrt
 
-from docutils.parsers.rst.directives import nonnegative_int
-from pyspelling.filters.python import tokenizer
-from sphinx.cmd.quickstart import nonempty
+
 
 Vector = tuple[float, ...]
 from lab_2_retrieval_w_bm25.main import calculate_idf
@@ -23,7 +21,6 @@ class NodeLike(Protocol):
     def save(self) -> dict:
         """
         Save Node instance to state.
-
         Returns:
             dict: State of the Node instance
         """
@@ -606,73 +603,50 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
-        # if not isinstance(vectors, list) or not vectors or len(vectors) == 0:
-        #     return False
-        #
-        # # ind = 0
-        #
-        # vect_inf = [{
-        #     'pos': [(vect, ind) for vect, ind in enumerate(vectors)],
-        #     'depth': 0,
-        #     'ancestor': Node(tuple([0.0] * len(vectors[0])), -1),
-        #     'Left': True
-        # }]
-        #
-        # while vect_inf:
-        #     state = vect_inf.pop(0)
-        #     cur_vect = state['pos']
-        #     depth = state['depth']
-        #     ancestor = state['ancestor']
-        #     left = state['Left']
-        #
-        #     if cur_vect:
-        #         axis = depth % len(cur_vect[0])
-        #         cur_vect.sort(key=lambda x: x[0][axis])
-        #         med_ind = len(cur_vect) // 2
-        #         med_node = Node(cur_vect[med_ind][0], cur_vect[med_ind][1])
-        #
-        #         if ancestor.payload != -1 and left:
-        #             ancestor.left_node = med_node
-        #         elif ancestor.payload == -1:
-        #             self._root = med_node
-        #         else:
-        #             ancestor.right_node = med_node  # Добавляем информацию о левой части
-        #         if med_ind > 0:
-        #             states_info.append({
-        #                 'pos': cur_vect[:med_ind],
-        #                 'depth': depth + 1,
-        #                 'ancestor': med_node,
-        #                 'is_left': True}
-        #
-        #
-        #         med_node = Node(cur_vect[med_ind][0], cur_vect[med_ind][1])
-        #         if ancestor.payload != -1 and left:
-        #             ancestor.left_node = med_node
-        #         elif ancestor.payload == -1:
-        #             self._root = med_node
-        #         else:
-        #             ancestor.right_node = med_node
-        #
-        #         cur_vect[ind] = {
-        #             'pos': cur_vect[med_ind + 1:],
-        #             'depth': depth + 1,
-        #             'ancestor': med_node,
-        #             'Left': True
-        #         }
-        #
-        # # return True
+        if not isinstance(vectors, list) or not vectors:
+            return False
+        inf = [{
+            'cur': [(vector, index) for index, vector in enumerate(vectors)],
+            'depth': 0,
+            'ancestor': Node(tuple([0.0] * len(vectors[0])), -1),
+            'left': True
+                }]
 
+        while inf:
+            cur_vect = inf[0]['cur']
+            depth = inf[0]['depth']
+            parent = inf[0]['ancestor']
+            is_left = inf[0]['left']
+            inf.pop(0)
+            if cur_vect:
+                axis = depth % len(cur_vect[0])
+                cur_vect.sort(key=lambda vector: vector[0][axis])
+                median_index = len(cur_vect) // 2
+                median_node = Node(cur_vect[median_index][0],
+                                   cur_vect[median_index][1])
 
+                if parent.payload != -1 and is_left:
+                    parent.left_node = median_node
+                elif parent.payload == -1:
+                    self._root = median_node
+                else:
+                    parent.right_node = median_node
 
-
-
-
-
-
-
-
-
-
+                inf.append(
+                    {
+                    'cur': cur_vect[:median_index],
+                    'depth': depth + 1,
+                    'ancestor': median_node,
+                    'left': True
+                    })
+                inf.append(
+                    {
+                    'cur': cur_vect[median_index + 1:],
+                    'depth': depth + 1,
+                    'ancestor': median_node,
+                    'left': False
+                    })
+        return True
 
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
@@ -729,26 +703,24 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(vector, tuple) or not isinstance(k, int):
+        if not isinstance(vector, tuple) or not isinstance(k, int) or not vector:
             return None
 
-        space = [self._root, 0]
-        while space:
-            node, depth = space.pop(0)
+        spaces = []
+        spaces.append((self._root, 0))
+        while spaces:
+            node, depth = spaces.pop(0)
             if node is None:
                 return None
-            if node.right_node is None and node.left_node is None:
-                dist = calculate_distance(vector, node.vector)
-                return [(dist, node.payload)] if dist is None else None
-
+            if node.left_node is None and node.right_node is None:
+                distance = calculate_distance(vector, node.vector)
+                return [(distance, node.payload)] if distance is not None else None
             axis = depth % len(node.vector)
-            upd_depth = depth + 1
-
+            new_depth = depth + 1
             if vector[axis] <= node.vector[axis]:
-                space.append((node.left_node, upd_depth))
+                spaces.append((node.left_node, new_depth))
             else:
-                space.append((node.right_node, upd_depth))
-
+                spaces.append((node.right_node, new_depth))
         return None
 
 
@@ -827,7 +799,7 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query, str) or not isinstance(n_neighbours, int) or not query:
+        if not isinstance(query, str) or not isinstance(n_neighbours, int):
             return None
 
         pre_query = self._index_document(query)
@@ -837,10 +809,14 @@ class SearchEngine(BasicSearchEngine):
 
         res = self._tree.query(pre_query)
 
-        if res is None or not res:
+        if res is None or not res or not all(isinstance(dist, float) or isinstance(ind, int) for dist, ind in res):
             return None
 
-        return [(dist, self._documents[doc]) for dist, doc in res]
+        result = []
+        for dist, doc in res:
+            result.append((dist, self._documents[doc]))
+
+        return result[:n_neighbours]
 
 
     def save(self, file_path: str) -> bool:

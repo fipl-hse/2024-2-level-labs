@@ -52,17 +52,10 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
-    bad_input = (query_vector is None or document_vector is None or
-                 not isinstance(query_vector, tuple) or not isinstance(document_vector, tuple)
-                 or not all(isinstance(value, float) for value in query_vector)
-                 or not all(isinstance(value, float) for value in document_vector)
-                 or len(query_vector) != len(document_vector) or len(query_vector) == 0
-                 or len(document_vector) == 0 or not query_vector or not document_vector)
-    if bad_input:
+    if query_vector is None or document_vector is None:
         return None
     if not query_vector or not document_vector:
         return 0.0
-
     return sqrt(sum((query_value - doc_value) ** 2
                     for query_value, doc_value in zip(query_vector, document_vector)))
 
@@ -383,6 +376,28 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (isinstance(query, str) and isinstance(n_neighbours, int)):
+            return None
+
+        tokenized_query = self._tokenizer.tokenize(query)
+        if tokenized_query is None:
+            return None
+
+        query_vector = self._vectorizer.vectorize(tokenized_query)
+        if query_vector is None:
+            return None
+
+        nearest_neighbours = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
+        if not nearest_neighbours or any(neighbour is None or neighbour[0] is None or neighbour[1]
+                                         is None for neighbour in nearest_neighbours):
+            return None
+
+        relevant_documents = []
+        for document_index, document_distance in nearest_neighbours:
+            text = self._documents[document_index]
+            relevant_documents.append((document_distance, text))
+
+        return relevant_documents
 
     def save(self, file_path: str) -> bool:
         """
@@ -794,15 +809,18 @@ class SearchEngine(BasicSearchEngine):
         query_vector = self._vectorizer.vectorize(tokenized_query)
         if query_vector is None:
             return None
-        nearest_neighbors = self._tree.query(query_vector, n_neighbours)
-        if nearest_neighbors is None:
+        nearest_neighbours = self._tree.query(query_vector)
+        if not nearest_neighbours:
             return None
         relevant_documents = []
 
-        for score, index in nearest_neighbors:
-            if index is None or index < len(self._documents):
+        for score, index in nearest_neighbours:
+            if index is None or index < len(self._documents) or not isinstance(index, int):
                 return None
             relevant_documents.append((score, self._documents[index]))
+
+        if not isinstance(relevant_documents, list) or relevant_documents == []:
+            return None
 
         return relevant_documents
 

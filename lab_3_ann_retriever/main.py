@@ -215,14 +215,15 @@ class Vectorizer:
 
         if not self._vocabulary:
             return False
-        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if self._idf_values is None:
+        idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if idf_values is None:
             return False
+        self._idf_values = idf_values
 
         for word in self._vocabulary:
             self._token2ind[word] = self._vocabulary.index(word)
 
-        if (self._idf_values and self._token2ind
+        if (self._token2ind
                 and None not in self._idf_values and None not in self._token2ind):
             return True
         return False

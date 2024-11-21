@@ -92,7 +92,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
-        self._stop_words = stop_words
+        self.stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -137,11 +137,8 @@ class Tokenizer:
         """
         if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or not tokens:
             return None
-        for word in tokens:
-            if word in self._stop_words:
-                tokens.remove(word)
-        return tokens
-
+        if token not in self._stop_words:
+            return(token for token in tokens)
 class Vectorizer:
     """
     TF-IDF Vectorizer.

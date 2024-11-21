@@ -444,19 +444,6 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
 
-        '''if not query_vector or not document_vectors or not n_neighbours:
-            return None
-        if not isinstance(document_vectors, list) \
-            or not isinstance(n_neighbours, int):
-            return None
-
-        knn_neighbours = []
-        for index, doc in enumerate(document_vectors):
-            distance = calculate_distance(query_vector, doc)
-            if not doc or not distance:
-                return None
-            knn_neighbours.append((index, distance))
-        return sorted(knn_neighbours, key=lambda x: x[1])[:n_neighbours]'''
         if not isinstance(query_vector, (list, tuple)) or not query_vector \
                 or not isinstance(document_vectors, list) or not document_vectors \
                 or not isinstance(n_neighbours, int) or n_neighbours <= 0:

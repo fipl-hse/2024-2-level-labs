@@ -625,6 +625,9 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not vector or not isinstance(k, int):
+            return None
+        return self._find_closest(vector, k)
 
     def save(self) -> dict | None:
         """
@@ -664,9 +667,25 @@ class NaiveKDTree:
             return None
 
         pairs = [(self._root, 0)]
-
         while pairs:
             node, depth = pairs.pop(0)
+            if node is None or not isinstance(node.payload, int):
+                return None
+
+            if node.left_node is None and node.right_node is None:
+                distance = calculate_distance(vector, node.vector)
+                if distance is None:
+                    return None
+                else:
+                    return [(distance, node.payload)]
+
+            axis = depth % len(vector)
+            if vector[axis] < node.vector[axis]:
+                if node.left_node is not None:
+                    pairs.append((node.left_node, depth + 1))
+            else:
+                if node.right_node is not None:
+                    pairs.append((node.right_node, depth + 1))
 
         return None
 
@@ -706,6 +725,8 @@ class SearchEngine(BasicSearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        BasicSearchEngine.__init__(self, vectorizer, tokenizer)
+        self._tree = NaiveKDTree()
 
     def index_documents(self, documents: list[str]) -> bool:
         """
@@ -719,6 +740,13 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
+        if (not documents or not isinstance(documents, list) or
+                not all(isinstance(elem, str) for elem in documents)):
+            return False
+
+        if super().index_documents(documents) is False:
+            return False
+        return self._tree.build(self._document_vectors)
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -735,6 +763,8 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not isinstance(n_neighbours, int):
+            return None
 
     def save(self, file_path: str) -> bool:
         """

@@ -135,11 +135,9 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokens, list) or not tokens:
+        if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or not tokens:
             return None
         for word in tokens:
-            if not isinstance(word, str):
-                return None
             if word in self._stop_words:
                 tokens.remove(word)
         return tokens

@@ -36,7 +36,7 @@ def main() -> None:
         text = text_file.read()
     documents, stopwords = open_files()
     tokenizer = Tokenizer(stopwords)
-    tokenized_docs = tokenizer.tokenize_documents(documents)[:50]
+    tokenized_docs = tokenizer.tokenize_documents(documents)
     if not tokenized_docs:
         return
     vectorizer = Vectorizer(tokenized_docs)

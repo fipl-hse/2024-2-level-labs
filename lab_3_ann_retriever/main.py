@@ -56,7 +56,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     if len(query_vector) == 0 or len(document_vector) == 0:
         return 0.0
     distance = 0.0
-    for coord in range(len(document_vector)):
+    for coord, value in enumerate(document_vector):
         distance += (query_vector[coord] - document_vector[coord]) ** 2
     return distance ** 0.5
 
@@ -117,7 +117,8 @@ class Tokenizer:
         if not isinstance(text, str) or not isinstance(self, Tokenizer):
             return None
         return self._remove_stop_words(
-            ''.join([letter for letter in text.lower() if letter == ' ' or letter.isalpha()]).split()
+            ''.join([letter for letter in text.lower()
+                     if letter == ' ' or letter.isalpha()]).split()
         )
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
@@ -592,8 +593,14 @@ class NaiveKDTree:
                 dimension_info_copy[2].left_node = new_node
             else:
                 dimension_info_copy[2].right_node = new_node
-            dimension_info.extend([(dimension_vectors[:median_index], dimension_info_copy[1] + 1, new_node, True),
-                                  (dimension_vectors[median_index + 1:], dimension_info_copy[1] + 1, new_node, False)])
+            dimension_info.extend([(dimension_vectors[:median_index],
+                                    dimension_info_copy[1] + 1,
+                                    new_node,
+                                    True),
+                                  (dimension_vectors[median_index + 1:],
+                                   dimension_info_copy[1] + 1,
+                                   new_node,
+                                   False)])
         return True
 
 
@@ -802,3 +809,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        ...

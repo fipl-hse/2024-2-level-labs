@@ -53,8 +53,8 @@ def main() -> None:
     query = 'Нижний Новгород'
     engine = SearchEngine(vectorizer, tokenizer)
     engine.index_documents(documents)
-    nearest_engine = engine.retrieve_relevant_documents(query, 1)
-    print(nearest_engine)
+    result = engine.retrieve_relevant_documents(query, 1)
+    print(result)
 
     assert result, "Result is None"
 

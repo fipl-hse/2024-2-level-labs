@@ -431,7 +431,6 @@ class BasicSearchEngine:
             return None
         return self._documents[document_number[0][0]]
 
-
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
@@ -456,7 +455,10 @@ class BasicSearchEngine:
         list_of_values = []
         for index, document_vector in enumerate(document_vectors):
             distance = calculate_distance(query_vector, document_vector)
-            list_of_values.append((index, distance))
+            if distance is not None:
+                list_of_values.append((index, distance))
+        if not list_of_values:
+            return None
         sorted_tuples = sorted(list_of_values, key=lambda number: number[1])
         return sorted_tuples[:n_neighbours]
 

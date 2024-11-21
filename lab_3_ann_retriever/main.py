@@ -236,6 +236,11 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(tokenized_document, list) or len(tokenized_document) == 0:
+            return None
+        if len(self._vocabulary) == 0:
+            return None
+
         return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
@@ -297,14 +302,17 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(document, list) or not document:
+        if not isinstance(document, list) or len(document) == 0:
             return None
 
-        vector = [0.0] * len(self._vocabulary)
-        tf = calculate_tf(self._vocabulary, document)
+        vector = [0.0 for elem in self._vocabulary]
+        text_tf = calculate_tf(self._vocabulary, document)
 
-        for i, word in enumerate(self._vocabulary):
-            vector[i] = tf[word] * self._idf_values[word]
+        if text_tf is None or len(text_tf) == 0:
+            return None
+
+        for token, ind in self._token2ind.items():
+            vector[ind] = text_tf[token] * self._idf_values[token]
 
         return tuple(vector)
 

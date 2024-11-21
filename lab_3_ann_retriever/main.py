@@ -279,20 +279,22 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if (not isinstance(document, list) or not document or
-                not all(isinstance(token, str) for token in document)):
-            return None
-        if self._idf_values is None or not isinstance(self._idf_values, dict):
+        if not (isinstance(document, list) and isinstance(self._vocabulary, list) and
+                isinstance(self._token2ind, dict)):
             return None
 
-        vector = []
         tf = calculate_tf(self._vocabulary, document)
-        for token in self._vocabulary:
-            if token not in document:
-                vector.append(0.0)
-                continue
-            vector.append(tf[token] * self._idf_values[token])
-        return Vector(vector)
+        if not isinstance(tf, dict):
+            return None
+
+        vector_to_fill = [0.0] * len(self._vocabulary)
+        for word in tf:
+            if word in self._token2ind:
+                vec_ind = self._token2ind[word]
+                if not isinstance(vec_ind, int):
+                    return None
+                vector_to_fill[vec_ind] = tf[word] * self._idf_values[word]
+        return Vector(vector_to_fill)
 
 
 class BasicSearchEngine:
@@ -597,7 +599,8 @@ class NaiveKDTree:
                 axis = depth % len(current_vectors[0])
                 current_vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
                 median_index = len(current_vectors) // 2
-                median_node = Node(current_vectors[median_index][0], current_vectors[median_index][1])
+                median_node = Node(current_vectors[median_index][0],
+                                   current_vectors[median_index][1])
 
                 if parent_node.payload == -1:
                     self._root = median_node

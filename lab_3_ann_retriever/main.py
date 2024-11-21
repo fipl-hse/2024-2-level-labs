@@ -106,6 +106,13 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+        tokenized_list = []
+        for token in text.lower():
+            if token.isalpha():
+                tokenized_list.append(token)
+        return tokenized_list
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """

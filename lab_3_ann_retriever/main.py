@@ -53,9 +53,9 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     """
     if (not isinstance(query_vector, tuple) or not isinstance(document_vector, tuple)):
         return None
-    if len(query_vector) == 0 or len(document_vector) == 0:
-        return 0.0
     distance = 0.0
+    if len(query_vector) == 0 or len(document_vector) == 0:
+        return distance
     for coord, value in enumerate(document_vector):
         distance += (query_vector[coord] - value) ** 2
     if not isinstance(distance, float):
@@ -255,9 +255,10 @@ class Vectorizer:
         tokens2ind_new = dict((v, k) for k, v in self._token2ind.items())
         for ind, coord in enumerate(vector):
             if coord != 0.0:
-                if tokens2ind_new.get(ind) is None:
+                token_current = tokens2ind_new.get(ind)
+                if token_current is None:
                     return None
-                tokens.append(tokens2ind_new.get(ind))
+                tokens.append(token_current)
         return tokens
     def save(self, file_path: str) -> bool:
         """

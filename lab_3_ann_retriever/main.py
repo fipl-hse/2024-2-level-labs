@@ -330,10 +330,6 @@ class Vectorizer:
         return tuple(list_zero_vector)
 
 
-
-
-
-
 class BasicSearchEngine:
     """
     Engine based on KNN algorithm.
@@ -453,8 +449,7 @@ class BasicSearchEngine:
         retrieve_doc = self._calculate_knn(query_vector, self._document_vectors, 1)
         if not isinstance(retrieve_doc, list) or not retrieve_doc:
             return None
-        index = retrieve_doc[0][0]
-        doc = self._documents[index]
+        doc = self._documents[retrieve_doc[0][0]]
         return doc
 
     def _calculate_knn(
@@ -607,21 +602,12 @@ class NaiveKDTree:
         i_vectors = []
         for i, vector in enumerate(vectors):
             i_vectors.append((vector, i))
-        space = [[i_vectors,
-                 0,
-                 Node((), -1),
-                 True]]
+        space = [(i_vectors, 0, Node((), -1), True)]
         while space:
-            ind_vectors = space[0][0]
-            depth = space[0][1]
-            root = space[0][2]
-            side_left = space[0][3]
-            space.pop(0)
-            if not isinstance(depth, int) or not isinstance(ind_vectors, list):
-                return False
+            ind_vectors, depth, root, side_left = space.pop(0)
             if ind_vectors:
                 axis = depth % len(ind_vectors[0])
-                ind_vectors.sort(key=lambda x: x[0][axis])
+                ind_vectors.sort(key = lambda x: x[0][axis])
                 median_index = len(ind_vectors) // 2
                 median = Node(ind_vectors[median_index][0], ind_vectors[median_index][1])
                 if root.payload == -1:
@@ -630,14 +616,14 @@ class NaiveKDTree:
                     root.left_node = median
                 else:
                     root.right_node = median
-                space.append([ind_vectors[:median_index],
+                space.append((ind_vectors[:median_index],
                               depth + 1,
                               median,
-                              True])
-                space.append([ind_vectors[median_index + 1:],
+                              True))
+                space.append((ind_vectors[median_index + 1:],
                               depth + 1,
                               median,
-                              False])
+                              False))
         return True
 
 
@@ -753,7 +739,7 @@ class SearchEngine(BasicSearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
-        BasicSearchEngine.__init__(self, vectorizer, tokenizer)
+        super().__init__(vectorizer, tokenizer)
         self._tree = NaiveKDTree()
 
     def index_documents(self, documents: list[str]) -> bool:

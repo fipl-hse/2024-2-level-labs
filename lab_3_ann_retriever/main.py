@@ -774,7 +774,8 @@ class SearchEngine(BasicSearchEngine):
         result = self._tree.query(query_vector)
 
         if (not result or result is None or
-                not all(isinstance(distance, float) or isinstance(index, int) for distance, index in result)):
+                not all(isinstance(distance, float)
+                        or isinstance(index, int) for distance, index in result)):
             return None
         return [(distance, self._documents[document]) for distance, document in result]
 

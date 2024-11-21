@@ -577,7 +577,7 @@ class NaiveKDTree:
             return False
 
         space_condition: list[dict] = [{
-            "vectors": [(index, vector) for index, vector in list(list(enumerate(vectors)))],
+            "vectors": [(index, vector) for index, vector in zip(enumerate(vectors))],
             "depth": 0,
             "parent_node": Node((0.0,) * len(vectors[0]), -1),
             "is_left_subspace": True}]
@@ -848,3 +848,4 @@ class AdvancedSearchEngine(SearchEngine):
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
         super().__init__(vectorizer, tokenizer)
+        self._tree = KDTree()

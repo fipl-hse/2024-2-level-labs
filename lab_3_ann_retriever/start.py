@@ -36,7 +36,7 @@ def main() -> None:
     tokenized_docs = tokenizer.tokenize_documents(documents)
     if (not tokenized_docs or
             not isinstance(tokenized_docs, list)):
-        return None
+        return
 
     vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()

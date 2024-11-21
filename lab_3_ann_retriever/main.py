@@ -9,7 +9,6 @@ from typing import Protocol
 
 from lab_2_retrieval_w_bm25.main import build_vocabulary, calculate_idf, calculate_tf
 
-
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
@@ -572,7 +571,7 @@ class NaiveKDTree:
             return False
 
         space_condition: list[dict] = [{
-            "vectors": [(index, vector) for index, vector in enumerate(vectors)],
+            "vectors": [(index, vector) for index, vector in list(enumerate(vectors))],
             "depth": 0,
             "parent_node": Node((0.0,) * len(vectors[0]), -1),
             "is_left_subspace": True}]
@@ -586,7 +585,7 @@ class NaiveKDTree:
             if not vectors:
                 return False
 
-            axis = depth % len(vectors[0])
+            axis: float = depth % len(vectors[0])
             vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
             median_index = len(vectors) // 2
             median_node = Node(vectors[median_index][0], vectors[median_index][1])

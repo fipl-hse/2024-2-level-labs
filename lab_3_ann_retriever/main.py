@@ -52,6 +52,19 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
+    if not query_vector or query_vector is None or not document_vector or document_vector is None:
+        return None
+    if not all(isinstance(item, float) for item in query_vector)\
+        or not all(isinstance(item, float) for item in document_vector):
+        return None
+
+    distance = 0.0
+    for i, value in enumerate(document_vector):
+        distance += (query_vector[i] - value) ** 2
+
+    if not isinstance(distance, float):
+        return None
+    return distance
 
 def save_vector(vector: Vector) -> dict:
     """
@@ -192,14 +205,13 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        vocab = set()
-
-        if not isinstance(self._corpus, list):
+        if not self._corpus or not isinstance(self._corpus, list):
             return False
+        vocab = set()
 
         for doc in self._corpus:
             vocab |= set(doc)
-        self._vocabulary = sorted(vocab)
+        self._vocabulary = sorted(list(vocab))
         if not self._vocabulary:
             return False
 
@@ -242,6 +254,16 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if len(vector) != len(self._vocabulary):
+            return None
+
+        text = []
+
+        for word in self._vocabulary:
+            if vector[self._token2ind[word]] != 0:
+                text.append(word)
+
+        return text
 
     def save(self, file_path: str) -> bool:
         """

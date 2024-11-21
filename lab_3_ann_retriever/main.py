@@ -7,6 +7,7 @@ import json
 from math import sqrt
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
+
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
@@ -120,7 +121,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
-        self._stop_words = stop_words.copy()
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -167,7 +168,7 @@ class Tokenizer:
             if not item:
                 return None
             out.append(self.tokenize(item))
-        return out
+        return self._remove_stop_words(out)
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """

@@ -60,7 +60,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         distance += (query_vector[coord] - value) ** 2
     if not isinstance(distance, float):
         return None
-    return distance ** 0.5
+    return float(distance ** 0.5)
 
 def save_vector(vector: Vector) -> dict:
     """
@@ -355,11 +355,13 @@ class BasicSearchEngine:
             vector = self._index_document(text)
             if vector is None or len(vector) == 0:
                 return False
+        docs_to_append = []
         for text in documents:
             doc_vector = self._index_document(text)
             if doc_vector is None:
-                return None
-        self._document_vectors = [self._index_document(text) for text in documents]
+                return False
+            docs_to_append.append(doc_vector)
+        self._document_vectors = docs_to_append
         if self._documents == [] or self._document_vectors == []:
             return False
         return True

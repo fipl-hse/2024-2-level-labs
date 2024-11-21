@@ -681,6 +681,8 @@ class NaiveKDTree:
         while True:
             data_copy = data.pop(0)
             current_node = data_copy[0]
+            if not isinstance(data_copy[1], int):
+                return None
             current_depth = int(data_copy[1])
             distance = calculate_distance(vector, current_node.vector)
             if distance is None:
@@ -697,7 +699,7 @@ class NaiveKDTree:
             elif data_copy[0].right_node is None:
                 data.append([data_copy[0].left_node, current_depth + 1])
             else:
-                data.append([data_copy[0].right_node,current_depth + 1])
+                data.append([data_copy[0].right_node, current_depth + 1])
         return sorted(neighbours)[:k]
 class KDTree(NaiveKDTree):
     """

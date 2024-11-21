@@ -216,6 +216,8 @@ class Vectorizer:
         if not self._vocabulary:
             return False
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if self._idf_values is None:
+            return False
 
         for word in self._vocabulary:
             self._token2ind[word] = self._vocabulary.index(word)

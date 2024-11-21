@@ -425,6 +425,8 @@ class BasicSearchEngine:
             return None
         out = []
         for rng in rng_am:
+            if None in rng:
+                return None
             out.append((rng[1], self._documents[rng[0]]))
         return out
 

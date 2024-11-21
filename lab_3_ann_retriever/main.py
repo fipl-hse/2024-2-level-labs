@@ -806,7 +806,6 @@ class SearchEngine(BasicSearchEngine):
 
         return relevant_documents
 
-
     def save(self, file_path: str) -> bool:
         """
         Save the SearchEngine instance to a file.

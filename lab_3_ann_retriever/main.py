@@ -386,7 +386,8 @@ class BasicSearchEngine:
             return None
 
         self.index_documents(self._documents)
-        knn_list_of_tuples = self._calculate_knn(query_vectorized, self._document_vectors, n_neighbours)
+        knn_list_of_tuples = self._calculate_knn(query_vectorized,
+                                                 self._document_vectors, n_neighbours)
         if knn_list_of_tuples is None or not knn_list_of_tuples:
             return None
 
@@ -695,8 +696,7 @@ class NaiveKDTree:
                 distance = calculate_distance(vector, node.vector)
                 if distance is None:
                     return None
-                else:
-                    return [(distance, node.payload)]
+                return [(distance, node.payload)]
 
             axis = depth % len(vector)
             if vector[axis] < node.vector[axis]:
@@ -838,3 +838,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        self._tree = KDTree()
+        super().__init__(vectorizer, tokenizer)

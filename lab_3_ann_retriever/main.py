@@ -211,7 +211,7 @@ class Vectorizer:
         if not self._vocabulary:
             return False
 
-        self._idf_values = dict(calculate_idf(self._vocabulary, self._corpus))
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
         if not self._idf_values:
             return False
 
@@ -299,7 +299,7 @@ class Vectorizer:
         vector = [0.0] * len(self._vocabulary)
         tf = calculate_tf(self._vocabulary, document)
 
-        for i, word in enumerate(dict(self._vocabulary)):
+        for i, word in enumerate(self._vocabulary):
             vector[i] = tf[word] * self._idf_values[word]
 
         return tuple(vector)
@@ -347,8 +347,7 @@ class BasicSearchEngine:
         self._documents = documents
         self._document_vectors = [self._index_document(doc) for doc in documents]
 
-        if self._document_vectors and None not in self._document_vectors \
-                and not all(isinstance(vector, tuple) for vector in self._document_vectors):
+        if self._document_vectors and None not in self._document_vectors:
             return True
         return False
 

@@ -23,7 +23,7 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return documents, stopwords
+    return (documents, stopwords)
 
 
 def main() -> None:
@@ -32,24 +32,29 @@ def main() -> None:
     """
     with open("assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    stopwords = open_files()[1]
-    documents = open_files()[0]
+    documents, stopwords = open_files()
+
     tokenizer = Tokenizer(stopwords)
     tokenized_docs = tokenizer.tokenize_documents(documents)
     if not tokenized_docs:
         return
     vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()
-    secret_vector = tuple(float(value) for value in text.split(", "))
+
     basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
     basic_search_engine.index_documents(documents)
-    print(f"Secret 5 is unraveled! {basic_search_engine.retrieve_vectorized(secret_vector)}")
     print(f"Results by BasicSearchEngine: "
           f"{basic_search_engine.retrieve_relevant_documents('Нижний Новгород', 3)}")
+
+    # secret_vector = tuple(float(value) for value in text.split(", "))
+    # print(f"Secret 5 is unraveled! {basic_search_engine.retrieve_vectorized(secret_vector)}")
+
     search_engine = SearchEngine(vectorizer, tokenizer)
     search_engine.index_documents(documents)
-    result = search_engine.retrieve_relevant_documents("Нижний Новгород", 1)
-    print(f"Results by SearchEngine: {result}")
+    print(f"Results by SearchEngine: {search_engine.retrieve_relevant_documents("Нижний Новгород", 1)}")
+
+    result =
+    print()
     assert result, "Result is None"
 
 

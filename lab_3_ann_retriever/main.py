@@ -309,7 +309,7 @@ class Vectorizer:
                 or not all(isinstance(elem, str) for elem in document)
                 or not document):
             return None
-        vector_with_nulls = [0 for i in self._vocabulary]
+        vector_with_nulls = [0.0 for _ in self._vocabulary]
         tf = calculate_tf(self._vocabulary, document)
         idf = self._idf_values
         for index, word in enumerate(self._vocabulary):

@@ -364,18 +364,21 @@ class BasicSearchEngine:
             return None
 
         tokenized_query = self._tokenizer.tokenize(query)
+        if tokenized_query is None:
+            return None
         vectorized_query = self._vectorizer.vectorize(tokenized_query)
+        if vectorized_query is None:
+            return None
         nearest_neighbours = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
-        relevant_documents = []
-
-        if not tokenized_query or not vectorized_query or not nearest_neighbours:
+        if not nearest_neighbours or any(neighbour is None or neighbour[0] is None or neighbour[1]
+                                         is None for neighbour in nearest_neighbours):
             return None
 
+        relevant_documents = []
         for nearest_neighbour in nearest_neighbours:
-            document_index = nearest_neighbour[0]
-            document_distance = nearest_neighbour[1]
-            text = self._documents[document_index]
-            relevant_documents.append((document_distance, text))
+            if None in nearest_neighbour:
+                return None
+            relevant_documents.append((nearest_neighbour[1], self._documents[nearest_neighbour[0]]))
         return relevant_documents
 
     def save(self, file_path: str) -> bool:
@@ -412,10 +415,13 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not is_valid_vector(query_vector):
+        if not isinstance(query_vector, (list, tuple)) or not all(
+                isinstance(val, (int, float)) for val in query_vector):
             return None
 
         nearest_neighbors = self._calculate_knn(query_vector, self._document_vectors, 1)
+        if nearest_neighbors is None or not nearest_neighbors:
+            return None
         return self._documents[nearest_neighbors[0][0]]
 
     def _calculate_knn(
@@ -434,11 +440,13 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if (not is_valid_vector(query_vector) or
-                not isinstance(document_vectors, list) or
-                not all(is_valid_vector(doc_vec) for doc_vec in document_vectors) or
-                not isinstance(n_neighbours, int) or
-                n_neighbours <= 0):
+        bad_input = (not isinstance(query_vector, (list, tuple)) or
+                     not query_vector or
+                     not isinstance(document_vectors, list) or
+                     not document_vectors or
+                     not isinstance(n_neighbours, int) or
+                     n_neighbours <= 0)
+        if bad_input:
             return None
 
         neighbours = []
@@ -448,7 +456,7 @@ class BasicSearchEngine:
                 return None
             neighbours.append((document_vectors.index(document_vector), document_distance))
 
-        neighbours = sorted(neighbours, key=lambda tuple_: tuple_[1])
+        neighbours.sort(key=lambda tuple_: tuple_[1])
         return neighbours[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
@@ -467,7 +475,12 @@ class BasicSearchEngine:
             return None
 
         tokenized_document = self._tokenizer.tokenize(document)
-        return self._vectorizer.vectorize(tokenized_document)
+        if tokenized_document is None or not tokenized_document:
+            return None
+        vectorized_document = self._vectorizer.vectorize(tokenized_document)
+        if vectorized_document is None:
+            return None
+        return vectorized_document
 
     def _dump_documents(self) -> dict:
         """
@@ -493,28 +506,26 @@ class Node(NodeLike):
     """
     Interface definition for Node for KDTree.
     """
-
     vector: Vector
     payload: int
     left_node: NodeLike | None
     right_node: NodeLike | None
-
     def __init__(
-            self,
-            vector: Vector = (),
-            payload: int = -1,
-            left_node: NodeLike | None = None,
-            right_node: NodeLike | None = None,
+        self,
+        vector: Vector = (),
+        payload: int = -1,
+        left_node: NodeLike | None = None,
+        right_node: NodeLike | None = None,
     ) -> None:
         """
         Initialize an instance of the Node class.
-
         Args:
             vector (Vector): Current vector node
             payload (int): Index of current vector
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+
         self.vector = vector
         self.payload = payload
         self.left_node = left_node
@@ -565,7 +576,7 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not isinstance(vectors, list) or not all(is_valid_vector(vec) for vec in vectors):
+        if not vectors or not all(isinstance(vec, tuple) and len(vec) > 0 for vec in vectors):
             return False
 
         space_condition: list[dict] = [{
@@ -626,12 +637,9 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
-        if (not is_valid_vector(vector) or
-                len(vector) == 0 or not isinstance(k, int) or
-                k <= 0):
+        if not (isinstance(vector, tuple) and isinstance(k, int)):
             return None
-        nearest_neighbors = self._find_closest(vector, k)
-        return nearest_neighbors
+        return self._find_closest(vector, k)
 
     def save(self) -> dict | None:
         """
@@ -667,8 +675,8 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
-        if (not is_valid_vector(vector) or
-                not isinstance(k, int)):
+        if not (isinstance(vector, tuple) and isinstance(k, int) and vector
+                and self._root is not None and isinstance(self._root, Node)):
             return None
 
         neighbours_list = []

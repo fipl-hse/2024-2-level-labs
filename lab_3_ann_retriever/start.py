@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from main import Tokenizer
+from main import BasicSearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -35,7 +35,14 @@ def main() -> None:
     documents, stop_words = open_files()
     tokenizer = Tokenizer(stop_words)
     preprocessed_documents = tokenizer.tokenize_documents(documents)
-    result = preprocessed_documents
+    vectorizer = Vectorizer(preprocessed_documents)
+    vectorizer.build()
+    secret_vector = tuple(float(value.replace(',', '')) for value in text.split())
+    secret_tokens = vectorizer.vector2tokens(secret_vector)
+    print(secret_tokens)
+    basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
+    basic_search_engine.index_documents(documents)
+    result = basic_search_engine.retrieve_vectorized(secret_vector)
     assert result, "Result is None"
 
 

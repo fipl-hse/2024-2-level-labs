@@ -298,7 +298,7 @@ class Vectorizer:
         """
         if not isinstance(document, list) or len(document) == 0:
             return None
-        vector = [0 for elem in self._vocabulary]
+        vector = [0.0 for elem in self._vocabulary]
         text_tf = calculate_tf(self._vocabulary, document)
         if text_tf is None or len(text_tf) == 0:
             return None
@@ -355,10 +355,10 @@ class BasicSearchEngine:
             vector = self._index_document(text)
             if vector is None or len(vector) == 0:
                 return False
-        self._document_vectors = [self._index_document(text) for text in documents]
+        self._document_vectors = [self._index_document(text) for text
+                                  in documents if self._index_document(text) is not None]
         if self._documents == [] or self._document_vectors == []:
             return False
-        print(self._documents)
         return True
 
     def retrieve_relevant_documents(

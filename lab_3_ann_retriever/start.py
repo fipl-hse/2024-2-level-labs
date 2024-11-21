@@ -34,17 +34,10 @@ def main() -> None:
         text = text_file.read()
     result = None
     documents, stopwords = open_files()
-    tokenize = Tokenizer(stopwords)
-    vectorize = Vectorizer(tokenize.tokenize_documents(documents))
-    vectorize.build()
-    knn_retriever = BasicSearchEngine(vectorize, tokenize)
-    knn_retriever.index_documents(documents)
-    vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
-    print(vector)
-    token_vector = vectorize.vector2tokens(vector)
-    print(token_vector)
-    result = knn_retriever.retrieve_vectorized(vector)
-    print(result)
+    tokenizer = Tokenizer(stopwords)
+    tokenized_documents = tokenizer.tokenize_documents(documents)
+
+    result = tokenized_documents
     assert result, "Result is None"
 
 

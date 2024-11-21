@@ -23,7 +23,7 @@ class NodeLike(Protocol):
         Returns:
             dict: State of the Node instance
         """
-        12345678
+
 
     def load(self, state: dict) -> bool:
         """
@@ -92,6 +92,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -118,8 +119,14 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(documents, list):
+            return None
+        token_doc = []
+        for
+
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
+
         """
         Remove stopwords from the list of tokens.
 
@@ -131,6 +138,14 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(tokens, list) or not tokens:
+            return None
+        for token in tokens:
+            if token in self._stop_words:
+                tokens.remove(token)
+        return tokens
+
+
 
 
 class Vectorizer:

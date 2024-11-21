@@ -57,7 +57,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         return 0.0
     distance = 0.0
     for coord, value in enumerate(document_vector):
-        distance += (query_vector[coord] - document_vector[coord]) ** 2
+        distance += (query_vector[coord] - value) ** 2
     return distance ** 0.5
 
 def save_vector(vector: Vector) -> dict:
@@ -809,4 +809,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
-        ...
+        super().__init__(vectorizer, tokenizer)

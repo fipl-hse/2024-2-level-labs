@@ -314,10 +314,10 @@ class Vectorizer:
         for token, ind in self._token2ind.items():
             vector[ind] = text_tf[token] * self._idf_values[token]
 
-        if vector is None or not isinstance(vector, tuple):
+        if vector is None:
             return None
 
-        return vector
+        return tuple(vector)
 
 
 class BasicSearchEngine:

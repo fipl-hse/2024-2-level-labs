@@ -355,8 +355,11 @@ class BasicSearchEngine:
             vector = self._index_document(text)
             if vector is None or len(vector) == 0:
                 return False
-        self._document_vectors = [self._index_document(text) for text
-                                  in documents if self._index_document(text) is not None]
+        for text in documents:
+            doc_vector = self._index_document(text)
+            if doc_vector is None:
+                return None
+        self._document_vectors = [self._index_document(text) for text in documents]
         if self._documents == [] or self._document_vectors == []:
             return False
         return True

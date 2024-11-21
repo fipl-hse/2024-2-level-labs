@@ -23,18 +23,32 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return (documents, stopwords)
+    return documents, stopwords
 
 
 def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
+    with open("assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    stopwords = open_files()[1]
+
+    documents, stopwords = open_files()
+
     tokenizer = Tokenizer(stopwords)
-    tokenized_docs = tokenizer.tokenize_documents(open_files()[0])
+    tokenized_docs = tokenizer.tokenize_documents(documents)
+    vectorizer = Vectorizer(tokenized_docs)
+    vectorizer.build()
+
+    secret_vector = tuple(float(value.replace(',', '')) for value in text.split())
+    secret_tokens = vectorizer.vector2tokens(secret_vector)
+    print(secret_tokens)
+
+    basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
+    basic_search_engine.index_documents(documents)
+
+    result = basic_search_engine.retrieve_vectorized(secret_vector)
+    print(result)
 
     result = tokenized_docs
     assert result, "Result is None"

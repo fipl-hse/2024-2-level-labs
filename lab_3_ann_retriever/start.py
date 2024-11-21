@@ -6,6 +6,7 @@ Laboratory Work #3 starter.
 from pathlib import Path
 
 from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
+import time
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -45,16 +46,20 @@ def main() -> None:
     secret_tokens = vectorizer.vector2tokens(secret_vector)
     #print(secret_tokens)
 
+    basic_search_start = time.time()
     basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
     basic_search_engine.index_documents(documents)
     result = basic_search_engine.retrieve_vectorized(secret_vector)
-    #print(result)
+    basic_search_finish = time.time()
+    #print(basic_search_start, '\n', result, '\n' basic_search_finish)
 
+    search_start = time.time()
     query = 'Нижний Новгород'
     engine = SearchEngine(vectorizer, tokenizer)
     engine.index_documents(documents)
     result = engine.retrieve_relevant_documents(query, 1)
-    print(result)
+    search_finish = time.time()
+    #print(search_start, '\n', result, '\n'search_finish)
 
     assert result, "Result is None"
 

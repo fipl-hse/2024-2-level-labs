@@ -360,7 +360,9 @@ class BasicSearchEngine:
 
         document_vectors = [self._index_document(doc) for doc in documents]
         if (document_vectors is None or not document_vectors
-                or None in document_vectors):
+                or None in document_vectors
+                or self._document_vectors is None
+                or None in self._document_vectors):
             return False
         self._document_vectors = document_vectors
         self._documents = documents

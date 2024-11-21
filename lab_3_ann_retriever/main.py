@@ -136,7 +136,8 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (documents and isinstance(documents, list) and all(isinstance(doc, str) for doc in documents)):
+        if not (documents and isinstance(documents, list) and
+                all(isinstance(doc, str) for doc in documents)):
             return None
         tokenized_documents = []
         for doc in documents:
@@ -158,7 +159,8 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (tokens and isinstance(tokens, list) and all(isinstance(elem, str) for elem in tokens)):
+        if not (tokens and isinstance(tokens, list) and
+                all(isinstance(elem, str) for elem in tokens)):
             return None
         return [token for token in tokens if token not in self._stop_words]
 

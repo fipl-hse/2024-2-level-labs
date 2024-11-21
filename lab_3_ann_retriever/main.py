@@ -386,6 +386,8 @@ class BasicSearchEngine:
             return None
 
         vectorized_query = self._index_document(query)
+        if vectorized_query is None:
+            return None
         knn_calc = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
         if not knn_calc or knn_calc is None:
             return None

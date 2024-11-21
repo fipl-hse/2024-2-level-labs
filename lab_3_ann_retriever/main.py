@@ -7,7 +7,7 @@ Vector search with text retrieving
 from math import sqrt
 from typing import Protocol
 
-from lab_2_retrieval_w_bm25.main import build_vocabulary, calculate_idf, calculate_tf
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -55,7 +55,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         return None
     if not query_vector or not document_vector:
         return 0.0
-    dist = 0
+    dist = 0.0
     for que_vec, doc_vec in zip(query_vector, document_vector):
         dist += (que_vec - doc_vec) ** 2
     return sqrt(dist)
@@ -280,9 +280,10 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if (not document or
-                not isinstance(document, list) or
+        if (not isinstance(document, list) or not document or
                 not all(isinstance(token, str) for token in document)):
+            return None
+        if self._idf_values is None:
             return None
 
         vector = []
@@ -589,10 +590,10 @@ class NaiveKDTree:
             if not vectors:
                 return False
 
-            axis: float = depth % len(vectors[0])
+            axis: int = depth % len(vectors[0])
             vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
             median_index = len(vectors) // 2
-            median_node = Node(vectors[median_index][0], vectors[median_index][1])
+            median_node = Node(tuple(vectors[median_index][0]), int(vectors[median_index][1]))
 
             if parent_node.payload == -1:
                 self._root = median_node
@@ -690,15 +691,15 @@ class NaiveKDTree:
             axis = depth % len(vector)
 
             if vector[axis] < node.vector[axis]:
-                nodes.append((node.left_node, depth + 1))
+                nodes.append((Node(node.left_node), depth + 1))
                 if len(neighbours_list) < k or abs(vector[axis] -
                                                    node.vector[axis]) < neighbours_list[-1][0]:
-                    nodes.append((node.right_node, depth + 1))
+                    nodes.append((Node(node.right_node), depth + 1))
             else:
-                nodes.append((node.right_node, depth + 1))
+                nodes.append((Node(node.right_node), depth + 1))
                 if len(neighbours_list) < k or abs(vector[axis] -
                                                    node.vector[axis]) < neighbours_list[-1][0]:
-                    nodes.append((node.left_node, depth + 1))
+                    nodes.append((Node(node.left_node), depth + 1))
         return neighbours_list
 
 

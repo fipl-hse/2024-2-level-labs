@@ -215,8 +215,10 @@ class Vectorizer:
         if not self._idf_values:
             return False
 
-        for index, word in enumerate(self._vocabulary):
-            self._token2ind[word] = index
+        for word in self._vocabulary:
+            self._token2ind[word] = self._vocabulary.index(word)
+        if not self._vocabulary or not self._idf_values or not self._token2ind:
+            return False
 
         return True
 

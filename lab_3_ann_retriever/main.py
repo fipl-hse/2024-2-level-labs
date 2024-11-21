@@ -167,6 +167,8 @@ class Tokenizer:
         for item in documents:
             if not item:
                 return None
+            if not self.tokenize(item):
+                return None
             out.append(self.tokenize(item))
         return out
 

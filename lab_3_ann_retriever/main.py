@@ -359,7 +359,8 @@ class BasicSearchEngine:
             return False
 
         document_vectors = [self._index_document(doc) for doc in documents]
-        if document_vectors is None:
+        if (document_vectors is None
+                or not all(isinstance(tuple_inside, tuple) for tuple_inside in document_vectors)):
             return False
         self._document_vectors = document_vectors
         self._documents = documents

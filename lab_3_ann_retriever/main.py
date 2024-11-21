@@ -681,7 +681,7 @@ class NaiveKDTree:
         while True:
             data_copy = data.pop(0)
             current_node = data_copy[0]
-            current_depth = data_copy[1]
+            current_depth = int(data_copy[1])
             distance = calculate_distance(vector, current_node.vector)
             if distance is None:
                 return None

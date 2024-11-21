@@ -107,9 +107,6 @@ class Tokenizer:
         if not isinstance(text, str):
             return None
 
-        if not isinstance(text, str):
-            return None
-
         tokenized_list = []
         word = []
 
@@ -126,8 +123,7 @@ class Tokenizer:
 
         return self._remove_stop_words(tokenized_list)
 
-
-def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
+    def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
         Tokenize the input documents.
 

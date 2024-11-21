@@ -692,6 +692,8 @@ class NaiveKDTree:
             axis = depth % len(vector)
 
             if vector[axis] < node.vector[axis]:
+                if not isinstance(node.left_node, Node):
+                    return None
                 nodes.append((node.left_node, depth + 1))
                 if len(neighbours_list) < k or abs(vector[axis] -
                                                    node.vector[axis]) < neighbours_list[-1][0]:

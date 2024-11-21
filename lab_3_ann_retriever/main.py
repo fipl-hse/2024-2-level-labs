@@ -58,6 +58,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     distance = 0.0
     for coord, value in enumerate(document_vector):
         distance += (query_vector[coord] - value) ** 2
+    if not isinstance(distance, float):
+        return None
     return distance ** 0.5
 
 def save_vector(vector: Vector) -> dict:
@@ -253,6 +255,8 @@ class Vectorizer:
         tokens2ind_new = dict((v, k) for k, v in self._token2ind.items())
         for ind, coord in enumerate(vector):
             if coord != 0.0:
+                if tokens2ind_new.get(ind) is None:
+                    return None
                 tokens.append(tokens2ind_new.get(ind))
         return tokens
     def save(self, file_path: str) -> bool:
@@ -809,3 +813,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        SearchEngine.__init__(self, vectorizer, tokenizer)

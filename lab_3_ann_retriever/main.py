@@ -241,6 +241,8 @@ class Vectorizer:
         if len(self._vocabulary) == 0:
             return None
 
+        if self._calculate_tf_idf(tokenized_document) is None:
+            return None
         return self._calculate_tf_idf(tokenized_document)
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:

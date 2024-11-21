@@ -112,6 +112,7 @@ class Tokenizer:
                 text = text.replace(elem, " ")
         tokenized_text = text.lower().split()
         return self._remove_stop_words(tokenized_text)
+
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
         Tokenize the input documents.
@@ -148,8 +149,7 @@ class Tokenizer:
         """
         if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or not tokens:
             return None
-        tokens_without_stop_words = [elem for elem in tokens if elem not in self._stop_words]
-        return tokens_without_stop_words
+        return [elem for elem in tokens if elem not in self._stop_words]
 
 class Vectorizer:
     """

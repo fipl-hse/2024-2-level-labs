@@ -188,6 +188,9 @@ class Vectorizer:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
         self._corpus = corpus
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
 
     def build(self) -> bool:
         """
@@ -196,7 +199,7 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        if self._corpus is None or len(self._corpus) == 0:
+        if not self._corpus or not isinstance(self._corpus, list):
             return False
 
         self._vocabulary = sorted(list(set(token for doc in self._corpus for token in doc)))
@@ -216,8 +219,8 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if (not isinstance(tokenized_document, list) or
-                not all(isinstance(document, str) for document in tokenized_document)):
+        if not (isinstance(tokenized_document, list) and tokenized_document and
+                all(isinstance(token, str) for token in tokenized_document)):
             return None
 
         return self._calculate_tf_idf(tokenized_document)
@@ -237,12 +240,8 @@ class Vectorizer:
         if not isinstance(vector, tuple) or len(vector) != len(self._vocabulary):
             return None
 
-        tokenized_document = []
-        for token in self._vocabulary:
-            token_index = self._token2ind[token]
-            if vector[token_index] != 0.0:
-                tokenized_document.append(token)
-        return tokenized_document
+        tokens = [self._vocabulary[i] for i, value in enumerate(vector) if value > 0]
+        return tokens
 
     def save(self, file_path: str) -> bool:
         """
@@ -331,10 +330,12 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
-        if (not documents or not isinstance(documents, list) or
-                not all(isinstance(doc, str) for doc in documents)):
+        if not (isinstance(documents, list) and documents and all(
+                isinstance(doc, str) for doc in documents)):
             return False
 
+        self._documents = []
+        self._document_vectors = []
         for doc in documents:
             indexed_doc = self._index_document(doc)
             if not indexed_doc:

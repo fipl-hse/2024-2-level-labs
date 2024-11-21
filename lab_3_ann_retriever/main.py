@@ -282,7 +282,7 @@ class Vectorizer:
         if (not isinstance(document, list) or not document or
                 not all(isinstance(token, str) for token in document)):
             return None
-        if self._idf_values is None:
+        if self._idf_values is None or not isinstance(self._idf_values, dict):
             return None
 
         vector = []
@@ -577,7 +577,7 @@ class NaiveKDTree:
             return False
 
         space_condition: list[dict] = [{
-            "vectors": [(index, vector) for index, vector in list(zip(enumerate(vectors)))],
+            "vectors": [(index, vector) for index, vector in enumerate(vectors)],
             "depth": 0,
             "parent_node": Node((0.0,) * len(vectors[0]), -1),
             "is_left_subspace": True}]
@@ -591,7 +591,7 @@ class NaiveKDTree:
             if not vectors:
                 return False
 
-            axis: int = depth % len(vectors[0])
+            axis: int = int(depth % len(vectors[0]))
             vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
             median_index = len(vectors) // 2
             median_node = Node(tuple(vectors[median_index][0]), int(vectors[median_index][1]))

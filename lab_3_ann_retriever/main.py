@@ -23,7 +23,7 @@ class NodeLike(Protocol):
         Returns:
             dict: State of the Node instance
         """
-        12345
+        1234567
 
     def load(self, state: dict) -> bool:
         """

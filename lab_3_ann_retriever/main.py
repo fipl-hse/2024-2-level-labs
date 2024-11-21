@@ -230,6 +230,8 @@ class Vectorizer:
         """
         if not isinstance(tokenized_document, list) or len(tokenized_document) == 0:
             return None
+        if len(self._vocabulary) == 0:
+            return ()
         return self._calculate_tf_idf(tokenized_document)
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """

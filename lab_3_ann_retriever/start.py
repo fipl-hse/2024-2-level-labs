@@ -38,13 +38,13 @@ def main() -> None:
     vectorizer.build()
 
 
-    knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
-    knn_retriever.index_documents(documents)
-    result = knn_retriever.retrieve_relevant_documents(query, 3)
+    #knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
+    #knn_retriever.index_documents(documents)
+    #result = knn_retriever.retrieve_relevant_documents(query, 3)
 
-    #searcher = SearchEngine(tokenizer= tokenizer, vectorizer= vectorizer)
-    #searcher.index_documents(documents)
-    #result = searcher.retrieve_relevant_documents(query)
+    naive_kdtree_retriever = SearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
+    naive_kdtree_retriever.index_documents(documents)
+    result = naive_kdtree_retriever.retrieve_relevant_documents(query)
     assert result, "Result is None"
 
 

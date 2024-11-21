@@ -580,29 +580,27 @@ class NaiveKDTree:
         if not all(len(vec) == dimensions for vec in vectors):
             return False
         another_vec = vectors[:]
-        nodes_storage = []
-        nodes = [(vectors, 0, None, True)]
+        nodes = [(vectors, 0, Node(), True)]
         while nodes:
-            current_vectors, depth, parent_index, is_left = nodes.pop()
+            current_vectors = nodes[0][0]
+            depth = nodes[0][1]
+            parent_index = nodes[0][2]
+            is_left = nodes.pop(0)[3]
             if not current_vectors:
                 continue
             axis = depth % dimensions
             current_vectors.sort(key=lambda x: x[axis])
             median_index = len(current_vectors) // 2
-            median_point = current_vectors[median_index]
-            node_median = Node(median_point, another_vec.index(median_point))
-            nodes_storage.append(node_median)
-            current_node_index = len(nodes_storage) - 1
-            if parent_index is None:
+            node_median = Node(current_vectors[median_index], another_vec.index(current_vectors[median_index]))
+            if parent_index.payload == -1:
                 self._root = node_median
             else:
-                parent_node = nodes_storage[parent_index]
                 if is_left:
-                    parent_node.left_node = node_median
+                    parent_index.left_node = node_median
                 else:
-                    parent_node.right_node = node_median
-            nodes.append((current_vectors[:median_index], depth + 1, current_node_index, True))
-            nodes.append((current_vectors[median_index + 1:], depth + 1, current_node_index, False))
+                    parent_index.right_node = node_median
+            nodes.append((current_vectors[:median_index], depth + 1, node_median, True))
+            nodes.append((current_vectors[median_index + 1:], depth + 1, node_median, False))
         return self._root is not None
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:

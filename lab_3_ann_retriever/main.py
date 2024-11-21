@@ -141,7 +141,7 @@ class Tokenizer:
             if not isinstance(word, str):
                 return None
             if word in self._stop_words:
-                tokens.remove(token)
+                tokens.remove(word)
         return tokens
 
 class Vectorizer:

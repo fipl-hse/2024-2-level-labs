@@ -7,6 +7,8 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
+from docutils.nodes import document
+
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 Vector = tuple[float, ...]
@@ -52,8 +54,11 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     In case of corrupt input arguments, None is returned.
     """
 
-    if not query_vector or not document_vector:
+    if query_vector is None or document_vector is None \
+            or not isinstance(query_vector, tuple) or not isinstance(document_vector, tuple):
         return None
+    if not query_vector or not document_vector:
+        return 0.0
 
     euc_dist = 0.0
     for index, value in enumerate(query_vector):
@@ -119,7 +124,7 @@ class Tokenizer:
         if not text or not isinstance(text, str):
             return None
 
-        tokens = ''.join([symb for symb in text if symb.isalpha() or symb == " "]).split()
+        tokens = ''.join([symb for symb in text.lower() if symb.isalpha() or symb == " "]).split()
         return self._remove_stop_words(tokens)
 
 
@@ -137,7 +142,8 @@ class Tokenizer:
         """
 
         if not documents or not isinstance(documents, list) \
-            or not all(isinstance(doc, str) for doc in documents):
+            or not all(isinstance(doc, str) for doc in documents) \
+                or not all(isinstance(self.tokenize(doc), list) for doc in documents):
             return None
 
         return [self.tokenize(doc) for doc in documents]
@@ -192,6 +198,8 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        if not self._corpus:
+            return False
 
         result = set()
         for doc in self._corpus:
@@ -242,14 +250,14 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
 
-        if not vector:
+        if not vector or not isinstance(vector, tuple) or len(vector) != len(self._token2ind):
             return None
 
         tokens = []
         for word in self._vocabulary:
             if vector[self._token2ind[word]] != 0.0:
                 tokens.append(word)
-        return tokens.sort()
+        return sorted(tokens)
 
     def save(self, file_path: str) -> bool:
         """
@@ -370,7 +378,9 @@ class BasicSearchEngine:
 
         tok_vec_query = self._index_document(query)
         rel_documents = self._calculate_knn(tok_vec_query, self._document_vectors, n_neighbours)
-        return [(index, self._documents[text]) for text, index in rel_documents]
+        if not tok_vec_query or not rel_documents or any(None in doc for doc in rel_documents):
+            return None
+        return [(value, self._documents[index]) for index, value in rel_documents]
 
     def save(self, file_path: str) -> bool:
         """
@@ -407,10 +417,13 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
 
-        if not query_vector:
+        if not query_vector or not isinstance(query_vector, tuple) \
+            or len(query_vector) != len(self._document_vectors[0]):
             return None
 
         rel_doc = self._calculate_knn(query_vector, self._document_vectors, 1)
+        if not rel_doc:
+            return None
         return self._documents[rel_doc[0][0]]
 
 
@@ -437,11 +450,13 @@ class BasicSearchEngine:
             or not isinstance(n_neighbours, int):
             return None
 
-        ind_knn_neighbours = []
-        for index, value in enumerate(document_vectors):
-            distance = calculate_distance(query_vector, value)
-            ind_knn_neighbours.append((index, distance))
-        return ind_knn_neighbours.sort(key = lambda x: x[1])[:n_neighbours-1]
+        knn_neighbours = []
+        for index, doc in enumerate(document_vectors):
+            distance = calculate_distance(query_vector, doc)
+            if not doc or not distance:
+                return None
+            knn_neighbours.append((index, distance))
+        return sorted(knn_neighbours, key=lambda x: x[1])[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -460,6 +475,8 @@ class BasicSearchEngine:
             return None
 
         tok_doc = self._tokenizer.tokenize(document)
+        if not tok_doc:
+            return None
         return self._vectorizer.vectorize(tok_doc)
 
 

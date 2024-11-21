@@ -4,7 +4,7 @@ Lab 3.
 Vector search with text retrieving
 """
 
-# pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
+# pylint: disable=too-few-public-methods,    too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
 Vector = tuple[float, ...]

@@ -351,12 +351,14 @@ class BasicSearchEngine:
             return False
 
         self._documents = documents
+        if not self._documents:
+            return False
         self._document_vectors = [self._index_document(doc) for doc in documents]
 
         if self._document_vectors and None not in self._document_vectors:
             return True
-        else:
-            return False
+
+        return False
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -378,9 +380,13 @@ class BasicSearchEngine:
 
         query_vector = self._index_document(query)
         relevanced = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
+        if not relevanced or relevanced is None:
+            return None
 
         relevant_docs = []
         for index, value in relevanced:
+            # if not isinstance(value[0], int):
+            #     return None
             relevant_docs.append((value, self._documents[index]))
         return relevant_docs
 
@@ -420,6 +426,9 @@ class BasicSearchEngine:
         """
         if not query_vector or not isinstance(query_vector, tuple):
             return None
+        for vector in self._document_vectors:
+            if len(vector) < len(query_vector):
+                return None
 
         the_most = self._calculate_knn(query_vector, self._document_vectors, 1)
 
@@ -451,7 +460,8 @@ class BasicSearchEngine:
         for index, value in enumerate(document_vectors):
             distanced.append((index, calculate_distance(query_vector, value)))
 
-        return sorted(distanced, key=lambda x: x[1])
+        result = sorted(distanced, key=lambda x: x[1])
+        return result[:n_neighbours+1]
 
     def _index_document(self, document: str) -> Vector | None:
         """

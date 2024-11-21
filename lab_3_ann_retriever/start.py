@@ -36,6 +36,8 @@ def main() -> None:
     documents, stop_words = open_files()
     tokenizer = Tokenizer(stop_words)
     tok_docs = tokenizer.tokenize_documents(documents)
+    if tok_docs is None:
+        return None
     vectorizer = Vectorizer(tok_docs)
     vectorizer.build()
 

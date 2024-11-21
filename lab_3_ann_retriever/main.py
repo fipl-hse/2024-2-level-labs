@@ -362,7 +362,7 @@ class BasicSearchEngine:
                 return False
             docs_to_append.append(doc_vector)
         self._document_vectors = docs_to_append
-        if self._documents == [] or self._document_vectors == []:
+        if not self._documents or not self._document_vectors:
             return False
         return True
 

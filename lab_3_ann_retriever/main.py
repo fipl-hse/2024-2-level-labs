@@ -193,7 +193,6 @@ class Vectorizer:
         """
 
 
-
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
         Create a vector for tokenized document.

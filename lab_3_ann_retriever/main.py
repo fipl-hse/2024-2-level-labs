@@ -59,6 +59,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     distance = 0.0
     for i, number in enumerate(query_vector):
         distance += (number - document_vector[i]) ** 2
+    if not isinstance(distance, float):
+        return None
 
     return float(distance ** 0.5)
 
@@ -215,12 +217,19 @@ class Vectorizer:
         if not self._idf_values:
             return False
 
-        for word in self._vocabulary:
-            self._token2ind[word] = self._vocabulary.index(word)
-        if not self._vocabulary or not self._idf_values or not self._token2ind:
+        for ind, token in enumerate(self._vocabulary):
+            self._token2ind[token] = int(ind)
+
+        if (None in self._vocabulary or None in self._idf_values
+                or None in self._token2ind):
+            return False
+
+        if (len(self._vocabulary) == 0 or len(self._idf_values) == 0
+                or len(self._token2ind) == 0):
             return False
 
         return True
+
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """

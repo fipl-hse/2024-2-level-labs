@@ -5,6 +5,7 @@ Vector search with text retrieving
 """
 
 import json
+import math
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
@@ -59,8 +60,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     sum_ = 0.0
     for ind, value in enumerate(query_vector):
         sum_ += (value - document_vector[ind]) ** 2
-    sum_ = sum_ ** 0.5
-    return sum_
+    return math.sqrt(sum_)
 
 
 def save_vector(vector: Vector) -> dict:

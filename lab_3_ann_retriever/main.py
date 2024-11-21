@@ -314,7 +314,7 @@ class Vectorizer:
         for token, ind in self._token2ind.items():
             vector[ind] = text_tf[token] * self._idf_values[token]
 
-        return tuple(vector)
+        return tuple(vector) or None
 
 
 class BasicSearchEngine:

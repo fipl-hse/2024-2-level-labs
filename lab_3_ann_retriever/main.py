@@ -6,9 +6,6 @@ Vector search with text retrieving
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json
-
-import math
-
 from typing import Protocol
 
 from lab_2_retrieval_w_bm25.main import calculate_idf
@@ -78,8 +75,6 @@ def save_vector(vector: Vector) -> dict:
     Returns:
         dict: A state of the vector to save
     """
-    if not vector or not isinstance(vector,tuple):
-        return None
     elements = {index: value for index,value in enumerate(vector) if value != 0.0}
     return{'len':len(vector),'elements':elements}
 
@@ -293,7 +288,8 @@ class Vectorizer:
             return False
         with open(file_path,'r',encoding='utf-8') as file:
             loaded = json.load(file)
-            if not 'vocabulary' in loaded or not 'idf_values' in loaded or not 'token2ind' in loaded:
+            if not 'vocabulary' in loaded or not 'idf_values'\
+                                                 in loaded or not 'token2ind' in loaded:
                 return False
             self._idf_values = loaded['idf_values']
             self._vocabulary = loaded['vocabulary']
@@ -444,7 +440,7 @@ class BasicSearchEngine:
             return None
         for vector in self._document_vectors:
             if len(query_vector) != len(vector):
-                return None
+                return False
         doc_num = self._calculate_knn(query_vector, self._document_vectors, 1)
         if doc_num is None or not doc_num:
             return None
@@ -618,9 +614,7 @@ class Node(NodeLike):
             self.right_node = right
         else:
             self.right_node = None
-        if not self.vector and self.payload:
-            return False
-        return True
+        return bool(self.vector and self.payload)
 
 class NaiveKDTree:
     """
@@ -794,9 +788,7 @@ class KDTree(NaiveKDTree):
         In case of corrupt input arguments, None is returned.
         """
         if not isinstance(vector, tuple) or not isinstance(k,int)\
-                or not vector or not k:
-            return None
-        if len(vector) == 0:
+                or not vector or not k or len(vector) == 0:
             return None
         neighbours = []
         dimensions = len(vector)
@@ -821,7 +813,7 @@ class KDTree(NaiveKDTree):
             else:
                 if node.right_node:
                     start.append((node.right_node,depth+1))
-            if ((vector[axis] - node.vector[axis]) ** 2 < max(neighbours,key=lambda x:x[0])[0]):
+            if (vector[axis] - node.vector[axis]) ** 2 < max(neighbours,key=lambda x:x[0])[0]:
                 if node.left_node:
                     start.append((node.right_node,depth+1))
                 else:
@@ -923,7 +915,8 @@ class SearchEngine(BasicSearchEngine):
         document_vectors = self._dump_documents()['document_vectors']
         if not self._tree.save():
             return False
-        state = {'engine':{'tree': self._tree.save(),'documents':documents,'document_vectors':document_vectors}}
+        state = {'engine':{'tree': self._tree.save(),'documents':documents,
+                           'document_vectors':document_vectors}}
         with open(file_path,'w',encoding='utf-8') as file:
             json.dump(state,file)
         return True

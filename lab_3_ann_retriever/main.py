@@ -415,12 +415,12 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query_vector, (list, tuple)) or not all(
-                isinstance(val, (int, float)) for val in query_vector):
+        if (not isinstance(query_vector, tuple) or
+                not len(query_vector) == len(self._document_vectors[0])):
             return None
 
         nearest_neighbors = self._calculate_knn(query_vector, self._document_vectors, 1)
-        if nearest_neighbors is None or not nearest_neighbors:
+        if not (isinstance(nearest_neighbors, list) and len(nearest_neighbors) > 0):
             return None
         return self._documents[nearest_neighbors[0][0]]
 
@@ -573,52 +573,53 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not vectors or not all(isinstance(vec, tuple) and len(vec) > 0 for vec in vectors):
+        if not (isinstance(vectors, list) and all(isinstance(vector, (list, tuple)) and all(
+                isinstance(cor, float) for cor in vector) for vector in vectors) and vectors):
             return False
 
-        space_condition: list[dict] = [{
-            "vectors": [(index, vector) for index, vector in enumerate(vectors)],
-            "depth": 0,
-            "parent_node": Node((0.0,) * len(vectors[0]), -1),
-            "is_left_subspace": True}]
+        space_condition: list[dict] = [
+            {
+                "vectors": [(vectors[idx], idx) for idx in range(len(vectors))],
+                "depth": 0,
+                "parent_node": Node(tuple(0.0 for _ in range(len(vectors[0]))), -1),
+                "is_left_subspace": True
+            }
+        ]
 
         while space_condition:
-            vectors = space_condition[0]["vectors"]
+            current_vectors = space_condition[0]["vectors"]
             depth = space_condition[0]["depth"]
             parent_node = space_condition[0]["parent_node"]
-            is_left_subspace = space_condition.pop(0)["is_left_subspace"]
+            is_left_sub_dim = space_condition.pop(0)["is_left_subspace"]
 
-            if not vectors:
-                return False
+            if current_vectors:
 
-            axis: int = depth % len(vectors[0])
-            vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
-            median_index: int = len(vectors) // 2
-            median_node = Node(tuple(vectors[median_index][0]), int(vectors[median_index][1]))
+                axis = depth % len(current_vectors[0])
+                current_vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
+                median_index = len(current_vectors) // 2
+                median_node = Node(current_vectors[median_index][0], current_vectors[median_index][1])
 
-            if parent_node.payload == -1:
-                self._root = median_node
-            else:
-                if is_left_subspace:
-                    parent_node.left_node = median_node
+                if parent_node.payload == -1:
+                    self._root = median_node
                 else:
-                    parent_node.right_node = median_node
+                    if is_left_sub_dim:
+                        parent_node.left_node = median_node
+                    else:
+                        parent_node.right_node = median_node
 
-            left_space = {"vectors": vectors[:median_index],
-                          "depth": depth + 1,
-                          "parent_node": median_node,
-                          "is_left_subspace": True}
-
-            right_space = left_space.copy()
-            right_space["vectors"] = vectors[median_index + 1:]
-            right_space["is_left_subspace"] = False
-
-            space_condition.append(left_space)
-            space_condition.append(right_space)
-
+                left_subspace = {
+                    "vectors": current_vectors[:median_index],
+                    "depth": depth + 1,
+                    "parent_node": median_node,
+                    "is_left_subspace": True
+                }
+                right_subspace = left_subspace.copy()
+                right_subspace["vectors"] = current_vectors[median_index + 1:]
+                right_subspace["is_left_subspace"] = False
+                space_condition.append(left_subspace)
+                space_condition.append(right_subspace)
         if self._root is None:
             return False
-
         return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
@@ -634,7 +635,7 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (isinstance(vector, tuple) and isinstance(k, int)):
+        if not vector or not k:
             return None
         return self._find_closest(vector, k)
 
@@ -676,36 +677,29 @@ class NaiveKDTree:
                 and self._root is not None and isinstance(self._root, Node)):
             return None
 
-        neighbours_list = []
+        neighbors_list = []
         nodes = [(self._root, 0)]
-
         while nodes:
-            node, depth = nodes.pop()
-            if node is None:
-                continue
-            dist = calculate_distance(vector, node.vector)
-            if dist is None:
-                continue
-
-            neighbours_list.append((dist, node.payload))
-            neighbours_list = neighbours_list[:k]
-            axis = depth % len(vector)
-
-            if not isinstance(node.left_node, Node) or not isinstance(node.right_node, Node):
+            node = nodes.pop(0)
+            current_node, depth = node
+            if not isinstance(current_node, Node):
                 return None
 
-            if vector[axis] < node.vector[axis]:
-
-                nodes.append((node.left_node, depth + 1))
-                if len(neighbours_list) < k or abs(vector[axis] -
-                                                   node.vector[axis]) < neighbours_list[-1][0]:
-                    nodes.append((node.right_node, depth + 1))
+            if not current_node.left_node and not current_node.right_node:
+                dist = calculate_distance(vector, current_node.vector)
+                if (not dist or not isinstance(dist, float)
+                        or not isinstance(current_node.payload, int)):
+                    return None
+                neighbors_list.append((dist, current_node.payload))
             else:
-                nodes.append((node.right_node, depth + 1))
-                if len(neighbours_list) < k or abs(vector[axis] -
-                                                   node.vector[axis]) < neighbours_list[-1][0]:
-                    nodes.append((node.left_node, depth + 1))
-        return neighbours_list
+                axis = depth % len(current_node.vector)
+                if not vector[axis] > current_node.vector[axis]:
+                    if isinstance(current_node.left_node, Node):
+                        nodes.append((current_node.left_node, depth + 1))
+                else:
+                    if isinstance(current_node.right_node, Node):
+                        nodes.append((current_node.right_node, depth + 1))
+        return neighbors_list
 
 
 class KDTree(NaiveKDTree):
@@ -758,25 +752,20 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
-        if (not documents or
-                not isinstance(documents, list) or
-                not all(isinstance(doc, str) for doc in documents)):
+        if not isinstance(documents, list):
             return False
 
-        self._documents = []
-        self._document_vectors = []
+        self._documents = documents
+        temp_vector_docs = []
 
-        for doc in documents:
-            vector = self._index_document(doc)
-            if vector is None:
+        for doc in self._documents:
+            vector_doc = self._index_document(doc)
+            if not isinstance(vector_doc, tuple):
                 return False
+            temp_vector_docs.append(vector_doc)
 
-            self._documents.append(doc)
-            self._document_vectors.append(vector)
-
-        if not self._tree.build(self._document_vectors):
-            return False
-        return True
+        self._document_vectors = temp_vector_docs
+        return self._tree.build(self._document_vectors)
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -790,28 +779,24 @@ class SearchEngine(BasicSearchEngine):
             list[tuple[float, str]] | None: Relevant documents with their distances.
         In case of corrupt input arguments, None is returned.
         """
-        if (not isinstance(query, str) or
-                not isinstance(n_neighbours, int) or
-                n_neighbours <= 0):
+        if not (isinstance(query, str) and isinstance(n_neighbours, int)):
             return None
-
         tokenized_query = self._tokenizer.tokenize(query)
         if tokenized_query is None:
             return None
-
-        query_vector = self._vectorizer.vectorize(tokenized_query)
-        if query_vector is None:
+        vectorized_query = self._vectorizer.vectorize(tokenized_query)
+        if vectorized_query is None:
+            return None
+        n_distances = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
+        if not n_distances:
             return None
 
-        nearest_neighbors = self._tree.query(query_vector, n_neighbours)
-        if nearest_neighbors is None:
-            return None
-
-        relevant_documents = []
-        for _, (distance, index) in enumerate(nearest_neighbors):
-            if index is not None and index < len(self._documents):
-                relevant_documents.append((distance, self._documents[index]))
-        return relevant_documents
+        relevant_docs = []
+        for distance in n_distances:
+            if None in distance:
+                return None
+            relevant_docs.append((distance[1], self._documents[distance[0]]))
+        return relevant_docs
 
     def save(self, file_path: str) -> bool:
         """

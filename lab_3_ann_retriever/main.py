@@ -7,11 +7,11 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 from math import sqrt
-
+from lab_2_retrieval_w_bm25.main import calculate_idf
 
 
 Vector = tuple[float, ...]
-from lab_2_retrieval_w_bm25.main import calculate_idf
+
 
 class NodeLike(Protocol):
     """
@@ -298,16 +298,6 @@ class Vectorizer:
         if not isinstance(document, list) or not all(isinstance(item, str) for item in document) or not document:
             return None
 
-        # tf = {}
-        #
-        # voc = set(self._vocabulary)
-        # doc = set(document)
-        #
-        # for elem in voc.union(doc):
-        #     tf[elem] = document.count(elem) / len(document)
-        #
-        # return tuple((tf[elem] * self._idf_values[elem] if elem in document else 0.0 for elem in self._vocabulary))
-
         tf_idf_vector = []
 
         for item in self._vocabulary:
@@ -445,8 +435,7 @@ class BasicSearchEngine:
         if not isinstance(retrieve_doc, list) or not retrieve_doc:
             return None
         index, value = retrieve_doc[0]
-        doc = self._documents[index]
-        return doc
+        return self._documents[index]
 
 
     def _calculate_knn(

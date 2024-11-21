@@ -119,10 +119,7 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(documents, list):
-            return None
-        token_doc = []
-        for
+
 
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:

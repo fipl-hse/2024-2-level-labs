@@ -33,17 +33,18 @@ def main() -> None:
     documents, stopwords = open_files()
     query = 'Нижний Новгород'
     tokenizer = Tokenizer(stopwords)
-    docs_tokenized = tokenizer.tokenize_documents(documents)
-    vectorizer = Vectorizer(docs_tokenized)
+    tokenized_docs = tokenizer.tokenize_documents(documents)
+    vectorizer = Vectorizer(tokenized_docs)
+    vectorizer.build()
 
-    #knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
-    #knn_retriever.index_documents(documents)
-    #print(knn_retriever.retrieve_relevant_documents(query, 3))
 
-    searcher = SearchEngine(tokenizer= tokenizer, vectorizer= vectorizer)
-    searcher.index_documents(documents)
-    result = searcher.retrieve_relevant_documents(query, 3)
-    print(result)
+    knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
+    knn_retriever.index_documents(documents)
+    result = knn_retriever.retrieve_relevant_documents(query, 3)
+
+    #searcher = SearchEngine(tokenizer= tokenizer, vectorizer= vectorizer)
+    #searcher.index_documents(documents)
+    #result = searcher.retrieve_relevant_documents(query)
     assert result, "Result is None"
 
 

@@ -116,12 +116,9 @@ class Tokenizer:
         """
         if not isinstance(text, str) or not isinstance(self, Tokenizer):
             return None
-        for sign in text.lower():
-            if not sign.isalpha():
-                text = text.lower().replace(sign, ' ')
-        text = text.replace('  ', ' ')
-        text = self._remove_stop_words(text.split())
-        return text
+        return self._remove_stop_words(
+            ''.join([letter for letter in text.lower() if letter == ' ' or letter.isalpha()]).split()
+        )
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -170,8 +167,7 @@ class Tokenizer:
         for data in self._stop_words:
             if not isinstance(data, str):
                 return None
-        tokens_cleared = [elem for elem in tokens if elem not in self._stop_words]
-        return tokens_cleared
+        return [elem for elem in tokens if elem not in self._stop_words]
 
 class Vectorizer:
     """
@@ -201,18 +197,18 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        self._vocabulary = []
+
         if self._corpus is None or len(self._corpus) == 0:
             return False
-        for tokenized_text in self._corpus:
-            text = calculate_idf(tokenized_text, self._corpus)
-            if text is None:
-                return False
-            self._idf_values.update(text)
-        self._vocabulary = sorted([elem for elem in list(self._idf_values.keys()) if
-                            elem not in self._vocabulary])
+        self._vocabulary = sorted(list(set(token for doc in self._corpus for token in doc)))
+
+        text = calculate_idf(self._vocabulary, self._corpus)
+        if text is None:
+            return False
+        self._idf_values = text
+
         for ind, token in enumerate(self._vocabulary):
-            self._token2ind[token] = ind
+            self._token2ind[token] = int(ind)
         if (None in self._vocabulary or None in self._idf_values
                 or None in self._token2ind):
             return False
@@ -234,8 +230,7 @@ class Vectorizer:
         """
         if not isinstance(tokenized_document, list) or len(tokenized_document) == 0:
             return None
-        vector = self._calculate_tf_idf(tokenized_document)
-        return vector
+        return self._calculate_tf_idf(tokenized_document)
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
         Recreate a tokenized document based on a vector.
@@ -295,8 +290,6 @@ class Vectorizer:
         """
         if not isinstance(document, list) or len(document) == 0:
             return None
-        if not self.build():
-            return None
         vector = [0 for elem in self._vocabulary]
         text_tf = calculate_tf(self._vocabulary, document)
         if text_tf is None or len(text_tf) == 0:
@@ -344,7 +337,7 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
-        self._document_vectors = []
+
         if not isinstance(documents, list) or len(documents) == 0:
             return False
         self._documents = documents
@@ -354,7 +347,10 @@ class BasicSearchEngine:
             vector = self._index_document(text)
             if vector is None or len(vector) == 0:
                 return False
-            self._document_vectors.append(vector)
+        self._document_vectors = [self._index_document(text) for text in documents]
+        if self._documents == [] or self._document_vectors == []:
+            return False
+        print(self._documents)
         return True
 
     def retrieve_relevant_documents(
@@ -453,8 +449,7 @@ class BasicSearchEngine:
                 return None
             distance = calculate_distance(query_vector, doc)
             docs.append((int(ind), distance))
-        docs = sorted(docs, key= lambda x:x[1])
-        return docs[:n_neighbours]
+        return sorted(docs, key= lambda x:x[1])[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -471,8 +466,7 @@ class BasicSearchEngine:
         if not isinstance(document, str) or len(document) == 0:
             return None
         tokenized_text = self._tokenizer.tokenize(document)
-        vector = self._vectorizer.vectorize(tokenized_text)
-        return vector
+        return self._vectorizer.vectorize(tokenized_text)
     def _dump_documents(self) -> dict:
         """
         Dump documents states for save the Engine.
@@ -519,6 +513,7 @@ class Node(NodeLike):
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+
         self.vector = vector
         self.left_node = left_node
         self.right_node = right_node
@@ -554,6 +549,7 @@ class NaiveKDTree:
         """
         Initialize an instance of the KDTree class.
         """
+
         self._root = None
     def build(self, vectors: list[Vector]) -> bool:
         """
@@ -661,7 +657,6 @@ class NaiveKDTree:
         while True:
             data_copy = data.pop(0)
             current_node = data_copy[0]
-            print(current_node.payload)
             distance = calculate_distance(vector, current_node.vector)
             if distance is None:
                 return None
@@ -732,7 +727,8 @@ class SearchEngine(BasicSearchEngine):
             return False
         if not super().index_documents(documents):
             return False
-        self._tree.build(self._document_vectors)
+        if not self._tree.build(self._document_vectors):
+            return False
         return True
 
     def retrieve_relevant_documents(
@@ -752,6 +748,8 @@ class SearchEngine(BasicSearchEngine):
         """
         if (not isinstance(query, str) or len(query) == 0
                 or query is None or not isinstance(n_neighbours, int) or n_neighbours != 1):
+            return None
+        if not self.index_documents(self._documents):
             return None
         query_vector = super()._index_document(query)
         result = self._tree.query(query_vector, n_neighbours)

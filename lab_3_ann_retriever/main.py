@@ -600,26 +600,21 @@ class NaiveKDTree:
         vector_lst = {}
         for ind, vector in enumerate(vectors):
             vector_lst.update({vector: ind})
-
         dimensions = len(vectors[0])
         node_parent = Node()
-
         dimension_info = [(vectors,
                            depth,
                            node_parent,
                            True)]
-
         while len(dimension_info) != 0:
             dimension_info_copy = dimension_info.pop(0)
             if len(dimension_info_copy[0]) == 0:
                 continue
-
             axis = int(int(dimension_info_copy[1]) % dimensions)
             dimension_vectors = sorted(dimension_info_copy[0], key=lambda x: x[axis])
             median_index = len(dimension_vectors) // 2
             node_vector = dimension_vectors[median_index]
             new_node = Node(node_vector, int(vector_lst[node_vector]))
-
             if dimension_info_copy[2].payload == -1:
                 self._root = new_node
             elif dimension_info_copy[-1]:
@@ -746,7 +741,9 @@ class SearchEngine(BasicSearchEngine):
         if super().index_documents(documents) is False:
             return False
 
-        return self._tree.build(self._document_vectors)
+        if not self._tree.build(self._document_vectors):
+            return False
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -771,12 +768,16 @@ class SearchEngine(BasicSearchEngine):
             return None
 
         result = self._tree.query(query_indexed)
-        if result is None or not result or not \
-                all(isinstance(distance, float) or isinstance(index, int)
-                    for distance, index in result):
+        if result is None or len(result) == 0:
+            return None
+        if None in result[0]:
             return None
 
-        return [(distance, self._documents[document]) for distance, document in result]
+        dist = result[0][0]
+        ind = int(result[0][1])
+        final = [(dist, self._documents[ind])]
+
+        return final
 
     def save(self, file_path: str) -> bool:
         """
@@ -816,3 +817,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        SearchEngine.__init__(self, vectorizer, tokenizer)

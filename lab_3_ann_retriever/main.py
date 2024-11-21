@@ -781,6 +781,8 @@ class SearchEngine(BasicSearchEngine):
             return None
 
         query_vector = self._index_document(query)
+        if query_vector is None:
+            return None
         result = self._tree.query(query_vector)
 
         if (not result or result is None or

@@ -648,3 +648,6 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+
+
+

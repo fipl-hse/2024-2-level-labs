@@ -100,7 +100,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
-        self.stop_words = stop_words
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -159,18 +159,18 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if tokens is None or not isinstance(tokens, list) or not isinstance(self.stop_words, list):
+        if tokens is None or not isinstance(tokens, list) or not isinstance(self._stop_words, list):
             return None
         for token in tokens:
             if not isinstance(token, str):
                 return None
-        for word in self.stop_words:
+        for word in self._stop_words:
             if not isinstance(word, str):
                 return None
-        if len(tokens) == 0 or len(self.stop_words) == 0:
+        if len(tokens) == 0 or len(self._stop_words) == 0:
             return None
 
-        return list(filter(lambda x: x not in self.stop_words, tokens))
+        return list(filter(lambda x: x not in self._stop_words, tokens))
 
 
 class Vectorizer:
@@ -810,7 +810,7 @@ class SearchEngine(BasicSearchEngine):
         if query_vector is None:
             return None
         nearest_neighbours = self._tree.query(query_vector)
-        if not nearest_neighbours:
+        if nearest_neighbours is None or len(nearest_neighbours) == 0:
             return None
         relevant_documents = []
 

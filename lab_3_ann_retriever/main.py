@@ -815,14 +815,10 @@ class SearchEngine(BasicSearchEngine):
         relevant_documents = []
 
         for score, index in nearest_neighbours:
-            if index is None or index < len(self._documents) or not isinstance(index, int):
-                return None
-            relevant_documents.append((score, self._documents[index]))
+            if index is not None and index == len(self._documents) and isinstance(index, int):
+                relevant_documents.append((score, self._documents[index]))
 
-        if not isinstance(relevant_documents, list) or relevant_documents == []:
-            return None
-
-        return relevant_documents
+        return relevant_documents if relevant_documents else None
 
     def save(self, file_path: str) -> bool:
         """

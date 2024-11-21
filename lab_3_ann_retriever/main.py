@@ -214,7 +214,7 @@ class Vectorizer:
             return False
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if not self._idf_values and not isinstance(self._idf_values, dict):
+        if not self._idf_values or not isinstance(self._idf_values, dict):
             return False
 
         for ind, token in enumerate(self._vocabulary):

@@ -483,6 +483,8 @@ class BasicSearchEngine:
         if not isinstance(document, str) or len(document) == 0:
             return None
         tokenized_text = self._tokenizer.tokenize(document)
+        if tokenized_text is None:
+            return None
         return self._vectorizer.vectorize(tokenized_text)
     def _dump_documents(self) -> dict:
         """
@@ -672,30 +674,30 @@ class NaiveKDTree:
         """
         if not isinstance(vector, tuple) or not isinstance(k, int) or len(vector) == 0 or k != 1:
             return None
-        depth = 0
         dimensions = len(self._root.vector)
         data = [[self._root,
-                depth]]
+                0]]
         neighbours = []
         while True:
             data_copy = data.pop(0)
             current_node = data_copy[0]
+            current_depth = int(data_copy[1])
             distance = calculate_distance(vector, current_node.vector)
             if distance is None:
                 return None
             if current_node.left_node is None and current_node.right_node is None:
                 neighbours.append((distance, current_node.payload))
                 break
-            axis = data_copy[1] % dimensions
+            axis = current_depth % dimensions
             if current_node.left_node is not None and current_node.right_node is not None:
                 if vector[axis] <= current_node.vector[axis]:
-                    data.append([data_copy[0].left_node, data_copy[1] + 1])
+                    data.append([data_copy[0].left_node, current_depth + 1])
                 else:
-                    data.append([data_copy[0].right_node, data_copy[1] + 1])
+                    data.append([data_copy[0].right_node, current_depth + 1])
             elif data_copy[0].right_node is None:
-                data.append([data_copy[0].left_node, data_copy[1] + 1])
+                data.append([data_copy[0].left_node, current_depth + 1])
             else:
-                data.append([data_copy[0].right_node, data_copy[1] + 1])
+                data.append([data_copy[0].right_node,current_depth + 1])
         return sorted(neighbours)[:k]
 class KDTree(NaiveKDTree):
     """

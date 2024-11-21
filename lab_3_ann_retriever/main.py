@@ -14,12 +14,6 @@ Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
 
-def is_valid_vector(vector: any) -> bool:
-    if isinstance(vector, tuple) and all(isinstance(point, float) for point in vector):
-        return True
-    return False
-
-
 class NodeLike(Protocol):
     """
     Type alias for a tree node.
@@ -58,7 +52,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
-    if not is_valid_vector(query_vector) or not is_valid_vector(document_vector):
+    if not isinstance(query_vector, tuple) or not isinstance(document_vector, tuple):
         return None
 
     dist = 0
@@ -166,11 +160,11 @@ class Tokenizer:
                 not isinstance(tokens, list) or
                 not all(isinstance(token, str) for token in tokens)):
             return None
-
-        for token in tokens.copy():
-            if token in self._stop_words:
-                tokens.remove(token)
-        return tokens
+        clear_list = []
+        for token in tokens:
+            if token not in self._stop_words:
+                clear_list.append(token)
+        return clear_list
 
 
 class Vectorizer:
@@ -237,7 +231,7 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not is_valid_vector(vector) or len(vector) != len(self._vocabulary):
+        if not isinstance(vector, tuple) or len(vector) != len(self._vocabulary):
             return None
 
         tokenized_document = []
@@ -369,7 +363,8 @@ class BasicSearchEngine:
         vectorized_query = self._vectorizer.vectorize(tokenized_query)
         if vectorized_query is None:
             return None
-        nearest_neighbours = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
+        nearest_neighbours = self._calculate_knn(vectorized_query,
+                                                 self._document_vectors, n_neighbours)
         if not nearest_neighbours or any(neighbour is None or neighbour[0] is None or neighbour[1]
                                          is None for neighbour in nearest_neighbours):
             return None
@@ -425,19 +420,16 @@ class BasicSearchEngine:
         return self._documents[nearest_neighbors[0][0]]
 
     def _calculate_knn(
-            self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
+        self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
         """
         Find nearest neighbours for a query vector.
-
         Args:
             query_vector (Vector): Vectorized query
             document_vectors (list[Vector]): Vectorized documents
             n_neighbours (int): Number of neighbours to return
-
         Returns:
             list[tuple[int, float]] | None: Nearest neighbours indices and distances
-
         In case of corrupt input arguments, None is returned.
         """
         bad_input = (not isinstance(query_vector, (list, tuple)) or
@@ -696,11 +688,13 @@ class NaiveKDTree:
 
             if vector[axis] < node.vector[axis]:
                 nodes.append((node.left_node, depth + 1))
-                if len(neighbours_list) < k or abs(vector[axis] - node.vector[axis]) < neighbours_list[-1][0]:
+                if len(neighbours_list) < k or abs(vector[axis] -
+                                                   node.vector[axis]) < neighbours_list[-1][0]:
                     nodes.append((node.right_node, depth + 1))
             else:
                 nodes.append((node.right_node, depth + 1))
-                if len(neighbours_list) < k or abs(vector[axis] - node.vector[axis]) < neighbours_list[-1][0]:
+                if len(neighbours_list) < k or abs(vector[axis] -
+                                                   node.vector[axis]) < neighbours_list[-1][0]:
                     nodes.append((node.left_node, depth + 1))
         return neighbours_list
 
@@ -776,18 +770,15 @@ class SearchEngine(BasicSearchEngine):
         return True
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int = 1
+        self, query: str, n_neighbours: int = 1
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
-
         Args:
             query (str): Query for obtaining relevant documents.
             n_neighbours (int): Number of relevant documents to return.
-
         Returns:
             list[tuple[float, str]] | None: Relevant documents with their distances.
-
         In case of corrupt input arguments, None is returned.
         """
         if (not isinstance(query, str) or

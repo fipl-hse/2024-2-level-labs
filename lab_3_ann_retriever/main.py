@@ -51,17 +51,14 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
-    if document_vector is None or query_vector is None:
+    if query_vector is None or document_vector is None:
         return None
     if not query_vector or not document_vector:
         return 0.0
 
     distance = 0.0
-    for i, value in enumerate(document_vector):
-        distance += (query_vector[i] - value) ** 2
-
-    if not distance or not isinstance(distance, float):
-        return None
+    for i, value in enumerate(query_vector):
+        distance += (value - document_vector[i] ) ** 2
 
     return distance ** 0.5
 
@@ -385,10 +382,9 @@ class BasicSearchEngine:
 
         relevant_docs = []
         for index, value in relevanced:
-            # if not isinstance(value[0], int):
-            #     return None
             relevant_docs.append((value, self._documents[index]))
         return relevant_docs
+
 
     def save(self, file_path: str) -> bool:
         """
@@ -463,7 +459,7 @@ class BasicSearchEngine:
                 return None
             distanced.append((index, distance))
 
-        result = sorted(distanced, key=lambda x: x[1])
+        result = sorted(distanced, key=lambda tuple_: tuple_[1])
         return result[:n_neighbours+1]
 
     def _index_document(self, document: str) -> Vector | None:

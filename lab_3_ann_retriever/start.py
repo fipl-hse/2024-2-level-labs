@@ -4,11 +4,7 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
-
-from pyspelling.filters.python import tokenizer
-
-from lab_3_ann_retriever.main import BasicSearchEngine, Vectorizer, Tokenizer, SearchEngine
-from seminars.practice_5_functions import return_hello_world
+from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:

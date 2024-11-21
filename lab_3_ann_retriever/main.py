@@ -9,7 +9,6 @@ from typing import Protocol
 from math import sqrt
 from lab_2_retrieval_w_bm25.main import calculate_idf
 
-
 Vector = tuple[float, ...]
 
 

@@ -220,11 +220,13 @@ class Vectorizer:
 
         self._token2ind = {word: index for index, word in enumerate(self._vocabulary)}
 
-        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-
-        if self._idf_values:
-            return True
-        return False
+        idf = calculate_idf(self._vocabulary, self._corpus)
+        if idf is None:
+            return False
+        self._idf_values = idf
+        if self._idf_values is None:
+            return False
+        return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -768,6 +770,14 @@ class SearchEngine(BasicSearchEngine):
         if not isinstance(query, str) or not isinstance(n_neighbours, int):
             return None
 
+        query_vector = self._index_document(query)
+        result = self._tree.query(query_vector)
+
+        if (not result or result is None or
+                not all(isinstance(distance, float) or isinstance(index, int) for distance, index in result)):
+            return None
+        return [(distance, self._documents[document]) for distance, document in result]
+
     def save(self, file_path: str) -> bool:
         """
         Save the SearchEngine instance to a file.
@@ -806,3 +816,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        self._tree = KDTree()
+        super().init(vectorizer, tokenizer)

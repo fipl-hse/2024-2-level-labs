@@ -219,7 +219,7 @@ class Vectorizer:
         # create vocab
         unique_tokens = set()
         for doc in self._corpus:
-            unique_tokens.update(doc)
+            unique_tokens.update(set(doc))
 
         self._vocabulary = sorted(unique_tokens)
 
@@ -271,7 +271,6 @@ class Vectorizer:
         In case of corrupt input arguments, None is returned.
         """
 
-        # self._token2ind = {}
         if len(vector) != len(self._vocabulary):
             return None
         tokens = []

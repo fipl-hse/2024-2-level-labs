@@ -34,13 +34,22 @@ def main() -> None:
         text = text_file.read()
 
     tokenizer = Tokenizer(open_files()[1])
-    tokenized_docs = [tokenizer.tokenize(doc) for doc in open_files()[1]]
+    tokenized_docs = tokenizer.tokenize_documents(open_files()[0])
+    if not isinstance(tokenized_docs, list):
+        return None
+
     vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()
 
-    knn_retriever = BasicSearchEngine(vectorizer = vectorizer, tokenizer = tokenizer)
+    text_tuple = tuple(float(value) for value in text.split(', '))
+    secret_tokens = vectorizer.vector2tokens(text_tuple)
+    print(secret_tokens)
 
-    result = knn_retriever
+    knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
+    knn_retriever.index_documents(open_files()[0])
+
+    result = knn_retriever.retrieve_vectorized(text_tuple)
+    print(result)
     assert result, "Result is None"
 
 if __name__ == "__main__":

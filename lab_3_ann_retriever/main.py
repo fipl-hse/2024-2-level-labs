@@ -119,6 +119,16 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(documents, list) or not all(isinstance(doc, str) for doc in documents):
+            return None
+        tokenize_doc = []
+        for elem in documents:
+            elem = self.tokenize(elem)
+            if elem is None:
+                return None
+            tokenize_doc.append(elem)
+        return tokenize_doc
+
 
 
 

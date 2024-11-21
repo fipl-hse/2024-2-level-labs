@@ -656,6 +656,7 @@ class NaiveKDTree:
         """
         if not isinstance(k, int) or not vector:
             return None
+
         return self._find_closest(vector, k)
 
     def save(self) -> dict | None:
@@ -803,10 +804,10 @@ class SearchEngine(BasicSearchEngine):
             return None
 
         docs_plus_dist = []
-        for distance in distances:
-            if not isinstance(distance, tuple) or not isinstance(distance[0], int):
+        for one_distance in distances:
+            if not isinstance(one_distance, tuple) or not isinstance(one_distance[0], int):
                 return None
-            docs_plus_dist.append((distance[1], self._documents[distance[0]]))
+            docs_plus_dist.append((one_distance[1], self._documents[one_distance[0]]))
         return docs_plus_dist
 
     def save(self, file_path: str) -> bool:

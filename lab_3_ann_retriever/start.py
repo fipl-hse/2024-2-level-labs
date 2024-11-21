@@ -30,17 +30,24 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
+    with open("assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
 
-    tokenizer = Tokenizer(open_files()[1])
-    tokenized_docs = [tokenizer.tokenize(doc) for doc in open_files()[1]]
-    vectorizer = Vectorizer(tokenized_docs)
+    documents, stop_words = open_files()
+    tokenizer = Tokenizer(stop_words)
+    tok_docs = tokenizer.tokenize_documents(documents)
+    vectorizer = Vectorizer(tok_docs)
     vectorizer.build()
 
-    knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
+    secret_vector = tuple(float(value.replace(',', '')) for value in text.split())
+    secret_tokens = vectorizer.vector2tokens(secret_vector)
+    print(secret_tokens)
 
-    result = knn_retriever
+    basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
+    basic_search_engine.index_documents(documents)
+    result = basic_search_engine.retrieve_vectorized(secret_vector)
+    print(result)
+
     assert result, "Result is None"
 
 

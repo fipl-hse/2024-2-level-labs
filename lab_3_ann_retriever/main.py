@@ -56,7 +56,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
                  not isinstance(query_vector, tuple) or not isinstance(document_vector, tuple)
                  or not all(isinstance(value, float) for value in query_vector)
                  or not all(isinstance(value, float) for value in document_vector)
-                 or len(query_vector) == len(document_vector) or len(query_vector) == 0
+                 or len(query_vector) != len(document_vector) or len(query_vector) == 0
                  or len(document_vector) == 0 or not query_vector or not document_vector)
     if bad_input:
         return None

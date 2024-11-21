@@ -357,12 +357,15 @@ class BasicSearchEngine:
                 not all(isinstance(elem, str) for elem in documents)):
             return False
 
+        self._document_vectors = []
         self._documents = documents
-        self._document_vectors = [self._index_document(doc) for doc in documents]
+        for document in documents:
+            indexed = self._index_document(document)
+            if indexed is None:
+                return False
+            self._document_vectors.append(indexed)
 
-        if self._document_vectors and None not in self._document_vectors:
-            return True
-        return False
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int

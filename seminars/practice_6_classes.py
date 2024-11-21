@@ -267,4 +267,3 @@ print("*" * 15 + " TASKS " + "*" * 15)
 #     """
 #     A class to represent a learning discipline studied in HSE
 #     """
-

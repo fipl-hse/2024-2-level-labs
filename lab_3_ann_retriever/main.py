@@ -198,13 +198,12 @@ class Vectorizer:
         if not self._corpus or not isinstance(self._corpus,list):
             return False
         self._vocabulary = sorted(list({word for text in self._corpus for word in text}))
-        for word in self._vocabulary:
-            idf = calculate_idf(self._vocabulary, self._corpus)
-            if idf is None:
-                return False
-            self._idf_values = idf
-            self._token2ind[word] = self._vocabulary.index(word)
-        if self._vocabulary is None or self._idf_values is None or self._token2ind is None:
+        idf = calculate_idf(self._vocabulary, self._corpus)
+        if not idf:
+            return False
+        self._idf_values = idf
+        self._token2ind = {term: index for index, term in enumerate(self._vocabulary)}
+        if None in (self._vocabulary,self._idf_values,self._token2ind):
             return False
         return True
 

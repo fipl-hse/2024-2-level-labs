@@ -58,6 +58,7 @@ def main() -> None:
     if not tokenized_docs:
         return
     vectorizer = Vectorizer(tokenized_docs)
+    vectorizer.build()
     searchengine = BasicSearchEngine(vectorizer,tokenizer)
     searchengine.index_documents(documents)
     secret_tokens = text.split(', ')
@@ -68,7 +69,13 @@ def main() -> None:
     secret_revealed = searchengine.retrieve_vectorized(secret_vector)
     print(secret_revealed)
 
+    relevant_docs = searchengine.retrieve_relevant_documents('Нижний Новгород', 3)
+    print(f'Relevant documents with basic search engine: {relevant_docs}')
+
     searchengine_pro = SearchEngine(vectorizer, tokenizer)
+    searchengine_pro.index_documents(documents)
+    relevant_docs_pro = searchengine_pro.retrieve_relevant_documents('Нижний Новгород',1)
+    print(f'Relevant documents with normal search engine: {relevant_docs_pro}')
 
     result = '???'
     assert result, "Result is None"

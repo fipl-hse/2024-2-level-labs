@@ -118,10 +118,14 @@ class Tokenizer:
         if not isinstance(text, str):
             return None
 
-        for element in text:
-            if not element.isalpha() and element != ' ':
-                text = text.replace(element, ' ')
-        return self._remove_stop_words(text.lower().split())
+        tokenized_text_str = ''
+        for element in text.lower():
+            if element.isalpha() or element == ' ':
+                tokenized_text_str += element
+            else:
+                tokenized_text_str += ' '
+        tokenized_text = tokenized_text_str.split()
+        return self._remove_stop_words(tokenized_text)
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -497,6 +501,10 @@ class Node(NodeLike):
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+        self.vector = vector
+        self.left_node = left_node
+        self.right_node = right_node
+        self.payload = payload
 
     def save(self) -> dict:
         """
@@ -529,6 +537,7 @@ class NaiveKDTree:
         """
         Initialize an instance of the KDTree class.
         """
+        self._root = None
 
     def build(self, vectors: list[Vector]) -> bool:
         """
@@ -542,6 +551,37 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
+        if not isinstance(vectors, list) or not vectors:
+            return False
+
+        state_of_space = [{'vectors': [(vector, index) for index, vector in enumerate(vectors)],
+                           'depth': 0,
+                           'parent': Node(tuple([0.0] * len(vectors[0])), -1),
+                           'left_subspace': True}]
+        while state_of_space:
+            this_space = state_of_space.pop()
+            if this_space['vectors']:
+                axis = this_space['depth'] % len(this_space['vectors'])
+                sorted_vectors = sorted(this_space['vectors'], key=lambda x: x[axis])
+                median_index = len(sorted_vectors) // 2
+                median_node = Node(sorted_vectors[median_index][0],
+                                   sorted_vectors[median_index][1])
+
+                if this_space['parent'].payload == -1:
+                    self._root = median_node
+                elif this_space['parent'].payload != -1 and this_space['left_subspace']:
+                    this_space['parent'].left_node = median_node
+                else:
+                    this_space['parent'].right_node = median_node
+                state_of_space.append({'vectors': this_space[:median_index],
+                                       'depth': this_space['depth'] + 1,
+                                       'parent': median_node,
+                                       'is_left': True})
+                state_of_space.append({'vectors': this_space[median_index + 1:],
+                                       'depth': this_space['depth'] + 1,
+                                       'parent': median_node,
+                                       'is_left': False})
+        return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """

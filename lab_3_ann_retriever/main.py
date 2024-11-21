@@ -228,6 +228,8 @@ class Vectorizer:
             or not all(isinstance(item, str) for item in tokenized_document):
             return None
 
+        return self._calculate_tf_idf(tokenized_document)
+
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
         Recreate a tokenized document based on a vector.

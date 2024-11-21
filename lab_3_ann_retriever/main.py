@@ -591,14 +591,10 @@ class NaiveKDTree:
                 not all(isinstance(vector, tuple) and len(vector) > 0 for vector in vectors)):
             return False
 
-        space_state = [{'vectors': [(vector, ind) for ind, vector in enumerate(vectors)],
-                        'depth': 0, 'parent node': Node((), -1), 'left dimension': True}]
+        space_state = [(vectors, 0, Node((), -1), True)]
 
         while space_state:
-            current_vectors = space_state[0]['vectors']
-            depth = space_state[0]['depth']
-            parent_node = space_state[0]['parent node']
-            left_dimension = space_state.pop(0)['left dimension']
+            current_vectors, depth, parent_node, left_dimension = space_state.pop()
 
             if not current_vectors:
                 continue

@@ -39,7 +39,7 @@ def main() -> None:
     tokenized_docs = tokenizer.tokenize_documents(documents)
     if tokenized_docs is None:
         return
-    print('Tokenized documents:', tokenized_docs)
+    print('Tokenized documents: ', tokenized_docs)
 
     vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()
@@ -47,10 +47,15 @@ def main() -> None:
     knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
     knn_retriever.index_documents(documents)
 
-    vector = vectorizer.vectorize(tokenizer.tokenize(documents[0]))
-    print(vector)
+    tokenized_doc = tokenizer.tokenize(documents[0])
+    if tokenized_doc is None:
+        return
+    vector = vectorizer.vectorize(tokenized_doc)
+    if vector is None:
+        return
+    print('Vector: ', vector)
     token_vector = vectorizer.vector2tokens(vector)
-    print(token_vector)
+    print('Token vector: ', token_vector)
     knn_retriever.retrieve_vectorized(vector)
 
     search_engine = SearchEngine(vectorizer, tokenizer)

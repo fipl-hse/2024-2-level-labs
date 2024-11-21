@@ -207,10 +207,9 @@ class Vectorizer:
         self._vocabulary = sorted(list(unique_words))
         self._token2ind = {token: ind for ind, token in enumerate(self._vocabulary)}
         idf = calculate_idf(self._vocabulary, self._corpus)
-        if isinstance(idf, dict):
-            self._idf_values = idf
-        if not self._vocabulary or not self._idf_values or not self._token2ind:
+        if not self._vocabulary or not isinstance(idf, dict) or not self._token2ind:
             return False
+        self._idf_values = idf
         return True
 
 
@@ -252,14 +251,9 @@ class Vectorizer:
             return None
         if not all(i >= 0 for i in vector):
             return None
-        tokens = []
-        for index, value in enumerate(vector):
-            if value == 0:
-                continue
-            if value != 0:
-                for token, ind in self._token2ind.items():
-                    if index == ind:
-                        tokens.append(token)
+        tokens = [token for index, value in enumerate(vector)
+                  if value != 0 for token, ind in
+                  self._token2ind.items() if index == ind]
         return tokens
 
 
@@ -462,12 +456,9 @@ class BasicSearchEngine:
         list_of_values = []
         for index, document_vector in enumerate(document_vectors):
             distance = calculate_distance(query_vector, document_vector)
-            if distance is not None:
-                list_of_values.append((index, distance))
-        if list_of_values:
-            sorted_tuples = sorted(list_of_values, key=lambda number: number[1])
-            return sorted_tuples[:n_neighbours]
-        return None
+            list_of_values.append((index, distance))
+        sorted_tuples = sorted(list_of_values, key=lambda number: number[1])
+        return sorted_tuples[:n_neighbours]
 
 
     def _index_document(self, document: str) -> Vector | None:
@@ -549,7 +540,6 @@ class Node(NodeLike):
             dict: state of the Node instance
         """
 
-
     def load(self, state: dict[str, dict | int]) -> bool:
         """
         Load Node instance from state.
@@ -590,10 +580,10 @@ class NaiveKDTree:
         if not isinstance(vectors, list) or not vectors:
             return False
 
-        starting_point = [(vectors, 0, Node((), -1), True)]
+        initial_condition = [(vectors, 0, Node((), -1), True)]
 
-        while starting_point:
-            current_vectors, depth, parent_node, left_side = starting_point.pop()
+        while initial_condition:
+            current_vectors, depth, parent_node, left_side = initial_condition.pop()
 
             if not current_vectors:
                 continue
@@ -617,11 +607,10 @@ class NaiveKDTree:
             right_vectors = sorted_vectors[median_index + 1:]
 
             depth += 1
-            starting_point.append((left_vectors, depth, new_node, True))
-            starting_point.append((right_vectors, depth, new_node, False))
+            initial_condition.append((left_vectors, depth, new_node, True))
+            initial_condition.append((right_vectors, depth, new_node, False))
 
         return True
-
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """

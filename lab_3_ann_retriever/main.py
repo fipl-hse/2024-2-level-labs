@@ -140,13 +140,13 @@ class Tokenizer:
         """
         if not isinstance(tokens, list) or not tokens:
             return None
+        clear_tokens = []
         for token in tokens:
-            if token in self._stop_words:
-                tokens.remove(token)
-        return tokens
-
-
-
+            if token not in self._stop_words:
+                clear_tokens.append(token)
+        if len(clear_tokens) == 0:
+            return None
+        return clear_tokens
 
 class Vectorizer:
     """

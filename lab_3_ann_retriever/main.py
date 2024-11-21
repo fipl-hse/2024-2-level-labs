@@ -202,24 +202,17 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        if not self._corpus:
+        if self._corpus is None or len(self._corpus) == 0:
             return False
+        self._vocabulary = sorted(list(set(token for doc in self._corpus for token in doc)))
 
-        unique_words = set()
-
-        for doc in self._corpus:
-            unique_words |= set(doc)
-        self._vocabulary = sorted(list(unique_words))
-        if not self._vocabulary:
+        text = calculate_idf(self._vocabulary, self._corpus)
+        if text is None:
             return False
-
-        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if not self._idf_values or not isinstance(self._idf_values, dict):
-            return False
+        self._idf_values = text
 
         for ind, token in enumerate(self._vocabulary):
             self._token2ind[token] = int(ind)
-
         if (None in self._vocabulary or None in self._idf_values
                 or None in self._token2ind):
             return False

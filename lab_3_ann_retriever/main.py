@@ -148,7 +148,8 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (documents and isinstance(documents, list) and all(isinstance(doc, str) for doc in documents)):
+        if not (documents and isinstance(documents, list) and
+                all(isinstance(doc, str) for doc in documents)):
             return None
         tokenized_documents = []
         for doc in documents:
@@ -170,7 +171,8 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (tokens and isinstance(tokens, list) and all(isinstance(elem, str) for elem in tokens)):
+        if not (tokens and isinstance(tokens, list) and
+                all(isinstance(elem, str) for elem in tokens)):
             return None
         return [token for token in tokens if token not in self._stop_words]
 
@@ -424,7 +426,8 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query_vector, tuple) or len(query_vector) != len(self._document_vectors[0]):
+        if (not isinstance(query_vector, tuple) or
+                len(query_vector) != len(self._document_vectors[0])):
             return None
 
         knn_calc = self._calculate_knn(query_vector, self._document_vectors, 1)
@@ -676,8 +679,7 @@ class NaiveKDTree:
                 distance = calculate_distance(vector, node.vector)
                 if distance is None:
                     return None
-                else:
-                    return [(distance, node.payload)]
+                return [(distance, node.payload)]
 
             axis = depth % len(vector)
             if vector[axis] < node.vector[axis]:

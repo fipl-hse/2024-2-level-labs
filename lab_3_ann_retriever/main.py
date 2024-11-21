@@ -92,8 +92,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
-        self.stop_words = stop_words
-
+        self._stop_words = stop_words
     def tokenize(self, text: str) -> list[str] | None:
         """
         Tokenize the input text into lowercase words without punctuation, digits and other symbols.
@@ -113,7 +112,6 @@ class Tokenizer:
             if token.isalpha():
                 tokenized_list.append(token)
         return tokenized_list
-
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
         Tokenize the input documents.
@@ -128,17 +126,13 @@ class Tokenizer:
         """
         if not isinstance(documents, list) or not all(isinstance(doc, str) for doc in documents):
             return None
-        tokenize_doc = []
-        for elem in documents:
-            elem = self.tokenize(elem)
-            if elem is None:
+        tokenize_docs = []
+        for doc in documents:
+            clear_doc = self.tokenize(doc)
+            if clear_doc is None:
                 return None
-            tokenize_doc.append(elem)
-        return tokenize_doc
-
-
-
-
+            tokenize_docs.append(clear_doc)
+        return tokenize_docs
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
 
         """
@@ -156,7 +150,6 @@ class Tokenizer:
                 or not tokens):
             return None
         return [token for token in tokens if token not in self._stop_words]
-
 class Vectorizer:
     """
     TF-IDF Vectorizer.

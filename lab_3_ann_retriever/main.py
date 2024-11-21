@@ -673,9 +673,6 @@ class NaiveKDTree:
             median_index = len(current_space[0]) // 2
             median_ind_vec = current_space[0][median_index]
             node_to_assign = Node(median_ind_vec[1], median_ind_vec[0])
-            vectors_value_left = current_space[0][:median_index]
-            vectors_value_right = current_space[0][median_index + 1:]
-            depth_value = current_space[1] + 1
             if current_space[2].payload == -1:
                 self._root = node_to_assign
                 parent_value = self._root
@@ -685,9 +682,9 @@ class NaiveKDTree:
             else:
                 current_space[2].right_node = node_to_assign
                 parent_value = current_space[2].right_node
-            info_list.append((vectors_value_left, depth_value,
+            info_list.append((current_space[0][:median_index], current_space[1] + 1,
                               parent_value, True))
-            info_list.append((vectors_value_right, depth_value,
+            info_list.append((current_space[0][median_index + 1:], current_space[1] + 1,
                               parent_value, False))
         return True
 
@@ -762,7 +759,7 @@ class NaiveKDTree:
         if not (isinstance(vector, tuple) and isinstance(k, int) and len(vector) > 0 and
                 k > 0 and not self._root is None):
             return None
-        distance_list = []
+        closest_nodes = []
         info_list = [(self._root, 0)]
         while len(info_list) > 0:
             current_node = info_list.pop(0)
@@ -770,7 +767,7 @@ class NaiveKDTree:
                 distance = calculate_distance(vector, current_node[0].vector)
                 if not isinstance(distance, float):
                     return None
-                distance_list.append((distance, current_node[0].payload))
+                closest_nodes.append((distance, current_node[0].payload))
                 break
             axis = current_node[1] % len(vector)
             if current_node[0].right_node is None:
@@ -782,7 +779,7 @@ class NaiveKDTree:
             else:
                 new_node = current_node[0].right_node
             info_list.append((new_node, current_node[1] + 1))
-        return sorted(distance_list)[:k]
+        return sorted(closest_nodes)[:k]
 
 
 class KDTree(NaiveKDTree):
@@ -956,14 +953,14 @@ class SearchEngine(BasicSearchEngine):
             state = json.load(read_file)
         if not (isinstance(state, dict) and "engine" in state):
             return False
-        eng = state["engine"]
-        if not ("documents" in eng and "document_vectors" in eng and "tree" in eng):
+        engine = state["engine"]
+        if not ("documents" in engine and "document_vectors" in engine and "tree" in engine):
             return False
         self._load_documents(
-            {"documents": eng["documents"], "document_vectors": eng["document_vectors"]})
-        if not (isinstance(eng["tree"], dict) and len(eng["tree"]) > 0):
+            {"documents": engine["documents"], "document_vectors": engine["document_vectors"]})
+        if not (isinstance(engine["tree"], dict) and len(engine["tree"]) > 0):
             return False
-        return self._tree.load(eng["tree"])
+        return self._tree.load(engine["tree"])
 
 
 class AdvancedSearchEngine(SearchEngine):

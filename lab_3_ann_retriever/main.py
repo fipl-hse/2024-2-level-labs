@@ -708,6 +708,29 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(vector, tuple) or not isinstance(k, int) or len(vector) == 0 or k != 1:
+            return None
+
+        subspaces = [(self._root, 0)]
+
+        while subspaces:
+            node, depth = subspaces.pop(0)
+            if node is None:
+                return None
+
+            if node.left_node is None and node.right_node is None:
+                distance = calculate_distance(vector, node.vector)
+                return [(distance, node.payload)] if distance is not None else None
+
+            axis = depth % len(node.vector)
+            new_depth = depth + 1
+
+            if vector[axis] <= node.vector[axis]:
+                subspaces.append((node.left_node, new_depth))
+            else:
+                subspaces.append((node.right_node, new_depth))
+
+        return None
 
 
 class KDTree(NaiveKDTree):

@@ -364,6 +364,9 @@ class BasicSearchEngine:
         for tuple_inside in document_vectors:
             if tuple_inside is None:
                 return False
+            for every_float in tuple_inside:
+                if every_float is None:
+                    return False
         self._document_vectors = document_vectors
         self._documents = documents
 

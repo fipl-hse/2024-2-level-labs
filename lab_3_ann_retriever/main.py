@@ -3,9 +3,8 @@ Lab 3.
 
 Vector search with text retrieving
 """
-
 from json import dump, load
-# from math import sqrt
+from math import sqrt
 from re import findall
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
@@ -57,7 +56,7 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     if query_vector is None or document_vector is None:
         return None
 
-    return sum((query - doc) ** 2 for query, doc in zip(query_vector, document_vector)) ** 0.5
+    return sqrt(sum((query - doc) ** 2 for query, doc in zip(query_vector, document_vector)))
 
 
 def save_vector(vector: Vector) -> dict:
@@ -72,7 +71,7 @@ def save_vector(vector: Vector) -> dict:
     """
     return {
         'len': len(vector),
-        'elements': {vector.index(score): score for score in vector if score}
+        'elements': {index: score for index, score in enumerate(vector) if score}
             }
 
 
@@ -91,7 +90,7 @@ def load_vector(state: dict) -> Vector | None:
     if not isinstance(state, dict) or not state or 'len' not in state or 'elements' not in state:
         return None
 
-    vector = [0.0 for _ in range(state['len'])]
+    vector = [0.0 * k for k in range(state['len'])]
     for index, score in state['elements'].items():
         vector[int(index)] = score
     return tuple(vector)
@@ -421,6 +420,12 @@ class BasicSearchEngine:
         Returns:
             bool: True if engine was loaded, False in other cases
         """
+        if not isinstance(file_path, str) or not file_path:
+            return False
+
+        with open(file_path, 'r', encoding='utf-8') as state_file:
+            state = load(state_file)
+        return self._load_documents(state)
 
     def retrieve_vectorized(self, query_vector: Vector) -> str | None:
         """
@@ -461,7 +466,9 @@ class BasicSearchEngine:
         """
         if not isinstance(query_vector, tuple) or not query_vector \
                 or not isinstance(document_vectors, list) or not document_vectors \
-                or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+                or not isinstance(n_neighbours, int):
+            return None
+        if n_neighbours <= 0:
             return None
 
         distances = [(document_vectors.index(doc_vect), distance) for doc_vect in document_vectors
@@ -511,6 +518,20 @@ class BasicSearchEngine:
         Returns:
             bool: True if documents were loaded, False in other cases
         """
+        if not isinstance(state, dict) or not state or 'engine' not in state \
+                or not state['engine'] or 'document_vectors' not in state['engine']:
+            return False
+        if 'documents' not in state['engine'] or not state['engine']['documents'] \
+                or not state['engine']['document_vectors']:
+            return False
+
+        self._documents = state['engine']['documents']
+        self._document_vectors = [loaded_vect for vect in state['engine']['document_vectors']
+                                  if (loaded_vect := load_vector(vect))]
+        if not self._documents or not self._document_vectors:
+            return False
+
+        return True
 
 
 class Node(NodeLike):
@@ -551,6 +572,12 @@ class Node(NodeLike):
         Returns:
             dict: state of the Node instance
         """
+        return {
+            'vector': save_vector(self.vector),
+            'payload': self.payload,
+            'left_node': self.left_node.save() if self.left_node else None,
+            'right_node': self.right_node.save() if self.right_node else None
+        }
 
     def load(self, state: dict[str, dict | int]) -> bool:
         """
@@ -562,6 +589,33 @@ class Node(NodeLike):
         Returns:
             bool: True if Node was loaded successfully, False in other cases.
         """
+        if not isinstance(state, dict) or not state or 'vector' not in state \
+                or 'payload' not in state or 'left_node' not in state:
+            return False
+        if 'right_node' not in state or not isinstance(state['vector'], dict) \
+                or not isinstance(state['payload'], int):
+            return False
+
+        vector = load_vector(state['vector'])
+        if not vector:
+            return False
+        self.vector = vector
+        self.payload = state['payload']
+
+        left_node = Node()
+        if state['left_node'] is None:
+            self.left_node = None
+        elif not isinstance(state['left_node'], dict) or not left_node.load(state['left_node']):
+            return False
+        self.left_node = left_node
+
+        right_node = Node()
+        if state['right_node'] is None:
+            self.right_node = None
+        elif not isinstance(state['right_node'], dict) or not right_node.load(state['right_node']):
+            return False
+        self.right_node = right_node
+        return True
 
 
 class NaiveKDTree:
@@ -636,10 +690,6 @@ class NaiveKDTree:
                     'current dimension': False
                 }
             )
-
-        if not self._root:
-            return False
-
         return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
@@ -669,6 +719,10 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
+        if self._root is None:
+            return None
+
+        return {'root': self._root.save()}
 
     def load(self, state: dict) -> bool:
         """
@@ -680,6 +734,15 @@ class NaiveKDTree:
         Returns:
             bool: True is loaded successfully, False in other cases
         """
+        if not isinstance(state, dict) or not state or 'root' not in state:
+            return False
+
+        self._root = Node()
+        self._root.load(state)
+        if not self._root:
+            return False
+
+        return True
 
     def _find_closest(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
@@ -847,6 +910,24 @@ class SearchEngine(BasicSearchEngine):
         Returns:
             bool: True if saved successfully, False in other case
         """
+        if not isinstance(file_path, str) or not file_path:
+            return False
+
+        tree_state = self._tree.save()
+        if tree_state is None:
+            return False
+        documents = super()._dump_documents()['documents']
+        document_vectors = super()._dump_documents()['document_vectors']
+        state = {
+            'engine': {
+                'tree': tree_state,
+                'documents': documents,
+                'document_vectors': document_vectors
+            }
+        }
+        with open(file_path, 'w', encoding='utf-8') as state_file:
+            dump(state, state_file, ensure_ascii=False)
+        return True
 
     def load(self, file_path: str) -> bool:
         """
@@ -858,6 +939,16 @@ class SearchEngine(BasicSearchEngine):
         Returns:
             bool: True if engine was loaded successfully, False in other cases
         """
+        if not isinstance(file_path, str) or not file_path:
+            return False
+
+        with open(file_path, 'r', encoding='utf-8') as state_file:
+            state = load(state_file)
+        if not isinstance(state, dict) or not state or 'engine' not in state \
+                or 'tree' not in state['engine'] or not self._tree.load(state['engine']['tree']):
+            return False
+
+        return self._load_documents(state)
 
 
 class AdvancedSearchEngine(SearchEngine):

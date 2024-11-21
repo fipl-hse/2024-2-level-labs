@@ -146,7 +146,7 @@ class Tokenizer:
                 if word != '':
                     out.append(word)
                 word = ''
-        return out or None
+        return self._remove_stop_words(out) or None
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -168,7 +168,7 @@ class Tokenizer:
             if not item:
                 return None
             out.append(self.tokenize(item))
-        return self._remove_stop_words(out)
+        return out
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """

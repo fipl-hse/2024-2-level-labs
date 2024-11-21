@@ -279,22 +279,17 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (isinstance(document, list) and isinstance(self._vocabulary, list) and
-                isinstance(self._token2ind, dict)):
+        if not (isinstance(document, list) and document and all(
+                isinstance(token, str) for token in document)):
             return None
 
-        tf = calculate_tf(self._vocabulary, document)
-        if not isinstance(tf, dict):
-            return None
-
-        vector_to_fill = [0.0] * len(self._vocabulary)
-        for word in tf:
-            if word in self._token2ind:
-                vec_ind = self._token2ind[word]
-                if not isinstance(vec_ind, int):
-                    return None
-                vector_to_fill[vec_ind] = tf[word] * self._idf_values[word]
-        return Vector(vector_to_fill)
+        vector = list(0.0 for _ in range(len(self._vocabulary)))
+        for token in document:
+            if self._token2ind.get(token) is not None:
+                tf = calculate_tf(self._vocabulary, document)
+                if tf is not None:
+                    vector[self._token2ind[token]] = tf[token] * self._idf_values[token]
+        return Vector(vector)
 
 
 class BasicSearchEngine:
@@ -455,7 +450,7 @@ class BasicSearchEngine:
                 return None
             neighbours.append((document_vectors.index(document_vector), document_distance))
 
-        neighbours.sort(key=lambda tuple_: tuple_[1])
+        neighbours.sort(key=lambda tuple_: tuple_[1], reverse=True)
         return neighbours[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
@@ -784,22 +779,20 @@ class SearchEngine(BasicSearchEngine):
         """
         if not (isinstance(query, str) and isinstance(n_neighbours, int)):
             return None
-        tokenized_query = self._tokenizer.tokenize(query)
-        if tokenized_query is None:
+        query_tokens = self._tokenizer.tokenize(query)
+        if query_tokens is None:
             return None
-        vectorized_query = self._vectorizer.vectorize(tokenized_query)
-        if vectorized_query is None:
-            return None
-        n_distances = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
-        if not n_distances:
+        query_vector = self._vectorizer.vectorize(query_tokens)
+        if query_vector is None:
             return None
 
-        relevant_docs = []
-        for distance in n_distances:
-            if None in distance:
-                return None
-            relevant_docs.append((distance[1], self._documents[distance[0]]))
-        return relevant_docs
+        relevant_vectors = self._tree.query(query_vector, n_neighbours)
+        if (relevant_vectors is None or any(None in vector for vector in relevant_vectors)
+                or not relevant_vectors):
+            return None
+
+        return [(relevant_vectors[i][0], self._documents[relevant_vectors[i][1]]) for i in
+                range(len(relevant_vectors))]
 
     def save(self, file_path: str) -> bool:
         """

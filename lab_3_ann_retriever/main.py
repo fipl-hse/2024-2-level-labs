@@ -458,7 +458,10 @@ class BasicSearchEngine:
         distanced = []
 
         for index, value in enumerate(document_vectors):
-            distanced.append((index, calculate_distance(query_vector, value)))
+            distance = calculate_distance(query_vector, value)
+            if distance is None:
+                return None
+            distanced.append((index, distance))
 
         result = sorted(distanced, key=lambda x: x[1])
         return result[:n_neighbours+1]

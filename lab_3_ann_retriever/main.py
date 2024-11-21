@@ -91,6 +91,7 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
+        self._stop_words = stop_words
 
     def tokenize(self, text: str) -> list[str] | None:
         """
@@ -105,6 +106,14 @@ class Tokenizer:
         In case of corrupt input arguments, None is returned.
         """
 
+        if not isinstance(text, str):
+            return None
+
+        for char in text:
+            if not char.isalpha() and char != ' ':
+                text = text.replace(char, ' ')
+        return text.lower().split()
+
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
         Tokenize the input documents.
@@ -118,6 +127,20 @@ class Tokenizer:
         In case of corrupt input arguments, None is returned.
         """
 
+        if (not isinstance(documents, list)
+                or not all(isinstance(document, str) for document in documents)
+                or not documents):
+            return None
+
+        tokenized_list = []
+        for text in documents:
+            doc = self.tokenize(text)
+            if not doc:
+                return None
+            tokenized_list.append(doc)
+
+        return tokenized_list
+
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
         Remove stopwords from the list of tokens.
@@ -130,7 +153,14 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or \
+                not tokens:
+            return None
+        if not isinstance(self._stop_words, list) or not all(isinstance(word, str) for word in self._stop_words) or \
+                not self._stop_words:
+            return None
 
+        return [token for token in tokens if token not in self._stop_words]
 
 class Vectorizer:
     """

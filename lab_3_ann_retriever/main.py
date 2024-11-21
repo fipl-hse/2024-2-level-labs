@@ -591,7 +591,8 @@ class NaiveKDTree:
             axis = depth % dimensions
             current_vectors.sort(key=lambda x: x[axis])
             median_index = len(current_vectors) // 2
-            node_median = Node(current_vectors[median_index], another_vec.index(current_vectors[median_index]))
+            node_median = Node(current_vectors[median_index],
+                               another_vec.index(current_vectors[median_index]))
             if parent_index.payload == -1:
                 self._root = node_median
             else:

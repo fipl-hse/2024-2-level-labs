@@ -681,7 +681,7 @@ class NaiveKDTree:
         while True:
             data_copy = data.pop(0)
             current_node = data_copy[0]
-            current_depth = int(data_copy[1])
+            current_depth = data_copy[1]
             distance = calculate_distance(vector, current_node.vector)
             if distance is None:
                 return None
@@ -777,6 +777,8 @@ class SearchEngine(BasicSearchEngine):
         if not self.index_documents(self._documents):
             return None
         query_vector = super()._index_document(query)
+        if query_vector is None:
+            return None
         result = self._tree.query(query_vector, n_neighbours)
         if result is None or len(result) == 0:
             return None

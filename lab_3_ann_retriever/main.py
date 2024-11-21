@@ -53,7 +53,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     """
     if not isinstance(query_vector, tuple) or not isinstance(document_vector, tuple):
         return None
-
+    if not query_vector or not document_vector:
+        return 0.0
     dist = 0
     for que_vec, doc_vec in zip(query_vector, document_vector):
         dist += (que_vec - doc_vec) ** 2
@@ -140,8 +141,11 @@ class Tokenizer:
 
         tokenized_documents = []
         for document in documents:
-            tokenized_documents.append(self.tokenize(document))
-        return tokenized_documents if None not in tokenized_documents else None
+            tokenized_doc = self.tokenize(document)
+            if not isinstance(tokenized_doc, list):
+                return None
+            tokenized_documents.append(tokenized_doc)
+        return tokenized_documents
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -195,9 +199,9 @@ class Vectorizer:
         if self._corpus is None or len(self._corpus) == 0:
             return False
 
-        self._vocabulary = sorted(build_vocabulary(self._corpus))
-        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        self._token2ind = {token: self._vocabulary.index(token) for token in self._vocabulary}
+        self._vocabulary = sorted(list(set(token for doc in self._corpus for token in doc)))
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus) or {}
+        self._token2ind = {word: index for index, word in enumerate(self._vocabulary)}
         return bool(self._vocabulary and self._idf_values and self._token2ind)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
@@ -571,7 +575,7 @@ class NaiveKDTree:
             return False
 
         space_condition: list[dict] = [{
-            "vectors": [(index, vector) for index, vector in list(enumerate(vectors))],
+            "vectors": [(index, vector) for index, vector in list(list(enumerate(vectors)))],
             "depth": 0,
             "parent_node": Node((0.0,) * len(vectors[0]), -1),
             "is_left_subspace": True}]
@@ -841,3 +845,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)

@@ -466,6 +466,8 @@ class BasicSearchEngine:
         doc_distances = []
         for vector in document_vectors:
             distance = calculate_distance(query_vector, vector)
+            if distance is None:
+                return None
             doc_distances.append((document_vectors.index(vector), distance))
 
         distances = sorted(doc_distances, key=lambda x: x[1], reverse=False)

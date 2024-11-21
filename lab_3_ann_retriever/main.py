@@ -618,10 +618,8 @@ class NaiveKDTree:
             right_vectors = sorted_vectors[median_index + 1:]
             depth += 1
 
-            space_state.append({'vectors': left_vectors, 'depth': depth,
-                                'parent node': median_node, 'left dimension': True})
-            space_state.append({'vectors': right_vectors, 'depth': depth,
-                                'parent node': median_node, 'left dimension': False})
+            space_state.append((left_vectors, depth, median_node, True))
+            space_state.append((right_vectors, depth, median_node, False))
 
         if not self._root:
             return False

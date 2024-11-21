@@ -138,6 +138,8 @@ class Tokenizer:
         if not isinstance(tokens, list) or not tokens:
             return None
         for word in tokens:
+            if not isinstance(word, str):
+                return None
             if word in self._stop_words:
                 tokens.remove(token)
         return tokens

@@ -400,7 +400,7 @@ class BasicSearchEngine:
             bool: returns True if save was done correctly, False in another cases
         """
         if not file_path or not isinstance(file_path,str):
-            return None
+            return False
         with open(file_path,'w',encoding='utf-8') as file:
             json.dump({'engine': self._dump_documents()},file)
         return True
@@ -440,7 +440,7 @@ class BasicSearchEngine:
             return None
         for vector in self._document_vectors:
             if len(query_vector) != len(vector):
-                return False
+                return None
         doc_num = self._calculate_knn(query_vector, self._document_vectors, 1)
         if doc_num is None or not doc_num:
             return None

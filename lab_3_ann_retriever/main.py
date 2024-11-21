@@ -758,18 +758,21 @@ class SearchEngine(BasicSearchEngine):
         if (not isinstance(documents, list) or not documents
                 or not all(isinstance(doc, str) for doc in documents)):
             return False
+
         self._documents = documents
+        if not self._documents:
+            return False
 
         for doc in documents:
             indexed_doc = self._index_document(doc)
             if indexed_doc is None:
                 return False
             self._document_vectors.append(indexed_doc)
+        self._tree.build(self._document_vectors)
 
         if (self._document_vectors is None or not self._document_vectors
-                or len(self._document_vectors) != len(documents)):
-            return False
-        if not self._tree.build(self._document_vectors):
+                or len(self._document_vectors) != len(documents)
+                or not self._tree.build(self._document_vectors)):
             return False
 
         return True

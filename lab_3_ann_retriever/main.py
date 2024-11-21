@@ -580,7 +580,7 @@ class NaiveKDTree:
         if not all(len(vec) == dimensions for vec in vectors):
             return False
         another_vec = vectors[:]
-        nodes: list[tuple[list[Vector], int, Node | None, bool]] = [(vectors, 0, None, True)]
+        nodes = [(vectors, 0, None, True)]
         while nodes:
             current_vectors, depth, parent, is_left = nodes.pop()
             if not current_vectors:

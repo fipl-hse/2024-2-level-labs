@@ -64,6 +64,8 @@ def main() -> None:
     query = 'Нижний Новгород'
     most_relevant_doc = search_engine.retrieve_relevant_documents(query)
     result = most_relevant_doc
+
+    print('Most relevant document: ', result)
     assert result, "Result is None"
 
 

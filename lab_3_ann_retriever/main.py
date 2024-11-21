@@ -55,9 +55,11 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         return None
     if not query_vector or not document_vector:
         return 0.0
+
     euclidean_distance = 0.0
     for i, number in enumerate(query_vector):
         euclidean_distance += (number - document_vector[i]) ** 2
+
     return euclidean_distance ** 0.5
 
 
@@ -165,9 +167,7 @@ class Tokenizer:
                 or not tokens):
             return None
 
-        list_without_sw = [token for token in tokens if token not in self.stop_words]
-
-        return list_without_sw
+        return [token for token in tokens if token not in self.stop_words]
 
 
 class Vectorizer:
@@ -369,16 +369,27 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if (n_neighbours <= 0 or not isinstance(query, str)
+                or not query or not isinstance(n_neighbours, int)):
+            return None
+
         relevant_documents = []
         vectorized_query = self._index_document(query)
         if vectorized_query is None:
             return None
+
         self.index_documents(self._documents)
         knn = self._calculate_knn(vectorized_query, self._document_vectors, n_neighbours)
         if knn is None or not knn:
             return None
+
         for value in knn:
+            if value is None:
+                return None
             relevant_documents.append((value[1], self._documents[value[0]]))
+
+        if relevant_documents is None:
+            return None
         return relevant_documents
 
     def save(self, file_path: str) -> bool:
@@ -415,11 +426,14 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query_vector, tuple):
+        if (not isinstance(query_vector, (list, tuple))
+                or not query_vector
+                or not self._document_vectors):
             return None
-        for vector in self._document_vectors:
-            if len(vector) < len(query_vector):
-                return None
+        if (not isinstance(query_vector, tuple)
+                or len(query_vector) != len(self._document_vectors[0])):
+            return None
+
         doc = self._calculate_knn(query_vector, self._document_vectors, 1)
         if not doc:
             return None
@@ -441,11 +455,16 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if query_vector is None or not document_vectors:
+        if (not isinstance(document_vectors, list) or not isinstance(n_neighbours, int)
+                or not query_vector or not document_vectors):
             return None
+
         knn = []
         for i, doc in enumerate(document_vectors):
             knn.append((i, calculate_distance(query_vector, doc)))
+            if knn is None:
+                return None
+
         sorted(knn, key=lambda x: x[1])
         return knn[:n_neighbours + 1]
 
@@ -461,10 +480,17 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(document, str):
+        if not isinstance(document, str) or not document:
             return None
+
         tokenized_doc = self._tokenizer.tokenize(document)
+        if tokenized_doc is None:
+            return None
+
         vectorized_doc = self._vectorizer.vectorize(tokenized_doc)
+        if vectorized_doc is None:
+            return None
+
         return vectorized_doc
 
     def _dump_documents(self) -> dict:
@@ -513,6 +539,10 @@ class Node(NodeLike):
             left_node (NodeLike | None): Left node
             right_node (NodeLike | None): Right node
         """
+        self.vector = vector
+        self.payload = payload
+        self.left_node = left_node
+        self.right_node = right_node
 
     def save(self) -> dict:
         """
@@ -521,6 +551,12 @@ class Node(NodeLike):
         Returns:
             dict: state of the Node instance
         """
+        return {
+            'vector': save_vector(self.vector),
+            'payload': self.payload,
+            'left_node': self.left_node.save() if self.left_node else None,
+            'right_node': self.right_node.save() if self.right_node else None
+        }
 
     def load(self, state: dict[str, dict | int]) -> bool:
         """
@@ -545,6 +581,7 @@ class NaiveKDTree:
         """
         Initialize an instance of the KDTree class.
         """
+        self._root = None
 
     def build(self, vectors: list[Vector]) -> bool:
         """

@@ -130,7 +130,6 @@ class Tokenizer:
 
         return self._remove_stop_words(re.findall('[a-zа-яё]+', text.lower()))
 
-
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
         Tokenize the input documents.
@@ -148,7 +147,6 @@ class Tokenizer:
         tokenized = [self.tokenize(document) for document in documents]
         return [tokens for tokens in tokenized
                 if tokens is not None] or None
-
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -212,7 +210,6 @@ class Vectorizer:
         self._idf_values = idf
         return True
 
-
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
         Create a vector for tokenized document.
@@ -231,7 +228,6 @@ class Vectorizer:
         if not self._vocabulary:
             return ()
         return self._calculate_tf_idf(tokenized_document)
-
 
     def vector2tokens(self, vector: Vector) -> list[str] | None:
         """
@@ -255,7 +251,6 @@ class Vectorizer:
                   if value != 0 for token, ind in
                   self._token2ind.items() if index == ind]
         return tokens
-
 
     def save(self, file_path: str) -> bool:
         """
@@ -325,7 +320,6 @@ class BasicSearchEngine:
         self._documents = []
         self._document_vectors = []
 
-
     def index_documents(self, documents: list[str]) -> bool:
         """
         Index documents for engine.
@@ -349,7 +343,6 @@ class BasicSearchEngine:
         if len(self._document_vectors) != len(documents):
             return False
         return True
-
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -384,7 +377,6 @@ class BasicSearchEngine:
         if result == []:
             return None
         return result
-
 
     def save(self, file_path: str) -> bool:
         """
@@ -458,7 +450,6 @@ class BasicSearchEngine:
         sorted_tuples = sorted(list_of_values, key=lambda number: number[1])
         return sorted_tuples[:n_neighbours]
 
-
     def _index_document(self, document: str) -> Vector | None:
         """
         Index document.
@@ -477,7 +468,6 @@ class BasicSearchEngine:
         if tokenized_doc is None or not tokenized_doc:
             return None
         return self._vectorizer.vectorize(tokenized_doc)
-
 
     def _dump_documents(self) -> dict:
         """
@@ -629,7 +619,6 @@ class NaiveKDTree:
 
         return self._find_closest(vector, k)
 
-
     def save(self) -> dict | None:
         """
         Save NaiveKDTree instance to state.
@@ -726,7 +715,6 @@ class SearchEngine(BasicSearchEngine):
         super().__init__(vectorizer, tokenizer)
         self._tree = NaiveKDTree()
 
-
     def index_documents(self, documents: list[str]) -> bool:
         """
         Index documents for retriever.
@@ -781,7 +769,6 @@ class SearchEngine(BasicSearchEngine):
             if isinstance(neigh, tuple) and len(neigh) >= 2 and isinstance(neigh[1], int):
                 result.append((neigh[0], self._documents[neigh[1]]))
         return result if result else None
-
 
     def save(self, file_path: str) -> bool:
         """

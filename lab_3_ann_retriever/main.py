@@ -6,6 +6,7 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from math import sqrt
 from typing import Protocol
+from json import dump, load
 
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
@@ -73,6 +74,12 @@ def save_vector(vector: Vector) -> dict:
     Returns:
         dict: A state of the vector to save
     """
+    vector_dict = {index: value for index, value in enumerate(vector) if value > 0}
+    vector_condition = {
+        'len': len(vector_dict),
+        'elements': vector_dict
+    }
+    return vector_condition
 
 
 def load_vector(state: dict) -> Vector | None:
@@ -255,6 +262,17 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
+        if (not file_path or not self._idf_values or
+                not self._vocabulary or self._token2ind):
+            return False
+        vectorizer_dict = {
+            'idf_values': self._idf_values,
+            'vocabulary': self._vocabulary,
+            'token2ind': self._token2ind
+        }
+        with open(file_path, 'w', encoding='utf-8') as f:
+            dump(vectorizer_dict, f)
+        return True
 
     def load(self, file_path: str) -> bool:
         """
@@ -268,6 +286,12 @@ class Vectorizer:
 
         In case of corrupt input arguments, False is returned.
         """
+        with open(file_path, 'w', encoding='utf-8') as f:
+            vectorizer_dict = load(f)
+        self._idf_values = vectorizer_dict['idf_values']
+        self._vocabulary = vectorizer_dict['vocabulary']
+        self._token2ind = vectorizer_dict['token2ind']
+        return bool(self._vocabulary and self._idf_values and self._token2ind)
 
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
         """
@@ -486,6 +510,11 @@ class BasicSearchEngine:
         Returns:
             dict: document and document_vectors states
         """
+        attribute_dict = {
+            "documents": self._documents,
+            "document_vectors": self._document_vectors,
+        }
+        return attribute_dict
 
     def _load_documents(self, state: dict) -> bool:
         """

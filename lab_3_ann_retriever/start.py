@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
+from lab_3_ann_retriever.main import BasicSearchEngine, save_vector, SearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -35,7 +35,7 @@ def main() -> None:
     documents, stopwords = open_files()
 
     tokenizer = Tokenizer(stopwords)
-    tokenized_docs = tokenizer.tokenize_documents(documents)
+    tokenized_docs = tokenizer.tokenize_documents(documents[:50])
     if not tokenized_docs or not isinstance(tokenized_docs, list):
         return
 
@@ -43,7 +43,7 @@ def main() -> None:
     vectorizer.build()
 
     knn_retriever = BasicSearchEngine(vectorizer, tokenizer)
-    knn_retriever.index_documents(documents)
+    knn_retriever.index_documents(documents[:50])
     knn_result = knn_retriever.retrieve_relevant_documents("Нижний Новгород", 1)
 
     naive_kdtree_retriever = SearchEngine(vectorizer, tokenizer)
@@ -51,6 +51,11 @@ def main() -> None:
     naive_kdtree_result = naive_kdtree_retriever.retrieve_relevant_documents("Нижний Новгород")
 
     result = (knn_result, naive_kdtree_result)
+
+    save_vector((0.0, -0.007, 0.0, 0.0, 0.5, 0.0, 0.0))
+    vectorizer.save("assets/vectorizer_state.json")
+    vectorizer.load("assets/vectorizer_state.json")
+    knn_retriever.save("assets/states/engine_state.json")
     assert result, "Result is None"
 
 

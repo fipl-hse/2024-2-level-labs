@@ -1,9 +1,11 @@
 """
 Laboratory Work #3 starter.
 """
-import time
+
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+import time
 from pathlib import Path
+
 from lab_3_ann_retriever.main import (AdvancedSearchEngine, BasicSearchEngine, SearchEngine,
                                       Tokenizer, Vectorizer)
 

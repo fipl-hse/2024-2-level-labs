@@ -427,9 +427,9 @@ class BasicSearchEngine:
         for vector in self._document_vectors:
             if len(vector) < len(query_vector):
                 return None
-
         the_most = self._calculate_knn(query_vector, self._document_vectors, 1)
-
+        if not the_most:
+            return None
         return self._documents[the_most[0][0]]
 
 

@@ -7,7 +7,6 @@ from pathlib import Path
 
 from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
 
-
 def open_files() -> tuple[list[str], list[str]]:
     """
     # stubs: keep.

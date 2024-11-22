@@ -97,7 +97,8 @@ def main() -> None:
     pro_max_start = time()
     relevant_docs_pro_max = engine_pro_max.retrieve_relevant_documents('Нижний Новгород',3)
     pro_max_finish = time()
-    print(f'Relevant docs with advanced SE: {relevant_docs_pro_max} Time: {pro_max_start - pro_max_finish}')
+    print(f'Relevant docs with advanced SE: {relevant_docs_pro_max}'
+          f' Time: {pro_max_start - pro_max_finish}')
 
 
     result = '???'

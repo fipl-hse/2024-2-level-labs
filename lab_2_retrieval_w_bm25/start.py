@@ -53,7 +53,7 @@ def main() -> None:
                 clear_tokens.append(clear_tok_doc)
     unique_tokens = build_vocabulary(clear_tokens)
     if not isinstance(unique_tokens, list):
-        return None
+        return
     idf = calculate_idf(unique_tokens, clear_tokens)
     metrics_tf_idf = []
     metrics_bm_25 = []
@@ -61,10 +61,10 @@ def main() -> None:
     adv_len = sum(len(tokens) for tokens in clear_tokens) / len(clear_tokens)
     for tok in tokens:
         if not isinstance(tok, list):
-            return None
+            return
         tf = calculate_tf(unique_tokens, tok)
         if not isinstance(tf, dict) or not isinstance(idf, dict):
-            return None
+            return
         tf_idf = calculate_tf_idf(tf, idf)
         if tf_idf is not None:
             metrics_tf_idf.append(tf_idf)

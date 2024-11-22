@@ -801,21 +801,19 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query, str) or not isinstance(n_neighbours, int) or n_neighbours < 1:
+        if not isinstance(query, str) or not isinstance(n_neighbours, int) or n_neighbours <= 0:
             return None
-        tokenized_query = self._tokenizer.tokenize(query)
-        if tokenized_query is None:
-            return None
-        query_vector = self._vectorizer.vectorize(tokenized_query)
+
+        query_vector = self._index_document(query)
         if query_vector is None:
             return None
-        nearest_neighbours = self._tree.query(query_vector)
-        if nearest_neighbours is None or len(nearest_neighbours) == 0:
+        nearest_neighbours = self._tree.query(query_vector, n_neighbours)
+        if nearest_neighbours is None:
             return None
-        relevant_documents = []
 
-        for score, index in nearest_neighbours:
-            if index is not None and index == len(self._documents) and isinstance(index, int):
+        relevant_documents = []
+        for _, (score, index) in enumerate(nearest_neighbours):
+            if score is not None and index is not None and index < len(self._documents):
                 relevant_documents.append((score, self._documents[index]))
 
         return relevant_documents if relevant_documents else None

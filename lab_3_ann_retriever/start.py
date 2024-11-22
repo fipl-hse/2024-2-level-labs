@@ -1,6 +1,7 @@
 """
 Laboratory Work #3 starter.
 """
+
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 from time import time

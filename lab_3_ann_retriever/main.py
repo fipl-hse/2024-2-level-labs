@@ -207,7 +207,7 @@ class Vectorizer:
 
         self._vocabulary = sorted(list(voc))
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if self._idf_values is None:
+        if self._idf_values is None or not isinstance(self._idf_values, dict):
             return False
 
         self._token2ind = {value: ind for ind, value in enumerate(self._vocabulary)}
@@ -589,89 +589,43 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
-        # if not isinstance(vectors, list) or not vectors:
-        #     return False
-        # inf = [{
-        #     'cur': [(vector, index) for index, vector in enumerate(vectors)],
-        #     'depth': 0,
-        #     'ancestor': Node(tuple([0.0] * len(vectors[0])), -1),
-        #     'left': True
-        #         }]
-        #
-        # while inf:
-        #     cur_vect = inf[0]['cur']
-        #     if not isinstance(cur_vect, list) and not all(isinstance(vec, (list, tuple)) for vec in cur_vect):
-        #         raise ValueError
-        #     depth = int(inf[0]['depth'])
-        #     parent = inf[0]['ancestor']
-        #     is_left = inf[0]['left']
-        #     inf.pop(0)
-        #     if cur_vect:
-        #         axis = depth % len(cur_vect[0])
-        #         cur_vect.sort(key=lambda vector: vector[0][axis])
-        #         median_index = len(cur_vect) // 2
-        #         median_node = Node(cur_vect[median_index][0],
-        #                            cur_vect[median_index][1])
-        #
-        #         if parent.payload != -1 and is_left:
-        #             parent.left_node = median_node
-        #         elif parent.payload == -1:
-        #             self._root = median_node
-        #         else:
-        #             parent.right_node = median_node
-        #
-        #         inf.append(
-        #             {
-        #             'cur': cur_vect[:median_index],
-        #             'depth': depth + 1,
-        #             'ancestor': median_node,
-        #             'left': True
-        #             })
-        #         inf.append(
-        #             {
-        #             'cur': cur_vect[median_index + 1:],
-        #             'depth': depth + 1,
-        #             'ancestor': median_node,
-        #             'left': False
-        #             })
-        # return True
         if not isinstance(vectors, list) or not vectors:
             return False
-        states_info = [{}]
-        states_info = [{
-            'vectors': [(vector, index) for index, vector in enumerate(vectors)],
+        inf = [{}]
+        inf = [{
+            'cur': [(vec, ind) for ind, vec in enumerate(vectors)],
             'depth': 0,
-            'parent': Node(tuple([0.0] * len(vectors[0])), -1),
-            'is_left': True
+            'ancestor': Node(tuple([0.0] * len(vectors[0])), -1),
+            'left': True
         }]
-        while states_info:
-            current_vectors, depth, parent, is_left = states_info.pop(0).values()
-            if current_vectors:
-                axis = depth % len(current_vectors[0])
-                current_vectors.sort(key=lambda vector: vector[0][axis])
-                median_index = len(current_vectors) // 2
-                median_node = Node(current_vectors[median_index][0],
-                                   current_vectors[median_index][1])
-                if parent.payload != -1 and is_left:
-                    parent.left_node = median_node
-                elif parent.payload == -1:
-                    self._root = median_node
+        while inf:
+            cur_vect, depth, ancestor, is_left = inf.pop(0).values()
+            if cur_vect:
+                axis = depth % len(cur_vect[0])
+                cur_vect.sort(key=lambda vector: vector[0][axis])
+                med_ind = len(cur_vect) // 2
+                med_node = Node(cur_vect[med_ind][0],
+                                   cur_vect[med_ind][1])
+                if ancestor.payload != -1 and is_left:
+                    ancestor.left_node = med_node
+                elif ancestor.payload == -1:
+                    self._root = med_node
                 else:
-                    parent.right_node = median_node
-                states_info.append(
+                    ancestor.right_node = med_node
+                inf.append(
                     {
-                        'vectors': current_vectors[:median_index],
+                        'cur': cur_vect[:med_ind],
                         'depth': depth + 1,
-                        'parent': median_node,
-                        'is_left': True
+                        'ancestor': med_node,
+                        'left': True
                     }
                 )
-                states_info.append(
+                inf.append(
                     {
-                        'vectors': current_vectors[median_index + 1:],
+                        'cur': cur_vect[med_ind + 1:],
                         'depth': depth + 1,
-                        'parent': median_node,
-                        'is_left': False
+                        'ancestor': med_node,
+                        'left': False
                     }
                 )
         return True

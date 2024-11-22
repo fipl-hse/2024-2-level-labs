@@ -810,10 +810,8 @@ class SearchEngine(BasicSearchEngine):
                 not relevant_vectors):
             return None
 
-        relevant_documents = []
-        for i in range(len(relevant_vectors)):
-            relevant_documents.append((relevant_vectors[i][0], self._documents[relevant_vectors[i][1]]))
-        return relevant_documents
+        return [(relevant_vectors[i][0], self._documents[relevant_vectors[i][1]]) for i in
+                range(len(relevant_vectors))]
 
     def save(self, file_path: str) -> bool:
         """

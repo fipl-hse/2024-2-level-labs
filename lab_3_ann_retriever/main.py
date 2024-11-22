@@ -288,12 +288,10 @@ class Vectorizer:
 
         vector = list(0.0 for _ in range(len(self._vocabulary)))
         for token in document:
-            if self._token2ind.get(token) is None:
-                return None
-            tf = calculate_tf(self._vocabulary, document)
-            if tf is None:
-                return None
-            vector[self._token2ind[token]] = tf[token] * self._idf_values[token]
+            if self._token2ind.get(token) is not None:
+                tf = calculate_tf(self._vocabulary, document)
+                if tf is not None:
+                    vector[self._token2ind[token]] = tf[token] * self._idf_values[token]
         return Vector(vector)
 
 

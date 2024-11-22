@@ -573,14 +573,14 @@ class NaiveKDTree:
                     this_space['parent'].left_node = median_node
                 else:
                     this_space['parent'].right_node = median_node
-                state_of_space.append({'vectors': this_space[:median_index],
+                state_of_space.append({'vectors': this_space['vectors'][:median_index],
                                        'depth': this_space['depth'] + 1,
                                        'parent': median_node,
-                                       'is_left': True})
-                state_of_space.append({'vectors': this_space[median_index + 1:],
+                                       'left_subspace': True})
+                state_of_space.append({'vectors': this_space['vectors'][median_index + 1:],
                                        'depth': this_space['depth'] + 1,
                                        'parent': median_node,
-                                       'is_left': False})
+                                       'left_subspace': False})
         return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:

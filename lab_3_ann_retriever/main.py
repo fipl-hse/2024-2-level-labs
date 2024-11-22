@@ -73,7 +73,12 @@ def save_vector(vector: Vector) -> dict:
     Returns:
         dict: A state of the vector to save
     """
-
+    state_vector = {'len': len(vector), 'elements': {}}
+    for i, value in enumerate(vector):
+        if value == 0.0 or not isinstance(state_vector['elements'], dict):
+            continue
+        state_vector['elements'][i] = value
+    return state_vector
 
 def load_vector(state: dict) -> Vector | None:
     """
@@ -87,8 +92,13 @@ def load_vector(state: dict) -> Vector | None:
 
     In case of corrupt input arguments, None is returned.
     """
-
-
+    if 'len' not in state or 'elements' not in state:
+        return None
+    vector = [0.0] * state['len']
+    for i in range(0, state['len']):
+        if f'{i}' in state['elements']:
+            vector[i] = state['elements'][f'{i}']
+    return tuple(vector)
 class Tokenizer:
     """
     Tokenizer with removing stop words.

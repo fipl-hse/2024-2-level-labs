@@ -47,7 +47,7 @@ def main() -> None:
 
     basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
     basic_search_engine.index_documents(documents)
-    result = basic_search_engine.retrieve_vectorized(secret_vector)
+    #result = basic_search_engine.retrieve_vectorized(secret_vector)
 
     query = 'Нижний Новгород'
     engine = SearchEngine(vectorizer, tokenizer)

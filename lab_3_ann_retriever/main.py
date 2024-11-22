@@ -11,7 +11,7 @@ from typing import Protocol
 from lab_2_retrieval_w_bm25.main import calculate_idf
 
 Vector = tuple[float, ...]
-
+"Type alias for vector representation of a text."
 
 class NodeLike(Protocol):
     """

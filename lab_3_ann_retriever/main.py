@@ -709,7 +709,7 @@ class NaiveKDTree:
                 return [(distance, node.payload)]
 
             axis = depth % len(vector)
-            if vector[axis] < node.vector[axis]:
+            if vector[axis] <= node.vector[axis]:
                 if node.left_node is not None:
                     pairs.append((node.left_node, depth + 1))
             else:
@@ -791,23 +791,22 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, None is returned.
         """
-        if (not isinstance(query, str) or not query
-                or not isinstance(n_neighbours, int) or n_neighbours <= 0):
+        if (not isinstance(query, str)
+                or not isinstance(n_neighbours, int)):
             return None
 
         query_vector = self._index_document(query)
-        if not query_vector or query_vector is None:
+        if query_vector is None:
             return None
 
-        distances = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        if not distances or distances is None:
+        distances = self._tree.query(query_vector, n_neighbours)
+        if (not distances or distances is None
+                or all(None in vec for vec in distances)):
             return None
 
         docs_plus_dist = []
         for one_distance in distances:
-            if not isinstance(one_distance, tuple) or not isinstance(one_distance[0], int):
-                return None
-            docs_plus_dist.append((one_distance[1], self._documents[one_distance[0]]))
+            docs_plus_dist.append((one_distance[0], self._documents[one_distance[1]]))
         return docs_plus_dist
 
     def save(self, file_path: str) -> bool:

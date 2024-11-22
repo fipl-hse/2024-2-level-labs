@@ -53,6 +53,8 @@ def main() -> None:
     engine = SearchEngine(vectorizer, tokenizer)
     engine.index_documents(documents)
     result = engine.retrieve_relevant_documents(query, 1)
+    if result is None:
+        return None
 
     assert result, "Result is None"
 

@@ -4,8 +4,9 @@ Lab 3.
 Vector search with text retrieving
 """
 
-from math import sqrt
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
+from math import sqrt
+
 from typing import Protocol
 
 from lab_2_retrieval_w_bm25.main import calculate_idf
@@ -21,10 +22,10 @@ class NodeLike(Protocol):
     def save(self) -> dict:
         """
         Save Node instance to state.
+
         Returns:
             dict: State of the Node instance
         """
-
 
     def load(self, state: dict) -> bool:
         """
@@ -121,10 +122,6 @@ class Tokenizer:
                 text = text.replace(element, ' ')
         return self._remove_stop_words(text.lower().split())
 
-        # toks = [word for word in ''.join(char for char in text.lower() if char.isalpha() or char.isspace()).split()]
-        # return self._remove_stop_words(toks)
-
-
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
         Tokenize the input documents.
@@ -187,7 +184,6 @@ class Vectorizer:
         self._vocabulary = []
         self._token2ind = {}
 
-
     def build(self) -> bool:
         """
         Build vocabulary with tokenized_documents.
@@ -213,7 +209,6 @@ class Vectorizer:
         self._token2ind = {value: ind for ind, value in enumerate(self._vocabulary)}
 
         return True
-
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -268,7 +263,6 @@ class Vectorizer:
             bool: True if saved successfully, False in other case
         """
 
-
     def load(self, file_path: str) -> bool:
         """
         Save the Vectorizer state to file.
@@ -281,7 +275,6 @@ class Vectorizer:
 
         In case of corrupt input arguments, False is returned.
         """
-
 
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
         """
@@ -358,7 +351,6 @@ class BasicSearchEngine:
             return False
         return True
 
-
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
@@ -391,7 +383,6 @@ class BasicSearchEngine:
                 return None
             retrieve_res.append((item[1], self._documents[item[0]]))
         return retrieve_res
-
 
     def save(self, file_path: str) -> bool:
         """
@@ -437,7 +428,6 @@ class BasicSearchEngine:
         index, value = retrieve_doc[0]
         return self._documents[index]
 
-
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
     ) -> list[tuple[int, float]] | None:
@@ -466,7 +456,6 @@ class BasicSearchEngine:
         neighbours = sorted(neighbours, key=lambda x: x[1])
         return neighbours[:n_neighbours]
 
-
     def _index_document(self, document: str) -> Vector | None:
         """
         Index document.
@@ -492,7 +481,6 @@ class BasicSearchEngine:
 
         return vec_doc
 
-
     def _dump_documents(self) -> dict:
         """
         Dump documents states for save the Engine.
@@ -500,7 +488,6 @@ class BasicSearchEngine:
         Returns:
             dict: document and document_vectors states
         """
-
 
     def _load_documents(self, state: dict) -> bool:
         """
@@ -544,7 +531,6 @@ class Node(NodeLike):
         self.payload = payload
         self.left_node = left_node
         self.right_node = right_node
-
 
     def save(self) -> dict:
         """
@@ -637,7 +623,6 @@ class NaiveKDTree:
                     })
         return True
 
-
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
         Get k nearest neighbours for vector.
@@ -655,7 +640,6 @@ class NaiveKDTree:
             return None
 
         return self._find_closest(vector, k)
-
 
     def save(self) -> dict | None:
         """
@@ -677,7 +661,6 @@ class NaiveKDTree:
         Returns:
             bool: True is loaded successfully, False in other cases
         """
-
 
     def _find_closest(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
@@ -751,7 +734,6 @@ class SearchEngine(BasicSearchEngine):
         self._tree = NaiveKDTree()
         BasicSearchEngine.__init__(self, vectorizer = vectorizer, tokenizer = tokenizer)
 
-
     def index_documents(self, documents: list[str]) -> bool:
         """
         Index documents for retriever.
@@ -771,7 +753,6 @@ class SearchEngine(BasicSearchEngine):
             return False
 
         return self._tree.build(self._document_vectors)
-
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int = 1
@@ -806,7 +787,6 @@ class SearchEngine(BasicSearchEngine):
             result.append((dist, self._documents[doc]))
 
         return result[:n_neighbours]
-
 
     def save(self, file_path: str) -> bool:
         """

@@ -161,8 +161,6 @@ class Tokenizer:
         if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or not tokens:
             return None
 
-        clear_text = list()
-
         clear_text = [token for token in tokens if token not in self._stop_words]
 
         return clear_text

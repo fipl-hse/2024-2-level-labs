@@ -41,10 +41,15 @@ def main() -> None:
     print(tokdocs)
     vect = Vectorizer(tokdocs)
     vect.build()
-    print(vect.vector2tokens(Vector(text)))
+    textwrds = text.split(", ")
+    convrt = []
+    for el in textwrds:
+        convrt.append(float(el))
+    inqvect = Vector(convrt)
+    print(vect.vector2tokens(inqvect))
     knn_retriever = BasicSearchEngine(vectorizer=vect, tokenizer=tkn)
     knn_retriever.index_documents(docs)
-    print(knn_retriever.retrieve_vectorized(Vector(text)))
+    print(knn_retriever.retrieve_vectorized(inqvect))
     result = 1
     assert result, "Result is None"
 

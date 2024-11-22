@@ -435,7 +435,7 @@ class BasicSearchEngine:
         retrieve_doc = self._calculate_knn(query_vector, self._document_vectors, 1)
         if not isinstance(retrieve_doc, list) or not retrieve_doc:
             return None
-        index, value = retrieve_doc[0]
+        index, _ = retrieve_doc[0]
         return self._documents[index]
 
     def _calculate_knn(
@@ -841,3 +841,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)

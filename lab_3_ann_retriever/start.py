@@ -34,8 +34,7 @@ def main() -> None:
 
     tokenizer = Tokenizer(stopwords)
     tokenized_docs = tokenizer.tokenize_documents(documents)
-    if (not tokenized_docs or
-            not isinstance(tokenized_docs, list)):
+    if not tokenized_docs or not isinstance(tokenized_docs, list):
         return
 
     vectorizer = Vectorizer(tokenized_docs)
@@ -50,6 +49,7 @@ def main() -> None:
     naive_kdtree_result = naive_kdtree_retriever.retrieve_relevant_documents("Нижний Новгород")
 
     result = (knn_result, naive_kdtree_result)
+    print(result)
     assert result, "Result is None"
 
 

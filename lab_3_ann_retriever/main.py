@@ -450,7 +450,7 @@ class BasicSearchEngine:
                 return None
             neighbours.append((document_vectors.index(document_vector), document_distance))
 
-        neighbours.sort(key=lambda tuple_: tuple_[1], reverse=True)
+        neighbours.sort(key=lambda tuple_: tuple_[1])
         return neighbours[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:

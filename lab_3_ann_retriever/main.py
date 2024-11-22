@@ -696,22 +696,27 @@ class NaiveKDTree:
             return None
 
         subspaces = [(self._root, 0)]
+        nearest_neighbour = []
         while subspaces:
             node, depth = subspaces.pop(0)
             if node is None:
                 return None
-            if node.left_node is None and node.right_node is None:
+            if not node.left_node and not node.right_node:
                 distance = calculate_distance(vector, node.vector)
-                if distance is None:
+                if not isinstance(distance, float):
                     return None
-                return [(distance, node.payload)]
-            axis = depth % len(node.vector)
-            current_depth = depth + 1
-            if vector[axis] <= node.vector[axis]:
-                subspaces.append((node.left_node, current_depth))
-            subspaces.append((node.right_node, current_depth))
+                nearest_neighbour.append((distance, node.payload))
+            else:
+                axis = depth % len(node.vector)
+                current_depth = depth + 1
+                if vector[axis] <= node.vector[axis]:
+                    if node.left_node is not None:
+                        subspaces.append((node.left_node, current_depth))
+                else:
+                    if node.right_node is not None:
+                        subspaces.append((node.right_node, current_depth))
 
-        return None
+        return nearest_neighbour
 
 
 class KDTree(NaiveKDTree):

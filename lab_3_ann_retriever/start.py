@@ -1,9 +1,9 @@
 """
 Laboratory Work #3 starter.
 """
-
-import time
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+from time import time
+
 from pathlib import Path
 
 from lab_3_ann_retriever.main import (AdvancedSearchEngine, BasicSearchEngine, SearchEngine,
@@ -48,25 +48,25 @@ def main() -> None:
 
     basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
     basic_search_engine.index_documents(documents)
-    basic_start = time.time()
+    basic_start = time()
     basic_result = basic_search_engine.retrieve_relevant_documents("Нижний Новгород", 3)
-    basic_finish = time.time()
+    basic_finish = time()
     print(f"Results by BasicSearchEngine: {basic_result} \n Time: {basic_finish - basic_start}")
 
     search_engine = SearchEngine(vectorizer, tokenizer)
     search_engine.index_documents(documents)
     search_engine.save("assets/states/engine_state.json")
-    search_start = time.time()
+    search_start = time()
     search_result = search_engine.retrieve_relevant_documents("Нижний Новгород", 3)
-    search_finish = time.time()
+    search_finish = time()
     print(f"Results by SearchEngine: {search_result} \n Time: {search_finish - search_start}")
 
     advanced_search_engine = AdvancedSearchEngine(new_vectorizer, tokenizer)
     advanced_search_engine.load("assets/states/engine_state.json")
     advanced_search_engine.index_documents(documents)
-    advanced_start = time.time()
+    advanced_start = time()
     advanced_result = advanced_search_engine.retrieve_relevant_documents("Нижний Новгород", 3)
-    advanced_finish = time.time()
+    advanced_finish = time()
     print(f"Results by AdvancedSearchEngine: {advanced_result} \n"
           f"Time: {advanced_finish - advanced_start}")
 

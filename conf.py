@@ -29,6 +29,8 @@ exclude_patterns = [
 
 nitpick_ignore = [
     ('py:class', 'Vector'),
+    ('py:class', 'Corpus'),
+    ('py:class', 'TokenizedCorpus'),
 ]
 
 language = 'ru'

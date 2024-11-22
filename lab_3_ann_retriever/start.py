@@ -41,6 +41,7 @@ def main() -> None:
     vectorize = Vectorizer(tokenize.tokenize_documents(documents))
     vectorize.build()
 
+
     knn = BasicSearchEngine(vectorize, tokenize)
     knn.index_documents(documents)
     res1 = knn.retrieve_relevant_documents(query, 1)

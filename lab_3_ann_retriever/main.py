@@ -90,7 +90,7 @@ def load_vector(state: dict) -> Vector | None:
     if not isinstance(state, dict) or not state or 'len' not in state or 'elements' not in state:
         return None
 
-    vector = [0.0 * k for k in range(state['len'])]
+    vector = [0.0 for _ in range(state['len'])]
     for index, score in state['elements'].items():
         vector[int(index)] = score
     return tuple(vector)
@@ -644,7 +644,7 @@ class NaiveKDTree:
         In case of corrupt input arguments, False is returned.
         """
         if not isinstance(vectors, list) or not vectors \
-                or not all(isinstance(vector, (tuple, list)) for vector in vectors):
+                or not all(isinstance(vector, tuple) for vector in vectors):
             return False
 
         space = [

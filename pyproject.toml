@@ -6,7 +6,8 @@ markers = [
     "mark10: tests for level 10",
     "lab_1_classify_by_unigrams: tests for lab 1",
     "lab_2_retrieval_w_bm25: tests for lab 2",
-    "lab_3_ann_retriever: tests for lab 3"
+    "lab_3_ann_retriever: tests for lab 3",
+    "lab_4_retrieval_w_clustering: tests for lab 4"
 ]
 norecursedirs = [
     "venv*"
@@ -63,7 +64,8 @@ src_paths = [
     "config",
     "lab_1_classify_by_unigrams",
     "lab_2_retrieval_w_bm25",
-    "lab_3_ann_retriever"
+    "lab_3_ann_retriever",
+    "lab_4_retrieval_w_clustering"
 ]
 
 [tool.mypy]

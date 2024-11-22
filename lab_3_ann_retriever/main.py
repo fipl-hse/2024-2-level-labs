@@ -212,7 +212,7 @@ class Vectorizer:
         if not isinstance(idfs, dict):
             return False
         self._idf_values = idfs
-        self._token2ind = {word:ind for ind, word in enumerate(self._vocabulary)}
+        self._token2ind = {word: ind for ind, word in enumerate(self._vocabulary)}
         return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:

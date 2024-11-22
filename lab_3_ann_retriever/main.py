@@ -354,20 +354,18 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not isinstance(documents, list) or not all(isinstance(doc, str) for doc in documents) \
-                or not documents:
+        if (not documents or not isinstance(documents, list) or
+                not all(isinstance(elem, str) for elem in documents)):
             return False
 
-        document_vectors = []
-        for doc in documents:
-            document_vectors.append(self._index_document(doc))
-
-        self._document_vectors = document_vectors
+        self._document_vectors = []
         self._documents = documents
-
-        if self._document_vectors and None not in self._document_vectors:
-            return True
-        return False
+        for document in documents:
+            index_docs = self._index_document(document)
+            if index_docs is None:
+                return False
+            self._document_vectors.append(index_docs)
+        return True
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int

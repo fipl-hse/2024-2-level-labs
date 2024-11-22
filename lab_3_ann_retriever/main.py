@@ -379,11 +379,10 @@ class BasicSearchEngine:
         knn = self._calculate_knn(vector, self._document_vectors, n_neighbours)
         if not knn or knn is None:
             return None
-        result = []
-        for index, distance in knn:
-            if index is None or distance is None:
-                return None
-            result.append((distance, self._documents[index]))
+        result = [(distance, self._documents[index]) for index, distance in knn
+                  if distance is not None and index is not None]
+        if result == []:
+            return None
         return result
 
 
@@ -423,9 +422,6 @@ class BasicSearchEngine:
         """
         if not isinstance(query_vector, tuple) or not query_vector:
             return None
-        for vector in self._document_vectors:
-            if len(query_vector) > len(vector):
-                return None
         document_number = self._calculate_knn(query_vector, self._document_vectors, 1)
         if not document_number:
             return None

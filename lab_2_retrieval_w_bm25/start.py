@@ -1,9 +1,9 @@
 """
 Laboratory Work #2 starter
 """
-
 # pylint:disable=too-many-locals, unused-argument, unused-variable,
 # too-many-branches, too-many-statements, duplicate-code
+
 from lab_2_retrieval_w_bm25.main import (
     build_vocabulary,
     calculate_bm25,
@@ -81,7 +81,7 @@ def main() -> None:
     save_index(bm_25_advanced, "assets/metrics.json")
     loaded = load_index("assets/metrics.json")
     if not isinstance(loaded, list):
-        return None
+        return
     rank_from_json = rank_documents(loaded, "Which fairy tale has Fairy Queen?", stopwords)
     spearman_tf_idf = calculate_spearman(
         [num[0] for num in rank_tf_idf], [golden[0] for golden in rank_from_json]
@@ -98,7 +98,6 @@ def main() -> None:
     print(f"Spearman BM25 with cutoff: {spearman_bm_25_adv}")
     result = spearman_bm_25_adv
     assert result, "Result is None"
-    return None
 
 
 if __name__ == "__main__":

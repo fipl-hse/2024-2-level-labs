@@ -694,7 +694,7 @@ class NaiveKDTree:
                 return [(distance, node.payload)]
 
             axis = depth % len(vector)
-            if vector[axis] < node.vector[axis]:
+            if vector[axis] <= node.vector[axis]:
                 if node.left_node is not None:
                     pairs.append((node.left_node, depth + 1))
             else:

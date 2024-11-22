@@ -1,11 +1,16 @@
 """
 Check docstrings for conformance to the Google-style-docstrings.
 """
+
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
-from config.constants import (CONFIG_PACKAGE_PATH, CORE_UTILS_PACKAGE_PATH, PROJECT_CONFIG_PATH,
-                              PROJECT_ROOT)
+from config.constants import (
+    CONFIG_PACKAGE_PATH,
+    CORE_UTILS_PACKAGE_PATH,
+    PROJECT_CONFIG_PATH,
+    PROJECT_ROOT,
+)
 from config.project_config import ProjectConfig
 
 
@@ -19,9 +24,10 @@ def get_files() -> list:
     return [
         file
         for directory in [CONFIG_PACKAGE_PATH, CORE_UTILS_PACKAGE_PATH]
-        for file in directory.glob('**/*.py')
-        if file.name != '__init__.py'
+        for file in directory.glob("**/*.py")
+        if file.name != "__init__.py"
     ]
+
 
 @handles_console_error()
 def check_with_pydoctest(path_to_file: Path, path_to_config: Path) -> tuple[str, str, int]:
@@ -35,13 +41,9 @@ def check_with_pydoctest(path_to_file: Path, path_to_config: Path) -> tuple[str,
     Returns:
         tuple[str, str, int]: stdout, stderr, exit code
     """
-    pydoctest_args = [
-        '--config',
-        str(path_to_config),
-        '--file',
-        str(path_to_file)
-    ]
-    return _run_console_tool('pydoctest', pydoctest_args, debug=True)
+    pydoctest_args = ["--config", str(path_to_config), "--file", str(path_to_file)]
+    return _run_console_tool("pydoctest", pydoctest_args, debug=True)
+
 
 @handles_console_error()
 def check_with_pydocstyle(path_to_file: Path) -> tuple[str, str, int]:
@@ -54,13 +56,8 @@ def check_with_pydocstyle(path_to_file: Path) -> tuple[str, str, int]:
     Returns:
         tuple[str, str, int]: stdout, stderr, exit code
     """
-    pydocstyle_args = [
-        '-m',
-        'pydocstyle',
-        str(path_to_file)
-    ]
-    return _run_console_tool(str(choose_python_exe()), pydocstyle_args,
-                             debug=True)
+    pydocstyle_args = ["-m", "pydocstyle", str(path_to_file)]
+    return _run_console_tool(str(choose_python_exe()), pydocstyle_args, debug=True)
 
 
 def check_file(path_to_file: Path) -> None:
@@ -70,7 +67,7 @@ def check_file(path_to_file: Path) -> None:
     Args:
         path_to_file (Path): Path to file
     """
-    pydoctest_config = PROJECT_ROOT / 'config' / 'static_checks' / 'pydoctest.json'
+    pydoctest_config = PROJECT_ROOT / "config" / "static_checks" / "pydoctest.json"
 
     check_with_pydoctest(path_to_file, pydoctest_config)
 
@@ -92,20 +89,19 @@ def main() -> None:
     # check docstrings in labs
     for lab_path in labs_list:
         paths = (
-            lab_path / 'main.py',
-            lab_path / 'start.py',
-            lab_path / 'scrapper.py',
-            lab_path / 'scrapper_dynamic.py',
-            lab_path / 'pipeline.py',
+            lab_path / "main.py",
+            lab_path / "start.py",
+            lab_path / "scrapper.py",
+            lab_path / "scrapper_dynamic.py",
+            lab_path / "pipeline.py",
         )
         for path in paths:
             if not path.exists():
-                print(f'\nIgnoring {path}: it does not exist.')
+                print(f"\nIgnoring {path}: it does not exist.")
                 continue
 
             check_file(path)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

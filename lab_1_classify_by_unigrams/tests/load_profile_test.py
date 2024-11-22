@@ -1,6 +1,7 @@
 """
 Checks the first lab profile loading function
 """
+
 import json
 import unittest
 from pathlib import Path
@@ -16,7 +17,7 @@ class LoadProfileTest(unittest.TestCase):
     """
 
     PATH_TO_LAB_FOLDER = Path(__file__).parent.parent
-    PATH_TO_PROFILES_FOLDER = Path(__file__).parent.parent / 'assets' / 'profiles'
+    PATH_TO_PROFILES_FOLDER = Path(__file__).parent.parent / "assets" / "profiles"
 
     @pytest.mark.lab_1_classify_by_unigrams
     @pytest.mark.mark10
@@ -24,9 +25,9 @@ class LoadProfileTest(unittest.TestCase):
         """
         Ideal scenario
         """
-        path_to_profile = LoadProfileTest.PATH_TO_PROFILES_FOLDER / 'en.json'
+        path_to_profile = LoadProfileTest.PATH_TO_PROFILES_FOLDER / "en.json"
 
-        with open(path_to_profile, 'r', encoding='utf-8') as file:
+        with open(path_to_profile, "r", encoding="utf-8") as file:
             expected = json.load(file)
 
         actual = load_profile(str(path_to_profile))

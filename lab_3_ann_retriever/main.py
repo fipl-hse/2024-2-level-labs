@@ -51,10 +51,12 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
 
     In case of corrupt input arguments, None is returned.
     """
-    if not isinstance(query_vector, tuple) or not isinstance(document_vector, tuple):
+    if (not isinstance(query_vector, tuple) or
+            not isinstance(document_vector, tuple)):
         return None
     if not query_vector or not document_vector:
         return 0.0
+
     dist = 0.0
     for que_vec, doc_vec in zip(query_vector, document_vector):
         dist += (que_vec - doc_vec) ** 2
@@ -163,6 +165,7 @@ class Tokenizer:
                 not isinstance(tokens, list) or
                 not all(isinstance(token, str) for token in tokens)):
             return None
+
         clear_list = []
         for token in tokens:
             if token not in self._stop_words:
@@ -240,8 +243,7 @@ class Vectorizer:
         if not isinstance(vector, tuple) or len(vector) != len(self._vocabulary):
             return None
 
-        tokens = [self._vocabulary[i] for i, value in enumerate(vector) if value > 0]
-        return tokens
+        return [self._vocabulary[i] for i, value in enumerate(vector) if value > 0]
 
     def save(self, file_path: str) -> bool:
         """
@@ -279,16 +281,19 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (isinstance(document, list) and document and all(
-                isinstance(token, str) for token in document)):
+        if (not isinstance(document, list) or
+                not document or
+                not all(isinstance(token, str) for token in document)):
             return None
 
         vector = list(0.0 for _ in range(len(self._vocabulary)))
         for token in document:
-            if self._token2ind.get(token) is not None:
-                tf = calculate_tf(self._vocabulary, document)
-                if tf is not None:
-                    vector[self._token2ind[token]] = tf[token] * self._idf_values[token]
+            if self._token2ind.get(token) is None:
+                return None
+            tf = calculate_tf(self._vocabulary, document)
+            if tf is None:
+                return None
+            vector[self._token2ind[token]] = tf[token] * self._idf_values[token]
         return Vector(vector)
 
 
@@ -327,12 +332,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not (isinstance(documents, list) and documents and all(
-                isinstance(doc, str) for doc in documents)):
+        if (not isinstance(documents, list) or
+                not documents or
+                not all(isinstance(doc, str) for doc in documents)):
             return False
 
-        self._documents = []
-        self._document_vectors = []
         for doc in documents:
             indexed_doc = self._index_document(doc)
             if not indexed_doc:
@@ -356,7 +360,8 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query, str) or not isinstance(n_neighbours, int):
+        if (not isinstance(query, str) or
+                not isinstance(n_neighbours, int)):
             return None
 
         tokenized_query = self._tokenizer.tokenize(query)
@@ -417,7 +422,7 @@ class BasicSearchEngine:
             return None
 
         nearest_neighbors = self._calculate_knn(query_vector, self._document_vectors, 1)
-        if not (isinstance(nearest_neighbors, list) and len(nearest_neighbors) > 0):
+        if nearest_neighbors is None or not nearest_neighbors:
             return None
         return self._documents[nearest_neighbors[0][0]]
 
@@ -472,7 +477,7 @@ class BasicSearchEngine:
         if tokenized_document is None or not tokenized_document:
             return None
         vectorized_document = self._vectorizer.vectorize(tokenized_document)
-        if vectorized_document is None:
+        if vectorized_document is None or not vectorized_document:
             return None
         return vectorized_document
 
@@ -570,8 +575,11 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not (isinstance(vectors, list) and all(isinstance(vector, (list, tuple)) and all(
-                isinstance(cor, float) for cor in vector) for vector in vectors) and vectors):
+        if (not isinstance(vectors, list) or
+                not all(isinstance(vector, (list, tuple)) or
+                        not all(isinstance(val, float) for val in vector)
+                        for vector in vectors) or
+                not vectors):
             return False
 
         space_condition: list[dict] = [
@@ -590,7 +598,6 @@ class NaiveKDTree:
             is_left_sub_dim = space_condition.pop(0)["is_left_subspace"]
 
             if current_vectors:
-
                 axis = depth % len(current_vectors[0])
                 current_vectors.sort(key=lambda vector_with_idx: vector_with_idx[0][axis])
                 median_index = len(current_vectors) // 2
@@ -611,9 +618,13 @@ class NaiveKDTree:
                     "parent_node": median_node,
                     "is_left_subspace": True
                 }
-                right_subspace = left_subspace.copy()
-                right_subspace["vectors"] = current_vectors[median_index + 1:]
-                right_subspace["is_left_subspace"] = False
+                right_subspace = {
+                    "vectors": current_vectors[median_index + 1:],
+                    "depth": depth + 1,
+                    "parent_node": median_node,
+                    "is_left_subspace": False
+                }
+
                 space_condition.append(left_subspace)
                 space_condition.append(right_subspace)
         if self._root is None:
@@ -635,6 +646,7 @@ class NaiveKDTree:
         """
         if not vector or not k:
             return None
+
         return self._find_closest(vector, k)
 
     def save(self) -> dict | None:
@@ -671,12 +683,16 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not (isinstance(vector, tuple) and isinstance(k, int) and vector
-                and self._root is not None and isinstance(self._root, Node)):
+        if (not isinstance(vector, tuple) or
+                not isinstance(k, int) or
+                not vector or
+                self._root is None or
+                not isinstance(self._root, Node)):
             return None
 
         neighbors_list = []
         nodes = [(self._root, 0)]
+
         while nodes:
             node = nodes.pop(0)
             current_node, depth = node
@@ -754,15 +770,15 @@ class SearchEngine(BasicSearchEngine):
             return False
 
         self._documents = documents
-        temp_vector_docs = []
+        document_vectors = []
 
         for doc in self._documents:
             vector_doc = self._index_document(doc)
             if not isinstance(vector_doc, tuple):
                 return False
-            temp_vector_docs.append(vector_doc)
+            document_vectors.append(vector_doc)
 
-        self._document_vectors = temp_vector_docs
+        self._document_vectors = document_vectors
         return self._tree.build(self._document_vectors)
 
     def retrieve_relevant_documents(
@@ -777,22 +793,27 @@ class SearchEngine(BasicSearchEngine):
             list[tuple[float, str]] | None: Relevant documents with their distances.
         In case of corrupt input arguments, None is returned.
         """
-        if not (isinstance(query, str) and isinstance(n_neighbours, int)):
-            return None
-        query_tokens = self._tokenizer.tokenize(query)
-        if query_tokens is None:
-            return None
-        query_vector = self._vectorizer.vectorize(query_tokens)
-        if query_vector is None:
+        if (not isinstance(query, str) or
+                not isinstance(n_neighbours, int)):
             return None
 
-        relevant_vectors = self._tree.query(query_vector, n_neighbours)
-        if (relevant_vectors is None or any(None in vector for vector in relevant_vectors)
-                or not relevant_vectors):
+        tokenized_query = self._tokenizer.tokenize(query)
+        if tokenized_query is None:
+            return None
+        vectorized_query = self._vectorizer.vectorize(tokenized_query)
+        if vectorized_query is None:
             return None
 
-        return [(relevant_vectors[i][0], self._documents[relevant_vectors[i][1]]) for i in
-                range(len(relevant_vectors))]
+        relevant_vectors = self._tree.query(vectorized_query, n_neighbours)
+        if (relevant_vectors is None or
+                any(None in vector for vector in relevant_vectors) or
+                not relevant_vectors):
+            return None
+
+        relevant_documents = []
+        for i in range(len(relevant_vectors)):
+            relevant_documents.append((relevant_vectors[i][0], self._documents[relevant_vectors[i][1]]))
+        return relevant_documents
 
     def save(self, file_path: str) -> bool:
         """

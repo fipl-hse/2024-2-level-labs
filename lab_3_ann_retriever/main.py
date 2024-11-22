@@ -4,10 +4,13 @@ Lab 3.
 Vector search with text retrieving
 """
 from json import dump, load
-# pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
+
+# pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
+
+
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."

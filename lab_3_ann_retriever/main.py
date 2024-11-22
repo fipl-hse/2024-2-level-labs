@@ -248,7 +248,7 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if len(vector) != len(self._vocabulary):
+        if len(vector) != len(self._vocabulary) or not isinstance(vector, tuple):
             return None
 
         toks = []

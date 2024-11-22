@@ -12,7 +12,7 @@ from lab_3_ann_retriever.main import (
     BasicSearchEngine,
     SearchEngine,
     Tokenizer,
-    Vectorizer
+    Vectorizer,
 )
 
 

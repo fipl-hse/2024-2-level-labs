@@ -6,8 +6,13 @@ Laboratory Work #3 starter.
 import time
 from pathlib import Path
 
-from lab_3_ann_retriever.main import (AdvancedSearchEngine, BasicSearchEngine, SearchEngine,
-                                      Tokenizer, Vectorizer)
+from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
+    BasicSearchEngine,
+    SearchEngine,
+    Tokenizer,
+    Vectorizer,
+)
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -45,13 +50,15 @@ def main() -> None:
     vectorizer.build()
     docs_vector = [vectorizer.vectorize(tokens) for tokens in tokenized_docs]
 
-    query = 'Нижний Новгород'
+    query = "Нижний Новгород"
     basic_engine = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
     basic_engine.index_documents(documents)
     start_time = time.time()
     nearest_basic = basic_engine.retrieve_relevant_documents(query, 1)
-    print(f"Результат BasicSearchEngine {nearest_basic} \n "
-          f"Время выполнения: {time.time() - start_time}")
+    print(
+        f"Результат BasicSearchEngine {nearest_basic} \n "
+        f"Время выполнения: {time.time() - start_time}"
+    )
     engine = SearchEngine(vectorizer, tokenizer)
     engine.index_documents(documents)
     nearest_engine = engine.retrieve_relevant_documents(query, 1)
@@ -68,8 +75,10 @@ def main() -> None:
     new_engine.load(file_path_for_search_engine)
     start_time_adv = time.time()
     nearest_advanced = new_engine.retrieve_relevant_documents(query, 1)
-    print(f"Результат AdvancedSearchEngine {nearest_advanced} \n"
-          f"Время выполнения: {time.time() - start_time_adv}")
+    print(
+        f"Результат AdvancedSearchEngine {nearest_advanced} \n"
+        f"Время выполнения: {time.time() - start_time_adv}"
+    )
     result = nearest_advanced
     assert result, "Result is None"
 

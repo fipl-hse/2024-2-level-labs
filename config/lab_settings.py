@@ -1,7 +1,9 @@
 """
 Settings manager.
 """
+
 import json
+
 # pylint: disable=no-name-in-module
 from pathlib import Path
 
@@ -14,6 +16,7 @@ class ParametersModel:
     """
     Additional parameters of a lab.
     """
+
     model: str
     dataset: str
     metrics: list[str]
@@ -24,6 +27,7 @@ class InferenceParams:
     """
     Inference parameters.
     """
+
     num_samples: int
     max_length: int
     batch_size: int
@@ -36,6 +40,7 @@ class LabSettingsModel:
     """
     DTO for storing labs settings.
     """
+
     target_score: int
     parameters: ParametersModel | None = None
 
@@ -44,6 +49,7 @@ class LabSettings:
     """
     Main model for working with settings.
     """
+
     # Labs settings
     _dto: LabSettingsModel
 
@@ -55,7 +61,7 @@ class LabSettings:
             config_path (Path): Path to configuration
         """
         super().__init__()
-        with config_path.open(encoding='utf-8') as config_file:
+        with config_path.open(encoding="utf-8") as config_file:
             # pylint: disable=no-member
             self._dto = parse_obj_as(LabSettingsModel, json.load(config_file))
 

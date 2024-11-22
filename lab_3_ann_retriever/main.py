@@ -55,7 +55,8 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
     if query_vector is None or document_vector is None:
         return None
 
-    return sqrt(sum((query_val - doc_val) ** 2 for query_val, doc_val in zip(query_vector, document_vector)))
+    return sqrt(sum((query_val - doc_val) ** 2 for query_val, doc_val
+                    in zip(query_vector, document_vector)))
 
 
 def save_vector(vector: Vector) -> dict:
@@ -98,7 +99,8 @@ class Tokenizer:
         Args:
             stop_words (list[str]): List with stop words
         """
-        if not isinstance(stop_words, list) or not all(isinstance(item, str) for item in stop_words) or not stop_words:
+        if (not isinstance(stop_words, list)
+                or not all(isinstance(item, str) for item in stop_words) or not stop_words):
             raise ValueError
         self._stop_words = stop_words
 
@@ -134,7 +136,9 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(documents, list) or not all(isinstance(item, str) for item in documents) or not documents:
+        if (not isinstance(documents, list)
+                or not all(isinstance(item, str)
+                           for item in documents) or not documents):
             return None
         doc = []
         for text in documents:
@@ -156,7 +160,8 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokens, list) or not all(isinstance(item, str) for item in tokens) or not tokens:
+        if (not isinstance(tokens, list) or not
+        all(isinstance(item, str) for item in tokens) or not tokens):
             return None
         filtered_tokens = [word for word in tokens if word not in set(self._stop_words)]
         return filtered_tokens
@@ -222,7 +227,9 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokenized_document, list) or not all(isinstance(item, str) for item in tokenized_document) or not tokenized_document:
+        if (not isinstance(tokenized_document, list) or
+                not all(isinstance(item, str) for item in tokenized_document)
+                or not tokenized_document):
             return None
 
         vect_doc = self._calculate_tf_idf(tokenized_document)
@@ -288,7 +295,8 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(document, list) or not all(isinstance(item, str) for item in document) or not document:
+        if (not isinstance(document, list) or not
+        all(isinstance(item, str) for item in document) or not document):
             return None
 
         tf_idf_vector = []
@@ -366,7 +374,9 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query, str) or not isinstance(n_neighbours, int) or not query or n_neighbours <= 0:
+        if (not isinstance(query, str) or
+                not isinstance(n_neighbours, int)
+                or not query or n_neighbours <= 0):
             return None
 
         quer_vec = self._index_document(query)
@@ -444,7 +454,9 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(document_vectors, list) or not isinstance(n_neighbours, int) or not query_vector or not document_vectors:
+        if (not isinstance(document_vectors, list)
+                or not isinstance(n_neighbours, int)
+                or not query_vector or not document_vectors):
             return None
 
         neighbours = []
@@ -746,7 +758,8 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
-        if not isinstance(documents, list) or not all(isinstance(item, str) for item in documents) or not documents:
+        if (not isinstance(documents, list) or not
+        all(isinstance(item, str) for item in documents) or not documents):
             return False
 
         if super().index_documents(documents) is False:
@@ -779,7 +792,9 @@ class SearchEngine(BasicSearchEngine):
 
         res = self._tree.query(pre_query)
 
-        if res is None or not res or not all(isinstance(dist, float) or isinstance(ind, int) for dist, ind in res):
+        if (res is None or not res
+                or not all(isinstance(dist, float)
+                           or isinstance(ind, int) for dist, ind in res)):
             return None
 
         result = []

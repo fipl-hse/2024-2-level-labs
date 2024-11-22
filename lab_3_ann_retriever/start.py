@@ -4,8 +4,10 @@ Laboratory Work #3 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
+from time import time
 
-from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
+from lab_3_ann_retriever.main import AdvancedSearchEngine, BasicSearchEngine,\
+    SearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -69,13 +71,32 @@ def main() -> None:
     secret_revealed = searchengine.retrieve_vectorized(secret_vector)
     print(secret_revealed)
 
+    basic_start = time()
     relevant_docs = searchengine.retrieve_relevant_documents('Нижний Новгород', 3)
-    print(f'Relevant documents with basic search engine: {relevant_docs}')
+    basic_finish = time()
+    print(f'Relevant documents with basic search engine: {relevant_docs} Time: {basic_start-basic_finish}')
 
     searchengine_pro = SearchEngine(vectorizer, tokenizer)
     searchengine_pro.index_documents(documents)
+    searchengine_pro.save('assets/states/engine_state.json')
+    pro_start = time()
     relevant_docs_pro = searchengine_pro.retrieve_relevant_documents('Нижний Новгород',1)
-    print(f'Relevant documents with normal search engine: {relevant_docs_pro}')
+    pro_finish = time()
+    print(f'Relevant documents with normal search engine: {relevant_docs_pro} Time: {pro_start - pro_finish}')
+
+    vectorizer.save('assets/states/vectorizer_state.json')
+    vectorizer_new = Vectorizer(tokenized_docs)
+    vectorizer_new.load('assets/states/vectorizer_state.json')
+    vectorizer_new.build()
+
+    searchengine_pro_max = AdvancedSearchEngine(vectorizer_new,tokenizer)
+    searchengine_pro_max.load('assets/states/engine_state.json')
+    searchengine_pro_max.index_documents(documents)
+    pro_max_start = time()
+    relevant_docs_pro_max = searchengine_pro_max.retrieve_relevant_documents('Нижний Новгород',3)
+    pro_max_finish = time()
+    print(f'Relevant docs with advanced SE: {relevant_docs_pro_max} Time: {pro_max_start - pro_max_finish}')
+
 
     result = '???'
     assert result, "Result is None"

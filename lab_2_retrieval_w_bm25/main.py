@@ -125,10 +125,7 @@ def calculate_idf(vocab: list[str], documents: list[list[str]]) -> dict[str, flo
         return None
     idf = {}
     for word in vocab:
-        num = 0
-        for doc in documents:
-            if word in doc:
-                num += 1
+        num = sum(1 if word in doc else 0 for doc in documents)
         idf[word] = math.log((len(documents) - num + 0.5) /
                              (num + 0.5))
     return idf

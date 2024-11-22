@@ -21,11 +21,39 @@ class CalculateMSETest(unittest.TestCase):
         """
         Ideal scenario
         """
-        predicted_value = [0.1538, 0.0, 0.0, 0.0769, 0.0769, 0.0769, 0.0, 0.0,
-                           0.0769, 0.0769, 0.0769, 0.1538, 0.2307, 0.0]
+        predicted_value = [
+            0.1538,
+            0.0,
+            0.0,
+            0.0769,
+            0.0769,
+            0.0769,
+            0.0,
+            0.0,
+            0.0769,
+            0.0769,
+            0.0769,
+            0.1538,
+            0.2307,
+            0.0,
+        ]
 
-        actual_value = [0.1666, 0.1666, 0.0333, 0.1333, 0.0, 0.0666, 0.0666,
-                        0.0333, 0.0333, 0.1, 0.0666, 0.0, 0.0666, 0.0666]
+        actual_value = [
+            0.1666,
+            0.1666,
+            0.0333,
+            0.1333,
+            0.0,
+            0.0666,
+            0.0666,
+            0.0333,
+            0.0333,
+            0.1,
+            0.0666,
+            0.0,
+            0.0666,
+            0.0666,
+        ]
 
         expected = 0.0072
         actual = calculate_mse(predicted_value, actual_value)
@@ -38,11 +66,24 @@ class CalculateMSETest(unittest.TestCase):
         """
         Bad input scenario
         """
-        predicted_value = [0.1538, 0.0, 0.0, 0.0769, 0.0769, 0.0769, 0.0, 0.0,
-                           0.0769, 0.0769, 0.0769, 0.1538, 0.2307, 0.0]
+        predicted_value = [
+            0.1538,
+            0.0,
+            0.0,
+            0.0769,
+            0.0769,
+            0.0769,
+            0.0,
+            0.0,
+            0.0769,
+            0.0769,
+            0.0769,
+            0.1538,
+            0.2307,
+            0.0,
+        ]
 
-        actual_value = [0.1666, 0.1666, 0.0333, 0.1333, 0.0, 0.0666, 0.0666,
-                        0.0333, 0.0333, 0.1]
+        actual_value = [0.1666, 0.1666, 0.0333, 0.1333, 0.0, 0.0666, 0.0666, 0.0333, 0.0333, 0.1]
 
         expected = None
         actual = calculate_mse(predicted_value, actual_value)
@@ -55,10 +96,24 @@ class CalculateMSETest(unittest.TestCase):
         """
         Bad input scenario
         """
-        predicted_value = '0.0'
+        predicted_value = "0.0"
 
-        actual_value = [0.1666, 0.1666, 0.0333, 0.1333, 0.0, 0.0666, 0.0666,
-                        0.0333, 0.0333, 0.1, 0.0666, 0.0, 0.0666, 0.0666]
+        actual_value = [
+            0.1666,
+            0.1666,
+            0.0333,
+            0.1333,
+            0.0,
+            0.0666,
+            0.0666,
+            0.0333,
+            0.0333,
+            0.1,
+            0.0666,
+            0.0,
+            0.0666,
+            0.0666,
+        ]
 
         expected = None
         actual = calculate_mse(predicted_value, actual_value)
@@ -71,8 +126,22 @@ class CalculateMSETest(unittest.TestCase):
         """
         Bad input scenario
         """
-        predicted_value = [0.1538, 0.0, 0.0, 0.0769, 0.0769, 0.0769, 0.0, 0.0,
-                           0.0769, 0.0769, 0.0769, 0.1538, 0.2307, 0.0]
+        predicted_value = [
+            0.1538,
+            0.0,
+            0.0,
+            0.0769,
+            0.0769,
+            0.0769,
+            0.0,
+            0.0,
+            0.0769,
+            0.0769,
+            0.0769,
+            0.1538,
+            0.2307,
+            0.0,
+        ]
 
         actual_value = {}
 

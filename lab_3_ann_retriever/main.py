@@ -600,7 +600,9 @@ class NaiveKDTree:
 
         while inf:
             cur_vect = inf[0]['cur']
-            depth = inf[0]['depth']
+            if not isinstance(cur_vect, list) and not all(isinstance(vec, (list, tuple)) for vec in cur_vect):
+                raise ValueError
+            depth = int(inf[0]['depth'])
             parent = inf[0]['ancestor']
             is_left = inf[0]['left']
             inf.pop(0)

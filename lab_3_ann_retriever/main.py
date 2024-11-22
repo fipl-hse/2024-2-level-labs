@@ -382,6 +382,8 @@ class BasicSearchEngine:
 
         relevant_docs = []
         for index, value in relevanced:
+            if index is None:
+                return None
             relevant_docs.append((value, self._documents[index]))
         return relevant_docs
 

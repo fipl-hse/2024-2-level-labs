@@ -940,9 +940,7 @@ class SearchEngine(BasicSearchEngine):
             state = json.load(file_to_read)
         if not isinstance(state, dict) or 'engine' not in state or 'tree' not in state['engine']:
             return False
-        if not self._tree.load(state['engine']['tree']):
-            return False
-        if not self._load_documents(state):
+        if not self._tree.load(state['engine']['tree']) or not self._load_documents(state):
             return False
         return True
 

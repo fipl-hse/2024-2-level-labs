@@ -70,10 +70,7 @@ def save_vector(vector: Vector) -> dict:
     Returns:
         dict: A state of the vector to save
     """
-    return {
-        'len': len(vector),
-        'elements': {i: value for i, value in enumerate(vector) if value}
-    }
+    return {"len": len(vector), "elements": {i: value for i, value in enumerate(vector) if value}}
 
 
 def load_vector(state: dict) -> Vector | None:
@@ -88,10 +85,10 @@ def load_vector(state: dict) -> Vector | None:
 
     In case of corrupt input arguments, None is returned.
     """
-    if not state or not isinstance(state, dict) or 'len' not in state or 'elements' not in state:
+    if not state or not isinstance(state, dict) or "len" not in state or "elements" not in state:
         return None
-    vector = [0.0] * state['len']
-    for index, value in state['elements'].items():
+    vector = [0.0] * state["len"]
+    for index, value in state["elements"].items():
         vector[int(index)] = value
     return tuple(vector)
 
@@ -127,8 +124,8 @@ class Tokenizer:
         if not isinstance(text, str):
             return None
         for symbol in text:
-            if not symbol.isalpha() and symbol != ' ':
-                text = text.replace(symbol, ' ')
+            if not symbol.isalpha() and symbol != " ":
+                text = text.replace(symbol, " ")
         without_sp = self._remove_stop_words(text.lower().split())
         if without_sp is None:
             return None
@@ -146,8 +143,11 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not documents or not isinstance(documents, list) or \
-                not all(isinstance(document, str) for document in documents):
+        if (
+            not documents
+            or not isinstance(documents, list)
+            or not all(isinstance(document, str) for document in documents)
+        ):
             return None
         tokenized_docs = []
         for document in documents:
@@ -169,8 +169,11 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or \
-                not tokens:
+        if (
+            not isinstance(tokens, list)
+            or not all(isinstance(token, str) for token in tokens)
+            or not tokens
+        ):
             return None
         return [token for token in tokens if token not in self._stop_words]
 
@@ -229,9 +232,11 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(tokenized_document, list) \
-                or not all(isinstance(token, str) for token in tokenized_document) \
-                or not tokenized_document:
+        if (
+            not isinstance(tokenized_document, list)
+            or not all(isinstance(token, str) for token in tokenized_document)
+            or not tokenized_document
+        ):
             return None
         return self._calculate_tf_idf(tokenized_document)
 
@@ -247,12 +252,20 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not vector or not isinstance(vector, tuple) \
-                or not all(isinstance(elem, float) for elem in vector) \
-                or len(vector) != len(self._token2ind):
+        if (
+            not vector
+            or not isinstance(vector, tuple)
+            or not all(isinstance(elem, float) for elem in vector)
+            or len(vector) != len(self._token2ind)
+        ):
             return None
-        return [token for i, value in enumerate(vector) if value for token, index
-                in self._token2ind.items() if index == i]
+        return [
+            token
+            for i, value in enumerate(vector)
+            if value
+            for token, index in self._token2ind.items()
+            if index == i
+        ]
 
     def save(self, file_path: str) -> bool:
         """
@@ -268,11 +281,11 @@ class Vectorizer:
         if not isinstance(file_path, str):
             return False
         state = {
-            'idf_values': self._idf_values,
-            'vocabulary': self._vocabulary,
-            'token2ind': self._token2ind
+            "idf_values": self._idf_values,
+            "vocabulary": self._vocabulary,
+            "token2ind": self._token2ind,
         }
-        with open(file_path, 'w', encoding='utf-8') as file_to_save:
+        with open(file_path, "w", encoding="utf-8") as file_to_save:
             json.dump(state, file_to_save)
         return True
 
@@ -290,14 +303,19 @@ class Vectorizer:
         """
         if not isinstance(file_path, str):
             return False
-        with open(file_path, 'r', encoding='utf-8') as file_to_read:
+        with open(file_path, "r", encoding="utf-8") as file_to_read:
             state = json.load(file_to_read)
-        if not state or not isinstance(state, dict) or 'idf_values' not in state or \
-                'vocabulary' not in state or 'token2ind' not in state:
+        if (
+            not state
+            or not isinstance(state, dict)
+            or "idf_values" not in state
+            or "vocabulary" not in state
+            or "token2ind" not in state
+        ):
             return False
-        self._idf_values = state['idf_values']
-        self._vocabulary = state['vocabulary']
-        self._token2ind = state['token2ind']
+        self._idf_values = state["idf_values"]
+        self._vocabulary = state["vocabulary"]
+        self._token2ind = state["token2ind"]
         return True
 
     def _calculate_tf_idf(self, document: list[str]) -> Vector | None:
@@ -312,8 +330,11 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(document, list) or not all(isinstance(elem, str) for elem in document) \
-                or not document:
+        if (
+            not isinstance(document, list)
+            or not all(isinstance(elem, str) for elem in document)
+            or not document
+        ):
             return None
         if not self._vocabulary:
             return ()
@@ -362,9 +383,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not isinstance(documents, list) \
-                or not all(isinstance(token, str) for token in documents) \
-                or not documents:
+        if (
+            not isinstance(documents, list)
+            or not all(isinstance(token, str) for token in documents)
+            or not documents
+        ):
             return False
         self._documents = documents
         vectors = []
@@ -413,8 +436,8 @@ class BasicSearchEngine:
         """
         if not isinstance(file_path, str):
             return False
-        engine_state = {'engine': self._dump_documents()}
-        with open(file_path, 'w', encoding='utf-8') as file_to_save:
+        engine_state = {"engine": self._dump_documents()}
+        with open(file_path, "w", encoding="utf-8") as file_to_save:
             json.dump(engine_state, file_to_save)
         return True
 
@@ -430,11 +453,15 @@ class BasicSearchEngine:
         """
         if not isinstance(file_path, str):
             return False
-        with open(file_path, 'r', encoding='utf-8') as file_to_read:
+        with open(file_path, "r", encoding="utf-8") as file_to_read:
             state = json.load(file_to_read)
-        if not state or not isinstance(state, dict) or 'engine' not in state or \
-                'documents' not in state['engine'] or \
-                'document_vectors' not in state['engine']:
+        if (
+            not state
+            or not isinstance(state, dict)
+            or "engine" not in state
+            or "documents" not in state["engine"]
+            or "document_vectors" not in state["engine"]
+        ):
             return False
         self._load_documents(state)
         if not self._document_vectors or not self._documents:
@@ -453,8 +480,11 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if query_vector is None or not isinstance(query_vector, tuple) \
-                or any(True for vec in self._document_vectors if len(vec) != len(query_vector)):
+        if (
+            query_vector is None
+            or not isinstance(query_vector, tuple)
+            or any(True for vec in self._document_vectors if len(vec) != len(query_vector))
+        ):
             return None
         answer = self._calculate_knn(query_vector, self._document_vectors, 1)
         if answer is None or not answer:
@@ -487,7 +517,7 @@ class BasicSearchEngine:
             if distance is None:
                 return None
             distances.append((index, distance))
-        return sorted(distances, reverse=False, key=lambda t: t[1])[: n_neighbours]
+        return sorted(distances, reverse=False, key=lambda t: t[1])[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -516,8 +546,8 @@ class BasicSearchEngine:
             dict: document and document_vectors states
         """
         return {
-            'documents': self._documents,
-            'document_vectors': [save_vector(vector) for vector in self._document_vectors]
+            "documents": self._documents,
+            "document_vectors": [save_vector(vector) for vector in self._document_vectors],
         }
 
     def _load_documents(self, state: dict) -> bool:
@@ -530,12 +560,16 @@ class BasicSearchEngine:
         Returns:
             bool: True if documents were loaded, False in other cases
         """
-        if not state or not isinstance(state, dict) or 'engine' not in state or \
-                'documents' not in state['engine'] or \
-                'document_vectors' not in state['engine']:
+        if (
+            not state
+            or not isinstance(state, dict)
+            or "engine" not in state
+            or "documents" not in state["engine"]
+            or "document_vectors" not in state["engine"]
+        ):
             return False
-        self._documents = state['engine']['documents']
-        for vector in state['engine']['document_vectors']:
+        self._documents = state["engine"]["documents"]
+        for vector in state["engine"]["document_vectors"]:
             loaded_vector = load_vector(vector)
             if loaded_vector is None or not loaded_vector:
                 return False
@@ -582,10 +616,10 @@ class Node(NodeLike):
             dict: state of the Node instance
         """
         return {
-            'vector': save_vector(self.vector),
-            'payload': self.payload,
-            'left_node': self.left_node.save() if self.left_node is not None else None,
-            'right_node': self.right_node.save() if self.right_node is not None else None
+            "vector": save_vector(self.vector),
+            "payload": self.payload,
+            "left_node": self.left_node.save() if self.left_node is not None else None,
+            "right_node": self.right_node.save() if self.right_node is not None else None,
         }
 
     def load(self, state: dict[str, dict | int]) -> bool:
@@ -600,32 +634,39 @@ class Node(NodeLike):
         """
         if not state or not isinstance(state, dict):
             return False
-        if 'payload' not in state or 'vector' not in state \
-                or not state['vector'] or not isinstance(state['vector'], dict):
+        if (
+            "payload" not in state
+            or "vector" not in state
+            or not state["vector"]
+            or not isinstance(state["vector"], dict)
+        ):
             return False
-        vector = load_vector(state['vector'])
-        payload = state['payload']
-        if not vector or not isinstance(vector, tuple) \
-                or not all(isinstance(value, float) for value in vector) \
-                or not isinstance(payload, int):
+        vector = load_vector(state["vector"])
+        payload = state["payload"]
+        if (
+            not vector
+            or not isinstance(vector, tuple)
+            or not all(isinstance(value, float) for value in vector)
+            or not isinstance(payload, int)
+        ):
             return False
         self.vector = vector
         self.payload = payload
-        if state['left_node'] is None:
+        if state["left_node"] is None:
             self.left_node = None
         else:
-            if not isinstance(state['left_node'], dict):
+            if not isinstance(state["left_node"], dict):
                 return False
             left_node = Node()
-            left_node.load(state['left_node'])
+            left_node.load(state["left_node"])
             self.left_node = left_node
-        if state['right_node'] is None:
+        if state["right_node"] is None:
             self.right_node = None
         else:
-            if not isinstance(state['right_node'], dict):
+            if not isinstance(state["right_node"], dict):
                 return False
             right_node = Node()
-            right_node.load(state['right_node'])
+            right_node.load(state["right_node"])
             self.right_node = right_node
         return True
 
@@ -655,8 +696,12 @@ class NaiveKDTree:
 
         In case of corrupt input arguments, False is returned.
         """
-        if not vectors or vectors is None or not isinstance(vectors, list) \
-                or not all(isinstance(elem, tuple) for elem in vectors):
+        if (
+            not vectors
+            or vectors is None
+            or not isinstance(vectors, list)
+            or not all(isinstance(elem, tuple) for elem in vectors)
+        ):
             return False
         dim = len(vectors[0])
         all_dimensions = [(vectors, 0, Node(), True)]
@@ -678,10 +723,12 @@ class NaiveKDTree:
                     dim_parent.left_node = node_median
                 else:
                     dim_parent.right_node = node_median
-            all_dimensions.append((sorted_vectors[:median_index], dimension[1] + 1, node_median,
-                                   True))
-            all_dimensions.append((sorted_vectors[median_index + 1:], dimension[1] + 1, node_median,
-                                   False))
+            all_dimensions.append(
+                (sorted_vectors[:median_index], dimension[1] + 1, node_median, True)
+            )
+            all_dimensions.append(
+                (sorted_vectors[median_index + 1 :], dimension[1] + 1, node_median, False)
+            )
         return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
@@ -715,7 +762,7 @@ class NaiveKDTree:
         root = self._root.save()
         if not root or root is None or not isinstance(root, dict):
             return None
-        return {'root': root}
+        return {"root": root}
 
     def load(self, state: dict) -> bool:
         """
@@ -727,10 +774,10 @@ class NaiveKDTree:
         Returns:
             bool: True is loaded successfully, False in other cases
         """
-        if not state or not isinstance(state, dict) or 'root' not in state:
+        if not state or not isinstance(state, dict) or "root" not in state:
             return False
         self._root = Node()
-        self._root.load(state['root'])
+        self._root.load(state["root"])
         if not self._root:
             return False
         return True
@@ -813,13 +860,15 @@ class KDTree(NaiveKDTree):
             axis = depth % len(vector)
             if vector[axis] <= node.vector[axis]:
                 current_pairs.append((node.left_node, depth + 1))
-                if ((vector[axis] - node.vector[axis]) ** 2) < max(closest_nodes,
-                                                                   key=lambda x: x[0])[0]:
+                if ((vector[axis] - node.vector[axis]) ** 2) < max(
+                    closest_nodes, key=lambda x: x[0]
+                )[0]:
                     current_pairs.append((node.right_node, depth + 1))
             else:
                 current_pairs.append((node.right_node, depth + 1))
-                if ((vector[axis] - node.vector[axis]) ** 2) < max(closest_nodes,
-                                                                   key=lambda x: x[0])[0]:
+                if ((vector[axis] - node.vector[axis]) ** 2) < max(
+                    closest_nodes, key=lambda x: x[0]
+                )[0]:
                     current_pairs.append((node.left_node, depth + 1))
         return closest_nodes
 
@@ -854,9 +903,11 @@ class SearchEngine(BasicSearchEngine):
 
         In case of corrupt input arguments, False is returned.
         """
-        if not isinstance(documents, list) \
-                or not all(isinstance(token, str) for token in documents) \
-                or not documents:
+        if (
+            not isinstance(documents, list)
+            or not all(isinstance(token, str) for token in documents)
+            or not documents
+        ):
             return False
         self._documents = documents
         vectors = []
@@ -910,8 +961,8 @@ class SearchEngine(BasicSearchEngine):
         if not tree_state or tree_state is None:
             return False
         dump = self._dump_documents()
-        documents = dump['documents']
-        document_vectors = dump['document_vectors']
+        documents = dump["documents"]
+        document_vectors = dump["document_vectors"]
         if not documents or documents is None or not document_vectors or document_vectors is None:
             return False
         state = {
@@ -921,7 +972,7 @@ class SearchEngine(BasicSearchEngine):
                 "document_vectors": document_vectors,
             }
         }
-        with open(file_path, 'w', encoding='utf-8') as file_to_save:
+        with open(file_path, "w", encoding="utf-8") as file_to_save:
             json.dump(state, file_to_save)
         return True
 
@@ -937,11 +988,11 @@ class SearchEngine(BasicSearchEngine):
         """
         if not isinstance(file_path, str):
             return False
-        with open(file_path, 'r', encoding='utf-8') as file_to_read:
+        with open(file_path, "r", encoding="utf-8") as file_to_read:
             state = json.load(file_to_read)
-        if not isinstance(state, dict) or 'engine' not in state or 'tree' not in state['engine']:
+        if not isinstance(state, dict) or "engine" not in state or "tree" not in state["engine"]:
             return False
-        if not self._tree.load(state['engine']['tree']) or not self._load_documents(state):
+        if not self._tree.load(state["engine"]["tree"]) or not self._load_documents(state):
             return False
         return True
 

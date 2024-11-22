@@ -6,6 +6,7 @@ Vector search with text retrieving
 from json import dump, load
 from math import sqrt
 from re import findall
+
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 

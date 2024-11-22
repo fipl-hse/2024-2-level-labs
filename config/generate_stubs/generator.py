@@ -85,6 +85,16 @@ def cleanup_code(source_code_path: Path) -> str:
             "TreeNode",
         ]
         accepted_modules["core_utils.article.article"] = ["Article"]
+    elif (
+        "lab_4_retrieval_w_clustering" in str(source_code_path)
+        and source_code_path.name == "main.py"
+    ):
+        accepted_modules["lab_3_ann_retriever.main"] = [
+            "BasicSearchEngine",
+            "Tokenizer",
+            "Vector",
+            "Vectorizer",
+        ]
 
     new_decl: list[stmt] = []
 

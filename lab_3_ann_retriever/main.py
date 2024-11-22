@@ -793,10 +793,8 @@ class SearchEngine(BasicSearchEngine):
             list[tuple[float, str]] | None: Relevant documents with their distances.
         In case of corrupt input arguments, None is returned.
         """
-        if (not isinstance(query, str) or
-                not isinstance(n_neighbours, int)):
+        if not isinstance(query, str) or not isinstance(n_neighbours, int):
             return None
-
         tokenized_query = self._tokenizer.tokenize(query)
         if tokenized_query is None:
             return None
@@ -805,9 +803,8 @@ class SearchEngine(BasicSearchEngine):
             return None
 
         relevant_vectors = self._tree.query(vectorized_query, n_neighbours)
-        if (relevant_vectors is None or
-                any(None in vector for vector in relevant_vectors) or
-                not relevant_vectors):
+        if (relevant_vectors is None or any(None in vector for vector in relevant_vectors)
+                or not relevant_vectors):
             return None
 
         return [(relevant_vectors[i][0], self._documents[relevant_vectors[i][1]]) for i in

@@ -141,10 +141,7 @@ class Tokenizer:
             tokenized_document = self.tokenize(document)
             if tokenized_document is None:
                 return None
-            document_without_stopwords = self._remove_stop_words(tokenized_document)
-            if document_without_stopwords is None:
-                return None
-            tokenized_documents.append(document_without_stopwords)
+            tokenized_documents.append(tokenized_document)
 
         return tokenized_documents
 
@@ -164,11 +161,9 @@ class Tokenizer:
         if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or not tokens:
             return None
 
-        clear_text = []
+        clear_text = list()
 
-        for token in tokens:
-            if token not in self._stop_words:
-                clear_text.append(token)
+        clear_text = [token for token in tokens if token not in self._stop_words]
 
         return clear_text
 

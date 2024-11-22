@@ -111,7 +111,7 @@ class Tokenizer:
         for char in text:
             if not char.isalpha() and char != ' ':
                 text = text.replace(char, ' ')
-        return self._remove_stop_words(text.lower().split())
+        return self._remove_stop_words(text.split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """

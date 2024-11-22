@@ -32,7 +32,6 @@ def main() -> None:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
 
-<<<<<<< HEAD
     tokenized_docs = []
     for doc in documents:
         tokenized_doc = tokenize(doc)
@@ -50,7 +49,6 @@ def main() -> None:
     for doc in tf_values_lst:
         result = calculate_tf_idf(doc, calculate_idf(vocab, meaningful_docs))
         print(result)
-=======
     documents_preprocessed = []
     for document in documents:
         document_tokenized = tokenize(document)
@@ -164,7 +162,6 @@ def main() -> None:
 
     result = bm25_cutoff_ranks_only
     print('golden standard:', result)
->>>>>>> e9f9d9378e418e51e425b5ed8035cb5fb994d4c1
     assert result, "Result is None"
 
 

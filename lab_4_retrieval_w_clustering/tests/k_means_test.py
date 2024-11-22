@@ -99,7 +99,6 @@ class KMeansTest(unittest.TestCase):
             self.kmeans.infer((0.5, 0.5), 0)
 
     @pytest.mark.lab_4_retrieval_w_clustering
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_calculate_square_sum_ideal(self):
         """

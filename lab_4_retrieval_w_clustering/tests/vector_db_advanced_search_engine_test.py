@@ -27,7 +27,6 @@ class VectorDBAdvancedSearchEngineTest(unittest.TestCase):
         self.advanced_engine = VectorDBAdvancedSearchEngine(self.mock_db)
 
     @pytest.mark.lab_4_retrieval_w_clustering
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_initialization(self):
         """

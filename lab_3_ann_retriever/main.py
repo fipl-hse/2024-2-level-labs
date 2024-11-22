@@ -770,7 +770,7 @@ class NaiveKDTree:
         result = []
         while space:
             node, depth = space.pop()
-            if node is None or not isinstance(node.payload, int):
+            if not node or not isinstance(node.payload, int):
                 return None
             if not node.left_node and not node.right_node:
                 distance = calculate_distance(vector, node.vector)
@@ -779,7 +779,7 @@ class NaiveKDTree:
                 result.append((distance, node.payload))
                 if len(result) == k:
                     return result
-            axis = depth % len(node.vector)
+            axis = depth % len(vector)
             if vector[axis] <= node.vector[axis]:
                 if node.left_node is not None:
                     space.append((node.left_node, depth + 1))

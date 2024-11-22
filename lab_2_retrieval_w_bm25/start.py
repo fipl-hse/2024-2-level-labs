@@ -1,13 +1,23 @@
 """
 Laboratory Work #2 starter
 """
+
 # pylint:disable=too-many-locals, unused-argument, unused-variable,
 # too-many-branches, too-many-statements, duplicate-code
-from lab_2_retrieval_w_bm25.main import (build_vocabulary, calculate_bm25,
-                                         calculate_bm25_with_cutoff, calculate_idf,
-                                         calculate_spearman, calculate_tf, calculate_tf_idf,
-                                         load_index, rank_documents, remove_stopwords, save_index,
-                                         tokenize)
+from lab_2_retrieval_w_bm25.main import (
+    build_vocabulary,
+    calculate_bm25,
+    calculate_bm25_with_cutoff,
+    calculate_idf,
+    calculate_spearman,
+    calculate_tf,
+    calculate_tf_idf,
+    load_index,
+    rank_documents,
+    remove_stopwords,
+    save_index,
+    tokenize,
+)
 
 
 def main() -> None:
@@ -48,7 +58,7 @@ def main() -> None:
     metrics_tf_idf = []
     metrics_bm_25 = []
     bm_25_advanced = []
-    adv_len = sum(len(tokens) for tokens in clear_tokens)/len(clear_tokens)
+    adv_len = sum(len(tokens) for tokens in clear_tokens) / len(clear_tokens)
     for tok in tokens:
         if not isinstance(tok, list):
             return None
@@ -58,38 +68,34 @@ def main() -> None:
         tf_idf = calculate_tf_idf(tf, idf)
         if tf_idf is not None:
             metrics_tf_idf.append(tf_idf)
-        bm_25 = calculate_bm25(unique_tokens, tok, idf,
-                               1.5, 0.75, adv_len, len(tok))
+        bm_25 = calculate_bm25(unique_tokens, tok, idf, 1.5, 0.75, adv_len, len(tok))
         if bm_25 is not None:
             metrics_bm_25.append(bm_25)
-        bm_25_adv = calculate_bm25_with_cutoff(unique_tokens, tok, idf,
-                                               0.2, 1.5, 0.75,
-                                               adv_len, len(tok))
+        bm_25_adv = calculate_bm25_with_cutoff(
+            unique_tokens, tok, idf, 0.2, 1.5, 0.75, adv_len, len(tok)
+        )
         if bm_25_adv is not None:
             bm_25_advanced.append(bm_25_adv)
-    rank_tf_idf = rank_documents(metrics_tf_idf,
-                                 'Which fairy tale has Fairy Queen?',
-                                 stopwords)
-    rank_bm_25 = rank_documents(metrics_bm_25,
-                                'Which fairy tale has Fairy Queen?',
-                                stopwords)
+    rank_tf_idf = rank_documents(metrics_tf_idf, "Which fairy tale has Fairy Queen?", stopwords)
+    rank_bm_25 = rank_documents(metrics_bm_25, "Which fairy tale has Fairy Queen?", stopwords)
     save_index(bm_25_advanced, "assets/metrics.json")
     loaded = load_index("assets/metrics.json")
     if not isinstance(loaded, list):
         return None
-    rank_from_json = rank_documents(loaded,
-                                    'Which fairy tale has Fairy Queen?',
-                                    stopwords)
-    spearman_tf_idf = calculate_spearman([num[0] for num in rank_tf_idf],
-                                         [golden[0] for golden in rank_from_json])
-    spearman_bm_25 = calculate_spearman([num[0] for num in rank_bm_25],
-                                        [golden[0] for golden in rank_from_json])
-    spearman_bm_25_adv = calculate_spearman([num[0] for num in rank_from_json],
-                                            [golden[0] for golden in rank_from_json])
-    print(f'Golden rank: {[golden[0] for golden in rank_from_json]}')
-    print(f'Spearman tf_idf: {spearman_tf_idf}')
-    print(f'Spearman BM25: {spearman_bm_25}')
-    print(f'Spearman BM25 with cutoff: {spearman_bm_25_adv}')
+    rank_from_json = rank_documents(loaded, "Which fairy tale has Fairy Queen?", stopwords)
+    spearman_tf_idf = calculate_spearman(
+        [num[0] for num in rank_tf_idf], [golden[0] for golden in rank_from_json]
+    )
+    spearman_bm_25 = calculate_spearman(
+        [num[0] for num in rank_bm_25], [golden[0] for golden in rank_from_json]
+    )
+    spearman_bm_25_adv = calculate_spearman(
+        [num[0] for num in rank_from_json], [golden[0] for golden in rank_from_json]
+    )
+    print(f"Golden rank: {[golden[0] for golden in rank_from_json]}")
+    print(f"Spearman tf_idf: {spearman_tf_idf}")
+    print(f"Spearman BM25: {spearman_bm_25}")
+    print(f"Spearman BM25 with cutoff: {spearman_bm_25_adv}")
     result = spearman_bm_25_adv
     assert result, "Result is None"
     return None

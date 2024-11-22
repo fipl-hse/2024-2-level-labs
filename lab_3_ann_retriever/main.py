@@ -293,11 +293,9 @@ class Vectorizer:
             return False
         with open(file_path, "r", encoding="utf-8") as file:
             loaded = json.load(file)
-            if (
-                not "vocabulary" in loaded
+            if (not "vocabulary" in loaded
                 or not "idf_values" in loaded
-                or not "token2ind" in loaded
-            ):
+                or not "token2ind" in loaded):
                 return False
             self._idf_values = loaded["idf_values"]
             self._vocabulary = loaded["vocabulary"]
@@ -360,11 +358,9 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, False is returned.
         """
-        if (
-            not documents
+        if (not documents
             or not isinstance(documents, list)
-            or not all(isinstance(word, str) for word in documents)
-        ):
+            or not all(isinstance(word, str) for word in documents)):
             return False
         self._documents = documents
         self._document_vectors = [vec for doc in documents if (vec := self._index_document(doc))]
@@ -914,14 +910,12 @@ class SearchEngine(BasicSearchEngine):
         """
         if not isinstance(query, str) or not isinstance(n_neighbours, int):
             return None
-
         query_vector = self._index_document(query)
         if query_vector is None:
             return None
         answer = self._tree.query(query_vector, n_neighbours)
         if answer is None:
             return None
-
         relevant_documents = []
         for _, (distance, index) in enumerate(answer):
             if index is not None and distance is not None:

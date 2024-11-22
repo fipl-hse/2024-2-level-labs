@@ -136,6 +136,8 @@ class Tokenizer:
         tokenized_documents = []
 
         for document in documents:
+            if document is None:
+                return None
             tokenized_document = self.tokenize(document)
             if tokenized_document is None:
                 return None

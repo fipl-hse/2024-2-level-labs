@@ -4,7 +4,7 @@ Lab 4.
 Vector search with clusterization
 """
 
-# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member
+# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
 
 Corpus = list[str]

@@ -91,11 +91,11 @@ def main() -> None:
     vectorizer_new.load('assets/states/vectorizer_state.json')
     vectorizer_new.build()
 
-    searchengine_pro_max = AdvancedSearchEngine(vectorizer_new,tokenizer)
-    searchengine_pro_max.load('assets/states/engine_state.json')
-    searchengine_pro_max.index_documents(documents)
+    engine_pro_max = AdvancedSearchEngine(vectorizer_new,tokenizer)
+    engine_pro_max.load('assets/states/engine_state.json')
+    engine_pro_max.index_documents(documents)
     pro_max_start = time()
-    relevant_docs_pro_max = searchengine_pro_max.retrieve_relevant_documents('Нижний Новгород',3)
+    relevant_docs_pro_max = engine_pro_max.retrieve_relevant_documents('Нижний Новгород',3)
     pro_max_finish = time()
     print(f'Relevant docs with advanced SE: {relevant_docs_pro_max} Time: {pro_max_start - pro_max_finish}')
 

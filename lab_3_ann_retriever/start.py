@@ -24,6 +24,8 @@ def open_files() -> tuple[list[str], list[str]]:
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
     return (documents, stopwords)
+
+
 def main() -> None:
     """
     Launch an implementation.
@@ -70,5 +72,7 @@ def main() -> None:
           f"Время выполнения: {time.time() - start_time_adv}")
     result = nearest_advanced
     assert result, "Result is None"
+
+
 if __name__ == "__main__":
     main()

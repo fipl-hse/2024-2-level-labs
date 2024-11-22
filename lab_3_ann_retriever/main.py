@@ -8,7 +8,6 @@ Vector search with text retrieving
 from typing import Protocol
 import re
 
-
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 

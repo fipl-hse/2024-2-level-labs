@@ -36,6 +36,7 @@ def main() -> None:
     documents, stopwords = open_files()
     tokenizer = Tokenizer(stopwords)
     tokenized_documents = tokenizer.tokenize_documents(documents)
+    print(tokenized_documents)
 
     result = tokenized_documents
     assert result, "Result is None"

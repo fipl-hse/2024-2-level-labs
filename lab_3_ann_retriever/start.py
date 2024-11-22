@@ -30,6 +30,8 @@ def main() -> None:
     """
     Launch an implementation.
     """
+    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
+        text = text_file.read()
     documents, stopwords = open_files()
 
     tokenizer = Tokenizer(stopwords)
@@ -49,7 +51,6 @@ def main() -> None:
     naive_kdtree_result = naive_kdtree_retriever.retrieve_relevant_documents("Нижний Новгород")
 
     result = (knn_result, naive_kdtree_result)
-    print(result)
     assert result, "Result is None"
 
 

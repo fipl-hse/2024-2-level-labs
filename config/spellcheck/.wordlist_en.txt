@@ -58,6 +58,7 @@ aims
 ain
 alekseevna
 alexander
+algo
 algorithm
 all
 allowed
@@ -151,6 +152,7 @@ autoformatting
 automatically
 autongramlanguagemodel
 available
+avg
 avgdl
 axis
 axmatova
@@ -197,6 +199,7 @@ bilingual
 bleu
 block
 blocks
+blog
 blok
 blyudova
 bm
@@ -242,6 +245,8 @@ casts
 cat
 cconj
 cd
+centroid
+centroids
 certain
 certificate
 certification
@@ -271,6 +276,14 @@ clickcrawler
 clone
 closely
 closest
+cluster
+clusterdto
+clustering
+clusteringengine
+clusteringsearchengine
+clusterization
+clusterizator
+clusters
 cmd
 code
 collaborators
@@ -344,6 +357,7 @@ control
 convenient
 convention
 conventions
+convergence
 conversion
 convert
 converted
@@ -395,6 +409,7 @@ dates
 datetime
 datv
 day
+db
 de
 deadline
 debug
@@ -470,6 +485,7 @@ docstrings
 document
 documentation
 documents
+documentvectordb
 does
 doesn
 dogs
@@ -506,6 +522,7 @@ edition
 effortless
 egor
 either
+elbow
 elements
 elif
 else
@@ -543,6 +560,7 @@ eow
 equal
 equating
 er
+erase
 error
 errors
 es
@@ -696,6 +714,7 @@ generatortypes
 geo
 geometric
 get
+getparagraphstest
 gets
 getter
 getters
@@ -783,6 +802,7 @@ ids
 if
 ignore
 igorevich
+ii
 image
 images
 imagine
@@ -817,6 +837,9 @@ ind
 index
 indexes
 indicates
+indices
+infer
+inference
 inferior
 infn
 info
@@ -885,6 +908,7 @@ iterable
 iterate
 iterates
 iterating
+iteration
 itertools
 its
 itself
@@ -895,6 +919,7 @@ joined
 json
 juice
 just
+k-means
 k-nearest
 kashchikhin
 kazyulina
@@ -909,6 +934,7 @@ key-value
 keys
 keywords
 klimova
+kmeans
 knearestneighbourretriever
 knn
 knnalgorithm
@@ -1051,6 +1077,7 @@ mikhailovna
 milestone
 mind
 mini-task
+minirag
 misc
 missing
 mistake
@@ -1091,6 +1118,7 @@ my
 mypy
 myself
 n-gram
+naftaliharris
 naivekdtree
 name
 named
@@ -1212,6 +1240,9 @@ pair
 pairs
 paper
 papers
+paragraphs
+paragraphsearchengine
+paragraphtokenizer
 param
 parameter
 parameters
@@ -1391,6 +1422,7 @@ question
 questions
 quickly
 quite
+rag
 raise
 random
 range
@@ -1406,6 +1438,7 @@ rd
 re
 re-implement
 reach
+reached
 reaches
 read
 reads
@@ -1448,6 +1481,7 @@ removing
 repeat
 repeats
 repetitions
+replacement
 repo
 report
 repository
@@ -1464,6 +1498,8 @@ require
 required
 requirements
 requires
+reranker
+rerankerengine
 research
 resources
 respond
@@ -1475,6 +1511,7 @@ result
 resulting
 results
 retrieval
+retrieval-augmented
 retrieve
 retrieved
 retriever
@@ -1626,7 +1663,9 @@ split
 splits
 splitting
 spro
+square
 squared
+sse
 stage
 stages
 stand
@@ -1686,6 +1725,7 @@ substring
 subtype
 such
 suffix
+sum
 summary
 summer
 super
@@ -1720,6 +1760,7 @@ tbd
 technical
 techniques
 tells
+temporary
 term
 terms
 tests
@@ -1753,6 +1794,7 @@ this
 those
 thousands
 three
+threshold
 through
 throwing
 thrown
@@ -1770,6 +1812,7 @@ token
 tokenization
 tokenize
 tokenized
+tokenizedcorpus
 tokenizer
 tokenizes
 tokenizing
@@ -1789,6 +1832,7 @@ track
 traditional
 traffic
 train
+training
 transfer
 transform
 transformations
@@ -1881,6 +1925,11 @@ vasilisa
 ve
 vec
 vector
+vectordb
+vectordbadvancedsearchengine
+vectordbengine
+vectordbsearchengine
+vectordbtreesearchengine
 vectorization
 vectorize
 vectorized
@@ -1907,6 +1956,7 @@ visualization
 visualize
 visualizer
 visualizes
+visualizing-k-means-clustering
 vita
 vitazaytseva
 vkontakte

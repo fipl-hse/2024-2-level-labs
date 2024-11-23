@@ -3,7 +3,7 @@ Lab 4.
 
 Vector search with clusterization
 """
-import lab_3_ann_retriever.main
+
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code,
 # unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
@@ -41,14 +41,13 @@ class BM25Vectorizer(Vectorizer):
     _corpus: TokenizedCorpus
     _avg_doc_len: float
 
-    def __init__(self) -> None:
+    def __init__(self, corpus: list[list[str]]) -> None:
         """
         Initialize an instance of the BM25Vectorizer class.
         """
-        self._corpus: TokenizedCorpus = []
+        self._corpus = []
         self._avg_doc_len = -1.0
-        super().__init__(self._corpus)
-        super().build()
+        super().__init__(corpus)
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -84,6 +83,13 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        if not isinstance(tokenized_document, list) or not tokenized_document\
+                or not all(isinstance(token, str) for token in tokenized_document):
+            raise ValueError
+        bm_25 = self._calculate_bm25(tokenized_document)
+        if not bm_25:
+            raise ValueError
+        return bm_25
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
         """
@@ -101,13 +107,15 @@ class BM25Vectorizer(Vectorizer):
         if not isinstance(tokenized_document, list) or not tokenized_document\
                 or not all(isinstance(token, str) for token in tokenized_document):
             raise ValueError
-        vocab = super()._vocabulary
-        vector = [0.0] * len(vocab)
-        if vocab is None:
-            raise ValueError
+        # self._calculate_tf_idf(tokenized_document)
+        vocab = self._vocabulary
+        vector = [0.0] * len(self._vocabulary)
+        idf = self._idf_values
+        bm_25 = calculate_bm25(vocab, tokenized_document, idf, 1.5, 0.75,
+                               self._avg_doc_len, len(tokenized_document))
         for index, token in enumerate(vocab):
             if token in tokenized_document:
-                vector[index] = calculate_bm25(vocab, tokenized_document, Vectorizer._idf_values)
+                vector[index] = bm_25.get(token)
         return tuple(vector)
 
 
@@ -128,6 +136,10 @@ class DocumentVectorDB:
         Args:
             stop_words (list[str]): List with stop words.
         """
+        self._tokenizer = Tokenizer(stop_words)
+        self.__documents = []
+        self.__vectors = {}
+        self._vectorizer = BM25Vectorizer()
 
     def put_corpus(self, corpus: Corpus) -> None:
         """

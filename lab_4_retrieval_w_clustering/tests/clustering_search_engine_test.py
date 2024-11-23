@@ -106,7 +106,6 @@ class ClusteringSearchEngineTest(unittest.TestCase):
             self.engine.retrieve_relevant_documents("test query", 2)
 
     @pytest.mark.lab_4_retrieval_w_clustering
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_calculate_square_sum_ideal(self):
         """

@@ -22,11 +22,9 @@ class CalculateFrequenciesTest(unittest.TestCase):
         """
         Ideal calculate frequencies scenario
         """
-        expected = {'a': 0.1666, 'n': 0.1666,
-                    'm': 0.1666, 'h': 0.1666,
-                    't': 0.1666, 'e': 0.1666}
+        expected = {"a": 0.1666, "n": 0.1666, "m": 0.1666, "h": 0.1666, "t": 0.1666, "e": 0.1666}
 
-        actual = calculate_frequencies(['t', 'h', 'e', 'm', 'a', 'n'])
+        actual = calculate_frequencies(["t", "h", "e", "m", "a", "n"])
 
         self.assertEqual(expected.keys(), actual.keys())
 
@@ -42,11 +40,22 @@ class CalculateFrequenciesTest(unittest.TestCase):
         """
         Calculate frequencies with several same tokens
         """
-        expected = {'t': 0.1176, 'r': 0.0588, 'u': 0.0588, 'n': 0.1176,
-                      'a': 0.0588, 'y': 0.0588, 'h': 0.1176, 'i': 0.0588,
-                      's': 0.1176, 'w': 0.0588, 'e': 0.1764}
-        actual = calculate_frequencies(['t', 'h', 'e', 'w', 'e', 'a', 't', 'h', 'e',
-                                          'r', 'i', 's', 's', 'u', 'n', 'n', 'y'])
+        expected = {
+            "t": 0.1176,
+            "r": 0.0588,
+            "u": 0.0588,
+            "n": 0.1176,
+            "a": 0.0588,
+            "y": 0.0588,
+            "h": 0.1176,
+            "i": 0.0588,
+            "s": 0.1176,
+            "w": 0.0588,
+            "e": 0.1764,
+        }
+        actual = calculate_frequencies(
+            ["t", "h", "e", "w", "e", "a", "t", "h", "e", "r", "i", "s", "s", "u", "n", "n", "y"]
+        )
 
         self.assertEqual(expected.keys(), actual.keys())
 
@@ -62,7 +71,7 @@ class CalculateFrequenciesTest(unittest.TestCase):
         """
         Calculate frequencies invalid input tokens check
         """
-        bad_inputs = ['string', {}, (), None, 9, 9.34, True, [None]]
+        bad_inputs = ["string", {}, (), None, 9, 9.34, True, [None]]
         expected = None
         for bad_input in bad_inputs:
             actual = calculate_frequencies(bad_input)
@@ -76,7 +85,7 @@ class CalculateFrequenciesTest(unittest.TestCase):
         """
         Calculate frequencies return values check
         """
-        tokens = ['t', 'h', 'e', 'm', 'a', 'n']
+        tokens = ["t", "h", "e", "m", "a", "n"]
         expected = 6
         actual = calculate_frequencies(tokens)
         self.assertEqual(expected, len(actual))

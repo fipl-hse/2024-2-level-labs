@@ -5,7 +5,6 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 import time
 from pathlib import Path
-from main import Tokenizer
 
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
@@ -31,7 +30,8 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return documents, stopwords
+    return (documents, stopwords)
+
 
 def main() -> None:
     """

@@ -5,7 +5,6 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 import time
 from pathlib import Path
-from lab_3_ann_retriever.main import (Tokenizer)
 
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,

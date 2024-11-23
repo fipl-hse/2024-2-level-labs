@@ -112,7 +112,6 @@ class Tokenizer:
         """
         self._stop_words = stop_words
 
-        self._stop_words = stop_words
     def tokenize(self, text: str) -> list[str] | None:
         """
         Tokenize the input text into lowercase words without punctuation, digits and other symbols.
@@ -134,13 +133,6 @@ class Tokenizer:
         if without_sp is None:
             return None
         return without_sp
-
-        if not isinstance(text, str):
-            return None
-        for char in text:
-            if not char.isalpha() and char != ' ':
-                text = text.replace(char, ' ')
-        return self._remove_stop_words(text.split())
 
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
@@ -164,18 +156,6 @@ class Tokenizer:
                 return None
             tokenized_docs.append(doc)
         return tokenized_docs
-
-        if not isinstance(documents, list) or \
-                not all(isinstance(document, str) for document in documents) or not documents:
-            return None
-
-        tokenized_documents = []
-
-        for document in documents:
-            tokenized_documents.append(self.tokenize(document))
-
-        return tokenized_documents if None not in tokenized_documents \
-            else None
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """

@@ -3,6 +3,7 @@ Lab 3.
 
 Vector search with text retrieving
 """
+
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json
 import math
@@ -99,6 +100,7 @@ class Tokenizer:
     """
     Tokenizer with removing stop words.
     """
+
     _stop_words: list[str]
 
     def __init__(self, stop_words: list[str]) -> None:
@@ -177,6 +179,7 @@ class Vectorizer:
     """
     TF-IDF Vectorizer.
     """
+
     _corpus: list[list[str]]
     _idf_values: dict[str, float]
     _vocabulary: list[str]
@@ -261,14 +264,6 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
-        if not (isinstance(file_path, str) and len(file_path) > 0 and
-                isinstance(self._vocabulary, list) and isinstance(self._idf_values, dict) and
-                isinstance(self._token2ind, dict)):
-            return False
-        with open(file_path, "w", encoding="utf-8") as write_file:
-            json.dump({"vocabulary": self._vocabulary, "idf_values": self._idf_values,
-                      "token2ind": self._token2ind}, write_file, indent="\t")
-        return True
 
         if not isinstance(file_path, str):
             return False
@@ -336,6 +331,7 @@ class BasicSearchEngine:
     """
     Engine based on KNN algorithm.
     """
+
     _vectorizer: Vectorizer
     _tokenizer: Tokenizer
     _documents: list[str]
@@ -551,6 +547,7 @@ class Node(NodeLike):
     """
     Interface definition for Node for KDTree.
     """
+
     vector: Vector
     payload: int
     left_node: NodeLike | None
@@ -637,6 +634,7 @@ class NaiveKDTree:
     """
     NaiveKDTree.
     """
+
     _root: NodeLike | None
 
     def __init__(self) -> None:
@@ -779,6 +777,7 @@ class KDTree(NaiveKDTree):
     """
     KDTree.
     """
+
     def _find_closest(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:
         """
         Get k nearest neighbours for vector by filling best list.
@@ -829,6 +828,7 @@ class SearchEngine(BasicSearchEngine):
     """
     Retriever based on KDTree algorithm.
     """
+
     _tree: NaiveKDTree
 
     def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:
@@ -950,6 +950,7 @@ class AdvancedSearchEngine(SearchEngine):
     """
     Retriever based on KDTree algorithm.
     """
+
     _tree: KDTree
 
     def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:

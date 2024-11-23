@@ -10,7 +10,11 @@
         },
         {
             "name": "lab_3_ann_retriever",
-            "coverage": 79
+            "coverage": 100
+        },
+        {
+            "name": "lab_4_retrieval_w_clustering",
+            "coverage": 91
         }
     ],
     "addons": [],

@@ -3,8 +3,17 @@ Laboratory Work #3 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+import time
 from pathlib import Path
 from time import time
+
+from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
+    BasicSearchEngine,
+    SearchEngine,
+    Tokenizer,
+    Vectorizer,
+)
 
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
@@ -39,74 +48,63 @@ def main() -> None:
     """
     with open("assets/secrets/secret_4.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
+    vector_from_text = text.split(", ")
+    vector = tuple(float(value) for value in vector_from_text)
     stopwords = open_files()[1]
     documents = open_files()[0]
     tokenizer = Tokenizer(stopwords)
-    test_doc = '"Мой кот Вектор по утрам приносит мне тапочки, а по вечерам' \
-               ' мы гуляем с ним на шлейке во дворе.' \
-               ' Вектор забавный и храбрый. Он не боится собак!'
-    tokenized_test_doc = tokenizer.tokenize(test_doc)
-    print(tokenized_test_doc)
-    test_docs = ['Векторы используются для поиска релевантного документа. Давайте научимся,'
-                 ' как их создавать и использовать!','Мой кот Вектор по утрам приносит мне тапочки,'
-                 ' а по вечерам мы гуляем с ним на шлейке во дворе.'
-                 ' Вектор забавный и храбрый.'
-                 ' Он не боится собак!', 'Котёнок, которого мы нашли во дворе,'
-                 ' очень забавный и пушистый.'
-                 ' По утрам я играю с ним в догонялки перед работой.',
-                 'Моя собака думает, что её любимый'
-                 ' плед — это кошка. Просто он очень пушистый и мягкий.'
-                 ' Забавно наблюдать, как они спят'
-                 ' вместе!']
-    tokenized_test_docs = tokenizer.tokenize_documents(test_docs)
-    print(tokenized_test_docs)
-
-    tokenized_docs = tokenizer.tokenize_documents(documents)
-    if not tokenized_docs:
-        return
-    vectorizer = Vectorizer(tokenized_docs)
+    tokenized_documents = tokenizer.tokenize_documents(documents)
+    if tokenized_documents is None:
+        result = None
+        assert result, "Result is None"
+    vectorizer = Vectorizer(tokenized_documents)
     vectorizer.build()
-    searchengine = BasicSearchEngine(vectorizer,tokenizer)
-    searchengine.index_documents(documents)
-    secret_tokens = text.split(', ')
-    secret_vector = tuple(float(token) for token in secret_tokens)
-    print(secret_vector)
-    secret = vectorizer.vector2tokens(secret_vector)
-    print(secret)
-    secret_revealed = searchengine.retrieve_vectorized(secret_vector)
-    print(secret_revealed)
+    question = vectorizer.vector2tokens(vector)
+    if question is None:
+        result = None
+        assert result, "Result is None"
+    preparing_answer = BasicSearchEngine(vectorizer, tokenizer)
+    preparing_answer.index_documents(documents)
+    answer = preparing_answer.retrieve_vectorized(vector)
+    if answer is None:
+        result = None
+        assert result, "Result is None"
+    print(answer)
 
-    basic_start = time()
-    relevant_docs = searchengine.retrieve_relevant_documents('Нижний Новгород', 3)
-    basic_finish = time()
-    print(f'Relevant documents with basic search engine:'
-          f' {relevant_docs} Time: {basic_start-basic_finish}')
+    query = "Нижний Новгород"
+    search_engine = SearchEngine(vectorizer, tokenizer)
+    search_engine.index_documents(documents)
+    basic_search = BasicSearchEngine(vectorizer, tokenizer)
+    basic_search.index_documents(documents)
+    result_engine = search_engine.retrieve_relevant_documents(query)
+    print(f"Result returned by SearchEngine: {result_engine}\n")
+    start_for_basic = time.time()
+    basic_results = basic_search.retrieve_relevant_documents(query, 3)
+    if basic_results is None:
+        result = None
+        assert result, "Result is None"
+    print(f"Working time of BasicSearchEngine: {time.time() - start_for_basic}\n")
+    if result_engine is None or basic_results is None:
+        result = None
+        assert result, "Result is None"
+    for i, basic_result in enumerate(basic_results):
+        print(f"Result #{i + 1} returned by BasicSearchEngine: {basic_result}\n")
 
-    searchengine_pro = SearchEngine(vectorizer, tokenizer)
-    searchengine_pro.index_documents(documents)
-    searchengine_pro.save('assets/states/engine_state.json')
-    pro_start = time()
-    relevant_docs_pro = searchengine_pro.retrieve_relevant_documents('Нижний Новгород',1)
-    pro_finish = time()
-    print(f'Relevant documents with normal search engine:'
-          f' {relevant_docs_pro} Time: {pro_start - pro_finish}')
-
-    vectorizer.save('assets/states/vectorizer_state.json')
-    vectorizer_new = Vectorizer(tokenized_docs)
-    vectorizer_new.load('assets/states/vectorizer_state.json')
-    vectorizer_new.build()
-
-    engine_pro_max = AdvancedSearchEngine(vectorizer_new,tokenizer)
-    engine_pro_max.load('assets/states/engine_state.json')
-    engine_pro_max.index_documents(documents)
-    pro_max_start = time()
-    relevant_docs_pro_max = engine_pro_max.retrieve_relevant_documents('Нижний Новгород',3)
-    pro_max_finish = time()
-    print(f'Relevant docs with advanced SE: {relevant_docs_pro_max}'
-          f' Time: {pro_max_start - pro_max_finish}')
-
-
-    result = '???'
+    vectorizer.save("assets/states/vectorizer_state.json")
+    new_vectorizer = Vectorizer(tokenized_documents)
+    new_vectorizer.load("assets/states/vectorizer_state.json")
+    search_engine.save("assets/states/engine_state.json")
+    advanced_search = AdvancedSearchEngine(new_vectorizer, tokenizer)
+    advanced_search.load("assets/states/engine_state.json")
+    start_for_advanced = time.time()
+    advanced_results = advanced_search.retrieve_relevant_documents(query, 3)
+    if advanced_results is None:
+        result = None
+        assert result, "Result is None"
+    print(f"Working time of AdvancedSearchEngine: {time.time() - start_for_advanced}\n")
+    for i, advanced_result in enumerate(advanced_results):
+        print(f"Result #{i + 1} returned by AdvancedSearchEngine: {advanced_result}\n")
+    result = advanced_results
     assert result, "Result is None"
 
 

@@ -8,7 +8,6 @@ Vector search with text retrieving
 import json
 import math
 from typing import Protocol
-import re
 
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
@@ -328,7 +327,6 @@ class Vectorizer:
         return tuple(tf_idf)
 
 
-
 class BasicSearchEngine:
     """
     Engine based on KNN algorithm.
@@ -462,7 +460,6 @@ class BasicSearchEngine:
         if answer is None or not answer:
             return None
         return self._documents[answer[0][0]]
-
 
     def _calculate_knn(
         self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int

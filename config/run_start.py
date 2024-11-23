@@ -1,6 +1,7 @@
 """
 Run start.
 """
+
 import argparse
 from pathlib import Path
 
@@ -23,12 +24,8 @@ def run_is_admin_check(pr_name: str) -> tuple[str, str, int]:
     """
     return _run_console_tool(
         str(choose_python_exe()),
-        [
-            str(Path(CONFIG_PACKAGE_PATH, 'is_admin.py')),
-            '--pr_name',
-            pr_name
-        ],
-        debug=True
+        [str(Path(CONFIG_PACKAGE_PATH, "is_admin.py")), "--pr_name", pr_name],
+        debug=True,
     )
 
 
@@ -44,8 +41,8 @@ def check_skip_conditions(pr_name: str, repository_type: str) -> bool:
         bool: True if should be skipped
     """
     stdout, _, _ = run_is_admin_check(pr_name)
-    if repository_type == "public" and stdout.strip() == 'YES':
-        print('[skip-lab] option was enabled, skipping check...')
+    if repository_type == "public" and stdout.strip() == "YES":
+        print("[skip-lab] option was enabled, skipping check...")
         return True
     return False
 
@@ -62,10 +59,7 @@ def run_start(lab_name: str) -> tuple[str, str, int]:
         tuple[str, str, int]: stdout, stderr, exit code
     """
     return _run_console_tool(
-        str(choose_python_exe()),
-        [str('start.py')],
-        cwd=PROJECT_ROOT / lab_name,
-        debug=True
+        str(choose_python_exe()), [str("start.py")], cwd=PROJECT_ROOT / lab_name, debug=True
     )
 
 
@@ -80,15 +74,20 @@ def check_start_content(lab_name: str) -> tuple[str, str, int]:
     Returns:
         tuple[str, str, int]: stdout, stderr, exit code
     """
-    start_py_file = PROJECT_ROOT / lab_name / 'start.py'
+    start_py_file = PROJECT_ROOT / lab_name / "start.py"
     with start_py_file.open() as f:
         start_py_content = f.read()
 
-    return _run_console_tool(str(choose_python_exe()),
-                             [str(Path(CONFIG_PACKAGE_PATH, 'check_start_content.py')),
-                              '--start_py_content', start_py_content],
-                             cwd=PROJECT_ROOT,
-                             debug=True)
+    return _run_console_tool(
+        str(choose_python_exe()),
+        [
+            str(Path(CONFIG_PACKAGE_PATH, "check_start_content.py")),
+            "--start_py_content",
+            start_py_content,
+        ],
+        cwd=PROJECT_ROOT,
+        debug=True,
+    )
 
 
 def parse_arguments() -> argparse.Namespace:

@@ -1,6 +1,7 @@
 """
 Script for updating student`s fork.
 """
+
 import sys
 import tempfile
 from enum import Enum
@@ -41,6 +42,7 @@ class RemoteBranches(Enum):
     """
     Remote branches.
     """
+
     UPSTREAM = "upstream/main"
     ORIGIN = "origin/main"
 
@@ -105,7 +107,7 @@ def setup_repository(fork_path: Path, user: str) -> tuple[str, str, int]:
 
 
 @handles_console_error()
-def add_upstream(fork_path: Path, upstream: str)  -> tuple[str, str, int]:
+def add_upstream(fork_path: Path, upstream: str) -> tuple[str, str, int]:
     """
     Add remote with name upstream.
 
@@ -147,9 +149,9 @@ def get_repository_path(root_path: Path) -> Path:
     Returns:
         Path: path to the repository
     """
-    folders = list(root_path.glob('*'))
+    folders = list(root_path.glob("*"))
     if len(folders) != 1:
-        raise ValueError(f'Cannot find repository in {root_path}')
+        raise ValueError(f"Cannot find repository in {root_path}")
     return folders[0]
 
 
@@ -158,7 +160,7 @@ def checkout_path(
     fork_path: Path,
     paths_to_checkout: tuple[str, ...],
     branch: RemoteBranches,
-)  -> tuple[str, str, int]:
+) -> tuple[str, str, int]:
     """
     Revert files to branch.
 
@@ -166,7 +168,7 @@ def checkout_path(
         fork_path (Path): Path to the local repository
         paths_to_checkout (tuple[str, ...]): Paths to check out to a branch
         branch (RemoteBranches): Branch name
-    
+
     Returns:
         tuple[str, str, int]: stdout, stderr, exit code
     """
@@ -185,7 +187,7 @@ def push_head_to_origin(fork_path: Path) -> tuple[str, str, int]:
 
     Args:
         fork_path (Path): Path to the local repository
-    
+
     Returns:
         tuple[str, str, int]: stdout, stderr, exit code
     """
@@ -204,7 +206,7 @@ def git_status(fork_path: Path) -> tuple[str, str, int]:
 
     Args:
         fork_path (Path): Path to the local repository
-    
+
     Returns:
         tuple[str, str, int]: stdout, stderr, exit code
     """
@@ -216,7 +218,6 @@ def git_status(fork_path: Path) -> tuple[str, str, int]:
     )
 
 
-
 @handles_console_error()
 def git_commit(fork_path: Path, commit_message: str) -> tuple[str, str, int]:
     """
@@ -225,7 +226,7 @@ def git_commit(fork_path: Path, commit_message: str) -> tuple[str, str, int]:
     Args:
         fork_path (Path): Path to the local repository
         commit_message (str): Commit message
-    
+
     Returns:
         tuple[str, str, int]: stdout, stderr, exit code
     """
@@ -234,7 +235,6 @@ def git_commit(fork_path: Path, commit_message: str) -> tuple[str, str, int]:
         args=["commit", "-m", f'"{commit_message}"'],
         cwd=fork_path,
         debug=True,
-        rais_if_error=False
     )
 
 
@@ -242,14 +242,14 @@ def git_commit(fork_path: Path, commit_message: str) -> tuple[str, str, int]:
 def update_with_upstream(
     fork_path: Path,
     strategy: Strategies,
-)  -> tuple[str, str, int]:
+) -> tuple[str, str, int]:
     """
     Update with upstream/main.
 
     Args:
         fork_path (Path): Path to the local repository
         strategy (Strategies): strategy to update student`s repository
-        
+
     Returns:
         tuple[str, str, int]: stdout, stderr, exit code
     """
@@ -328,7 +328,7 @@ def main(
                 print()
 
         stdout, stderr, exit_code = git_status(fork_path=fork_path)
-        skip_commit_message = 'nothing to commit, working tree clean'
+        skip_commit_message = "nothing to commit, working tree clean"
         if skip_commit_message not in stdout:
             git_commit(fork_path, merge_commit_message)
         push_head_to_origin(fork_path)

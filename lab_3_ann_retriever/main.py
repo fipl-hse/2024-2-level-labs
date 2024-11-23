@@ -3,8 +3,7 @@ Lab 3.
 
 Vector search with text retrieving
 """
-import json
-from math import sqrt
+
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json
 import math
@@ -265,16 +264,6 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
-        if not isinstance(file_path, str):
-            return False
-        vectorizer_info = {
-            "idf_values": self._idf_values,
-            "vocabulary": self._vocabulary,
-            "token2ind": self._token2ind
-        }
-        with open(file_path, "w", encoding="UTF-8") as file:
-            json.dump(vectorizer_info, file, ensure_ascii=False, indent=4)
-        return True
 
         if not isinstance(file_path, str):
             return False

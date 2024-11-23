@@ -189,7 +189,7 @@ class ClusterDTO:
     Store clusters.
     """
 
-    _centroid: Vector
+    __centroid: Vector
     __indices: list[int]
 
     def __init__(self, centroid_vector: Vector) -> None:

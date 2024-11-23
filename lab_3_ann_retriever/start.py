@@ -4,10 +4,16 @@ Laboratory Work #3 starter.
 
 import time
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+import time
 from pathlib import Path
 
-from lab_3_ann_retriever.main import (AdvancedSearchEngine, BasicSearchEngine, SearchEngine,
-                                      Tokenizer, Vectorizer)
+from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
+    BasicSearchEngine,
+    SearchEngine,
+    Tokenizer,
+    Vectorizer,
+)
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -34,43 +40,63 @@ def main() -> None:
     """
     with open("assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    secret_vector = tuple(float(item) for item in text.split(', '))
-    query = 'Нижний Новгород'
+    vector_from_text = text.split(", ")
+    vector = tuple(float(value) for value in vector_from_text)
     stopwords = open_files()[1]
-    tokenizer = Tokenizer(stopwords)
     documents = open_files()[0]
+    tokenizer = Tokenizer(stopwords)
     tokenized_documents = tokenizer.tokenize_documents(documents)
-    print(tokenized_documents)
-    if not tokenized_documents:
-        return
+    if tokenized_documents is None:
+        result = None
+        assert result, "Result is None"
     vectorizer = Vectorizer(tokenized_documents)
     vectorizer.build()
-    start = time.time()
-    knn_retriever = BasicSearchEngine(vectorizer=vectorizer, tokenizer=tokenizer)
-    knn_retriever.index_documents(documents)
-    print(knn_retriever.retrieve_relevant_documents(query, 3))
-    finish = time.time()
-    print(f'BasicSearchEngine time: {finish - start}')
-    print(vectorizer.vector2tokens(secret_vector))
-    print(knn_retriever.retrieve_vectorized(secret_vector))
-    start = time.time()
-    naive_kdtree_retriever = SearchEngine(vectorizer, tokenizer)
-    naive_kdtree_retriever.index_documents(documents)
-    print(naive_kdtree_retriever.retrieve_relevant_documents(query))
-    finish = time.time()
-    print(f'SearchEngine time: {finish - start}')
-    vectorizer.save('assets/states/vectorizer_state.json')
+    question = vectorizer.vector2tokens(vector)
+    if question is None:
+        result = None
+        assert result, "Result is None"
+    preparing_answer = BasicSearchEngine(vectorizer, tokenizer)
+    preparing_answer.index_documents(documents)
+    answer = preparing_answer.retrieve_vectorized(vector)
+    if answer is None:
+        result = None
+        assert result, "Result is None"
+    print(answer)
+
+    query = "Нижний Новгород"
+    search_engine = SearchEngine(vectorizer, tokenizer)
+    search_engine.index_documents(documents)
+    basic_search = BasicSearchEngine(vectorizer, tokenizer)
+    basic_search.index_documents(documents)
+    result_engine = search_engine.retrieve_relevant_documents(query)
+    print(f"Result returned by SearchEngine: {result_engine}\n")
+    start_for_basic = time.time()
+    basic_results = basic_search.retrieve_relevant_documents(query, 3)
+    if basic_results is None:
+        result = None
+        assert result, "Result is None"
+    print(f"Working time of BasicSearchEngine: {time.time() - start_for_basic}\n")
+    if result_engine is None or basic_results is None:
+        result = None
+        assert result, "Result is None"
+    for i, basic_result in enumerate(basic_results):
+        print(f"Result #{i + 1} returned by BasicSearchEngine: {basic_result}\n")
+
+    vectorizer.save("assets/states/vectorizer_state.json")
     new_vectorizer = Vectorizer(tokenized_documents)
-    new_vectorizer.load('assets/states/vectorizer_state.json')
-    naive_kdtree_retriever.save('assets/states/engine_state.json')
-    start = time.time()
-    kdtree_retriever = AdvancedSearchEngine(new_vectorizer, tokenizer)
-    kdtree_retriever.load('assets/states/engine_state.json')
-    kdtree_retriever.index_documents(documents)
-    result = kdtree_retriever.retrieve_relevant_documents(query, 3)
-    print(result)
-    finish = time.time()
-    print(f'AdvancedSearchEngine time: {finish - start}')
+    new_vectorizer.load("assets/states/vectorizer_state.json")
+    search_engine.save("assets/states/engine_state.json")
+    advanced_search = AdvancedSearchEngine(new_vectorizer, tokenizer)
+    advanced_search.load("assets/states/engine_state.json")
+    start_for_advanced = time.time()
+    advanced_results = advanced_search.retrieve_relevant_documents(query, 3)
+    if advanced_results is None:
+        result = None
+        assert result, "Result is None"
+    print(f"Working time of AdvancedSearchEngine: {time.time() - start_for_advanced}\n")
+    for i, advanced_result in enumerate(advanced_results):
+        print(f"Result #{i + 1} returned by AdvancedSearchEngine: {advanced_result}\n")
+    result = advanced_results
     assert result, "Result is None"
 
 

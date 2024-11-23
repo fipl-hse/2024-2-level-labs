@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """
 Checks the second lab's calculate TF-IDF function
 """
@@ -15,8 +16,9 @@ class CalculateTfIdfTest(unittest.TestCase):
     """
     Tests TF-IDF calculation functions
     """
+
     def setUp(self) -> None:
-        with open(Path(__file__).parent / "assets" / 'test_scores.json', encoding='utf-8') as file:
+        with open(Path(__file__).parent / "assets" / "test_scores.json", encoding="utf-8") as file:
             scores = json.load(file)
 
         self.tfs = scores["TF"]
@@ -63,14 +65,24 @@ class CalculateTfIdfTest(unittest.TestCase):
         Bad input scenario
         """
         expected = None
-        bad_inputs = [None, True, 42, 3.14, (), 'frequency', [],
-                      {}, {0: 'bad', 1: 7}, {'token': 'not frequency'}]
+        bad_inputs = [
+            None,
+            True,
+            42,
+            3.14,
+            (),
+            "frequency",
+            [],
+            {},
+            {0: "bad", 1: 7},
+            {"token": "not frequency"},
+        ]
 
         for bad_input in bad_inputs:
-            actual = calculate_tf_idf({'good': 0.91, 'tf': 0.54}, bad_input)
+            actual = calculate_tf_idf({"good": 0.91, "tf": 0.54}, bad_input)
             self.assertEqual(expected, actual)
 
-            actual = calculate_tf_idf(bad_input, {'good': 0.91, 'idf': 0.54})
+            actual = calculate_tf_idf(bad_input, {"good": 0.91, "idf": 0.54})
             self.assertEqual(expected, actual)
 
     @pytest.mark.lab_2_retrieval_w_bm25
@@ -81,10 +93,7 @@ class CalculateTfIdfTest(unittest.TestCase):
         """
         Function return value check
         """
-        actual = calculate_tf_idf(
-            {'happy': 0.5, 'token': 0.133},
-            {'happy': 1.6, 'token': 1.845}
-        )
+        actual = calculate_tf_idf({"happy": 0.5, "token": 0.133}, {"happy": 1.6, "token": 1.845})
         self.assertIsInstance(actual, dict)
         for token, tf_idf in actual.items():
             self.assertIsInstance(token, str)

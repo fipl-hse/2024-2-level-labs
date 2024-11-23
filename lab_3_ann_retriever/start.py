@@ -30,14 +30,14 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return documents, stopwords
+    return (documents, stopwords)
 
 
 def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
+    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     vector_from_text = text.split(", ")
     vector = tuple(float(value) for value in vector_from_text)

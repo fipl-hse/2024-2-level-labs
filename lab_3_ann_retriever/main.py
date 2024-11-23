@@ -3,10 +3,6 @@ Lab 3.
 
 Vector search with text retrieving
 """
-from json import dump, load
-from typing import Protocol
-
-from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json
@@ -268,12 +264,6 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
-        state = {'idf_values': self._idf_values,
-                 'vocabulary': self._vocabulary,
-                 'token2ind': self._token2ind}
-        with open(file_path, 'w', encoding='utf-8') as file:
-            dump(state, file)
-        return True
 
         if not isinstance(file_path, str):
             return False

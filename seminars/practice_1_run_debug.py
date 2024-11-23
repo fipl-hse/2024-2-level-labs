@@ -25,7 +25,7 @@ Running python application and debugging
 first_num = 15
 second_num = 0
 
-print(f'Numbers: {first_num} and {second_num}')
+print(f"Numbers: {first_num} and {second_num}")
 
 # Case1: the first exception trigger:
 # third_num = first_num / second_num
@@ -33,13 +33,13 @@ print(f'Numbers: {first_num} and {second_num}')
 # Fix the first exception:
 second_num = 6
 third_num = first_num / second_num
-print(f'Numbers: {first_num}, {second_num} and {third_num}')
+print(f"Numbers: {first_num}, {second_num} and {third_num}")
 
 
 # Case 2: the second debugging case:
 if first_num * second_num == third_num:
-    print('First number * second equals third number')
+    print("First number * second equals third number")
 else:
-    print('First number * second does not equal third number')
+    print("First number * second does not equal third number")
 
-print('Program finished')
+print("Program finished")

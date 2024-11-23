@@ -21,8 +21,15 @@ class PrintReportTest(unittest.TestCase):
         Ideal scenario
         """
         expected = None
-        detections = [('es', 0.0016), ('tr', 0.0018), ('it', 0.002), ('fr', 0.0021),
-                      ('en', 0.0022), ('de', 0.0024), ('ru', 0.0037)]
+        detections = [
+            ("es", 0.0016),
+            ("tr", 0.0018),
+            ("it", 0.002),
+            ("fr", 0.0021),
+            ("en", 0.0022),
+            ("de", 0.0024),
+            ("ru", 0.0037),
+        ]
 
         self.assertEqual(expected, print_report(detections))
 

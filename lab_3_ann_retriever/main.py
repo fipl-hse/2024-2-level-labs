@@ -3,8 +3,7 @@ Lab 3.
 
 Vector search with text retrieving
 """
-from json import dump, load
-from math import sqrt
+
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json
 import math
@@ -101,6 +100,7 @@ class Tokenizer:
     """
     Tokenizer with removing stop words.
     """
+
     _stop_words: list[str]
 
     def __init__(self, stop_words: list[str]) -> None:
@@ -179,6 +179,7 @@ class Vectorizer:
     """
     TF-IDF Vectorizer.
     """
+
     _corpus: list[list[str]]
     _idf_values: dict[str, float]
     _vocabulary: list[str]
@@ -263,17 +264,6 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
-        if not isinstance(file_path, str) or not file_path:
-            return False
-
-        state = {
-            'idf_values': self._idf_values,
-            'vocabulary': self._vocabulary,
-            'token2ind': self._token2ind
-        }
-        with open(file_path, 'w', encoding='utf-8') as file:
-            dump(state, file)
-        return True
 
         if not isinstance(file_path, str):
             return False
@@ -644,6 +634,7 @@ class NaiveKDTree:
     """
     NaiveKDTree.
     """
+
     _root: NodeLike | None
 
     def __init__(self) -> None:
@@ -959,6 +950,7 @@ class AdvancedSearchEngine(SearchEngine):
     """
     Retriever based on KDTree algorithm.
     """
+
     _tree: KDTree
 
     def __init__(self, vectorizer: Vectorizer, tokenizer: Tokenizer) -> None:

@@ -1,6 +1,7 @@
 """
 Checks the second lab's text preprocessing functions
 """
+
 import unittest
 
 import pytest
@@ -22,8 +23,8 @@ class TokenizeTest(unittest.TestCase):
         """
         Ideal tokenize scenario
         """
-        expected = ['the', 'weather', 'is', 'sunny']
-        actual = tokenize('The weather is sunny.')
+        expected = ["the", "weather", "is", "sunny"]
+        actual = tokenize("The weather is sunny.")
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_2_retrieval_w_bm25
@@ -35,9 +36,18 @@ class TokenizeTest(unittest.TestCase):
         """
         Tokenize text with several sentences
         """
-        expected = ['the', 'first', 'sentence', 'the', 'second',
-                    'sentence', 'the', 'third', 'sentence']
-        actual = tokenize('The first sentence. The second sentence. The third sentence.')
+        expected = [
+            "the",
+            "first",
+            "sentence",
+            "the",
+            "second",
+            "sentence",
+            "the",
+            "third",
+            "sentence",
+        ]
+        actual = tokenize("The first sentence. The second sentence. The third sentence.")
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_2_retrieval_w_bm25
@@ -49,8 +59,8 @@ class TokenizeTest(unittest.TestCase):
         """
         Tokenize text with different punctuation marks
         """
-        expected = ['the', 'first', 'sentence', 'nice']
-        actual = tokenize('The, first sentence - nice!')
+        expected = ["the", "first", "sentence", "nice"]
+        actual = tokenize("The, first sentence - nice!")
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_2_retrieval_w_bm25
@@ -62,8 +72,8 @@ class TokenizeTest(unittest.TestCase):
         """
         Tokenize russian text
         """
-        expected = ['этот', 'текст', 'на', 'русском', 'языке', 'он', 'содержит', 'кириллицу']
-        actual = tokenize('Этот текст на русском языке. Он содержит кириллицу.')
+        expected = ["этот", "текст", "на", "русском", "языке", "он", "содержит", "кириллицу"]
+        actual = tokenize("Этот текст на русском языке. Он содержит кириллицу.")
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_2_retrieval_w_bm25
@@ -75,8 +85,8 @@ class TokenizeTest(unittest.TestCase):
         """
         Tokenize dirty text
         """
-        expected = ['the', 'first', 'sentence', 'the', 'sec', 'ond', 'sent', 'ence']
-        actual = tokenize('The first% sentence><. The sec&*ond sent@ence #.')
+        expected = ["the", "first", "sentence", "the", "sec", "ond", "sent", "ence"]
+        actual = tokenize("The first% sentence><. The sec&*ond sent@ence #.")
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_2_retrieval_w_bm25
@@ -89,7 +99,7 @@ class TokenizeTest(unittest.TestCase):
         Text without words scenario
         """
         expected = []
-        actual = tokenize('#%$ (2+3)/2!=2.6')
+        actual = tokenize("#%$ (2+3)/2!=2.6")
         self.assertEqual(expected, actual)
 
     @pytest.mark.lab_2_retrieval_w_bm25
@@ -116,6 +126,6 @@ class TokenizeTest(unittest.TestCase):
         """
         Tokenize return value check
         """
-        actual = tokenize('This is a sentence, it is complex.')
+        actual = tokenize("This is a sentence, it is complex.")
         self.assertIsInstance(actual, list)
         self.assertTrue(all(isinstance(token, str) for token in actual))

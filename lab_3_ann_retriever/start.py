@@ -37,7 +37,7 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_2.txt", "r", encoding="utf-8") as text_file:
+    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     vector_from_text = text.split(", ")
     vector = tuple(float(value) for value in vector_from_text)

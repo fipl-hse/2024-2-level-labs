@@ -4,7 +4,6 @@ Lab 3.
 Vector search with text retrieving
 """
 
-import math
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json
 import math

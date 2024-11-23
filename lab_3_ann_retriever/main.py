@@ -4,8 +4,6 @@ Lab 3.
 Vector search with text retrieving
 """
 
-import json
-import math
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json
 import math
@@ -159,11 +157,6 @@ class Tokenizer:
             tokenized_docs.append(doc)
         return tokenized_docs
 
-        if not documents or not isinstance(documents, list):
-            return None
-        return [tokenized_doc for document in documents
-                if (tokenized_doc := self.tokenize(document))] or None
-
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
         Remove stopwords from the list of tokens.
@@ -180,10 +173,6 @@ class Tokenizer:
                 not tokens:
             return None
         return [token for token in tokens if token not in self._stop_words]
-
-        if not tokens or not isinstance(tokens, list):
-            return None
-        return list(filter(lambda word: word not in self._stop_words, tokens))
 
 
 class Vectorizer:
@@ -203,11 +192,6 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
-        self._corpus = corpus
-        self._idf_values = {}
-        self._vocabulary = []
-        self._token2ind = {}
-
         self._corpus = corpus
         self._idf_values = {}
         self._vocabulary = []
@@ -280,13 +264,6 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
-        if not file_path or not isinstance(file_path, str):
-            return False
-        with open(file_path, 'w', encoding='utf-8') as file:
-            json.dump({'vocabulary': self._vocabulary,
-                       'idf_values': self._idf_values,
-                       'token2ind': self._token2ind}, file, ensure_ascii=False)
-        return True
 
         if not isinstance(file_path, str):
             return False

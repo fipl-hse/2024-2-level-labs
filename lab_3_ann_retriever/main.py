@@ -3,9 +3,6 @@ Lab 3.
 
 Vector search with text retrieving
 """
-from json import dump, load
-from math import sqrt
-from re import findall
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json
@@ -267,17 +264,6 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
-        if not isinstance(file_path, str) or not file_path:
-            return False
-
-        state = {
-            'idf_values': self._idf_values,
-            'vocabulary': self._vocabulary,
-            'token2ind': self._token2ind
-        }
-        with open(file_path, 'w', encoding='utf-8') as state_file:
-            dump(state, state_file)
-        return True
 
         if not isinstance(file_path, str):
             return False

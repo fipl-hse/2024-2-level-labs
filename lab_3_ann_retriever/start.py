@@ -5,15 +5,6 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 import time
 from pathlib import Path
-from time import time
-
-from lab_3_ann_retriever.main import (
-    AdvancedSearchEngine,
-    BasicSearchEngine,
-    SearchEngine,
-    Tokenizer,
-    Vectorizer,
-)
 
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
@@ -46,7 +37,7 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_5.txt", "r", encoding="utf-8") as text_file:
+    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
     vector_from_text = text.split(", ")
     vector = tuple(float(value) for value in vector_from_text)

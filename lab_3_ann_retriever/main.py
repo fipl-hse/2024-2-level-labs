@@ -3,13 +3,11 @@ Lab 3.
 
 Vector search with text retrieving
 """
+
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json
 import math
 from typing import Protocol
-from json import dump, load
-
-from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
 from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf
 
@@ -266,17 +264,6 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
-        if (not file_path or not self._idf_values or
-                not self._vocabulary or self._token2ind):
-            return False
-        vectorizer_dict = {
-            'idf_values': self._idf_values,
-            'vocabulary': self._vocabulary,
-            'token2ind': self._token2ind
-        }
-        with open(file_path, 'w', encoding='utf-8') as f:
-            dump(vectorizer_dict, f)
-        return True
 
         if not isinstance(file_path, str):
             return False
@@ -390,7 +377,7 @@ class BasicSearchEngine:
         return True
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int
+        self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
@@ -479,12 +466,15 @@ class BasicSearchEngine:
     ) -> list[tuple[int, float]] | None:
         """
         Find nearest neighbours for a query vector.
+
         Args:
             query_vector (Vector): Vectorized query
             document_vectors (list[Vector]): Vectorized documents
             n_neighbours (int): Number of neighbours to return
+
         Returns:
             list[tuple[int, float]] | None: Nearest neighbours indices and distances
+
         In case of corrupt input arguments, None is returned.
         """
         if query_vector is None or document_vectors is None or n_neighbours is None:
@@ -557,10 +547,12 @@ class Node(NodeLike):
     """
     Interface definition for Node for KDTree.
     """
+
     vector: Vector
     payload: int
     left_node: NodeLike | None
     right_node: NodeLike | None
+
     def __init__(
         self,
         vector: Vector = (),
@@ -570,6 +562,7 @@ class Node(NodeLike):
     ) -> None:
         """
         Initialize an instance of the Node class.
+
         Args:
             vector (Vector): Current vector node
             payload (int): Index of current vector
@@ -580,11 +573,6 @@ class Node(NodeLike):
         self.left_node = left_node
         self.right_node = right_node
         self.payload = payload
-
-        self.vector = vector
-        self.payload = payload
-        self.left_node = left_node
-        self.right_node = right_node
 
     def save(self) -> dict:
         """
@@ -886,11 +874,14 @@ class SearchEngine(BasicSearchEngine):
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.
+
         Args:
             query (str): Query for obtaining relevant documents.
             n_neighbours (int): Number of relevant documents to return.
+
         Returns:
             list[tuple[float, str]] | None: Relevant documents with their distances.
+
         In case of corrupt input arguments, None is returned.
         """
         if not isinstance(query, str) or not isinstance(n_neighbours, int):

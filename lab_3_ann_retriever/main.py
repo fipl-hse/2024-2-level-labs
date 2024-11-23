@@ -3,8 +3,6 @@ Lab 3.
 
 Vector search with text retrieving
 """
-import math
-import re
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 import json

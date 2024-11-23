@@ -693,7 +693,7 @@ class BasicSearchEngineTest(unittest.TestCase):
             actual = self.retriever._calculate_knn(
                 query_vector=bad_input,
                 document_vectors=bad_input,
-                n_neighbours=good_input_neighbour
+                n_neighbours=good_input_neighbour,
             )
             self.assertEqual(expected, actual)
 

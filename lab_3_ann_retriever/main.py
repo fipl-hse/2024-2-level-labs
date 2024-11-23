@@ -134,15 +134,6 @@ class Tokenizer:
             return None
         return without_sp
 
-        if not isinstance(text, str):
-            return None
-        tokens = []
-        for symbol in text:
-            if symbol.isalpha() or symbol == ' ':
-                tokens.append(symbol.lower())
-        text_tokens = ''.join(tokens).split()
-        return self._remove_stop_words(text_tokens)
-
     def tokenize_documents(self, documents: list[str]) -> list[list[str]] | None:
         """
         Tokenize the input documents.
@@ -165,16 +156,6 @@ class Tokenizer:
                 return None
             tokenized_docs.append(doc)
         return tokenized_docs
-
-        if not isinstance(documents, list) or not documents:
-            return None
-        if not all(isinstance(doc, str) for doc in documents):
-            return None
-        tokenized_documents = [self.tokenize(doc) for doc in documents]
-        if any(doc is None for doc in tokenized_documents):
-            return None
-
-        return tokenized_documents
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """

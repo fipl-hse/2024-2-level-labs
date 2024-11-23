@@ -217,7 +217,6 @@ class Vectorizer:
         self._idf_values = idf
         return True
 
-
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
         Create a vector for tokenized document.

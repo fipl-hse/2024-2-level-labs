@@ -264,18 +264,6 @@ class Vectorizer:
         Returns:
             bool: True if saved successfully, False in other case
         """
-        if not file_path or not isinstance(file_path, str):
-            return False
-        with open(file_path, "w", encoding="utf-8") as file:
-            json.dump(
-                {
-                    "idf_values": self._idf_values,
-                    "vocabulary": self._vocabulary,
-                    "token2ind": self._token2ind,
-                },
-                file,
-            )
-        return True
 
         if not isinstance(file_path, str):
             return False

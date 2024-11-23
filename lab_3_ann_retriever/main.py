@@ -59,11 +59,6 @@ def calculate_distance(query_vector: Vector, document_vector: Vector) -> float |
         return 0.0
     return math.sqrt(sum((value - document_vector[i]) ** 2 for i, value in enumerate(query_vector)))
 
-    distance = 0.0
-    for i, value in enumerate(query_vector):
-        distance += (value - document_vector[i] ) ** 2
-
-    return distance ** 0.5
 
 def save_vector(vector: Vector) -> dict:
     """
@@ -179,7 +174,6 @@ class Tokenizer:
             return None
         return [token for token in tokens if token not in self._stop_words]
 
-        return [token for token in tokens if token not in self.stopwords]
 
 class Vectorizer:
     """

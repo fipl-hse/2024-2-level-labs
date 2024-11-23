@@ -217,24 +217,6 @@ class Vectorizer:
         self._idf_values = idf
         return True
 
-        if self._corpus is None or len(self._corpus) == 0:
-            return False
-        self._vocabulary = sorted(list(set(token for doc in self._corpus for token in doc)))
-
-        text = calculate_idf(self._vocabulary, self._corpus)
-        if text is None:
-            return False
-        self._idf_values = text
-
-        for ind, token in enumerate(self._vocabulary):
-            self._token2ind[token] = int(ind)
-        if (None in self._vocabulary or None in self._idf_values
-                or None in self._token2ind):
-            return False
-        if (len(self._vocabulary) == 0 or len(self._idf_values) == 0
-            or len(self._token2ind) == 0):
-            return False
-        return True
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
         Create a vector for tokenized document.
@@ -392,26 +374,6 @@ class BasicSearchEngine:
                 return False
             vectors.append(vector)
         self._document_vectors = vectors
-        return True
-
-        if not isinstance(documents, list) or len(documents) == 0:
-            return False
-        self._documents = documents
-        for text in documents:
-            if not isinstance(text, str):
-                return False
-            vector = self._index_document(text)
-            if vector is None or len(vector) == 0:
-                return False
-        docs_to_append = []
-        for text in documents:
-            doc_vector = self._index_document(text)
-            if doc_vector is None:
-                return False
-            docs_to_append.append(doc_vector)
-        self._document_vectors = docs_to_append
-        if not self._documents or not self._document_vectors:
-            return False
         return True
 
     def retrieve_relevant_documents(
@@ -612,10 +574,6 @@ class Node(NodeLike):
         self.right_node = right_node
         self.payload = payload
 
-        self.vector = vector
-        self.left_node = left_node
-        self.right_node = right_node
-        self.payload = payload
     def save(self) -> dict:
         """
         Save Node instance to state.
@@ -685,7 +643,6 @@ class NaiveKDTree:
         """
         self._root = None
 
-        self._root = None
     def build(self, vectors: list[Vector]) -> bool:
         """
         Build tree.

@@ -1,6 +1,7 @@
 """
 Check lint for code style in Python code.
 """
+
 # pylint: disable=duplicate-code
 import argparse
 import re
@@ -24,12 +25,7 @@ def transform_score_into_lint(target_score: int) -> int:
     Returns:
         int: Lint score
     """
-    target_score_to_lint_score = {
-        10: 10,
-        8: 10,
-        6: 7,
-        4: 5
-    }
+    target_score_to_lint_score = {10: 10, 8: 10, 6: 7, 4: 5}
     return target_score_to_lint_score.get(target_score, 0)
 
 
@@ -47,27 +43,25 @@ def is_passed(lint_output: str, target_lint_level: int) -> bool:
     if not lint_output:
         return True
 
-    lint_level = re.search(r'Your code has been rated at \d+\.\d+', lint_output).group(0)
-    lint_score = int(re.search(r'\d+', lint_level).group(0))
+    lint_level = re.search(r"Your code has been rated at \d+\.\d+", lint_output).group(0)
+    lint_score = int(re.search(r"\d+", lint_level).group(0))
 
     if lint_score < target_lint_level:
-        print('\nLint check is not passed!')
-        print('Fix the following issues and try again.\n')
+        print("\nLint check is not passed!")
+        print("Fix the following issues and try again.\n")
         print(lint_output)
         return False
     if lint_score != 10:
-        print('\nLint check passed but there are thing to improve:\n')
+        print("\nLint check passed but there are thing to improve:\n")
         print(lint_output)
         return True
-    print('\nLint check passed!\n')
+    print("\nLint check passed!\n")
     return True
 
 
 @handles_console_error()
 def check_lint_on_paths(
-        paths: list[Path], path_to_config: Path,
-        exit_zero: bool = False,
-        ignore_tests: bool = False
+    paths: list[Path], path_to_config: Path, exit_zero: bool = False, ignore_tests: bool = False
 ) -> tuple[str, str, int]:
     """
     Run lint checks for the project.
@@ -84,17 +78,15 @@ def check_lint_on_paths(
     lint_args = [
         "-m",
         "pylint",
-        *map(str, filter(lambda x: x.exists(), paths))
-        ,
+        *map(str, filter(lambda x: x.exists(), paths)),
         "--rcfile",
-        str(path_to_config)
+        str(path_to_config),
     ]
     if ignore_tests:
         lint_args.extend(["--ignore", "tests"])
     if exit_zero:
         lint_args.append("--exit-zero")
-    return _run_console_tool(str(choose_python_exe()), lint_args,
-                             debug=True)
+    return _run_console_tool(str(choose_python_exe()), lint_args, debug=True)
 
 
 def check_lint_level(lint_output: str, target_score: int) -> bool:
@@ -112,7 +104,7 @@ def check_lint_level(lint_output: str, target_score: int) -> bool:
     target_lint_level = transform_score_into_lint(score)
 
     if not target_lint_level:
-        print('\nInvalid value for target score: accepted are 4, 6, 8, 10.\n')
+        print("\nInvalid value for target score: accepted are 4, 6, 8, 10.\n")
         return False
     return is_passed(lint_output, target_lint_level)
 
@@ -144,12 +136,10 @@ def main() -> None:
 
     print("Running lint on config, seminars, admin_utils")
     stdout, _, _ = check_lint_on_paths(
-        [
-            PROJECT_ROOT / "config",
-            PROJECT_ROOT / "seminars",
-            PROJECT_ROOT / "admin_utils"
-        ],
-        pyproject_path, exit_zero=True)
+        [PROJECT_ROOT / "config", PROJECT_ROOT / "seminars", PROJECT_ROOT / "admin_utils"],
+        pyproject_path,
+        exit_zero=True,
+    )
     if not check_lint_level(stdout, 10):
         check_is_failed = True
 
@@ -157,10 +147,8 @@ def main() -> None:
         print("core_utils exist")
         print("Running lint on core_utils")
         stdout, _, _ = check_lint_on_paths(
-            [
-                PROJECT_ROOT / "core_utils"
-            ],
-            pyproject_path, exit_zero=True)
+            [PROJECT_ROOT / "core_utils"], pyproject_path, exit_zero=True
+        )
         if not check_lint_level(stdout, 10):
             check_is_failed = True
 
@@ -175,15 +163,13 @@ def main() -> None:
 
             print(f"Running lint for lab {lab_path}")
             stdout, _, _ = check_lint_on_paths(
-                [
-                    lab_path
-                ],
-                pyproject_path, ignore_tests=repository_type == "public", exit_zero=True)
+                [lab_path], pyproject_path, ignore_tests=repository_type == "public", exit_zero=True
+            )
             if not check_lint_level(stdout, target_score):
                 check_is_failed = True
 
     if check_is_failed:
-        print('Some of checks failed. Fix it.')
+        print("Some of checks failed. Fix it.")
         sys.exit(1)
 
 

@@ -148,14 +148,18 @@ class DocumentVectorDB:
         if not corpus:
             raise ValueError
         self.__documents = corpus
-        tok = self._tokenizer.tokenize_documents(corpus)
-        if not tok:
+        tokenized_docs = []
+        for doc in self.__documents:
+            tok_doc = self._tokenizer.tokenize(doc)
+            if tok_doc:
+                tokenized_docs.append(tok_doc)
+        if not tokenized_docs:
             raise ValueError
-        self._vectorizer.set_tokenized_corpus(tok)
+        self._vectorizer.set_tokenized_corpus(tokenized_docs)
         self._vectorizer.build()
-        for doc in tok:
+        for doc in tokenized_docs:
             vectorized = self._vectorizer.vectorize(doc)
-            self.__vectors[tok.index(doc)] = vectorized
+            self.__vectors[tokenized_docs.index(doc)] = vectorized
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """

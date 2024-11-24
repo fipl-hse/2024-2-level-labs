@@ -50,7 +50,6 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    result = 'h'
     documents = ''.join(open_files()[0])
     paragraphs = get_paragraphs(documents)
     stopwords = open_files()[-1]

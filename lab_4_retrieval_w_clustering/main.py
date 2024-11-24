@@ -399,7 +399,7 @@ class KMeans:
             for centroid in centroids:
                 distances.append((calculate_distance(vector[-1], centroid), centroids.index(centroid)))
             closest = min(distances)
-            self.__clusters[closest[-1]].add_document_index(vector[0])
+            self.__clusters[closest[-1]].add_document_index(vectors.index(vector))
         for cluster in self.__clusters:
             cluster_vectors = []
             for num in cluster.get_indices():
@@ -544,9 +544,11 @@ class ClusteringSearchEngine:
         relevant_distances = self.__algo.infer(query_vector, n_neighbours)
         if not relevant_distances:
             raise ValueError
+        indices = tuple([i[-1] for i in relevant_distances])
+        docs = self._db.get_raw_documents(indices)
         result = []
-        for neighbour in relevant_distances:
-            result.append((neighbour[0], self._db.get_raw_documents((neighbour[-1]))[neighbour[-1]]))
+        for i, neighbour in enumerate(relevant_distances):
+            result.append((neighbour[0], docs[i]))
         return result
 
     def make_report(self, num_examples: int, output_path: str) -> None:

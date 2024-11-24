@@ -148,11 +148,7 @@ class DocumentVectorDB:
         if not corpus:
             raise ValueError
         self.__documents = corpus
-        tokenized_docs = []
-        for doc in self.__documents:
-            tok_doc = self._tokenizer.tokenize(doc)
-            if tok_doc:
-                tokenized_docs.append(tok_doc)
+        tokenized_docs = [tok_doc for doc in self.__documents if (tok_doc := self._tokenizer.tokenize(doc))]
         if not tokenized_docs:
             raise ValueError
         self._vectorizer.set_tokenized_corpus(tokenized_docs)
@@ -255,11 +251,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         neighbours = self._calculate_knn(vectorized_query, vectors, n_neighbours)
         if not neighbours:
             raise ValueError
-        result = []
         documents = self._db.get_raw_documents(tuple(sorted([tup[0] for tup in neighbours])))
-        for i, j in enumerate(neighbours):
-            result.append((j[-1], documents[i]))
-        return result
+        return [(tup[-1], documents[ind]) for ind, tup in enumerate(neighbours)]
 
 
 class ClusterDTO:
@@ -404,8 +397,8 @@ class KMeans:
             cluster_vectors = []
             for num in cluster.get_indices():
                 cluster_vectors.append(vectors[num][-1])
-            new_centroid = [sum(y) / len(y) for y in zip(*cluster_vectors)]
-            cluster.set_new_centroid(tuple(new_centroid))
+            new_centroid = tuple(sum(value) / len(value) for value in zip(*cluster_vectors))
+            cluster.set_new_centroid(new_centroid)
         return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
@@ -425,21 +418,21 @@ class KMeans:
         Returns:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
-        if not isinstance(query_vector, tuple) or not query_vector or not isinstance(n_neighbours, int) or not n_neighbours:
+        if (not isinstance(query_vector, tuple) or not query_vector
+                or not isinstance(n_neighbours, int) or not n_neighbours):
             raise ValueError
-        distances = []
-        for i, cluster in enumerate(self.__clusters):
-            distances.append((calculate_distance(query_vector, cluster.get_centroid()), i))
+        distances = [(calculate_distance(query_vector, cluster.get_centroid()), ind)
+                     for ind, cluster in enumerate(self.__clusters)]
         closest_cluster = min(distances)[-1]
         cluster_indices = self.__clusters[closest_cluster].get_indices()
         vectors = [self._db.get_vectors()[num] for num in cluster_indices]
         distances = []
-        for index, vec in enumerate(vectors):
-            distance = calculate_distance(query_vector, vec[-1])
+        for index, vector in enumerate(vectors):
+            distance = calculate_distance(query_vector, vector[-1])
             if distance is None:
                 raise ValueError
             distances.append((distance, index))
-        return sorted(distances, reverse=False, key=lambda t: t[1])[: n_neighbours]
+        return sorted(distances, key=lambda x: x[-1])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """
@@ -478,11 +471,12 @@ class KMeans:
         Returns:
             bool: True if the distance is correct, False in other cases.
         """
-        if not isinstance(new_clusters, list) or not new_clusters or not isinstance(threshold, float) or not threshold:
+        if (not isinstance(new_clusters, list) or not new_clusters
+                or not isinstance(threshold, float) or not threshold):
             raise ValueError
-        for i, cluster in enumerate(self.__clusters):
+        for ind, cluster in enumerate(self.__clusters):
             old_centroid = cluster.get_centroid()
-            new_centroid = new_clusters[i].get_centroid()
+            new_centroid = new_clusters[ind].get_centroid()
             if not old_centroid or not new_centroid:
                 raise ValueError
             distance = calculate_distance(old_centroid, new_centroid)
@@ -532,7 +526,8 @@ class ClusteringSearchEngine:
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
-        if not isinstance(query, str) or not query or not isinstance(n_neighbours, int) or not n_neighbours:
+        if (not isinstance(query, str) or not query
+                or not isinstance(n_neighbours, int) or not n_neighbours):
             raise ValueError
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         if not tokenized_query:
@@ -544,12 +539,9 @@ class ClusteringSearchEngine:
         relevant_distances = self.__algo.infer(query_vector, n_neighbours)
         if not relevant_distances:
             raise ValueError
-        indices = tuple([i[-1] for i in relevant_distances])
+        indices = tuple(tup[-1] for tup in relevant_distances)
         docs = self._db.get_raw_documents(indices)
-        result = []
-        for i, neighbour in enumerate(relevant_distances):
-            result.append((neighbour[0], docs[i]))
-        return result
+        return [(neighbour[0], docs[ind]) for ind, neighbour in enumerate(relevant_distances)]
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """

@@ -49,7 +49,7 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    result = None
+    result = '???'
     assert result, "Result is None"
 
 

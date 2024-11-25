@@ -26,7 +26,9 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
-
+    if not text:
+        raise ValueError("Empty string")
+    return text.split('\n')
 
 class BM25Vectorizer(Vectorizer):
     """
@@ -40,6 +42,10 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        Vectorizer.__init__(self, [])
+        self._corpus = []
+        self._avg_doc_len = -1.0
+
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """

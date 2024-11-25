@@ -7,6 +7,8 @@ Vector search with text retrieving
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
+from lab_2_retrieval_w_bm25.main import calculate_idf, calculate_tf, calculate_tf_idf
+
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
@@ -182,6 +184,10 @@ class Vectorizer:
         Args:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
+        self._corpus = corpus
+        self._idf_values = {}
+        self._vocabulary = []
+        self._token2ind = {}
 
     def build(self) -> bool:
         """
@@ -190,6 +196,22 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
+        if not isinstance(self._corpus, list):
+            return False
+        words_set = set()
+        for doc in self._corpus:
+            for token in doc:
+                if not isinstance(token, str):
+                    return False
+            words_set = words_set | set(doc)
+        self._vocabulary = sorted(list(words_set))
+        for word in self._vocabulary:
+            self._token2ind[f"{word}"] = self._vocabulary.index(word)
+        idf = calculate_idf(self._vocabulary, self._corpus)
+        if not isinstance(idf, dict):
+            return False
+        self._idf_values = idf
+        return True
 
     def vectorize(self, tokenized_document: list[str]) -> Vector | None:
         """
@@ -253,6 +275,24 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not (isinstance(document, list)
+                and isinstance(self._vocabulary, list)
+                and isinstance(self._token2ind, list)):
+            return None
+        tf = calculate_tf(self._vocabulary, document)
+        if not tf:
+            return None
+        vect = []
+        for word in tf:
+            if word not in self._token2ind:
+                return None
+            ind = self._token2ind[word]
+            if not isinstance(ind, int):
+                return None
+            vect.append(tf[word] * self._idf_values[word])
+        if not vect:
+            return None
+        return tuple(vect)
 
 
 class BasicSearchEngine:

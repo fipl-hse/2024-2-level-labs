@@ -4,9 +4,10 @@ Lab 4.
 Vector search with clusterization
 """
 
+from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
+
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
-from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
 
 Corpus = list[str]
 "Type alias for corpus of texts."

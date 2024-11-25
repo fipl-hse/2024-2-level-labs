@@ -1,6 +1,7 @@
 """
 Script for updating student`s forks.
 """
+
 import json
 from pathlib import Path
 
@@ -32,7 +33,7 @@ def update_fork(
     Args:
         python (Path): Path to python executable
         repositories (dict[str, str]): dict with URLs to repositories
-        authentication (dict[str, str]): dict with username and GitHub token 
+        authentication (dict[str, str]): dict with username and GitHub token
         strategy (str): strategy to update student`s repository
         paths_to_keep (dict[str, list[str]]): dict with files to keep as is from upstream and fork
 
@@ -72,14 +73,14 @@ def update_forks(
 
     Args:
         python (Path): Path to python executable
-        authentication (dict[str, str]): dict with username and GitHub token 
+        authentication (dict[str, str]): dict with username and GitHub token
         repositories (dict): dict with upstream and forks
         strategy (str): strategy to update student`s repository
         paths_to_keep (dict[str, list[str]]): dict with files to keep as is from upstream and fork
     """
-    upstream = repositories['upstream']
+    upstream = repositories["upstream"]
     for fork in repositories["forks"]:
-        print(f'Start update fork: {fork}')
+        print(f"Start update fork: {fork}")
         update_fork(
             python=python,
             repositories={
@@ -88,7 +89,7 @@ def update_forks(
             },
             authentication=authentication,
             strategy=strategy,
-            paths_to_keep=paths_to_keep
+            paths_to_keep=paths_to_keep,
         )
 
 

@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from main import Tokenizer
+from lab_3_ann_retriever.main import Tokenizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -37,8 +37,9 @@ def main() -> None:
     stopwords = documents_and_stopwords[1]
     tokenizer = Tokenizer(stop_words=stopwords)
     result = tokenizer.tokenize_documents(documents)
-    print(result)
-    return
+    if isinstance(result,list):
+        print(result)
+    assert result, "Result is None"
 
 
 if __name__ == "__main__":

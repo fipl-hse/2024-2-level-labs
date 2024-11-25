@@ -6,6 +6,7 @@ Vector search with clusterization
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
+from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -26,6 +27,10 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
+    if not isinstance(text, str):
+        raise ValueError
+
+    return text.split('\n')
 
 
 class BM25Vectorizer(Vectorizer):
@@ -40,6 +45,9 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        self._corpus = []
+        self._avg_doc_len = -1.0
+        Vectorizer.__init__(self, self._corpus)
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -51,6 +59,14 @@ class BM25Vectorizer(Vectorizer):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not tokenized_corpus or not isinstance(tokenized_corpus, list):
+            raise ValueError
+        self._corpus = tokenized_corpus
+
+        tokens = sum(len(doc) for doc in tokenized_corpus)
+        docs = len(tokenized_corpus)
+
+        self._avg_doc_len = tokens / docs
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
         """
@@ -67,6 +83,15 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        if (tokenized_document is None or
+                not tokenized_document or
+                not isinstance(tokenized_document, list) or
+                not all(isinstance(elem, str) for elem in tokenized_document)):
+            raise ValueError
+        vector_tok_doc = self._calculate_bm25(tokenized_document)
+        if not vector_tok_doc:
+            raise ValueError
+        return vector_tok_doc
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
         """
@@ -81,6 +106,21 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        if not isinstance(tokenized_document, list) or not all(isinstance(elem, str) for elem in tokenized_document):
+            raise ValueError
+
+        calculated_bm25 = [0.0] * len(self._vocabulary)
+
+        idf_document = calculate_idf(self._vocabulary, self._corpus)
+        doc_len = len(tokenized_document)
+        k1 = 1.5
+        b = 0.75
+
+        bm25 = calculate_bm25(self._vocabulary, tokenized_document, idf_document, k1, b, self._avg_doc_len, doc_len)
+
+        for index, word in enumerate(self._vocabulary):
+            calculated_bm25[index] = bm25[word]
+        return tuple(calculated_bm25)
 
 
 class DocumentVectorDB:
@@ -100,6 +140,10 @@ class DocumentVectorDB:
         Args:
             stop_words (list[str]): List with stop words.
         """
+        self._tokenizer = Tokenizer(stop_words)
+        self._vectorizer = BM25Vectorizer()
+        self.__vectors = {}
+        self.__documents = []
 
     def put_corpus(self, corpus: Corpus) -> None:
         """
@@ -113,6 +157,9 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
+        if not corpus or not isinstance(corpus, list):
+            raise ValueError
+        self.__documents = corpus
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -121,6 +168,7 @@ class DocumentVectorDB:
         Returns:
             BM25Vectorizer: BM25Vectorizer class object.
         """
+        return self._vectorizer
 
     def get_tokenizer(self) -> Tokenizer:
         """
@@ -129,6 +177,7 @@ class DocumentVectorDB:
         Returns:
             Tokenizer: Tokenizer class object.
         """
+        return self._tokenizer
 
     def get_vectors(self, indices: list[int] | None = None) -> list[tuple[int, Vector]]:
         """

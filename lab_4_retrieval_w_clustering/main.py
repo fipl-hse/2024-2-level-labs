@@ -4,6 +4,8 @@ Lab 4.
 Vector search with clusterization
 """
 
+from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
+
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
 
@@ -26,6 +28,10 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
+    if not text or not isinstance(text, str):
+        raise ValueError
+
+    return text.split('\n') #список параграфов, где строки - это абзацы
 
 
 class BM25Vectorizer(Vectorizer):
@@ -40,6 +46,9 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        self._corpus = []
+        self._avg_doc_len = -1.0
+        Vectorizer.__init__(self, self._corpus)
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -51,6 +60,18 @@ class BM25Vectorizer(Vectorizer):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if (tokenized_corpus is None
+                or not tokenized_corpus
+                or not isinstance(tokenized_corpus, list)
+                or not all(isinstance(tok_paragraph, list) for tok_paragraph in tokenized_corpus)):
+            raise ValueError
+        self._corpus = tokenized_corpus
+
+        sum_len_every_doc = 0
+        for every_paragraph in tokenized_corpus:
+            sum_len_every_doc += len(every_paragraph)
+
+        self._avg_doc_len = sum_len_every_doc / len(tokenized_corpus)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
         """
@@ -67,6 +88,14 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        if (not tokenized_document
+                or not isinstance(tokenized_document, list)
+                or not all(isinstance(el, str) for el in tokenized_document)):
+            raise ValueError
+
+        bm25_vector = self._calculate_bm25(tokenized_document)
+
+        return bm25_vector
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
         """
@@ -81,6 +110,23 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        if (not tokenized_document
+                or not isinstance(tokenized_document, list)
+                or not all(isinstance(elem, str) for elem in tokenized_document)):
+            raise ValueError
+
+        doc_len = len(tokenized_document)
+        bm25_vector = [0.0] * len(self._vocabulary)
+        k1 = 1.5
+        b = 0.75
+        bm25 = calculate_bm25(self._vocabulary,
+                              tokenized_document,
+                              calculate_idf(self._vocabulary, self._corpus),
+                              k1, b,
+                              self._avg_doc_len, doc_len)
+        for i, token in enumerate(self._vocabulary):
+            bm25_vector[i] = bm25[token]
+        return tuple(bm25_vector)
 
 
 class DocumentVectorDB:
@@ -100,6 +146,10 @@ class DocumentVectorDB:
         Args:
             stop_words (list[str]): List with stop words.
         """
+        self._tokenizer = Tokenizer(stop_words)
+        self._vectorizer = BM25Vectorizer()
+        self.__documents = []
+        self.__vectors = {}
 
     def put_corpus(self, corpus: Corpus) -> None:
         """
@@ -113,6 +163,26 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
+        if (not corpus or not isinstance(corpus, list)
+                or not all(isinstance(element, str) for element in corpus)):
+            raise ValueError
+
+        self._vectorizer.build()
+        self.__documents = corpus
+
+        list_of_tok_paragraphs = []
+        for doc_aka_str in self.__documents:
+            doc_aka_list = Tokenizer.tokenize(self._tokenizer, doc_aka_str)
+            if not isinstance(doc_aka_list, list):
+                raise ValueError
+            list_of_tok_paragraphs.append(doc_aka_list)
+        if not list_of_tok_paragraphs:
+            raise ValueError
+
+        self._vectorizer.set_tokenized_corpus(list_of_tok_paragraphs)
+
+        for index_of_paragraph, tok_paragraph in enumerate(list_of_tok_paragraphs):
+            self.__vectors[index_of_paragraph] = self._vectorizer.vectorize(tok_paragraph)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -121,6 +191,7 @@ class DocumentVectorDB:
         Returns:
             BM25Vectorizer: BM25Vectorizer class object.
         """
+        return self._vectorizer
 
     def get_tokenizer(self) -> Tokenizer:
         """
@@ -129,6 +200,7 @@ class DocumentVectorDB:
         Returns:
             Tokenizer: Tokenizer class object.
         """
+        return self._tokenizer
 
     def get_vectors(self, indices: list[int] | None = None) -> list[tuple[int, Vector]]:
         """

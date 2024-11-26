@@ -3,6 +3,7 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+from lab_4_retrieval_w_clustering.main import BM25Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -42,14 +43,15 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return (documents, stopwords)
+    return documents, stopwords
 
 
 def main() -> None:
     """
     Launch an implementation.
     """
-    result = None
+    vectorizer = BM25Vectorizer()
+    result = vectorizer
     assert result, "Result is None"
 
 

@@ -45,6 +45,7 @@ def open_files() -> tuple[list[str], list[str]]:
     return (documents, stopwords)
 
 
+
 def main() -> None:
     """
     Launch an implementation.

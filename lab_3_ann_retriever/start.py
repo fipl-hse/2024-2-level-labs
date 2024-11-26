@@ -40,11 +40,11 @@ def main() -> None:
     query = 'Нижний Новгород'
     tokenize = Tokenizer(stopwords)
     k = tokenize.tokenize_documents(documents)
+    if not isinstance(k, list):
+        return None
 
     vectorize = Vectorizer(k)
     vectorize.build()
-    if not isinstance(vectorize, list):
-        return None
 
 
     knn = BasicSearchEngine(vectorize, tokenize)

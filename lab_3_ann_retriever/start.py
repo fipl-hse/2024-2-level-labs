@@ -54,10 +54,16 @@ def main() -> None:
         return None
     print(res1)
 
+    if not isinstance(documents, list) or len(documents) == 0 or documents[0] is None:
+        return None#1
+    tokens = tokenize.tokenize(documents[0])
+    if tokens is None or not isinstance(tokens, list):
+        return None
+    vector = vectorize.vectorize(tokens)
 
 
-    vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
-    if not isinstance(vector, tuple) or not isinstance(documents, list):
+    # vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
+    if not isinstance(vector, tuple):
         return None
 
     pre_vect = vectorize.vector2tokens(vector)

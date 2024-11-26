@@ -5,6 +5,8 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
+from sphinx.cmd.quickstart import nonempty
+
 from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
 
 
@@ -37,22 +39,31 @@ def main() -> None:
     documents, stopwords = open_files()
     query = 'Нижний Новгород'
     tokenize = Tokenizer(stopwords)
+    k = tokenize.tokenize_documents(documents)
 
-    vectorize = Vectorizer(tokenize.tokenize_documents(documents))
+    vectorize = Vectorizer(k)
     vectorize.build()
+    if not isinstance(vectorize, list):
+        return None
 
 
     knn = BasicSearchEngine(vectorize, tokenize)
     knn.index_documents(documents)
     res1 = knn.retrieve_relevant_documents(query, 1)
+    if not isinstance(res1, list):
+        return None
     print(res1)
 
 
 
     vector = vectorize.vectorize(tokenize.tokenize(documents[0]))
+    if not isinstance(vector, tuple):
+        return None
 
     pre_vect = vectorize.vector2tokens(vector)
     print(pre_vect)
+    if not isinstance(pre_vect, tuple):
+        return None
 
     res = knn.retrieve_vectorized(vector)
     print(res)

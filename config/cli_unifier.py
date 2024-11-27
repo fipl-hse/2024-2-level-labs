@@ -1,6 +1,7 @@
 """
 CLI commands.
 """
+
 import functools
 import platform
 import re
@@ -28,7 +29,7 @@ def convert_raw_output_to_str(content: bytes) -> str:
     Returns:
         str: string representation
     """
-    return content.decode("utf-8").replace('\r', '')
+    return content.decode("utf-8").replace("\r", "")
 
 
 def log_output(output_type: str, content: bytes | str) -> None:
@@ -42,7 +43,7 @@ def log_output(output_type: str, content: bytes | str) -> None:
     print(
         LOG_TEMPLATE.format(
             output_type=output_type,
-            content=convert_raw_output_to_str(content) if isinstance(content, bytes) else content
+            content=convert_raw_output_to_str(content) if isinstance(content, bytes) else content,
         )
     )
 
@@ -55,10 +56,10 @@ def choose_python_exe() -> Path:
         Path: A path to python exe
     """
     lab_path = Path(__file__).parent.parent
-    if platform.system() == 'Windows':
-        python_exe_path = lab_path / 'venv' / 'Scripts' / 'python.exe'
+    if platform.system() == "Windows":
+        python_exe_path = lab_path / "venv" / "Scripts" / "python.exe"
     else:
-        python_exe_path = lab_path / 'venv' / 'bin' / 'python'
+        python_exe_path = lab_path / "venv" / "bin" / "python"
     return python_exe_path
 
 
@@ -85,21 +86,19 @@ def modify_path(path: str) -> str:
     Returns:
         str: Modified path in str format
     """
-    pattern_to_remove = r'/home/runner/work/[^/]+/[^/]+/'
+    pattern_to_remove = r"/home/runner/work/[^/]+/[^/]+/"
 
-    pattern_python_end = r'python$'
+    pattern_python_end = r"python$"
 
     if re.search(pattern_python_end, path):
-        return 'python'
+        return "python"
 
-    modified_path = re.sub(pattern_to_remove, '', path)
+    modified_path = re.sub(pattern_to_remove, "", path)
 
     return modified_path
 
 
-def _run_console_tool(
-        exe: str, /, args: list[str], **kwargs: Any
-) -> tuple[str, str, int]:
+def _run_console_tool(exe: str, /, args: list[str], **kwargs: Any) -> tuple[str, str, int]:
     """
     Run CLI commands.
 
@@ -113,41 +112,42 @@ def _run_console_tool(
     """
     kwargs_processed: list[str] = []
     for item in kwargs.items():
-        if item[0] in ('env', 'debug', 'cwd'):
+        if item[0] in ("env", "debug", "cwd"):
             continue
         kwargs_processed.extend(map(str, item))
 
-    options = [
-        str(exe),
-        *args,
-        *kwargs_processed
-    ]
+    options = [str(exe), *args, *kwargs_processed]
 
-    if kwargs.get('debug', False):
+    if kwargs.get("debug", False):
         arguments = []
         for index, option in enumerate(options[1:]):
-            arguments.append(f'"{modify_path(option)}"'
-                             if '--' in options[index] or '-m' in options[index]
-                             else modify_path(option))
-        print(f"""Attempting to run with the following arguments: {" ".join([modify_path(str(exe)),
-                                                                           *arguments])}""")
+            arguments.append(
+                f'"{modify_path(option)}"'
+                if "--" in options[index] or "-m" in options[index]
+                else modify_path(option)
+            )
+        print(
+            f"""Attempting to run with the following arguments: {" ".join([modify_path(str(exe)),
+                                                                           *arguments])}"""
+        )
 
-    env = kwargs.get('env')
+    env = kwargs.get("env")
     if env:
         result = subprocess.run(options, capture_output=True, check=True, env=env)
-    elif kwargs.get('cwd'):
-        result = subprocess.run(options, capture_output=True, check=True, cwd=kwargs.get('cwd'))
+    elif kwargs.get("cwd"):
+        result = subprocess.run(options, capture_output=True, check=True, cwd=kwargs.get("cwd"))
     else:
         result = subprocess.run(options, capture_output=True, check=True)
     return (
         convert_raw_output_to_str(result.stdout),
         convert_raw_output_to_str(result.stderr),
-        result.returncode
+        result.returncode,
     )
 
 
-def handles_console_error(exit_code_on_error: int = 1,
-                          ok_codes: tuple[int, ...] = (0,)) -> Callable:
+def handles_console_error(
+    exit_code_on_error: int = 1, ok_codes: tuple[int, ...] = (0,)
+) -> Callable:
     """
     Decorator to handle console tool errors.
 
@@ -180,27 +180,27 @@ def handles_console_error(exit_code_on_error: int = 1,
                 **kwargs (Any): Arbitrary keyword arguments to pass to the decorated function.
             """
             try:
-                print(f'Call to {func.__name__}')
+                print(f"Call to {func.__name__}")
                 stdout, stderr, return_code = func(*args, **kwargs)
             except subprocess.CalledProcessError as error:
                 print(f"Exit code: {error.returncode}.")
-                log_output('Console run stdout', error.output)
+                log_output("Console run stdout", error.output)
                 # return code is not 0, but sometimes it still can be OK
                 if error.returncode in ok_codes:
                     print(f"Exit code: {error.returncode}.")
-                    log_output('Console run stdout', error.output)
-                    log_output('Console run stderr', error.stderr)
+                    log_output("Console run stdout", error.output)
+                    log_output("Console run stderr", error.stderr)
                     return (
                         convert_raw_output_to_str(error.output),
                         convert_raw_output_to_str(error.stderr),
-                        error.returncode
+                        error.returncode,
                     )
                 print(f"Check failed with exit code {error.returncode}.")
-                log_output('Console run stderr', error.stderr)
+                log_output("Console run stderr", error.stderr)
                 sys.exit(exit_code_on_error)
             else:
                 print(f"Exit code: {return_code}.")
-                log_output('Console run stdout', stdout)
+                log_output("Console run stdout", stdout)
                 return stdout, stderr, return_code
 
         return wrapper

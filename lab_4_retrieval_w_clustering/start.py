@@ -9,6 +9,7 @@ from lab_4_retrieval_w_clustering.main import (
     DocumentVectorDB,
     get_paragraphs,
     VectorDBSearchEngine,
+    ClusteringSearchEngine
 )
 
 
@@ -70,14 +71,22 @@ def main() -> None:
     database = DocumentVectorDB(stopwords)
     database.put_corpus(documents)
 
-    searcher = VectorDBSearchEngine(database)
-    relevant_documents = searcher.retrieve_relevant_documents(
+    database_searcher = VectorDBSearchEngine(database)
+    relevant_documents = database_searcher.retrieve_relevant_documents(
         "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления", 3)
 
-    result = relevant_documents
+    clustering_searcher = ClusteringSearchEngine(database)
+    more_relevant_documents = clustering_searcher.retrieve_relevant_documents(
+        "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления", 5)
+
+    result = more_relevant_documents
     print(document_vector)
+    print()
     for relevant_document in relevant_documents:
         print(relevant_document)
+    print()
+    for more_relevant_document in more_relevant_documents:
+        print(more_relevant_document)
     assert result, "Result is None"
 
 

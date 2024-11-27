@@ -197,7 +197,7 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        if not self._corpus:
+        if not self._corpus or not isinstance:
             return False
 
         voc = set()
@@ -211,6 +211,8 @@ class Vectorizer:
         if self._vocabulary is None or not isinstance(self._vocabulary, list):
             return False
 
+        if not isinstance(self._idf_values, dict):
+            return False
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
         if not isinstance(self._idf_values, dict) or self._idf_values is None:
             return False

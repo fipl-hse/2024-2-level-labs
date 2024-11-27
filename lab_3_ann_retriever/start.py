@@ -62,6 +62,11 @@ def main() -> None:
     if not isinstance(vector, tuple):
         return None
 
+    pre_vect = vectorize.vector2tokens(vector)
+    if not isinstance(pre_vect, tuple):
+        raise ValueError
+
+    res = knn.retrieve_vectorized(vector)
 
     search = SearchEngine(vectorize, tokenize)
     search.index_documents(documents)

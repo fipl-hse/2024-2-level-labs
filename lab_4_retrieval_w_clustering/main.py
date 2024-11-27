@@ -6,7 +6,13 @@ Vector search with clusterization
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_2_retrieval_w_bm25.main import calculate_bm25
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer, calculate_distance
+from lab_3_ann_retriever.main import (
+    BasicSearchEngine,
+    calculate_distance,
+    Tokenizer,
+    Vector,
+    Vectorizer,
+)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -201,8 +207,7 @@ class DocumentVectorDB:
         """
         if indices is None:
             return list(self.__vectors.items())
-        else:
-            return [(index, self.__vectors[index]) for index in indices]
+        return [(index, self.__vectors[index]) for index in indices]
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
         """
@@ -219,14 +224,13 @@ class DocumentVectorDB:
         """
         if indices is None:
             return self.__documents
-        elif not isinstance(indices, tuple):
+        if not isinstance(indices, tuple):
             raise ValueError
-        else:
-            unique_indices = []
-            for index in indices:
-                if not index in unique_indices:
-                    unique_indices.append(index)
-            return [self.__documents[index] for index in unique_indices]
+        unique_indices = []
+        for index in indices:
+            if not index in unique_indices:
+                unique_indices.append(index)
+        return [self.__documents[index] for index in unique_indices]
 
 
 class VectorDBSearchEngine(BasicSearchEngine):
@@ -271,10 +275,10 @@ class VectorDBSearchEngine(BasicSearchEngine):
         nearest_docs = self._calculate_knn(query_vector, vectors_wo_indexes, n_neighbours)
         if not (isinstance(nearest_docs, list) and len(nearest_docs) > 0):
             raise ValueError
-        true_indices = tuple([vectors_with_indices[pair[0]][0] for pair in nearest_docs])
+        true_indices = tuple(vectors_with_indices[pair[0]][0] for pair in nearest_docs)
         retrieved_documents = self._db.get_raw_documents(true_indices)
         return_list = []
-        for index in range(len(nearest_docs)):
+        for index, _ in enumerate(nearest_docs):
             return_list.append((nearest_docs[index][1], retrieved_documents[index]))
         return return_list
 
@@ -421,7 +425,7 @@ class KMeans:
                 vector_from_index = db_vectors[vector_index][1]
                 if not len(vector_from_index) == len(mean_vector):
                     raise ValueError
-                for mean_vector_index in range(len(mean_vector)):
+                for mean_vector_index, _ in enumerate(mean_vector):
                     mean_vector[mean_vector_index] += vector_from_index[mean_vector_index]
             mean_vector = tuple(value / len(cluster) for value in mean_vector)
             cluster.set_new_centroid(mean_vector)
@@ -558,10 +562,10 @@ class ClusteringSearchEngine:
         nearest_docs = self.__algo.infer(query_vector, n_neighbours)
         if not (isinstance(nearest_docs, list) and len(nearest_docs) > 0):
             raise ValueError
-        doc_indices = tuple([pair[1] for pair in nearest_docs])
+        doc_indices = tuple(pair[1] for pair in nearest_docs)
         retrieved_documents = self._db.get_raw_documents(doc_indices)
         return_list = []
-        for index in range(len(nearest_docs)):
+        for index, _ in enumerate(nearest_docs):
             return_list.append((nearest_docs[index][0], retrieved_documents[index]))
         return return_list
 

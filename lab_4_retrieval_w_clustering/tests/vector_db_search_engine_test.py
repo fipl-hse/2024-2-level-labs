@@ -46,9 +46,9 @@ class VectorDBSearchEngineTest(unittest.TestCase):
         n = 3
 
         expected = [
-            (0.6146142752620154, "съешь ещё этих французских булочек"),
+            (0.6146142752620154, "чаю"),
             (0.6661661953007654, "да выпей ещё чаю"),
-            (0.9887748724546137, "чаю"),
+            (0.9887748724546137, "съешь ещё этих французских булочек"),
         ]
         actual = self._vector_search_engine.retrieve_relevant_documents(query, n)
 

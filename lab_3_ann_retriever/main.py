@@ -270,7 +270,6 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-
         if len(vector) != len(self._vocabulary):
             return None
         tokens = []

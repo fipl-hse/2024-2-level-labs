@@ -6,10 +6,10 @@ Laboratory Work #4 starter.
 
 from lab_4_retrieval_w_clustering.main import (
     BM25Vectorizer,
+    ClusteringSearchEngine,
     DocumentVectorDB,
     get_paragraphs,
     VectorDBSearchEngine,
-    ClusteringSearchEngine
 )
 
 

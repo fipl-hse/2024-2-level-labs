@@ -171,8 +171,8 @@ class DocumentVectorDB:
                 tokenized_documents.append(document_tokens_list)
         self._vectorizer.set_tokenized_corpus(tokenized_documents)
         self._vectorizer.build()
-        for index, document in enumerate(tokenized_documents):
-            document_vector = self._vectorizer.vectorize(document)
+        for index, token_document in enumerate(tokenized_documents):
+            document_vector = self._vectorizer.vectorize(token_document)
             if not isinstance(document_vector, tuple):
                 raise ValueError
             self.__vectors[index] = document_vector
@@ -415,19 +415,21 @@ class KMeans:
             distance_list = []
             for cluster_index, cluster in enumerate(self.__clusters):
                 centroid_distance = calculate_distance(cluster.get_centroid(), vector)
+                if not isinstance(centroid_distance, float):
+                    raise ValueError
                 distance_list.append((cluster_index, centroid_distance))
             min_distance_index = min(distance_list, key=lambda a: a[1])[0]
             self.__clusters[min_distance_index].add_document_index(index)
         for cluster in self.__clusters:
-            mean_vector = [0.0] * len(cluster.get_centroid())
+            vector_sums = [0.0] * len(cluster.get_centroid())
             indices = cluster.get_indices()
             for vector_index in indices:
                 vector_from_index = db_vectors[vector_index][1]
-                if not len(vector_from_index) == len(mean_vector):
+                if not len(vector_from_index) == len(vector_sums):
                     raise ValueError
-                for mean_vector_index, _ in enumerate(mean_vector):
-                    mean_vector[mean_vector_index] += vector_from_index[mean_vector_index]
-            mean_vector = tuple(value / len(cluster) for value in mean_vector)
+                for mean_vector_index, _ in enumerate(vector_sums):
+                    vector_sums[mean_vector_index] += vector_from_index[mean_vector_index]
+            mean_vector = tuple(value / len(cluster) for value in vector_sums)
             cluster.set_new_centroid(mean_vector)
         return self.__clusters
 
@@ -453,6 +455,8 @@ class KMeans:
         centroid_distances = []
         for index, cluster in enumerate(self.__clusters):
             centroid_distance = calculate_distance(query_vector, cluster.get_centroid())
+            if not isinstance(centroid_distance, float):
+                raise ValueError
             centroid_distances.append((index, centroid_distance))
         min_distance_index = min(centroid_distances, key=lambda a: a[1])[0]
         closest_cluster = self.__clusters[min_distance_index]
@@ -460,6 +464,8 @@ class KMeans:
         vector_distances = []
         for index, vector in enumerate(index_vectors):
             vector_distance = calculate_distance(query_vector, vector[1])
+            if not isinstance(vector_distance, float):
+                raise ValueError
             vector_distances.append((vector_distance, index))
         return sorted(vector_distances, key=lambda a: a[1])[:n_neighbours]
 

@@ -64,7 +64,7 @@ def main() -> None:
 
     pre_vect = vectorize.vector2tokens(vector)
     if not isinstance(pre_vect, tuple):
-        raise ValueError
+        return None
 
     res = knn.retrieve_vectorized(vector)
 

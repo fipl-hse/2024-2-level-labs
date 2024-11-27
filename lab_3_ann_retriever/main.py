@@ -186,7 +186,7 @@ class Vectorizer:
             corpus (list[list[str]]): Tokenized documents to vectorize
         """
         self._corpus = corpus
-        self._idf_values = {}
+        self._idf_values = dict()
         self._vocabulary = []
         self._token2ind = {}
 
@@ -197,7 +197,7 @@ class Vectorizer:
         Returns:
             bool: True if built successfully, False in other case
         """
-        if not self._corpus or not isinstance:
+        if not self._corpus:
             return False
 
         voc = set()

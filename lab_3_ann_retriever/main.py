@@ -216,7 +216,7 @@ class Vectorizer:
             return False
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus) or {}
-        if not isinstance(self._idf_values, dict) or self._idf_values is None:
+        if not isinstance(self._idf_values, dict) or self._idf_values is None or not self._idf_values:
             return False
 
         self._token2ind = {value: ind for ind, value in enumerate(self._vocabulary)}

@@ -4,9 +4,9 @@ Lab 3.
 Vector search with text retrieving
 """
 
+from math import log
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
-from math import log
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -252,6 +252,13 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
+        if len(vector) != len(self._vocabulary):
+            return None
+        tokens = []
+        for word in self._vocabulary:
+            if vector[self._token2ind[word]] != 0.0:
+                tokens.append(word)
+        return tokens
 
     def save(self, file_path: str) -> bool:
         """
@@ -370,6 +377,19 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query, str) or not query \
+                or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+            return None
+
+        query_vector = self._vectorizer.vectorize(self._tokenizer.tokenize(query))
+        closest_neighbours = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
+        if closest_neighbours is None or len(closest_neighbours) == 0:
+            return None
+
+        result = []
+        for i, distance in closest_neighbours:
+            result.append((distance, self._documents[i]))
+        return result
 
     def save(self, file_path: str) -> bool:
         """
@@ -405,6 +425,14 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
+        if not isinstance(query_vector, tuple) or \
+                len(query_vector) != len(self._document_vectors[0]):
+            return None
+
+        knn = self._calculate_knn(query_vector, self._document_vectors, 1)
+        if knn is None or not knn:
+            return None
+        return self._documents[knn[0][0]]
 
     def _calculate_knn(
             self, query_vector: Vector, document_vectors: list[Vector], n_neighbours: int
@@ -422,23 +450,21 @@ class BasicSearchEngine:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(query_vector, tuple) or len(query_vector) == 0:
+        if query_vector is None:
             return None
         if not isinstance(document_vectors, list) or len(document_vectors) == 0:
             return None
-        if n_neighbours <= 0:
+        if n_neighbours <= 0 or not isinstance(n_neighbours, int):
             return None
 
-        neighbours = []
-        result = []
+        distances = []
         for vector in document_vectors:
-            neighbours += calculate_distance(query_vector, document_vectors[vector])
-            index_documents = index_documents(self._documents)
-        neighbours = neighbours.sorted()
-        some_of_neighbours = neighbours[:n_neighbours+1]
-        for index in index_documents:
-            for neighbor in some_of_neighbours:
-                result[index] = neighbor
+            distances.append(calculate_distance(query_vector, vector))
+        neighbours = sorted(enumerate(distances), key=lambda x: x[1])
+
+        result = []
+        for neighbour in neighbours[:n_neighbours]:
+            result.append(neighbour)
         return result
 
     def _index_document(self, document: str) -> Vector | None:

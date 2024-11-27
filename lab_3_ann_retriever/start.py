@@ -38,8 +38,7 @@ def main() -> None:
     query = 'Нижний Новгород'
     tokenize = Tokenizer(stopwords)
     k = tokenize.tokenize_documents(documents)
-    if not isinstance(k, list):
-        return None
+    assert isinstance(k, list)
 
     vectorize = Vectorizer(k)
     vectorize.build()

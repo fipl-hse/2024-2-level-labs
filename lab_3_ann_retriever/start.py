@@ -32,7 +32,6 @@ def main() -> None:
     """
     with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    result = None
 
     documents, stopwords = open_files()
     query = 'Нижний Новгород'

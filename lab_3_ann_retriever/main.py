@@ -4,10 +4,9 @@ Lab 3.
 Vector search with text retrieving
 """
 
-from math import log
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
+from math import log
 from typing import Protocol
-
 
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
@@ -386,6 +385,9 @@ class BasicSearchEngine:
         closest_neighbours = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
         if closest_neighbours is None or len(closest_neighbours) == 0:
             return None
+        for item in closest_neighbours:
+            if item[0] is None or item[1] is None:
+                return None
 
         result = []
         for i, distance in closest_neighbours:

@@ -330,7 +330,7 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
-        if not isinstance(new_centroid, tuple):
+        if not (isinstance(new_centroid, tuple) and len(new_centroid) > 0):
             raise ValueError
         self._centroid = new_centroid
 
@@ -351,9 +351,10 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
-        if not isinstance(index, int):
+        if not (isinstance(index, int) and index >= 0):
             raise ValueError
-        self.__indices.append(index)
+        if not index in self.__indices:
+            self.__indices.append(index)
 
     def get_indices(self) -> list[int]:
         """

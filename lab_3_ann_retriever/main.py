@@ -8,6 +8,8 @@ Vector search with text retrieving
 from math import log
 from typing import Protocol
 
+from lab_2_retrieval_w_bm25.main import calculate_idf
+
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 
@@ -209,13 +211,9 @@ class Vectorizer:
         sorted_vocab = sorted(vocabulary)
         self._vocabulary = sorted_vocab
 
-        self_len = len(self._corpus)
-        for word in self._vocabulary:
-            doc_has_word_count = 0
-            for text in self._corpus:
-                if word in text:
-                    doc_has_word_count += 1
-            self._idf_values[word] = log((self_len - doc_has_word_count + 0.5) / (doc_has_word_count + 0.5))
+        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        if self._idf_values is None:
+            return False
 
         for word in self._vocabulary:
             self._token2ind[word] = self._vocabulary.index(word)

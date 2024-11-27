@@ -50,7 +50,6 @@ def main() -> None:
     res1 = knn.retrieve_relevant_documents(query, 1)
     if not isinstance(res1, list):
         return None
-    print(res1)
 
     if not isinstance(documents, list) or len(documents) == 0 or documents[0] is None:
         return None
@@ -64,18 +63,15 @@ def main() -> None:
         return None
 
     pre_vect = vectorize.vector2tokens(vector)
-    print(pre_vect)
     if not isinstance(pre_vect, tuple):
         return None
 
     res = knn.retrieve_vectorized(vector)
-    print(res)
 
     search = SearchEngine(vectorize, tokenize)
     search.index_documents(documents)
     search_res = search.retrieve_relevant_documents(query)
     result = search_res
-    print(result)
 
 
     assert result, "Result is None"

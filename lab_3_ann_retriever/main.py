@@ -8,8 +8,6 @@ Vector search with text retrieving
 from math import sqrt
 from typing import Protocol
 
-from sphinx.cmd.quickstart import nonempty
-
 from lab_2_retrieval_w_bm25.main import calculate_idf
 
 Vector = tuple[float, ...]
@@ -216,7 +214,8 @@ class Vectorizer:
             return False
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus) or {}
-        if not isinstance(self._idf_values, dict) or self._idf_values is None or not self._idf_values:
+        if (not isinstance(self._idf_values, dict)
+                or self._idf_values is None or not self._idf_values):
             return False
 
         self._token2ind = {value: ind for ind, value in enumerate(self._vocabulary)}

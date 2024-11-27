@@ -278,8 +278,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         true_indices = tuple(vectors_with_indices[pair[0]][0] for pair in nearest_docs)
         retrieved_documents = self._db.get_raw_documents(true_indices)
         return_list = []
-        for index, _ in enumerate(nearest_docs):
-            return_list.append((nearest_docs[index][1], retrieved_documents[index]))
+        for index, document in enumerate(nearest_docs):
+            return_list.append((document[1], retrieved_documents[index]))
         return return_list
 
 
@@ -565,8 +565,8 @@ class ClusteringSearchEngine:
         doc_indices = tuple(pair[1] for pair in nearest_docs)
         retrieved_documents = self._db.get_raw_documents(doc_indices)
         return_list = []
-        for index, _ in enumerate(nearest_docs):
-            return_list.append((nearest_docs[index][0], retrieved_documents[index]))
+        for index, document in enumerate(nearest_docs):
+            return_list.append((document[0], retrieved_documents[index]))
         return return_list
 
     def make_report(self, num_examples: int, output_path: str) -> None:

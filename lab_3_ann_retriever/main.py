@@ -8,6 +8,7 @@ from math import log
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 
+
 Vector = tuple[float, ...]
 "Type alias for vector representation of a text."
 

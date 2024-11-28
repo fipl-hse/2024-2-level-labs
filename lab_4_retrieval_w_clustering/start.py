@@ -8,8 +8,10 @@ from lab_4_retrieval_w_clustering.main import (
     DocumentVectorDB,
     get_paragraphs,
     VectorDBSearchEngine,
+    VectorDBTreeSearchEngine,
+    VectorDBAdvancedSearchEngine
 )
-
+import json
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -66,6 +68,18 @@ def main() -> None:
     clustering_search = ClusteringSearchEngine(db, n_clusters=2)
     print(result)
     print(clustering_search.retrieve_relevant_documents(query, 5))
+    for num in range(1, 15):
+        clustering_search = ClusteringSearchEngine(db, n_clusters=num)
+        print(clustering_search.calculate_square_sum())
+        clustering_search.retrieve_relevant_documents(query, 5)
+        clustering_search.make_report(3, 'assets/report.json')
+        with open('assets/report.json', 'r', encoding='utf-8') as file_to_read:
+            state = json.load(file_to_read)
+        print(state)
+    vector_tree_search = VectorDBTreeSearchEngine(db)
+    print(vector_tree_search.retrieve_relevant_documents(query, 5))
+    adv_vector_tree_search = VectorDBAdvancedSearchEngine(db)
+    print(adv_vector_tree_search.retrieve_relevant_documents(query, 5))
     assert result, "Result is None"
 
 

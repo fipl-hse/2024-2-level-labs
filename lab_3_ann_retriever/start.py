@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vectorizer
+from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -39,20 +39,30 @@ def main() -> None:
         return
     vectorizer = Vectorizer(documents_tokenized)
     vectorizer.build()
+
     knn_retriever = BasicSearchEngine(vectorizer, tokenizer)
-    print('start')
     knn_retriever.index_documents(documents)
 
     text_vector = tuple(float(distance) for distance in text.split(","))
     text_tokens = vectorizer.vector2tokens(text_vector)
-    text_relevant_document = knn_retriever.retrieve_vectorized(text_vector)
+    text_knn = knn_retriever.retrieve_vectorized(text_vector)
+
+    basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
+    basic_search_engine.index_documents(documents)
+    search_engine = SearchEngine(vectorizer, tokenizer)
+    search_engine.index_documents(documents)
+    query = "Нижний Новгород"
+    doc_bse_knn = basic_search_engine.retrieve_relevant_documents(query, 3)
+    doc_se_knn = search_engine.retrieve_relevant_documents(query, 3)
 
     if not isinstance(documents_tokenized, list):
         return
     print(f'Demo 1: Documents Tokenization:\n{documents_tokenized[0]}')
     print(f'Demo 2: Secret #2 Question\n{text_tokens}')
-    print(f'Demo 2: Answer\n{text_relevant_document}')
-    result = text_relevant_document
+    print(f'Demo 2: Answer\n{text_knn}')
+    print(f'Demo 3: Relevant News: Basic\n{doc_bse_knn}')
+    print(f'Demo 3: Relevant News\n{doc_se_knn}')
+    result = text_knn
     assert result, "Result is None"
 
 

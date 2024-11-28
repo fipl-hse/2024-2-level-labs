@@ -57,7 +57,7 @@ def main() -> None:
 
     if not isinstance(documents_tokenized, list):
         return
-    print(f'Demo 1: Documents Tokenization:\n{documents_tokenized[0]}')
+    print(f'Demo 1: Documents Tokenization:\n{documents_tokenized[0]}\n')
     print(f'Demo 2: Secret #2 Question\n{text_tokens}')
     print(f'Demo 2: Answer\n{text_knn}')
     print(f'Demo 3: Relevant News: Basic\n{doc_bse_knn}')

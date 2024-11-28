@@ -1,6 +1,7 @@
 """
 Run tests for each lab using pytest.
 """
+
 from typing import Optional
 
 from tap import Tap
@@ -16,14 +17,16 @@ class CommandLineInterface(Tap):
     """
     Types for the argument parser.
     """
+
     pr_name: str
     pr_author: str
     lab_path: Optional[str] = None
     pytest_label: Optional[str] = None
 
 
-def prepare_pytest_args(lab_path: str, target_score: int,
-                        pytest_label: Optional[str] = None) -> list[str]:
+def prepare_pytest_args(
+    lab_path: str, target_score: int, pytest_label: Optional[str] = None
+) -> list[str]:
     """
     Build the arguments for running pytest.
 
@@ -40,7 +43,9 @@ def prepare_pytest_args(lab_path: str, target_score: int,
 
     pytest_args = [
         "-m",
-        f"mark{target_score} and {pytest_label}" if lab_path else pytest_label, "--capture=no"]
+        f"mark{target_score} and {pytest_label}" if lab_path else pytest_label,
+        "--capture=no",
+    ]
     print(pytest_args)
 
     if lab_path == "lab_5_scrapper":
@@ -93,7 +98,6 @@ def main() -> None:
             pytest_args = prepare_pytest_args(lab_name, target_score)
 
             run_pytest(pytest_args)
-
 
 
 if __name__ == "__main__":

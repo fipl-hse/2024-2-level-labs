@@ -251,7 +251,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         neighbours = self._calculate_knn(vectorized_query, vectors, n_neighbours)
         if not neighbours:
             raise ValueError
-        documents = self._db.get_raw_documents(tuple(sorted([tup[0] for tup in neighbours])))
+        documents = self._db.get_raw_documents(tuple([tup[0] for tup in neighbours]))
         return [(tup[-1], documents[ind]) for ind, tup in enumerate(neighbours)]
 
 
@@ -473,7 +473,7 @@ class KMeans:
             vectors = [self._db.get_vectors()[num] for num in cluster_indices]
             sum_ = 0.0
             for vector in vectors:
-                sum_ += sqrt(sum((cx - vx) ** 2.0 for cx, vx in zip(centroid, vector[-1])))
+                sum_ += sqrt(sum((cx - vx) ** 2 for cx, vx in zip(centroid, vector[-1])))
             clusters_sum += sum_
         return clusters_sum
 

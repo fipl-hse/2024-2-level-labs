@@ -5,10 +5,14 @@ Vector search with clusterization
 """
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+import json
+
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
     BasicSearchEngine,
     calculate_distance,
+    SearchEngine,
     Tokenizer,
     Vector,
     Vectorizer,
@@ -264,12 +268,10 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if not (isinstance(query, str) and isinstance(n_neighbours, int) and
                 len(query) > 0 and n_neighbours > 0):
             raise ValueError
-        tokenized_query = self._tokenizer.tokenize(query)
+        tokenized_query = self._db.get_tokenizer().tokenize(query)
         if not isinstance(tokenized_query, list):
             raise ValueError
-        query_vector = self._vectorizer.vectorize(tokenized_query)
-        if not isinstance(query_vector, tuple):
-            raise ValueError
+        query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
         vectors_with_indices = self._db.get_vectors()
         vectors_wo_indexes = [pair[1] for pair in vectors_with_indices]
         nearest_docs = self._calculate_knn(query_vector, vectors_wo_indexes, n_neighbours)
@@ -423,8 +425,7 @@ class KMeans:
             self.__clusters[min_distance_index].add_document_index(index)
         for cluster in self.__clusters:
             vector_sums = [0.0] * len(cluster.get_centroid())
-            indices = cluster.get_indices()
-            for vector_index in indices:
+            for vector_index in cluster.get_indices():
                 vector_from_index = db_vectors[vector_index][1]
                 if not len(vector_from_index) == len(vector_sums):
                     raise ValueError
@@ -463,12 +464,12 @@ class KMeans:
         closest_cluster = self.__clusters[min_distance_index]
         index_vectors = self._db.get_vectors(closest_cluster.get_indices())
         vector_distances = []
-        for index, vector in enumerate(index_vectors):
-            vector_distance = calculate_distance(query_vector, vector[1])
+        for index, vector in index_vectors:
+            vector_distance = calculate_distance(query_vector, vector)
             if not isinstance(vector_distance, float):
                 raise ValueError
             vector_distances.append((vector_distance, index))
-        return sorted(vector_distances, key=lambda a: a[1])[:n_neighbours]
+        return sorted(vector_distances, key=lambda a: a[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """
@@ -478,8 +479,25 @@ class KMeans:
             num_examples (int): Number of examples for each cluster
 
         Returns:
-            list[dict[str, int| list[str]]]: List with information about each cluster
+            list[dict[str, int | list[str]]]: List with information about each cluster
         """
+        if not isinstance(num_examples, int):
+            raise ValueError
+        list_of_cluster_info = []
+        for cluster_index, cluster in enumerate(self.__clusters):
+            info_dict = {"id": cluster_index}
+            cluster_vectors = self._db.get_vectors(cluster.get_indices())
+            vector_distances = []
+            for index, vector in cluster_vectors:
+                vector_distance = calculate_distance(cluster.get_centroid(), vector)
+                if not isinstance(vector_distance, float):
+                    raise ValueError
+                vector_distances.append((index, vector_distance))
+            vector_distances = sorted(vector_distances, key=lambda a: a[1])[:num_examples]
+            doc_indices = tuple(pair[0] for pair in vector_distances)
+            info_dict["nearest_docs"] = self._db.get_raw_documents(doc_indices)
+            list_of_cluster_info.append(info_dict)
+        return list_of_cluster_info
 
     def calculate_square_sum(self) -> float:
         """
@@ -488,6 +506,15 @@ class KMeans:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
+        sse = 0.0
+        db_vectors = self._db.get_vectors()
+        for cluster in self.__clusters:
+            centroid = cluster.get_centroid()
+            for vector_index in cluster.get_indices():
+                vector_from_index = db_vectors[vector_index][1]
+                sse += sum((centroid[index] - element) ** 2
+                           for index, element in enumerate(vector_from_index))
+        return sse
 
     def _is_convergence_reached(
         self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
@@ -584,6 +611,8 @@ class ClusteringSearchEngine:
             num_examples (int): number of examples for each cluster
             output_path (str): path to output file
         """
+        with open(output_path, 'w', encoding='utf-8') as file_to_save:
+            json.dump(self.__algo.get_clusters_info(num_examples), file_to_save)
 
     def calculate_square_sum(self) -> float:
         """
@@ -592,6 +621,7 @@ class ClusteringSearchEngine:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
+        return self.__algo.calculate_square_sum()
 
 
 class VectorDBEngine:
@@ -610,6 +640,8 @@ class VectorDBEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             engine (BasicSearchEngine): A search engine.
         """
+        self._db = db
+        self._engine = engine
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -623,8 +655,8 @@ class VectorDBEngine:
 
         Returns:
             list[tuple[float, str]] | None: Relevant documents with their distances.
-
         """
+        return self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
 
 
 class VectorDBTreeSearchEngine(VectorDBEngine):
@@ -639,6 +671,9 @@ class VectorDBTreeSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        engine = SearchEngine(db.get_vectorizer(), db.get_tokenizer())
+        VectorDBEngine.__init__(self, db, engine)
+        self._engine.index_documents(db.get_raw_documents())
 
 
 class VectorDBAdvancedSearchEngine(VectorDBEngine):
@@ -653,3 +688,6 @@ class VectorDBAdvancedSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        engine = AdvancedSearchEngine(db.get_vectorizer(), db.get_tokenizer())
+        VectorDBEngine.__init__(self, db, engine)
+        self._engine.index_documents(db.get_raw_documents())

@@ -487,7 +487,7 @@ class KMeans:
             raise ValueError
         list_of_cluster_info = []
         for cluster_index, cluster in enumerate(self.__clusters):
-            info_dict = {"id": cluster_index}
+            info_dict: dict[str, int | list[str]] = {"id": cluster_index}
             cluster_vectors = self._db.get_vectors(cluster.get_indices())
             vector_distances = []
             for index, vector in cluster_vectors:

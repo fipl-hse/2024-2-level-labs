@@ -3,9 +3,10 @@ Lab 4.
 
 Vector search with clusterization
 """
-
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+
 import json
+from copy import copy
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
@@ -411,19 +412,20 @@ class KMeans:
         Returns:
             list[ClusterDTO]: List of clusters.
         """
-        for cluster in self.__clusters:
+        clusters = copy(self.__clusters)
+        for cluster in clusters:
             cluster.erase_indices()
         db_vectors = self._db.get_vectors()
         for index, vector in db_vectors:
             distance_list = []
-            for cluster_index, cluster in enumerate(self.__clusters):
+            for cluster_index, cluster in enumerate(clusters):
                 centroid_distance = calculate_distance(cluster.get_centroid(), vector)
                 if not isinstance(centroid_distance, float):
                     raise ValueError
                 distance_list.append((cluster_index, centroid_distance))
             min_distance_index = min(distance_list, key=lambda a: a[1])[0]
-            self.__clusters[min_distance_index].add_document_index(index)
-        for cluster in self.__clusters:
+            clusters[min_distance_index].add_document_index(index)
+        for cluster in clusters:
             vector_sums = [0.0] * len(cluster.get_centroid())
             for vector_index in cluster.get_indices():
                 vector_from_index = db_vectors[vector_index][1]
@@ -433,7 +435,7 @@ class KMeans:
                     vector_sums[mean_vector_index] += vector_from_index[mean_vector_index]
             mean_vector = tuple(value / len(cluster) for value in vector_sums)
             cluster.set_new_centroid(mean_vector)
-        return self.__clusters
+        return clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -642,6 +644,7 @@ class VectorDBEngine:
         """
         self._db = db
         self._engine = engine
+        self._engine.index_documents(db.get_raw_documents())
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int

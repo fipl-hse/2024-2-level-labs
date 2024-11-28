@@ -93,10 +93,10 @@ def main() -> None:
             print(cl_relevant_document)
         print()
 
-    basic_searcher = VectorDBTreeSearchEngine(database)
-    basic_relevant_documents = basic_searcher.retrieve_relevant_documents(query, n_neighbours)
-    for basic_relevant_document in basic_relevant_documents:
-        print(basic_relevant_document)
+    tree_searcher = VectorDBTreeSearchEngine(database)
+    basic_relevant_documents = tree_searcher.retrieve_relevant_documents(query, 1)
+    for tree_relevant_document in basic_relevant_documents:
+        print(tree_relevant_document)
     print()
 
     advanced_searcher = VectorDBAdvancedSearchEngine(database)

@@ -5,6 +5,7 @@ Vector search with text retrieving
 """
 
 import math
+
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
 from typing import Protocol
 

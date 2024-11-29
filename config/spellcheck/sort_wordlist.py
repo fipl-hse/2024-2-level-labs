@@ -5,6 +5,10 @@ Module to check if wordlist is properly sorted.
 import re
 from pathlib import Path
 
+from config.console_logging import get_child_logger
+
+logger = get_child_logger(__file__)
+
 
 def check_wordlist(wordlist_path: Path) -> None:
     """
@@ -29,12 +33,12 @@ def check_wordlist(wordlist_path: Path) -> None:
     )
 
     are_same = original_text == new_content
-    print(f"Wordlist {wordlist_path} is sorted well: {are_same}")
+    logger.info(f"Wordlist {wordlist_path} is sorted well: {are_same}")
 
     if are_same:
         return
 
-    print(f"Writing new content for {wordlist_path}")
+    logger.info(f"Writing new content for {wordlist_path}")
     with open(wordlist_path, "w", encoding="utf-8") as f:
         f.write(new_content)
 

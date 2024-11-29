@@ -20,7 +20,7 @@ class GetParagraphsTest(unittest.TestCase):
     @pytest.mark.mark10
     def test_get_paragraphs_ideal(self):
         """
-        Ideal get_paragraphs_scenario
+        Ideal get_paragraphs scenario
         """
         text = "Привет!\nЭто тестовый запрос в функцию!\nСпасибо, что прочитал это!\nВсех благ!"
         actual = get_paragraphs(text)

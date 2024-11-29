@@ -104,13 +104,13 @@ class BM25Vectorizer(Vectorizer):
             Vector: BM25 vector for document.
         """
 
-        if not tokenized_document or not isinstance(tokenized_document, list):
+        if not isinstance(tokenized_document, list) or not tokenized_document:
             raise ValueError
         bm25_vector = [0.0] * len(self._vocabulary)
-        bm25_scores = calculate_bm25(tokenized_document, self._corpus, self._avg_doc_len)
+        bm25_scores = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
+                                     1.5, 0.75, self._avg_doc_len, len(tokenized_document))
         for index, word in enumerate(self._vocabulary):
-            if word in bm25_scores:
-                bm25_vector[index] = bm25_scores[word]
+            bm25_vector[index] = bm25_scores[word]
         return tuple(bm25_vector)
 
 

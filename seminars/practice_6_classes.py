@@ -96,11 +96,11 @@ class Animal:
 dog = Animal(name="Sharick", legs=4, scariness=8)
 print(dog.name, dog.legs, dog.scariness)  # Sharick 4 8
 # we do not pass self when calling a method!!!
-dog.introduce()
+dog.introduce()  # Hello! My name is Sharick!
 
 spider = Animal("Spidy", 8, 225)  # Spidy 8 225
 print(spider.name, spider.legs, spider.scariness)
-spider.introduce()
+spider.introduce()  # Hello! My name is Spidy!
 # spider.bad_practice_to_add_attribute_not_in_init()
 
 print(hasattr(dog, "bad_practice"))  # False

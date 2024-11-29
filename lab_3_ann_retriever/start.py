@@ -9,8 +9,6 @@ from main import Tokenizer
 
 def open_files() -> tuple[list[str], list[str]]:
     """
-    # stubs: keep.
-
     Open files.
 
     Returns:
@@ -34,10 +32,9 @@ def main() -> None:
     result = None
     documents, stop_words = open_files()
     documents.append(text)
-
     tokenizer = Tokenizer(stop_words)
     tokenized_documents = tokenizer.tokenize_documents(documents)
-
+    print(tokenized_documents)
     result = tokenized_documents
     assert result, "Result is None"
 

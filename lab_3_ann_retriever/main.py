@@ -468,6 +468,8 @@ class BasicSearchEngine:
         for vector in document_vectors:
             distances.append(calculate_distance(query_vector, vector))
         neighbours = sorted(enumerate(distances), key=lambda x: x[1])
+        if not isinstance(neighbours, tuple):
+            return None
 
         result = []
         for neighbour in neighbours[:n_neighbours]:
@@ -487,7 +489,11 @@ class BasicSearchEngine:
         In case of corrupt input arguments, None is returned.
         """
         tokenized_doc = self._tokenizer.tokenize(document)
+        if not isinstance(tokenized_doc, list):
+            return None
         doc_vector = self._vectorizer.vectorize(tokenized_doc)
+        if not isinstance(doc_vector, tuple):
+            return None
         return doc_vector
 
     def _dump_documents(self) -> dict:
@@ -786,7 +792,7 @@ class SearchEngine(BasicSearchEngine):
         if query_vector is None:
             return None
 
-        distances_indices_list = self._tree.query(self._index_document(query))
+        distances_indices_list = self._tree.query(query_vector)
         if (not isinstance(distances_indices_list, list) or len(distances_indices_list) == 0
                 or distances_indices_list[0][0] is None or distances_indices_list[0][1] is None):
             return None

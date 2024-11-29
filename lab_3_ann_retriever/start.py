@@ -52,11 +52,10 @@ def main() -> None:
     basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
     basic_search_engine.index_documents(documents)
     result_basic_engine = search_engine.retrieve_relevant_documents(query)
-    print("Result returned by SearchEngine: ", result_basic_engine)
+    print("Result returned by BasicSearchEngine: ", result_basic_engine)
 
     result = result_engine
     assert result, "Result is None"
-    # return result
 
 
 if __name__ == "__main__":

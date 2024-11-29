@@ -40,7 +40,7 @@ def get_paragraphs(text: str) -> list[str]:
     """
     if not (isinstance(text, str) and len(text) > 0):
         raise ValueError
-    return text.split("\n")
+    return text.split("\n")[:-1]
 
 
 class BM25Vectorizer(Vectorizer):
@@ -166,7 +166,6 @@ class DocumentVectorDB:
         """
         if not isinstance(corpus, list):
             raise ValueError
-        self.__documents = corpus
         tokenized_documents = []
         for document in corpus:
             document_tokens_list = self._tokenizer.tokenize(document)
@@ -174,6 +173,7 @@ class DocumentVectorDB:
                 raise ValueError
             if not len(document_tokens_list) == 0:
                 tokenized_documents.append(document_tokens_list)
+                self.__documents.append(document)
         self._vectorizer.set_tokenized_corpus(tokenized_documents)
         self._vectorizer.build()
         for index, token_document in enumerate(tokenized_documents):
@@ -676,7 +676,6 @@ class VectorDBTreeSearchEngine(VectorDBEngine):
         """
         engine = SearchEngine(db.get_vectorizer(), db.get_tokenizer())
         VectorDBEngine.__init__(self, db, engine)
-        self._engine.index_documents(db.get_raw_documents())
 
 
 class VectorDBAdvancedSearchEngine(VectorDBEngine):
@@ -693,4 +692,3 @@ class VectorDBAdvancedSearchEngine(VectorDBEngine):
         """
         engine = AdvancedSearchEngine(db.get_vectorizer(), db.get_tokenizer())
         VectorDBEngine.__init__(self, db, engine)
-        self._engine.index_documents(db.get_raw_documents())

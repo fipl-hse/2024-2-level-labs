@@ -60,23 +60,25 @@ def main() -> None:
     Launch an implementation.
     """
     documents, stopwords = open_files()
-    document_paragraphs = []
+    paragraphs = []
+    paragraphs_together = []
     for document in documents:
-        paragraphs = get_paragraphs(document)
-        document_paragraphs.append(paragraphs)
+        doc_paragraphs = get_paragraphs(document)
+        paragraphs.append(doc_paragraphs)
+        paragraphs_together.extend(doc_paragraphs)
 
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
     n_neighbours = 5
 
     vectorizer = BM25Vectorizer()
-    vectorizer.set_tokenized_corpus(document_paragraphs)
+    vectorizer.set_tokenized_corpus(paragraphs)
     vectorizer.build()
-    document_vector = vectorizer.vectorize(document_paragraphs[0])
+    document_vector = vectorizer.vectorize(paragraphs[0])
     print(document_vector)
     print()
 
     database = DocumentVectorDB(stopwords)
-    database.put_corpus(documents)
+    database.put_corpus(paragraphs_together)
 
     database_searcher = VectorDBSearchEngine(database)
     db_relevant_documents = database_searcher.retrieve_relevant_documents(query, n_neighbours)
@@ -84,7 +86,7 @@ def main() -> None:
         print(db_relevant_document)
     print()
 
-    for cluster_number in range(1, 15):
+    for cluster_number in range(4, 5):
         clustering_searcher = ClusteringSearchEngine(database, cluster_number)
         print(f"For {cluster_number} cluster(s) the error is "
               f"{clustering_searcher.calculate_square_sum()}")
@@ -105,7 +107,7 @@ def main() -> None:
         print(adv_relevant_document)
     print()
 
-    result = "more_relevant_documents"
+    result = adv_relevant_documents
     assert result, "Result is None"
 
 

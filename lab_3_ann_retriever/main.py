@@ -480,11 +480,7 @@ class BasicSearchEngine:
             if distances is None:
                 return None
         neighbours = sorted(enumerate(distances), key=lambda x: x[1])
-
-        result = []
-        for neighbour in neighbours[:n_neighbours]:
-            result.append(neighbour)
-        return result
+        return neighbours[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:
         """
@@ -854,4 +850,3 @@ class AdvancedSearchEngine(SearchEngine):
         """
         super().__init__(vectorizer, tokenizer)
         self._tree = KDTree()
-# to check pr

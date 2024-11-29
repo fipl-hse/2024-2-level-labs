@@ -5,10 +5,13 @@ Check the relevance of stubs.
 import sys
 from pathlib import Path
 
+from config.console_logging import get_child_logger
 from config.constants import PROJECT_CONFIG_PATH
 from config.generate_stubs.generator import cleanup_code
 from config.generate_stubs.run_generator import format_stub_file, sort_stub_imports
 from config.project_config import ProjectConfig
+
+logger = get_child_logger(__file__)
 
 
 def get_code(code_path: Path) -> str:
@@ -62,17 +65,17 @@ def main() -> None:
     labs_paths = project_config.get_labs_paths()
     code_is_equal = True
     for lab_path in labs_paths:
-        print(f"Processing {lab_path}...")
+        logger.info(f"Processing {lab_path}...")
         if lab_path.name == "core_utils":
-            print(f"\t\tIgnoring {lab_path} as it can't have stubs.")
+            logger.info(f"\t\tIgnoring {lab_path} as it can't have stubs.")
             continue
 
         for module_name in get_module_names():
             module_path = lab_path / module_name
             if not module_path.exists():
-                print(f"\t\tIgnoring {module_path} as it does not exist.")
+                logger.info(f"\t\tIgnoring {module_path} as it does not exist.")
                 continue
-            print(f"\t{module_path}")
+            logger.info(f"\t{module_path}")
 
             stub_file_name = f"{module_path.stem}_stub.py"
             stub_code = get_code(module_path.parent / stub_file_name)
@@ -89,7 +92,7 @@ def main() -> None:
 
             if stub_code != expected_formatted_stub:
                 code_is_equal = False
-                print(f"\tYou have different {module_path.name} and its stub in {lab_path}")
+                logger.info(f"\tYou have different {module_path.name} and its stub in {lab_path}")
 
             if lab_path.name == "lab_8_llm":
                 lab_7_main = get_code(lab_path / "main.py")
@@ -97,11 +100,11 @@ def main() -> None:
 
                 if lab_7_main != lab_8_main:
                     code_is_equal = False
-                    print("You have different main for Lab 7 and Lab 8!")
+                    logger.info("You have different main for Lab 7 and Lab 8!")
 
         clear_examples(lab_path)
     if code_is_equal:
-        print("All stubs are relevant")
+        logger.info("All stubs are relevant")
     sys.exit(not code_is_equal)
 
 

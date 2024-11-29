@@ -70,7 +70,7 @@ def main() -> None:
 
     relevant_documents = search_engine.retrieve_relevant_documents(query, 3)
 
-    result = None
+    result = relevant_documents
     assert result, "Result is None"
 
 

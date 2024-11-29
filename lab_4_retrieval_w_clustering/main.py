@@ -154,7 +154,10 @@ class DocumentVectorDB:
         if not corpus or not isinstance(corpus, list):
             raise ValueError
         self.__documents = corpus
-        tokenized_corpus = [self._tokenizer.tokenize(doc) for doc in corpus]
+        tokenized_corpus = [tokenized_doc for doc in self.__documents
+                            if (tokenized_doc := self._tokenizer.tokenize(doc))]
+        if not tokenized_corpus:
+            raise ValueError
         self._vectorizer.set_tokenized_corpus(tokenized_corpus)
         self._vectorizer.build()
         for index, tokenized_doc in enumerate(tokenized_corpus):
@@ -250,9 +253,10 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
+        vectors = [index[1] for index in self._db.get_vectors()]
         if query_vector is None:
             raise ValueError
-        neighbours = self._calculate_knn(query_vector, n_neighbours)
+        neighbours = self._calculate_knn(query_vector, vectors, n_neighbours)
         if not neighbours:
             raise ValueError
         relevant_documents = []

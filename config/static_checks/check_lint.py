@@ -10,9 +10,12 @@ from os import listdir
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.console_logging import get_child_logger
 from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.lab_settings import LabSettings
 from config.project_config import ProjectConfig
+
+logger = get_child_logger(__file__)
 
 
 def transform_score_into_lint(target_score: int) -> int:
@@ -47,15 +50,17 @@ def is_passed(lint_output: str, target_lint_level: int) -> bool:
     lint_score = int(re.search(r"\d+", lint_level).group(0))
 
     if lint_score < target_lint_level:
-        print("\nLint check is not passed!")
-        print("Fix the following issues and try again.\n")
-        print(lint_output)
+        logger.error(
+            f"\nLint check is not passed!\n"
+            f"Fix the following issues and try again.\n"
+            f"{lint_output}"
+        )
         return False
     if lint_score != 10:
         print("\nLint check passed but there are thing to improve:\n")
         print(lint_output)
         return True
-    print("\nLint check passed!\n")
+    logger.info("\nLint check passed!\n")
     return True
 
 
@@ -104,7 +109,7 @@ def check_lint_level(lint_output: str, target_score: int) -> bool:
     target_lint_level = transform_score_into_lint(score)
 
     if not target_lint_level:
-        print("\nInvalid value for target score: accepted are 4, 6, 8, 10.\n")
+        logger.error("\nInvalid value for target score: accepted are 4, 6, 8, 10.\n")
         return False
     return is_passed(lint_output, target_lint_level)
 
@@ -134,7 +139,7 @@ def main() -> None:
 
     check_is_failed = False
 
-    print("Running lint on config, seminars, admin_utils")
+    logger.info("Running lint on config, seminars, admin_utils")
     stdout, _, _ = check_lint_on_paths(
         [PROJECT_ROOT / "config", PROJECT_ROOT / "seminars", PROJECT_ROOT / "admin_utils"],
         pyproject_path,
@@ -144,8 +149,8 @@ def main() -> None:
         check_is_failed = True
 
     if (PROJECT_ROOT / "core_utils").exists():
-        print("core_utils exist")
-        print("Running lint on core_utils")
+        logger.info("core_utils exist")
+        logger.info("Running lint on core_utils")
         stdout, _, _ = check_lint_on_paths(
             [PROJECT_ROOT / "core_utils"], pyproject_path, exit_zero=True
         )
@@ -158,10 +163,10 @@ def main() -> None:
         if "settings.json" in listdir(lab_path):
             target_score = LabSettings(PROJECT_ROOT / f"{lab_path}/settings.json").target_score
             if target_score == 0:
-                print("Skipping check")
+                logger.info("Skipping check")
                 continue
 
-            print(f"Running lint for lab {lab_path}")
+            logger.info(f"Running lint for lab {lab_path}")
             stdout, _, _ = check_lint_on_paths(
                 [lab_path], pyproject_path, ignore_tests=repository_type == "public", exit_zero=True
             )
@@ -169,7 +174,7 @@ def main() -> None:
                 check_is_failed = True
 
     if check_is_failed:
-        print("Some of checks failed. Fix it.")
+        logger.error("Some of checks were failed. Fix it.")
         sys.exit(1)
 
 

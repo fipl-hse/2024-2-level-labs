@@ -477,6 +477,8 @@ class BasicSearchEngine:
         distances = []
         for vector in document_vectors:
             distances.append(calculate_distance(query_vector, vector))
+            if distances is None:
+                return None
         neighbours = sorted(enumerate(distances), key=lambda x: x[1])
 
         result = []

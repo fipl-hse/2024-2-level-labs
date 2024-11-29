@@ -794,8 +794,9 @@ class SearchEngine(BasicSearchEngine):
             return None
 
         distances_indices_list = self._tree.query(query_vector)
-        if (not isinstance(distances_indices_list, list) or len(distances_indices_list) == 0
-                or distances_indices_list[0][0] is None or distances_indices_list[0][1] is None):
+        if distances_indices_list is None or not distances_indices_list or not \
+                all(isinstance(distance, float) or isinstance(index, int)
+                    for distance, index in distances_indices_list):
             return None
 
         result = []

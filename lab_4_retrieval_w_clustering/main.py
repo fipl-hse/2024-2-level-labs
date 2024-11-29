@@ -57,6 +57,15 @@ class BM25Vectorizer(Vectorizer):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not tokenized_corpus:
+            raise ValueError("Empty tokenized_corpus")
+        if self._corpus:
+            self._corpus = []
+        summary_len = 0
+        for token in tokenized_corpus:
+            summary_len += len(token)
+            self._corpus.append(token)
+        self._avg_doc_len = summary_len / len(self._corpus)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
         """
@@ -73,6 +82,7 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
         """

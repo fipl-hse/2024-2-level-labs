@@ -5,7 +5,7 @@ Laboratory Work #3 starter.
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from pathlib import Path
 
-from lab_3_ann_retriever.main import (BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer)
+from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -23,7 +23,7 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return documents, stopwords
+    return documents[:50], stopwords
 
 
 def main() -> None:
@@ -47,12 +47,12 @@ def main() -> None:
     search_engine = SearchEngine(vectorizer, tokenizer)
     search_engine.index_documents(documents)
     result_engine = search_engine.retrieve_relevant_documents(query)
-    print(f"Result returned by SearchEngine: ", result_engine)
+    print(f"Result returned by SearchEngine: ".format(result_engine))
 
     basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
     basic_search_engine.index_documents(documents)
     result_basic_engine = search_engine.retrieve_relevant_documents(query)
-    print(f"Result returned by SearchEngine: ", result_basic_engine)
+    print(f"Result returned by SearchEngine: ".format(result_basic_engine))
 
     return None
 

@@ -8,7 +8,10 @@ from pathlib import Path
 from tap import Tap
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.console_logging import get_child_logger
 from config.constants import CONFIG_PACKAGE_PATH
+
+logger = get_child_logger(__file__)
 
 
 class CommandLineInterface(Tap):
@@ -80,7 +83,7 @@ def update_forks(
     """
     upstream = repositories["upstream"]
     for fork in repositories["forks"]:
-        print(f"Start update fork: {fork}")
+        logger.info(f"Start update fork: {fork}")
         update_fork(
             python=python,
             repositories={

@@ -26,6 +26,11 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
+    if not text or not isinstance(text, str):
+        raise ValueError()
+    paragraphs = text.split('\n')
+
+    return paragraphs
 
 
 class BM25Vectorizer(Vectorizer):
@@ -40,6 +45,9 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        Vectorizer.__init__(self)
+        self._corpus = []
+        self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -51,6 +59,16 @@ class BM25Vectorizer(Vectorizer):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not tokenized_corpus or not isinstance(tokenized_corpus, list):
+            raise ValueError()
+
+        self._corpus = tokenized_corpus
+        sum = 0
+
+        for index, paragraph in enumerate(self._corpus):
+            sum += len(paragraph)
+
+        self._avg_doc_len = sum / len(self._corpus)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
         """

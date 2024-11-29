@@ -476,12 +476,13 @@ class BasicSearchEngine:
 
         distances = []
         for vector in document_vectors:
-            distances.append(calculate_distance(query_vector, vector))
-            if distances is None or not distances or isinstance(distances, tuple):
+            distance = calculate_distance(query_vector, vector)
+            if distance is None or not distance:
                 return None
-            for elem in enumerate(distances):
-                if not isinstance(elem[1], float):
-                    return None
+            if not isinstance(distance, float):
+                return None
+            distances.append(distance)
+
         neighbours = sorted(enumerate(distances), key=lambda x: x[1])
         return neighbours[:n_neighbours]
 

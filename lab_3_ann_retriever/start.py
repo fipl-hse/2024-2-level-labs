@@ -34,7 +34,6 @@ def main() -> None:
         # text = text_file.read()
 
     documents, stopwords = open_files()
-    query = "Нижний Новгород"
 
     tokenizer = Tokenizer(stopwords)
     tokenized_docs = tokenizer.tokenize_documents(documents)

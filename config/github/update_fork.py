@@ -10,6 +10,9 @@ from pathlib import Path
 from tap import Tap
 
 from config.cli_unifier import _run_console_tool, handles_console_error
+from config.console_logging import get_child_logger
+
+logger = get_child_logger(__file__)
 
 
 class Strategies(Enum):
@@ -312,7 +315,7 @@ def main(
                 branch=RemoteBranches.ORIGIN,
             )
             if exit_code:
-                print("Cannot checkout path to the upstream")
+                logger.error("Cannot checkout path to the upstream")
                 sys.exit(1)
 
         if paths_keep_from_upstream:
@@ -322,10 +325,10 @@ def main(
                 branch=RemoteBranches.UPSTREAM,
             )
             if exit_code and "did not match any file" in stderr:
-                print()
-                print("[WARNING] Cannot checkout path to the origin.")
-                print("[WARNING] Probably the fork does not contain it.")
-                print()
+                logger.error(
+                    "\n[WARNING] Cannot checkout path to the origin.\n"
+                    "[WARNING] Probably the fork does not contain it.\n"
+                )
 
         stdout, stderr, exit_code = git_status(fork_path=fork_path)
         skip_commit_message = "nothing to commit, working tree clean"

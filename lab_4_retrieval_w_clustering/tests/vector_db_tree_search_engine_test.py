@@ -27,7 +27,6 @@ class VectorDBTreeSearchEngineTest(unittest.TestCase):
         self.tree_engine = VectorDBTreeSearchEngine(self.mock_db)
 
     @pytest.mark.lab_4_retrieval_w_clustering
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_initialization(self):
         """

@@ -7,7 +7,10 @@ import re
 import sys
 from pathlib import Path
 
+from config.console_logging import get_child_logger
 from config.constants import PROJECT_ROOT
+
+logger = get_child_logger(__file__)
 
 
 def get_paths() -> list[Path]:
@@ -64,17 +67,18 @@ def check_dependencies(lines: list, compiled_pattern: re.Pattern, path: Path) ->
     ]
     actual = [i for i in map(str.lower, lines) if i.split()[0] not in ("--extra-index-url",)]
     if expected != actual:
-        print(f"Dependencies in {path.relative_to(PROJECT_ROOT)} do not follow sorting rule.")
-        print("Expected:")
-        print("\n".join(expected))
+        expected_str = "\n".join(expected)
+        logger.error(
+            f"Dependencies in {path.relative_to(PROJECT_ROOT)} do not follow sorting rule."
+            f"\nExpected\n{expected_str}"
+        )
         return False
     for line in lines:
         if not re.search(compiled_pattern, line):
-            print(
+            logger.error(
                 f"Specific dependency in {path.relative_to(PROJECT_ROOT)} "
-                "do not conform to the template."
+                f"do not conform to the template.\n{line}"
             )
-            print(line)
             return False
     return True
 
@@ -88,10 +92,10 @@ def main() -> None:
     for path in paths:
         lines = get_requirements(path)
         if not check_dependencies(lines, compiled_pattern, path):
-            print(f"{path.relative_to(PROJECT_ROOT)} : FAIL")
+            logger.error(f"{path.relative_to(PROJECT_ROOT)} : FAIL")
             sys.exit(1)
         else:
-            print(f"{path.relative_to(PROJECT_ROOT)} : OK")
+            logger.info(f"{path.relative_to(PROJECT_ROOT)} : OK")
 
 
 if __name__ == "__main__":

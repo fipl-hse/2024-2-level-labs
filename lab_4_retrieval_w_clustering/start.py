@@ -91,6 +91,7 @@ def main() -> None:
         print(f"For {cluster_number} cluster(s) the error is "
               f"{clustering_searcher.calculate_square_sum()}")
         cl_relevant_documents = clustering_searcher.retrieve_relevant_documents(query, n_neighbours)
+        clustering_searcher.make_report(3, "assets/report.json")
         for cl_relevant_document in cl_relevant_documents:
             print(cl_relevant_document)
         print()

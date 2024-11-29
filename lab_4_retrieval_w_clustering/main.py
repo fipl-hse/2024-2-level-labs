@@ -57,7 +57,7 @@ class BM25Vectorizer(Vectorizer):
         Initialize an instance of the BM25Vectorizer class.
         """
         self._corpus = []
-        Vectorizer.__init__(self, self._corpus)
+        super().__init__(self._corpus)
         self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -254,7 +254,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
         self._db = db
-        BasicSearchEngine.__init__(self, self._db.get_vectorizer(), self._db.get_tokenizer())
+        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -292,7 +292,7 @@ class ClusterDTO:
     Store clusters.
     """
 
-    _centroid: Vector
+    __centroid: Vector
     __indices: list[int]
 
     def __init__(self, centroid_vector: Vector) -> None:
@@ -302,7 +302,7 @@ class ClusterDTO:
         Args:
             centroid_vector (Vector): Centroid vector.
         """
-        self._centroid = centroid_vector
+        self.__centroid = centroid_vector
         self.__indices = []
 
     def __len__(self) -> int:
@@ -321,7 +321,7 @@ class ClusterDTO:
         Returns:
             Vector: Centroid of current cluster.
         """
-        return self._centroid
+        return self.__centroid
 
     def set_new_centroid(self, new_centroid: Vector) -> None:
         """
@@ -336,7 +336,7 @@ class ClusterDTO:
         """
         if not (isinstance(new_centroid, tuple) and len(new_centroid) > 0):
             raise ValueError
-        self._centroid = new_centroid
+        self.__centroid = new_centroid
 
     def erase_indices(self) -> None:
         """
@@ -428,13 +428,15 @@ class KMeans:
             clusters[min_distance_index].add_document_index(index)
         for cluster in clusters:
             vector_sums = [0.0] * len(cluster.get_centroid())
-            for vector_index in cluster.get_indices():
-                vector_from_index = db_vectors[vector_index][1]
-                if not len(vector_from_index) == len(vector_sums):
+            vectors_from_indices = self._db.get_vectors(cluster.get_indices())
+            for pair in vectors_from_indices:
+                if not len(pair[1]) == len(vector_sums):
                     raise ValueError
                 for mean_vector_index, _ in enumerate(vector_sums):
-                    vector_sums[mean_vector_index] += vector_from_index[mean_vector_index]
-            mean_vector = tuple(value / len(cluster) for value in vector_sums)
+                    vector_sums[mean_vector_index] += pair[1][mean_vector_index]
+            mean_vector = (tuple(value / len(vectors_from_indices) for value in vector_sums)
+                           if len(vectors_from_indices) > 0
+                           else vector_sums)
             cluster.set_new_centroid(mean_vector)
         return clusters
 
@@ -459,7 +461,10 @@ class KMeans:
             raise ValueError
         centroid_distances = []
         for index, cluster in enumerate(self.__clusters):
-            centroid_distance = calculate_distance(query_vector, cluster.get_centroid())
+            centroid = cluster.get_centroid()
+            centroid_distance = (calculate_distance(query_vector, (0.0,) * len(query_vector))
+                                 if centroid == 0
+                                 else calculate_distance(query_vector, centroid))
             if not isinstance(centroid_distance, float):
                 raise ValueError
             centroid_distances.append((index, centroid_distance))
@@ -484,11 +489,11 @@ class KMeans:
         Returns:
             list[dict[str, int | list[str]]]: List with information about each cluster
         """
-        if not isinstance(num_examples, int):
+        if not (isinstance(num_examples, int) and num_examples > 0):
             raise ValueError
         list_of_cluster_info = []
         for cluster_index, cluster in enumerate(self.__clusters):
-            info_dict: dict[str, int | list[str]] = {"id": cluster_index}
+            info_dict: dict[str, int | list[str]] = {"cluster_id": cluster_index}
             cluster_vectors = self._db.get_vectors(cluster.get_indices())
             vector_distances = []
             for index, vector in cluster_vectors:
@@ -498,7 +503,7 @@ class KMeans:
                 vector_distances.append((index, vector_distance))
             vector_distances = sorted(vector_distances, key=lambda a: a[1])[:num_examples]
             doc_indices = tuple(pair[0] for pair in vector_distances)
-            info_dict["nearest_docs"] = self._db.get_raw_documents(doc_indices)
+            info_dict["documents"] = self._db.get_raw_documents(doc_indices)
             list_of_cluster_info.append(info_dict)
         return list_of_cluster_info
 
@@ -615,7 +620,8 @@ class ClusteringSearchEngine:
             output_path (str): path to output file
         """
         with open(output_path, 'w', encoding='utf-8') as file_to_save:
-            json.dump(self.__algo.get_clusters_info(num_examples), file_to_save)
+            to_dump = self.__algo.get_clusters_info(num_examples)
+            json.dump(to_dump, file_to_save, indent="\t", ensure_ascii=False)
 
     def calculate_square_sum(self) -> float:
         """
@@ -676,7 +682,7 @@ class VectorDBTreeSearchEngine(VectorDBEngine):
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
         engine = SearchEngine(db.get_vectorizer(), db.get_tokenizer())
-        VectorDBEngine.__init__(self, db, engine)
+        super().__init__(db, engine)
 
 
 class VectorDBAdvancedSearchEngine(VectorDBEngine):
@@ -692,4 +698,4 @@ class VectorDBAdvancedSearchEngine(VectorDBEngine):
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
         engine = AdvancedSearchEngine(db.get_vectorizer(), db.get_tokenizer())
-        VectorDBEngine.__init__(self, db, engine)
+        super().__init__(db, engine)

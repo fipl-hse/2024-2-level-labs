@@ -479,8 +479,8 @@ class BasicSearchEngine:
             distances.append(calculate_distance(query_vector, vector))
             if distances is None or not distances or isinstance(distances, tuple):
                 return None
-            for elem in distances:
-                if not isinstance(elem, float):
+            for elem in enumerate(distances):
+                if not isinstance(elem[1], float):
                     return None
         neighbours = sorted(enumerate(distances), key=lambda x: x[1])
         return neighbours[:n_neighbours]

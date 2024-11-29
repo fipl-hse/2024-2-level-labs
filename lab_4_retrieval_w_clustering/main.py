@@ -40,7 +40,8 @@ def get_paragraphs(text: str) -> list[str]:
     """
     if not (isinstance(text, str) and len(text) > 0):
         raise ValueError
-    return text.split("\n")[:-1]
+    split_text = text.split("\n")
+    return split_text[:-1] if split_text[-1] == "" else split_text
 
 
 class BM25Vectorizer(Vectorizer):

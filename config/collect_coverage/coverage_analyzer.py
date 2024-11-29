@@ -12,9 +12,12 @@ from config.collect_coverage.run_coverage import (
     extract_percentage_from_report,
     run_coverage_collection,
 )
+from config.console_logging import get_child_logger
 from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.lab_settings import LabSettings
 from config.project_config import ProjectConfig
+
+logger = get_child_logger(__file__)
 
 CoverageResults = Mapping[
     str,
@@ -47,7 +50,7 @@ def collect_coverage(all_labs_names: Iterable[Path], artifacts_path: Path) -> Co
             report_path = artifacts_path / f"{lab_path.name}.json"
             percentage = extract_percentage_from_report(report_path)
         except (CoverageRunError, CoverageCreateReportError) as e:
-            print(e)
+            logger.error(str(e))
         finally:
             all_labs_results[lab_path.name] = (percentage,)
     return all_labs_results
@@ -66,9 +69,7 @@ def is_decrease_present(
     Returns:
         tuple[bool, bool, dict]: Is decrease present or not, and failed tests present or not
     """
-    print("\n\n" + "------" * 3)
-    print("REPORT")
-    print("------" * 3)
+    logger.info("\n\n------------------\nREPORT\n------------------")
     any_degradation = False
     any_fallen_tests = False
     labs_with_thresholds = {}
@@ -79,13 +80,11 @@ def is_decrease_present(
             current_lab_percentage = 0
         diff = current_lab_percentage - prev_lab_percentage
 
-        print(f'{lab_name:<30}: {current_lab_percentage}% ({"+" if diff >= 0 else ""}{diff})')
+        logger.info(f'{lab_name:<30}: {current_lab_percentage}% ({"+" if diff >= 0 else ""}{diff})')
         labs_with_thresholds[lab_name] = current_lab_percentage
         if diff < 0:
             any_degradation = True
-    print("\n\n" + "------" * 3)
-    print("END OF REPORT")
-    print("------" * 3 + "\n\n")
+    logger.info("\n\n------------------\nEND OF REPORT\n------------------")
 
     return any_degradation, any_fallen_tests, labs_with_thresholds
 
@@ -107,7 +106,7 @@ def main() -> None:
         if "core_utils" not in lab_path.name:
             settings = LabSettings(lab_path / "settings.json")
             if settings.target_score == 0:
-                print(f"Skip {lab_path} as target score is 0")
+                logger.info(f"Skip {lab_path} as target score is 0")
                 continue
         not_skipped.append(lab_path)
 
@@ -118,25 +117,25 @@ def main() -> None:
     )
 
     if any_degradation:
-        print("Some of labs have worse coverage. We cannot accept this. Write more tests!")
-        print(
+        logger.info(
+            "Some of labs have worse coverage. We cannot accept this. Write more tests!\n"
             "You can copy-paste the following content to the ./config/project_config.json "
             "to update thresholds. \n\n"
         )
 
         project_config.update_thresholds(labs_with_thresholds)
 
-        print(project_config.get_json())
+        logger.info(project_config.get_json())
         sys.exit(1)
 
     if any_fallen_tests:
-        print(
+        logger.info(
             "Some tests failed! We can't accept that.\n"
             "Make sure the tests pass. I wish you good luck! \n\n"
         )
         sys.exit(1)
 
-    print("Nice coverage. Anyway, write more tests!", end="\n\n")
+    logger.info("Nice coverage. Anyway, write more tests!\n\n")
 
 
 if __name__ == "__main__":

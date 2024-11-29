@@ -216,7 +216,10 @@ class Vectorizer:
         sorted_vocab = sorted(vocabulary)
         self._vocabulary = sorted_vocab
 
-        self._idf_values = calculate_idf(self._vocabulary, self._corpus)
+        idf = calculate_idf(self._vocabulary, self._corpus)
+        if idf is None or not isinstance(idf, dict):
+            return False
+        self._idf_values = idf
         if self._idf_values is None:
             return False
 

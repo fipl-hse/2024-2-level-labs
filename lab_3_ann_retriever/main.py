@@ -479,7 +479,7 @@ class BasicSearchEngine:
             distances.append(calculate_distance(query_vector, vector))
             if distances is None:
                 return None
-        neighbours = sorted(enumerate(distances), key=lambda x: x[1])
+        neighbours = sorted(enumerate(distances), key=lambda tuple_: tuple_[1])
         return neighbours[:n_neighbours]
 
     def _index_document(self, document: str) -> Vector | None:

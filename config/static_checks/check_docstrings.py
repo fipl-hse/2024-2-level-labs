@@ -5,6 +5,7 @@ Check docstrings for conformance to the Google-style-docstrings.
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.console_logging import get_child_logger
 from config.constants import (
     CONFIG_PACKAGE_PATH,
     CORE_UTILS_PACKAGE_PATH,
@@ -12,6 +13,8 @@ from config.constants import (
     PROJECT_ROOT,
 )
 from config.project_config import ProjectConfig
+
+logger = get_child_logger(__file__)
 
 
 def get_files() -> list:
@@ -97,7 +100,7 @@ def main() -> None:
         )
         for path in paths:
             if not path.exists():
-                print(f"\nIgnoring {path}: it does not exist.")
+                logger.info(f"\nIgnoring {path}: it does not exist.")
                 continue
 
             check_file(path)

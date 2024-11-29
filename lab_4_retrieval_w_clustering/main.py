@@ -191,7 +191,7 @@ class DocumentVectorDB:
             list[tuple[int, Vector]]: List of index and vector for documents.
         """
 
-        if indices is None:
+        if indices is None or not indices:
             return list(self.__vectors.items())
         return [(index, self.__vectors[index]) for index in indices]
 
@@ -209,7 +209,7 @@ class DocumentVectorDB:
             Corpus: List of documents.
         """
 
-        if indices is None:
+        if indices is None or not indices:
             return self.__documents
         unique_indices = set(indices)
         return [self.__documents[index] for index in unique_indices]
@@ -231,7 +231,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         """
 
         self._db = db
-        BasicSearchEngine.__init__(self, self._db.get_vectorizer(), self._db.get_tokenizer())
+        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -249,11 +249,14 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
+        if query_vector is None:
+            raise ValueError
         neighbours = self._calculate_knn(query_vector, n_neighbours)
         if not neighbours:
             raise ValueError
         relevant_documents = []
         for dist, index in neighbours:
+            index = int(index)
             doc = self._db.get_raw_documents([index])[0]
             relevant_documents.append((dist, doc))
         return relevant_documents

@@ -589,43 +589,43 @@ class NaiveKDTree:
         if not isinstance(vectors, list) or not vectors:
             return False
 
-        space_states_info = [{}]
-        space_states_info = [{
-            "vectors": [(vector, index) for index, vector in enumerate(vectors)],
-            "depth": 0,
-            "parent": Node(tuple([0.0]), -1),
-            "is_left": True
+        states_info = [{}]
+        states_info = [{
+            'vectors': [(vector, index) for index, vector in enumerate(vectors)],
+            'depth': 0,
+            'parent': Node(tuple([0.0] * len(vectors[0])), -1),
+            'is_left': True
         }]
-
-        while space_states_info:
-            current_vectors_indexes, depth, parent, is_left = space_states_info.pop(0)
-            if current_vectors_indexes:
-                axis = depth % len(current_vectors_indexes[0][0])
-                current_vectors_indexes.sort(key=lambda vector: vector[0][axis])
-                median_index = len(current_vectors_indexes) // 2
-                median_node = Node(current_vectors_indexes[median_index][0],
-                                   current_vectors_indexes[median_index][1])
-
-                if parent.payload != -1 and is_left is True:
+        while states_info:
+            current_vectors, depth, parent, is_left = states_info.pop(0).values()
+            if current_vectors:
+                axis = depth % len(current_vectors[0])
+                current_vectors.sort(key=lambda vector: vector[0][axis])
+                median_index = len(current_vectors) // 2
+                median_node = Node(current_vectors[median_index][0],
+                                   current_vectors[median_index][1])
+                if parent.payload != -1 and is_left:
                     parent.left_node = median_node
                 elif parent.payload == -1:
                     self._root = median_node
                 else:
                     parent.right_node = median_node
-
-                space_states_info.append({
-                    "vectors": current_vectors_indexes[:median_index],
-                    "depth": depth + 1,
-                    "parent": median_node,
-                    "is_left": True
-                })
-                space_states_info.append({
-                    "vectors": current_vectors_indexes[:median_index],
-                    "depth": depth + 1,
-                    "parent": median_node,
-                    "is_left": False
-                })
-
+                states_info.append(
+                    {
+                        'vectors': current_vectors[:median_index],
+                        'depth': depth + 1,
+                        'parent': median_node,
+                        'is_left': True
+                    }
+                )
+                states_info.append(
+                    {
+                        'vectors': current_vectors[median_index + 1:],
+                        'depth': depth + 1,
+                        'parent': median_node,
+                        'is_left': False
+                    }
+                )
         return True
 
     def query(self, vector: Vector, k: int = 1) -> list[tuple[float, int]] | None:

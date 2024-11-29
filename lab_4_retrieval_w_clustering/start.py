@@ -49,6 +49,7 @@ def main() -> None:
     """
     Launch an implementation.
     """
+    vectorizer = BM25Vectorizer()
     result = None
     assert result, "Result is None"
 

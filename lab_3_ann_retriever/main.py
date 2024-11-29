@@ -392,6 +392,8 @@ class BasicSearchEngine:
         if not isinstance(tokens, list):
             return None
         query_vector = self._vectorizer.vectorize(tokens)
+        if not isinstance(query_vector, tuple):
+            return None
         closest_neighbours = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
         if closest_neighbours is None or not closest_neighbours or len(closest_neighbours) == 0 or \
                 not all(isinstance(index, int) or isinstance(distance, float)

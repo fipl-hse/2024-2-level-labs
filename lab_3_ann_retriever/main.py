@@ -393,7 +393,9 @@ class BasicSearchEngine:
             return None
         query_vector = self._vectorizer.vectorize(tokens)
         closest_neighbours = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        if closest_neighbours is None or len(closest_neighbours) == 0:
+        if closest_neighbours is None or not closest_neighbours or len(closest_neighbours) == 0 or \
+                not all(isinstance(index, int) or isinstance(distance, float)
+                        for index, distance in closest_neighbours):
             return None
         for item in closest_neighbours:
             if item[0] is None or item[1] is None:

@@ -436,7 +436,7 @@ class KMeans:
                     vector_sums[mean_vector_index] += pair[1][mean_vector_index]
             mean_vector = (tuple(value / len(vectors_from_indices) for value in vector_sums)
                            if len(vectors_from_indices) > 0
-                           else vector_sums)
+                           else tuple(vector_sums))
             cluster.set_new_centroid(mean_vector)
         return clusters
 

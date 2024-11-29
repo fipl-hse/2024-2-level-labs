@@ -47,14 +47,16 @@ def main() -> None:
     search_engine = SearchEngine(vectorizer, tokenizer)
     search_engine.index_documents(documents)
     result_engine = search_engine.retrieve_relevant_documents(query)
-    print(f"Result returned by SearchEngine: ".format(result_engine))
+    print("Result returned by SearchEngine: ", result_engine)
 
     basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
     basic_search_engine.index_documents(documents)
     result_basic_engine = search_engine.retrieve_relevant_documents(query)
-    print(f"Result returned by SearchEngine: ".format(result_basic_engine))
+    print("Result returned by SearchEngine: ", result_basic_engine)
 
-    return None
+    result = result_engine
+    assert result, "Result is None"
+    return result
 
 
 if __name__ == "__main__":

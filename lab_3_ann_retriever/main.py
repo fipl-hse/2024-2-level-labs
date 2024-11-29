@@ -746,8 +746,9 @@ class SearchEngine(BasicSearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)
         self._tree = NaiveKDTree()
-        BasicSearchEngine.__init__(self, vectorizer = vectorizer, tokenizer = tokenizer)
+
 
     def index_documents(self, documents: list[str]) -> bool:
         """

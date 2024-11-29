@@ -62,7 +62,7 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(paragraph) for paragraph in tokenized_corpus) / len(tokenized_corpus)
-        return None
+
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
         """
@@ -157,6 +157,7 @@ class DocumentVectorDB:
             if not new:
                 del new
         bm.set_tokenized_corpus(tokenized_documents)
+        self.__vectors = {}
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """

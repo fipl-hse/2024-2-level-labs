@@ -4,10 +4,13 @@ Generator of all labs.
 
 from pathlib import Path
 
+from config.console_logging import get_child_logger
 from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.generate_stubs.generator import cleanup_code
 from config.generate_stubs.run_generator import format_stub_file, sort_stub_imports
 from config.project_config import ProjectConfig
+
+logger = get_child_logger(__file__)
 
 
 def _generate_stubs_single_module(module_path: Path) -> None:
@@ -35,7 +38,7 @@ def generate_all_stubs(project_config: ProjectConfig) -> None:
     """
     labs = project_config.get_labs_names()
     for lab_name in labs:
-        print(f"Generating stubs for {lab_name}")
+        logger.info(f"Generating stubs for {lab_name}")
         module_paths = (
             PROJECT_ROOT / lab_name / "main.py",
             PROJECT_ROOT / lab_name / "start.py",
@@ -46,7 +49,7 @@ def generate_all_stubs(project_config: ProjectConfig) -> None:
         for module_path in module_paths:
             if not module_path.exists():
                 continue
-            print(f"\t\t{module_path}")
+            logger.info(f"{module_path}")
             _generate_stubs_single_module(module_path)
 
 

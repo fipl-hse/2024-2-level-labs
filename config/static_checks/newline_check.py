@@ -4,7 +4,10 @@ Check newline at the end of a file.
 
 import sys
 
+from config.console_logging import get_child_logger
 from config.constants import PROJECT_ROOT
+
+logger = get_child_logger(__file__)
 
 
 def get_paths() -> list:
@@ -87,17 +90,17 @@ def has_newline(paths: list) -> bool:
     bad_paths = []
     check_is_good = True
     for path in paths:
-        print(f"Analyzing {path}")
+        logger.info(f"Analyzing {path}")
         with open(path, encoding="utf-8") as file:
             lines = file.readlines()
         if lines[-1][-1] != "\n":
             bad_paths.append(path)
             check_is_good = False
     if check_is_good:
-        print("All files conform to the template.")
+        logger.info("All files conform to the template.")
     else:
         for bad_path in bad_paths:
-            print(f"No newline at the end of the {bad_path}")
+            logger.info(f"No newline at the end of the {bad_path}")
     return check_is_good
 
 

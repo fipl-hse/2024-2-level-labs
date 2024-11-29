@@ -477,7 +477,7 @@ class BasicSearchEngine:
         distances = []
         for vector in document_vectors:
             distance = calculate_distance(query_vector, vector)
-            if distance is None or not distance:
+            if distance is None:
                 return None
             if not isinstance(distance, float):
                 return None

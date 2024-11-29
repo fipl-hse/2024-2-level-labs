@@ -88,6 +88,33 @@ class DocumentVectorDBTest(unittest.TestCase):
     @pytest.mark.mark6
     @pytest.mark.mark8
     @pytest.mark.mark10
+    def test_put_corpus_with_stop_word(self):
+        """
+        Scenario with put_corpus with stop word
+        """
+        expected_vectors = {0: self.vectors[0], 1: self.vectors[1]}
+        corpus = ["съешь ещё этих французских булочек", "да выпей ещё чаю", "булочки"]
+        tokens = [
+            ["съешь", "ещё", "этих", "французских", "булочек"],
+            ["да", "выпей", "ещё", "чаю"],
+            [],
+        ]
+        vectors = [
+            (0.0, 0.0, 0.0, -1.5327980118420002, 0.0, 0.0, 0.0, 0.0),
+            (0.0, 0.0, 0.0, -1.6941451709832633, 0.0, 0.0, 0.0, 0.0),
+        ]
+        self._document_vector_db._tokenizer.tokenize = MagicMock(side_effect=tokens)
+        self._document_vector_db._vectorizer.vectorize = MagicMock(side_effect=vectors)
+
+        self._document_vector_db.put_corpus(corpus)
+
+        self.assertEqual(self._document_vector_db._DocumentVectorDB__documents, self.corpus)
+        self.assertEqual(self._document_vector_db._DocumentVectorDB__vectors, expected_vectors)
+
+    @pytest.mark.lab_4_retrieval_w_clustering
+    @pytest.mark.mark6
+    @pytest.mark.mark8
+    @pytest.mark.mark10
     def test_put_corpus_tokenize_return_none(self):
         """
         Scenario with put_corpus when tokenize returns None
@@ -152,7 +179,7 @@ class DocumentVectorDBTest(unittest.TestCase):
 
         self._document_vector_db.put_corpus(self.corpus)
 
-        actual_vectors = self._document_vector_db.get_vectors((0, 1))
+        actual_vectors = self._document_vector_db.get_vectors([0, 1])
 
         for index, actual_pair in enumerate(actual_vectors):
             expected_vector = self.vectors[index]
@@ -168,7 +195,7 @@ class DocumentVectorDBTest(unittest.TestCase):
 
             np.testing.assert_almost_equal(actual_vector, expected_vector)
 
-        actual_pairs = self._document_vector_db.get_vectors((0,))
+        actual_pairs = self._document_vector_db.get_vectors([0])
         actual_vector = actual_pairs[0][1]
         np.testing.assert_almost_equal(actual_vector, self.vectors[0])
 

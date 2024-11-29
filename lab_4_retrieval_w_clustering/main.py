@@ -87,6 +87,8 @@ class BM25Vectorizer(Vectorizer):
                 or not all(isinstance(token, str) for token in tokenized_document):
             raise ValueError
         bm_25 = self._calculate_bm25(tokenized_document)
+        if not bm_25:
+            raise ValueError
         return bm_25
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -105,10 +107,9 @@ class BM25Vectorizer(Vectorizer):
         if not isinstance(tokenized_document, list) or not tokenized_document\
                 or not all(isinstance(token, str) for token in tokenized_document):
             raise ValueError
-        self.build()
         vector = [0.0 * num for num in range(len(self._vocabulary))]
-        bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
-                               1.5, 0.75, self._avg_doc_len, len(tokenized_document))
+        bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, 1.5, 0.75,
+                               self._avg_doc_len, len(tokenized_document))
         for index, token in enumerate(self._vocabulary):
             vector[index] = bm_25[token]
         return tuple(vector)
@@ -152,18 +153,12 @@ class DocumentVectorDB:
             raise ValueError
         self._vectorizer.build()
         self.__documents = corpus
-        all_tokens = []
-        for doc in self.__documents:
-            tokens = self._tokenizer.tokenize(doc)
-            if not isinstance(tokens, list):
-                raise ValueError
-            all_tokens.append(tokens)
+        all_tokens = [self._tokenizer.tokenize(doc) for doc in self.__documents]
         if not all_tokens:
             raise ValueError
         self._vectorizer.set_tokenized_corpus(all_tokens)
         for index, tokens in enumerate(all_tokens):
-            if isinstance(tokens, list):
-                self.__vectors[index] = self._vectorizer.vectorize(tokens)
+            self.__vectors[index] = self._vectorizer.vectorize(tokens)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -254,12 +249,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if not isinstance(query, str) or not query\
                 or not isinstance(n_neighbours, int) or n_neighbours <= 0:
             raise ValueError
-        tokenized_query = self._db.get_tokenizer().tokenize(query)
-        if not isinstance(tokenized_query, list):
-            raise ValueError
+        tokenized_query = self._tokenizer.tokenize(query)
         vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
-        if not isinstance(vectorized_query, tuple):
-            raise ValueError
         docs_vectors = [vector[1] for vector in self._db.get_vectors()]
         if len(docs_vectors[0]) < len(vectorized_query):
             raise ValueError

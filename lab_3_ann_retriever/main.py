@@ -217,7 +217,7 @@ class Vectorizer:
         self._vocabulary = sorted_vocab
 
         self._idf_values = calculate_idf(self._vocabulary, self._corpus)
-        if self._idf_values is None:
+        if self._idf_values is None or not isinstance(self._idf_values, tuple):
             return False
 
         for word in self._vocabulary:
@@ -385,9 +385,13 @@ class BasicSearchEngine:
                 or not isinstance(n_neighbours, int) or n_neighbours <= 0:
             return None
 
-        query_vector = self._vectorizer.vectorize(self._tokenizer.tokenize(query))
+        tokens = self._tokenizer.tokenize(query)
+        if not isinstance(tokens, list):
+            return None
+        query_vector = self._vectorizer.vectorize(tokens)
         closest_neighbours = self._calculate_knn(query_vector, self._document_vectors, n_neighbours)
-        if closest_neighbours is None or len(closest_neighbours) == 0:
+        if closest_neighbours is None or len(closest_neighbours) == 0 \
+                or not isinstance(closest_neighbours, tuple):
             return None
         for item in closest_neighbours:
             if item[0] is None or item[1] is None:
@@ -468,8 +472,6 @@ class BasicSearchEngine:
         for vector in document_vectors:
             distances.append(calculate_distance(query_vector, vector))
         neighbours = sorted(enumerate(distances), key=lambda x: x[1])
-        if not isinstance(neighbours, tuple):
-            return None
 
         result = []
         for neighbour in neighbours[:n_neighbours]:

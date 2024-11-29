@@ -28,7 +28,7 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
-    if not isinstance(text, str):
+    if not text or not isinstance(text, str):
         raise ValueError
 
     return text.split('\n')
@@ -63,11 +63,7 @@ class BM25Vectorizer(Vectorizer):
         if not tokenized_corpus or not isinstance(tokenized_corpus, list):
             raise ValueError
         self._corpus = tokenized_corpus
-
-        tokens = sum(len(doc) for doc in tokenized_corpus)
-        docs = len(tokenized_corpus)
-
-        self._avg_doc_len = tokens / docs
+        self._avg_doc_len = sum(len(doc) for doc in tokenized_corpus) / len(tokenized_corpus)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
         """
@@ -91,6 +87,7 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError
         vector_tok_doc = self._calculate_bm25(tokenized_document)
         if not vector_tok_doc:
+            # добавить сообщение об ошибке
             raise ValueError
         return vector_tok_doc
 
@@ -107,17 +104,17 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
-        if not isinstance(tokenized_document, list) or not all(isinstance(elem, str) for elem in tokenized_document):
+        if (not tokenized_document or
+                not isinstance(tokenized_document, list) or
+                not all(isinstance(elem, str) for elem in tokenized_document)):
             raise ValueError
 
         calculated_bm25 = [0.0] * len(self._vocabulary)
 
         idf_document = calculate_idf(self._vocabulary, self._corpus)
         doc_len = len(tokenized_document)
-        k1 = 1.5
-        b = 0.75
 
-        bm25 = calculate_bm25(self._vocabulary, tokenized_document, idf_document, k1, b, self._avg_doc_len, doc_len)
+        bm25 = calculate_bm25(self._vocabulary, tokenized_document, idf_document, 1.5, 0.75, self._avg_doc_len, doc_len)
 
         for index, word in enumerate(self._vocabulary):
             calculated_bm25[index] = bm25[word]
@@ -158,9 +155,24 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
-        if not corpus or not isinstance(corpus, list):
+        if not corpus or not isinstance(corpus, list) or not all(isinstance(elem, str) for elem in corpus):
             raise ValueError
         self.__documents = corpus
+
+        self._vectorizer.build()
+
+        tokenized_docs = []
+        for document in corpus:
+            list_of_tok = self._tokenizer.tokenize(document)
+            if list_of_tok:
+                tokenized_docs.append(list_of_tok)
+        if not tokenized_docs:
+            raise ValueError
+
+        self._vectorizer.set_tokenized_corpus(tokenized_docs)
+
+        for index, tok in enumerate(tokenized_docs):
+            self.__vectors[index] = self._vectorizer.vectorize(tok)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """

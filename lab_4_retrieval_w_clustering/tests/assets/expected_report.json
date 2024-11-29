@@ -1,0 +1,16 @@
+[
+    {
+        "centroid_id": 0,
+        "documents": [
+            "Document 0",
+            "Document 2"
+        ]
+    },
+    {
+        "centroid_id": 1,
+        "documents": [
+            "Document 1",
+            "Document 3"
+        ]
+    }
+]

@@ -6,7 +6,10 @@ import sys
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.console_logging import get_child_logger
 from config.generate_stubs.generator import ArgumentParser, NoDocStringForAMethodError
+
+logger = get_child_logger(__file__)
 
 
 @handles_console_error()
@@ -73,7 +76,7 @@ def main() -> None:
     try:
         remove_implementation(source_code_path, res_stub_path)
     except NoDocStringForAMethodError as e:
-        print(e)
+        logger.error(str(e))
         sys.exit(1)
 
     format_stub_file(res_stub_path)

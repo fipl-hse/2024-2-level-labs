@@ -72,7 +72,7 @@ class BM25VectorizerTest(unittest.TestCase):
             ["это", "тестовые", "токены"],
         ]
         corpora = [test_corpus, self.tokenized_corpus]
-        avg_lenghts = [3.0, 4.5]
+        avg_lengths = [3.0, 4.5]
 
         for index, corpus in enumerate(corpora):
             self.vectorizer.set_tokenized_corpus(corpus)
@@ -81,7 +81,7 @@ class BM25VectorizerTest(unittest.TestCase):
             actual_doc_len = self.vectorizer._avg_doc_len
 
             self.assertEqual(corpus, actual_corpus)
-            self.assertEqual(avg_lenghts[index], actual_doc_len)
+            self.assertEqual(avg_lengths[index], actual_doc_len)
 
     @pytest.mark.lab_4_retrieval_w_clustering
     @pytest.mark.mark6

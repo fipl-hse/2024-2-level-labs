@@ -7,7 +7,10 @@ import pathlib
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.console_logging import get_child_logger
 from config.lab_settings import LabSettings
+
+logger = get_child_logger(__file__)
 
 
 class CoverageRunError(Exception):
@@ -98,7 +101,7 @@ def run_coverage_collection(
     Returns:
         tuple[str, str, int]: stdout, stderr, return code
     """
-    print(f"Processing {lab_path} ...")
+    logger.info(f"Processing {lab_path} ...")
 
     python_exe_path = choose_python_exe()
     mark = ""

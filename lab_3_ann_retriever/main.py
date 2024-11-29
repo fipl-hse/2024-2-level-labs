@@ -589,16 +589,17 @@ class NaiveKDTree:
         if not isinstance(vectors, list) or not vectors:
             return False
 
-        space_states_info = [[
-            [(vector, index) for index, vector in enumerate(vectors)],
-            0,
-            Node(tuple([0.0]), -1),
-            True
-        ]]
+        space_states_info = [{}]
+        space_states_info = [{
+            "vectors": [(vector, index) for index, vector in enumerate(vectors)],
+            "depth": 0,
+            "parent": Node(tuple([0.0]), -1),
+            "is_left": True
+        }]
 
         while space_states_info:
             current_vectors_indexes, depth, parent, is_left = space_states_info.pop(0)
-            if len(current_vectors_indexes) != 0:
+            if current_vectors_indexes:
                 axis = depth % len(current_vectors_indexes[0][0])
                 current_vectors_indexes.sort(key=lambda vector: vector[0][axis])
                 median_index = len(current_vectors_indexes) // 2
@@ -612,22 +613,18 @@ class NaiveKDTree:
                 else:
                     parent.right_node = median_node
 
-                space_states_info.append(
-                    [
-                        current_vectors_indexes[:median_index],
-                        depth + 1,
-                        median_node,
-                        True
-                    ]
-                )
-                space_states_info.append(
-                    [
-                        current_vectors_indexes[median_index + 1:],
-                        depth + 1,
-                        median_node,
-                        False
-                    ]
-                )
+                space_states_info.append({
+                    "vectors": current_vectors_indexes[:median_index],
+                    "depth": depth + 1,
+                    "parent": median_node,
+                    "is_left": True
+                })
+                space_states_info.append({
+                    "vectors": current_vectors_indexes[:median_index],
+                    "depth": depth + 1,
+                    "parent": median_node,
+                    "is_left": False
+                })
 
         return True
 
@@ -785,16 +782,20 @@ class SearchEngine(BasicSearchEngine):
         if len(query) == 0:
             return None
 
-        query_vector = self._vectorizer.vectorize(self._tokenizer.tokenize(query))
+        query_vector = self._index_document(query)
         if query_vector is None:
             return None
 
-        distances_indices_list = self._tree.query(query_vector)
+        distances_indices_list = self._tree.query(self._index_document(query))
         if len(distances_indices_list) == 0 or distances_indices_list[0][0] is None \
                 or distances_indices_list[0][1] is None:
             return None
 
-        return [(distances_indices_list[0][0], self._documents[distances_indices_list[0][1]])]
+        result = []
+        for dist, doc in distances_indices_list:
+            result.append((dist, self._documents[doc]))
+
+        return result[:n_neighbours]
 
     def save(self, file_path: str) -> bool:
         """

@@ -56,7 +56,7 @@ def main() -> None:
 
     result = result_engine
     assert result, "Result is None"
-    return result
+    # return result
 
 
 if __name__ == "__main__":

@@ -787,8 +787,8 @@ class SearchEngine(BasicSearchEngine):
             return None
 
         distances_indices_list = self._tree.query(self._index_document(query))
-        if len(distances_indices_list) == 0 or distances_indices_list[0][0] is None \
-                or distances_indices_list[0][1] is None:
+        if (not isinstance(distances_indices_list, list) or len(distances_indices_list) == 0
+                or distances_indices_list[0][0] is None or distances_indices_list[0][1] is None):
             return None
 
         result = []
@@ -835,3 +835,5 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)
+        self._tree = KDTree()

@@ -145,13 +145,19 @@ class Tokenizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(documents, list):
+        if not isinstance(documents, list) or not documents:
             return None
         for text in documents:
             if not isinstance(text, str) or len(text) == 0 or self.tokenize(text) is None:
                 return None
 
-        return [self.tokenize(text) for text in documents if self.tokenize(text) is not None]
+        tokenized_docs = []
+        for text in documents:
+            processed_text = self.tokenize(text)
+            if processed_text is None:
+                return None
+            tokenized_docs.append(processed_text)
+        return tokenized_docs
 
     def _remove_stop_words(self, tokens: list[str]) -> list[str] | None:
         """
@@ -695,12 +701,11 @@ class NaiveKDTree:
                 if distance is None:
                     return None
                 return [(distance, node.payload)]
+            axis = depth % len(node.vector)
+            if vector[axis] <= node.vector[axis]:
+                node_depth_list.append((node.left_node, depth + 1))
             else:
-                axis = depth % len(node.vector)
-                if vector[axis] <= node.vector[axis]:
-                    node_depth_list.append((node.left_node, depth + 1))
-                else:
-                    node_depth_list.append((node.right_node, depth + 1))
+                node_depth_list.append((node.right_node, depth + 1))
 
 
 class KDTree(NaiveKDTree):
@@ -829,4 +834,3 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
-        super().__init__(vectorizer, tokenizer)

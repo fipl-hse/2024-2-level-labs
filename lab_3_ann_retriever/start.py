@@ -31,29 +31,28 @@ def main() -> None:
     Launch an implementation.
     """
     # with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
-        # text = text_file.read()
+    # text = text_file.read()
 
     documents, stopwords = open_files()
+    query = 'Нижний Новгород'
 
     tokenizer = Tokenizer(stopwords)
     tokenized_docs = tokenizer.tokenize_documents(documents)
     if tokenized_docs is None:
-        return
+        return None
 
     vectorizer = Vectorizer(tokenized_docs)
     vectorizer.build()
 
-    naive_kdtree_retriever = SearchEngine(vectorizer, tokenizer)
+    search_engine = SearchEngine(vectorizer, tokenizer)
+    search_engine.index_documents(documents)
+    result_engine = search_engine.retrieve_relevant_documents(query)
+    print(f"Result returned by SearchEngine: ", result_engine)
 
-    naive_kdtree_retriever.index_documents(documents)
-
-    print("\nНаиболее релевантный документ по методу К-мерного дерева:\n", naive_kdtree_retriever.retrieve_relevant_documents("Нижний Новгород"))
-
-    knn_retriever = BasicSearchEngine(vectorizer, tokenizer)
-
-    knn_retriever.index_documents(documents)
-
-    print("\nНаиболее релевантный документ по методу k ближайших соседей:\n", knn_retriever.retrieve_relevant_documents("Нижний Новгород"))
+    basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
+    basic_search_engine.index_documents(documents)
+    result_basic_engine = search_engine.retrieve_relevant_documents(query)
+    print(f"Result returned by SearchEngine: ", result_basic_engine)
 
     return None
 

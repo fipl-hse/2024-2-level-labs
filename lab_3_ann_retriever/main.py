@@ -5,7 +5,6 @@ Vector search with text retrieving
 """
 
 # pylint: disable=too-few-public-methods, too-many-arguments, duplicate-code, unused-argument
-from math import log
 from typing import Protocol
 
 from lab_2_retrieval_w_bm25.main import calculate_idf
@@ -294,7 +293,8 @@ class Vectorizer:
 
         In case of corrupt input arguments, None is returned.
         """
-        if not isinstance(document, list) or not all(isinstance(token, str) for token in document) or not document:
+        if not isinstance(document, list) or not all(isinstance(token, str) for token in document) \
+                or not document:
             return None
 
         vector = [0.0] * len(self._vocabulary)
@@ -583,12 +583,12 @@ class NaiveKDTree:
         if not isinstance(vectors, list) or not vectors:
             return False
 
-        space_states_info = [(
+        space_states_info = [[
             [(vector, index) for index, vector in enumerate(vectors)],
             0,
             Node(tuple([0.0]), -1),
             True
-        )]
+        ]]
 
         while space_states_info:
             current_vectors_indexes, depth, parent, is_left = space_states_info.pop(0)
@@ -596,7 +596,8 @@ class NaiveKDTree:
                 axis = depth % len(current_vectors_indexes[0][0])
                 current_vectors_indexes.sort(key=lambda vector: vector[0][axis])
                 median_index = len(current_vectors_indexes) // 2
-                median_node = Node(current_vectors_indexes[median_index][0], current_vectors_indexes[median_index][1])
+                median_node = Node(current_vectors_indexes[median_index][0],
+                                   current_vectors_indexes[median_index][1])
 
                 if parent.payload != -1 and is_left is True:
                     parent.left_node = median_node
@@ -606,20 +607,20 @@ class NaiveKDTree:
                     parent.right_node = median_node
 
                 space_states_info.append(
-                    (
+                    [
                         current_vectors_indexes[:median_index],
                         depth + 1,
                         median_node,
                         True
-                    )
+                    ]
                 )
                 space_states_info.append(
-                    (
+                    [
                         current_vectors_indexes[median_index + 1:],
                         depth + 1,
                         median_node,
                         False
-                    )
+                    ]
                 )
 
         return True
@@ -693,8 +694,7 @@ class NaiveKDTree:
                 distance = calculate_distance(vector, node.vector)
                 if distance is None:
                     return None
-                else:
-                    return [(distance, node.payload)]
+                return [(distance, node.payload)]
             else:
                 axis = depth % len(node.vector)
                 if vector[axis] <= node.vector[axis]:
@@ -785,7 +785,8 @@ class SearchEngine(BasicSearchEngine):
             return None
 
         distances_indices_list = self._tree.query(query_vector)
-        if len(distances_indices_list) == 0 or distances_indices_list[0][0] is None or distances_indices_list[0][1] is None:
+        if len(distances_indices_list) == 0 or distances_indices_list[0][0] is None \
+                or distances_indices_list[0][1] is None:
             return None
 
         return [(distances_indices_list[0][0], self._documents[distances_indices_list[0][1]])]
@@ -828,3 +829,4 @@ class AdvancedSearchEngine(SearchEngine):
             vectorizer (Vectorizer): Vectorizer for documents vectorization
             tokenizer (Tokenizer): Tokenizer for tokenization
         """
+        super().__init__(vectorizer, tokenizer)

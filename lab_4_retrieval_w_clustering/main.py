@@ -153,9 +153,15 @@ class DocumentVectorDB:
 
         if not corpus or not isinstance(corpus, list):
             raise ValueError
-        self.__documents = corpus
-        tokenized_corpus = [tokenized_doc for doc in self.__documents
-                            if (tokenized_doc := self._tokenizer.tokenize(doc))]
+        self.__documents = []
+        tokenized_corpus = []
+        for doc in corpus:
+            tokenized_doc = self._tokenizer.tokenize(doc)
+            if not isinstance(tokenized_doc, list):
+                raise ValueError
+            if tokenized_doc:
+                tokenized_corpus.append(tokenized_doc)
+                self.__documents.append(doc)
         if not tokenized_corpus:
             raise ValueError
         self._vectorizer.set_tokenized_corpus(tokenized_corpus)
@@ -215,8 +221,7 @@ class DocumentVectorDB:
 
         if indices is None or not indices:
             return self.__documents
-        unique_indices = set(indices)
-        return [self.__documents[index] for index in unique_indices]
+        return [self.__documents[index] for index in indices]
 
 
 class VectorDBSearchEngine(BasicSearchEngine):
@@ -259,12 +264,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         neighbours = self._calculate_knn(query_vector, vectors, n_neighbours)
         if not neighbours:
             raise ValueError
-        relevant_documents = []
-        for dist, index in neighbours:
-            index = int(index)
-            doc = self._db.get_raw_documents([index])[0]
-            relevant_documents.append((dist, doc))
-        return relevant_documents
+        relevant_documents = self._db.get_raw_documents(tuple([neighbor[0] for neighbor in neighbours]))
+        return [(neighbor[-1], relevant_documents[index]) for index, neighbor in enumerate(neighbours)]
 
 
 class ClusterDTO:

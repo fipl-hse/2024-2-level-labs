@@ -157,8 +157,6 @@ class DocumentVectorDB:
         tokenized_corpus = []
         for doc in corpus:
             tokenized_doc = self._tokenizer.tokenize(doc)
-            if not isinstance(tokenized_doc, list):
-                raise ValueError
             if tokenized_doc:
                 tokenized_corpus.append(tokenized_doc)
                 self.__documents.append(doc)

@@ -1,3 +1,25 @@
 {
-    "target_score": 0
+    "target_score": 6
 }
+    def put_corpus(self, corpus: Corpus) -> None:
+        """
+        Fill documents and vectors based on corpus.
+
+        Args:
+            corpus (Corpus): Corpus of texts.
+
+        Raises:
+            ValueError: In case of inappropriate type input arguments,
+                or if input arguments are empty,
+                or if methods used return None.
+        """
+        self.__documents = corpus
+        tokenized_docs = [self._tokenizer.tokenize(document)
+                          for document in corpus if self._tokenizer.tokenize(document)]
+        if not tokenized_docs:
+            raise ValueError
+        self._vectorizer.set_tokenized_corpus(tokenized_docs)
+        self._vectorizer.build()
+
+        for index, tok in enumerate(tokenized_docs):
+            self.__vectors[index] = self._vectorizer.vectorize(tok)

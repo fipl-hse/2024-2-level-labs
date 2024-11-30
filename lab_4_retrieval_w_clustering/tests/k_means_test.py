@@ -110,7 +110,6 @@ class KMeansTest(unittest.TestCase):
         self.assertIsInstance(square_sum, float)
 
     @pytest.mark.lab_4_retrieval_w_clustering
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_empty_clusters(self):
         """
@@ -121,7 +120,6 @@ class KMeansTest(unittest.TestCase):
             self.kmeans._is_convergence_reached([])
 
     @pytest.mark.lab_4_retrieval_w_clustering
-    @pytest.mark.mark8
     @pytest.mark.mark10
     def test_method_returns_none(self):
         """

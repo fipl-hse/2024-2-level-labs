@@ -3,11 +3,21 @@ Lab 4.
 
 Vector search with clusterization
 """
-from math import sqrt
-from lab_2_retrieval_w_bm25.main import calculate_bm25
 from json import dump
+from math import sqrt
+
+from lab_2_retrieval_w_bm25.main import calculate_bm25
+
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer, calculate_distance, SearchEngine, AdvancedSearchEngine
+from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
+    BasicSearchEngine,
+    calculate_distance,
+    SearchEngine,
+    Tokenizer,
+    Vector,
+    Vectorizer,
+)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -102,8 +112,8 @@ class BM25Vectorizer(Vectorizer):
         if not isinstance(tokenized_document, list):
             raise ValueError
         vector_list = [0.0 * n for n in range(len(self._vocabulary))]
-        bm_dict = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, 1.5, 0.75, self._avg_doc_len,
-                                 len(tokenized_document))
+        bm_dict = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
+                                 1.5, 0.75, self._avg_doc_len, len(tokenized_document))
         if not bm_dict:
             return tuple(vector_list)
         for ind, word in enumerate(self._vocabulary):
@@ -147,15 +157,19 @@ class DocumentVectorDB:
         """
         if not corpus:
             raise ValueError
-        self.__documents = corpus
-        tokenized_docs = [tok_doc for doc in self.__documents if (tok_doc := self._tokenizer.tokenize(doc))]
+        tokenized_docs = []
+        for doc in corpus:
+            tok_doc = self._tokenizer.tokenize(doc)
+            if tok_doc:
+                self.__documents.append(doc)
+                tokenized_docs.append(tok_doc)
         if not tokenized_docs:
             raise ValueError
         self._vectorizer.set_tokenized_corpus(tokenized_docs)
         self._vectorizer.build()
-        for doc in tokenized_docs:
-            vectorized = self._vectorizer.vectorize(doc)
-            self.__vectors[tokenized_docs.index(doc)] = vectorized
+        for tok_doc in tokenized_docs:
+            vectorized = self._vectorizer.vectorize(tok_doc)
+            self.__vectors[tokenized_docs.index(tok_doc)] = vectorized
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -243,15 +257,18 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
-        if not isinstance(query, str) or not query or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+        if (not isinstance(query, str) or not query
+                or not isinstance(n_neighbours, int) or n_neighbours <= 0):
             raise ValueError
         tokenized_query = self._db.get_tokenizer().tokenize(query)
+        if not tokenized_query:
+            raise ValueError
         vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
         vectors = [tup[1] for tup in self._db.get_vectors()]
         neighbours = self._calculate_knn(vectorized_query, vectors, n_neighbours)
         if not neighbours:
             raise ValueError
-        documents = self._db.get_raw_documents(tuple([tup[0] for tup in neighbours]))
+        documents = self._db.get_raw_documents(tuple(tup[0] for tup in neighbours))
         return [(tup[-1], documents[ind]) for ind, tup in enumerate(neighbours)]
 
 
@@ -390,7 +407,10 @@ class KMeans:
         for vector in vectors:
             distances = []
             for centroid in centroids:
-                distances.append((calculate_distance(vector[-1], centroid), centroids.index(centroid)))
+                distance = calculate_distance(vector[-1], centroid)
+                if distance is None:
+                    raise ValueError
+                distances.append((distance, centroids.index(centroid)))
             closest = min(distances)
             self.__clusters[closest[-1]].add_document_index(vectors.index(vector))
         for cluster in self.__clusters:
@@ -421,9 +441,13 @@ class KMeans:
         if (not isinstance(query_vector, tuple) or not query_vector
                 or not isinstance(n_neighbours, int) or not n_neighbours):
             raise ValueError
-        distances = [(calculate_distance(query_vector, cluster.get_centroid()), ind)
-                     for ind, cluster in enumerate(self.__clusters)]
-        closest_cluster = min(distances)[-1]
+        cluster_distances = []
+        for ind, cluster in enumerate(self.__clusters):
+            distance = calculate_distance(query_vector, cluster.get_centroid())
+            if distance is None:
+                raise ValueError
+            cluster_distances.append((distance, ind))
+        closest_cluster = min(cluster_distances)[-1]
         cluster_indices = self.__clusters[closest_cluster].get_indices()
         vectors = [self._db.get_vectors()[num] for num in cluster_indices]
         distances = []
@@ -431,7 +455,7 @@ class KMeans:
             distance = calculate_distance(query_vector, vector[-1])
             if distance is None:
                 raise ValueError
-            distances.append((distance, vector[0]))
+            distances.append((distance, index))
         return sorted(distances, key=lambda x: x[-1])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
@@ -444,19 +468,24 @@ class KMeans:
         Returns:
             list[dict[str, int| list[str]]]: List with information about each cluster
         """
-        clusters_info = {}
-        for cluster in self.__clusters:
+        if not isinstance(num_examples, int) or num_examples <= 0:
+            raise ValueError
+        clusters_info = []
+        for ind, cluster in enumerate(self.__clusters):
             centroid = cluster.get_centroid()
             cluster_indices = cluster.get_indices()
             vectors = [self._db.get_vectors()[num] for num in cluster_indices]
             distances = []
             for index, vector in enumerate(vectors):
                 distance = calculate_distance(centroid, vector[-1])
+                if distance is None:
+                    raise ValueError
                 distances.append((distance, vector[0]))
             distances = sorted(distances, key=lambda x: x[-1])[:num_examples]
             indices = tuple(tup[-1] for tup in distances)
             docs = self._db.get_raw_documents(indices)
-            clusters_info[f'{self.__clusters.index(cluster)}'] = docs
+            cluster_info = {'cluster_id': ind, 'documents': docs}
+            clusters_info.append(cluster_info)
         return clusters_info
 
     def calculate_square_sum(self) -> float:
@@ -506,7 +535,7 @@ class KMeans:
             distance = calculate_distance(old_centroid, new_centroid)
             if distance is None:
                 raise ValueError
-            if not distance < threshold:
+            if distance >= threshold:
                 return False
             continue
         return True
@@ -620,7 +649,6 @@ class VectorDBEngine:
 
         Returns:
             list[tuple[float, str]] | None: Relevant documents with their distances.
-
         """
         return self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
 

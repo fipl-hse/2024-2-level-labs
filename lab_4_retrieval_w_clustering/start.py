@@ -2,16 +2,18 @@
 Laboratory Work #4 starter.
 """
 
+import json
+
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from lab_4_retrieval_w_clustering.main import (
     ClusteringSearchEngine,
     DocumentVectorDB,
     get_paragraphs,
+    VectorDBAdvancedSearchEngine,
     VectorDBSearchEngine,
     VectorDBTreeSearchEngine,
-    VectorDBAdvancedSearchEngine
 )
-import json
+
 
 def open_files() -> tuple[list[str], list[str]]:
     """

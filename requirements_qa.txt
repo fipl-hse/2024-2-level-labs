@@ -6,6 +6,7 @@ flake8-isort==6.0.0
 flake8-pyproject==1.2.3
 flake8==6.0.0
 ghapi==0.1.19
+logging518==1.0.0
 mypy==1.1.1
 numpy==2.1.2
 pydantic==2.9.2

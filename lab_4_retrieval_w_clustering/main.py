@@ -221,7 +221,13 @@ class DocumentVectorDB:
 
         if indices is None or not indices:
             return self.__documents
-        return [self.__documents[index] for index in indices]
+        unique_documents = []
+        checked = set()
+        for index in indices:
+            if index not in checked:
+                unique_documents.append(self.__documents[index])
+                checked.add(index)
+        return unique_documents
 
 
 class VectorDBSearchEngine(BasicSearchEngine):

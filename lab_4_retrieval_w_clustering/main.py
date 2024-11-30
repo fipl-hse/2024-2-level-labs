@@ -132,7 +132,6 @@ class DocumentVectorDB:
         self.__vectors = {}
         self.__documents = []
 
-
     def put_corpus(self, corpus: Corpus) -> None:
         """
         Fill documents and vectors based on corpus.
@@ -146,7 +145,7 @@ class DocumentVectorDB:
                 or if methods used return None.
         """
         if not corpus or not isinstance(corpus, list):
-            raise ValueError("Input must be a non-empty list of documents.")
+            raise ValueError
 
         self.__documents = corpus
 
@@ -217,9 +216,6 @@ class DocumentVectorDB:
         return [self.__documents[ind] for ind in result]
 
 
-
-
-
 class VectorDBSearchEngine(BasicSearchEngine):
     """
     Engine based on VectorDB.
@@ -257,13 +253,9 @@ class VectorDBSearchEngine(BasicSearchEngine):
         neighbours = self._calculate_knn(vectorized_query, vectors, n_neighbours)
         if not neighbours:
             raise ValueError
-        indices = tuple(index for index, _ in neighbours)
-
-        documents = self._db.get_raw_documents(indices)
-
-        result = []
-        for ind, dist in neighbours:
-            result.append((dist, documents[ind]))
+        neighbour_ids = [tup[0] for tup in neighbours]
+        documents = self._db.get_raw_documents(tuple(neighbour_ids))
+        result = [(tup[-1], documents[ind]) for ind, tup in enumerate(neighbours)]
         return result
 
 

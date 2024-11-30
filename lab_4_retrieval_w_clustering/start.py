@@ -7,7 +7,8 @@ from lab_4_retrieval_w_clustering.main import (
     BM25Vectorizer,
     DocumentVectorDB,
     get_paragraphs,
-    VectorDBSearchEngine)
+    VectorDBSearchEngine,
+)
 
 
 def open_files() -> tuple[list[str], list[str]]:

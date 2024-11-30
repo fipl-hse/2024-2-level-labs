@@ -2,7 +2,7 @@
 Checks the fourth lab's ClusteringSearchEngine class.
 """
 
-# pylint: disable=duplicate-code
+# pylint: disable=duplicate-code, protected-access
 
 import json
 import shutil

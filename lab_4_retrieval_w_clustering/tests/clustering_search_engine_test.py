@@ -3,11 +3,15 @@ Checks the fourth lab's ClusteringSearchEngine class.
 """
 
 # pylint: disable=duplicate-code
+
+import json
+import shutil
 import unittest
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
+from config.constants import PROJECT_ROOT
 from lab_4_retrieval_w_clustering.main import ClusteringSearchEngine
 
 
@@ -28,6 +32,9 @@ class ClusteringSearchEngineTest(unittest.TestCase):
 
         with patch("lab_4_retrieval_w_clustering.main.KMeans", return_value=self.mock_kmeans):
             self.engine = ClusteringSearchEngine(self.mock_db, n_clusters=2)
+
+        self.tmp_path = Path(PROJECT_ROOT / "lab_4_retrieval_w_clustering" / "tests" / "tmp_dir")
+        self.tmp_path.mkdir(exist_ok=True)
 
     @pytest.mark.lab_4_retrieval_w_clustering
     @pytest.mark.mark8
@@ -113,3 +120,39 @@ class ClusteringSearchEngineTest(unittest.TestCase):
         """
         square_sum = self.engine.calculate_square_sum()
         self.assertEqual(square_sum, 1.0)
+
+    @pytest.mark.lab_4_retrieval_w_clustering
+    @pytest.mark.mark10
+    def test_make_report_ideal(self):
+        """
+        Test of making report.
+        """
+
+        test_input = [
+            {"centroid_id": 0, "documents": ["Document 0", "Document 2"]},
+            {"centroid_id": 1, "documents": ["Document 1", "Document 3"]},
+        ]
+        self.engine._ClusteringSearchEngine__algo.get_clusters_info = MagicMock(
+            return_value=test_input
+        )
+        actual_report_path = f"{self.tmp_path}/report.json"
+        self.engine.make_report(1, actual_report_path)
+
+        expected_path = Path(
+            PROJECT_ROOT
+            / "lab_4_retrieval_w_clustering"
+            / "tests"
+            / "assets"
+            / "expected_report.json"
+        )
+
+        with open(expected_path, "r", encoding="utf-8") as file:
+            expected_data = json.load(file)
+
+        with open(actual_report_path, "r", encoding="utf-8") as file:
+            actual_data = json.load(file)
+
+        self.assertListEqual(expected_data, actual_data)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp_path)

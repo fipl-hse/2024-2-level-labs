@@ -6,8 +6,11 @@ Check doc8 for style checking of rst files.
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.console_logging import get_child_logger
 from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.project_config import ProjectConfig
+
+logger = get_child_logger(__file__)
 
 
 @handles_console_error()
@@ -42,11 +45,11 @@ def main() -> None:
 
     pyproject_path = PROJECT_ROOT / "pyproject.toml"
 
-    print("Running doc8 for main docs")
+    logger.info("Running doc8 for main docs")
     rst_main_files = list(PROJECT_ROOT.glob("*rst"))
     check_doc8_on_paths(rst_main_files, pyproject_path)
 
-    print("Running doc8 for other docs")
+    logger.info("Running doc8 for other docs")
     docs_path = PROJECT_ROOT / "docs"
     rst_files = list(docs_path.rglob("*.rst"))
 
@@ -55,7 +58,7 @@ def main() -> None:
     for lab_name in labs_list:
         lab_path = PROJECT_ROOT / lab_name
         rst_labs_files = lab_path.rglob("*.rst")
-        print(f"Running doc8 for lab {lab_path}")
+        logger.info(f"Running doc8 for lab {lab_path}")
         check_doc8_on_paths(rst_labs_files, pyproject_path)
 
 

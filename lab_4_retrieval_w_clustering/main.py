@@ -161,13 +161,12 @@ class DocumentVectorDB:
         """
         if not isinstance(corpus, list) or not corpus:
             raise ValueError
-        self.__documents = corpus
         all_tokens = []
-        for doc in self.__documents:
+        for doc in corpus:
             tokens = self._tokenizer.tokenize(doc)
-            if not isinstance(tokens, list):
-                raise ValueError
-            all_tokens.append(tokens)
+            if tokens:
+                all_tokens.append(tokens)
+                self.__documents.append(doc)
         if not all_tokens or not isinstance(all_tokens, list):
             raise ValueError
         while [] in all_tokens:

@@ -3,7 +3,7 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-
+from lab_4_retrieval_w_clustering.main import get_paragraphs, BM25Vectorizer
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -50,6 +50,18 @@ def main() -> None:
     Launch an implementation.
     """
     result = None
+
+    files_tuple = open_files()
+    documents = files_tuple[0]
+    stopwords = files_tuple[1]
+
+    result = get_paragraphs('Привет! Как твои дела?\nХорошо. Как твои дела?\nУ меня всё отлично\nКак ты смотришь на '
+                            'то, чтобы сходить попить кофе?')
+    print(result)
+
+    vectorizer = BM25Vectorizer()
+
+
     assert result, "Result is None"
 
 

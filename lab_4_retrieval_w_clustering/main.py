@@ -166,22 +166,17 @@ class DocumentVectorDB:
                 or not all(isinstance(element, str) for element in corpus)):
             raise ValueError
 
-        self._vectorizer.build()
-        self.__documents = corpus
-
         list_of_tok_paragraphs = []
-        for doc_aka_str in self.__documents:
+        for doc_aka_str in corpus:
             doc_aka_list = self._tokenizer.tokenize(doc_aka_str)
-            if not isinstance(doc_aka_list, list):
-                raise ValueError
-            list_of_tok_paragraphs.append(doc_aka_list)
+            if doc_aka_list:
+                list_of_tok_paragraphs.append(doc_aka_list)
+                self.__documents.append(doc_aka_str)
         if not list_of_tok_paragraphs:
             raise ValueError
 
-        while [] in list_of_tok_paragraphs:
-            list_of_tok_paragraphs.remove([])
-
         self._vectorizer.set_tokenized_corpus(list_of_tok_paragraphs)
+        self._vectorizer.build()
         try:
             for index_of_paragraph, tok_paragraph in enumerate(list_of_tok_paragraphs):
                 self.__vectors[index_of_paragraph] = self._vectorizer.vectorize(tok_paragraph)
@@ -260,8 +255,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
-        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
         self._db = db
+        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -280,13 +275,16 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError
 
         tok_query = self._db.get_tokenizer().tokenize(query)
-        vec_query = self._db.get_vectorizer().vectorize(tok_query)
 
-        c_knn_result = self._calculate_knn(vec_query,
+        c_knn_result = self._calculate_knn(self._db.get_vectorizer().vectorize(tok_query),
                                            [vec[1] for vec in self._db.get_vectors()], n_neighbours)
-        get_raw_docs_result = self._db.get_raw_documents(tuple([t[1] for t in c_knn_result]))
+        if not c_knn_result:
+            raise ValueError
+        get_raw_docs_result = self._db.get_raw_documents(tuple(ind for ind in range(n_neighbours)))
+        if not get_raw_docs_result:
+            raise ValueError
 
-        return [(fl, get_raw_docs_result[ind]) for ind, fl in c_knn_result]
+        return [(float_figure, get_raw_docs_result[ind]) for ind, float_figure in c_knn_result]
 
 
 class ClusterDTO:

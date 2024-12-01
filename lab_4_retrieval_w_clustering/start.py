@@ -3,8 +3,10 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from lab_4_retrieval_w_clustering.main import (DocumentVectorDB, get_paragraphs,
+from lab_4_retrieval_w_clustering.main import (DocumentVectorDB,
+                                               get_paragraphs,
                                                VectorDBSearchEngine)
+
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -51,7 +53,7 @@ def main() -> None:
     Launch an implementation.
     """
     data = open_files()
-    documents = sum(data[0], [])
+    documents = str(set(sum(data[0], [])))
     stopwords = data[1]
 
     paragraphs = get_paragraphs(documents)

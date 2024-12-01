@@ -3,12 +3,7 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from lab_4_retrieval_w_clustering.main import (
-    BM25Vectorizer,
-    DocumentVectorDB,
-    get_paragraphs,
-    VectorDBSearchEngine,
-)
+import lab_4_retrieval_w_clustering.main as m
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -59,10 +54,10 @@ def main() -> None:
     documents = ''.join(data[0])
     stopwords = data[1]
 
-    paragraphs = get_paragraphs(documents)
-    db = DocumentVectorDB(stopwords)
+    paragraphs = m.get_paragraphs(documents)
+    db = m.DocumentVectorDB(stopwords)
     db.put_corpus(paragraphs)
-    search_engine = VectorDBSearchEngine(db)
+    search_engine = m.VectorDBSearchEngine(db)
 
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
     relevant_documents = search_engine.retrieve_relevant_documents(query, 3)

@@ -54,10 +54,13 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    documents = ''.join(open_files()[0])
-    stopwords = open_files()[1]
+    documents, stopwords = open_files()
 
-    paragraphs = get_paragraphs(documents)
+    paragraphs = []
+    for document in documents:
+        doc_paragraphs = get_paragraphs(document)
+        paragraphs.extend(doc_paragraphs)
+
     db = DocumentVectorDB(stopwords)
     db.put_corpus(paragraphs)
     search_engine = VectorDBSearchEngine(db)

@@ -1,6 +1,7 @@
 """
 Laboratory Work #4 starter.
 """
+from lab_4_retrieval_w_clustering.main import DocumentVectorDB, get_paragraphs, VectorDBSearchEngine
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 
@@ -42,14 +43,23 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return (documents, stopwords)
+    return documents, stopwords
 
 
 def main() -> None:
     """
     Launch an implementation.
     """
-    result = None
+    documents, stopwords = open_files()
+    document = ''.join(documents)
+    corpus_paragraphs = get_paragraphs(document)
+    corpus_paragraphs.pop(-1)
+    doc_db = DocumentVectorDB(stopwords)
+    doc_db.put_corpus(corpus_paragraphs)
+    vector_db = VectorDBSearchEngine(doc_db)
+    query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
+    result = vector_db.retrieve_relevant_documents(query, 3)
+    print(result)
     assert result, "Result is None"
 
 

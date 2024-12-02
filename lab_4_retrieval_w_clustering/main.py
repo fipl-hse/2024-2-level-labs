@@ -381,7 +381,9 @@ class KMeans:
         new_clusters = self.run_single_train_iteration()
         while not self._is_convergence_reached(new_clusters):
             new_clusters = self.run_single_train_iteration()
+        new_clusters = self.run_single_train_iteration()
         self.__clusters = new_clusters
+
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -524,6 +526,9 @@ class ClusteringSearchEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             n_clusters (int): Number of clusters.
         """
+        self._db = db
+        self.__algo = KMeans(self._db, n_clusters)
+        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -542,6 +547,25 @@ class ClusteringSearchEngine:
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
+        if not (query and isinstance(query, str) and
+                isinstance(n_neighbours, int) and n_neighbours > 0):
+            raise ValueError
+        tokenized_query = self._db.get_tokenizer().tokenize(query)
+        if tokenized_query is None:
+            raise ValueError
+        vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
+        if vectorized_query is None:
+            raise ValueError
+        relevant_docs_indices_with_distance = self.__algo.infer(vectorized_query, n_neighbours)
+        if relevant_docs_indices_with_distance is None:
+            raise ValueError
+        indices = tuple(pair[1] for pair in relevant_docs_indices_with_distance)
+        relevant_docs = self._db.get_raw_documents(indices)
+        relevant_docs_with_distance = []
+        for idx in range(len(indices)):
+            relevant_docs_with_distance.append((relevant_docs_indices_with_distance[idx][0],
+                                                relevant_docs[idx]))
+        return relevant_docs_with_distance
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """

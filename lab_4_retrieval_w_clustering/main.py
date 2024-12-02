@@ -261,7 +261,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         neighbours = self._calculate_knn(vectorized_query,vectors_list,n_neighbours)
         if not neighbours:
             raise ValueError
-        needed_docs = self._db.get_raw_documents(tuple([pair[0] for pair in neighbours]))
+        needed_docs = self._db.get_raw_documents(tuple(pair[0] for pair in neighbours))
         return [(pair[-1],needed_docs[index]) for index,pair in enumerate(neighbours)]
 
 
@@ -407,7 +407,7 @@ class KMeans:
             self.__clusters[close[1]].add_document_index(used_vectors.index(vector))
         for cluster in self.__clusters:
             cluster_vectors = [used_vectors[index][1] for index in cluster.get_indices()]
-            updated_centroid = [sum(vec[index] for index in range(len(vector))) / len(cluster_vectors) for
+            updated_centroid = [sum(vec[index] for index in range(len(vec))) / len(cluster_vectors) for
                                 vec in cluster_vectors]
             cluster.set_new_centroid(updated_centroid)
         return self.__clusters
@@ -474,7 +474,7 @@ class KMeans:
             distance = calculate_distance(old.get_centroid(),new_clusters[index].get_centroid())
             if not isinstance(distance,float):
                 raise ValueError
-            if not distance < threshold:
+            if distance >= threshold:
                 return False
         return True
 

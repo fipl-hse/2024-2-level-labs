@@ -8,8 +8,15 @@ from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code,
 # unused-private-member, super-init-not-called
-from lab_3_ann_retriever.main import (BasicSearchEngine, Tokenizer, Vector, Vectorizer,
-                                      calculate_distance)
+from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
+    BasicSearchEngine,
+    calculate_distance,
+    SearchEngine,
+    Tokenizer,
+    Vector,
+    Vectorizer,
+)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -670,6 +677,8 @@ class VectorDBTreeSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        super().__init__(db, SearchEngine(db.get_vectorizer(), db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())
 
 
 class VectorDBAdvancedSearchEngine(VectorDBEngine):
@@ -684,3 +693,5 @@ class VectorDBAdvancedSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        super().__init__(db, AdvancedSearchEngine(db.get_vectorizer(), db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())

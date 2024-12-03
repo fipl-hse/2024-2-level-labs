@@ -6,6 +6,7 @@ Vector search with clusterization
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
+from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -26,6 +27,10 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
+    if not text:
+        raise ValueError
+
+    return text.split('\n')
 
 
 class BM25Vectorizer(Vectorizer):
@@ -36,10 +41,13 @@ class BM25Vectorizer(Vectorizer):
     _corpus: TokenizedCorpus
     _avg_doc_len: float
 
-    def __init__(self) -> None:
+    def __init__(self, corpus: TokenizedCorpus) -> None:
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__(corpus)
+        self._corpus = []
+        self._avg_doc_len = -1
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -51,6 +59,10 @@ class BM25Vectorizer(Vectorizer):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
+        if not tokenized_corpus:
+            raise ValueError
+        self._corpus = tokenized_corpus
+        self._avg_doc_len = sum(len(paragraph) for paragraph in self._corpus) / len(self._corpus)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
         """
@@ -81,6 +93,7 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        zero_vector = [0.0] * len(self._vocabulary)
 
 
 class DocumentVectorDB:

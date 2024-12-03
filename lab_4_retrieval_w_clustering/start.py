@@ -1,6 +1,10 @@
 """
 Laboratory Work #4 starter.
 """
+from docutils.nodes import document
+
+from lab_4_retrieval_w_clustering.main import DocumentVectorDB, VectorDBSearchEngine, get_paragraphs
+
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 
@@ -49,8 +53,20 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    result = None
+    documents = ''.join(open_files()[0])
+    stopwords = open_files()[1]
+
+    paragraphs = get_paragraphs(documents)
+
+    db = DocumentVectorDB(stopwords)
+    db.put_corpus(paragraphs)
+    search_engine = VectorDBSearchEngine(db)
+
+    query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
+
+    result = search_engine.retrieve_relevant_documents(query, 3)
     assert result, "Result is None"
+    print(result)
 
 
 if __name__ == "__main__":

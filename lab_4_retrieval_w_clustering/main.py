@@ -46,9 +46,9 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
-        super()
         self._corpus = []
-        self._avg_doc_len = 0.0
+        super().__init__(self._corpus)
+        self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -63,9 +63,8 @@ class BM25Vectorizer(Vectorizer):
         if not tokenized_corpus:
             raise ValueError
 
-        self._avg_doc_len = sum((len(par) for par in tokenized_corpus))/len(tokenized_corpus)
-        for par in tokenized_corpus:
-            self._corpus.append(par)
+        self._corpus = tokenized_corpus
+        self._avg_doc_len = sum((len(par) for par in self._corpus))/len(self._corpus)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
         """
@@ -85,8 +84,7 @@ class BM25Vectorizer(Vectorizer):
         if not tokenized_document or not isinstance(tokenized_document, list) \
             or not all(isinstance(token, str) for token in tokenized_document):
             raise ValueError
-        if not self._calculate_bm25(tokenized_document) or \
-            not isinstance(self._calculate_bm25(tokenized_document), Vector):
+        if self._calculate_bm25(tokenized_document) is None:
             raise ValueError
 
         return self._calculate_bm25(tokenized_document)
@@ -108,14 +106,15 @@ class BM25Vectorizer(Vectorizer):
             or not all(isinstance(token, str) for token in tokenized_document):
             raise ValueError
 
-        vector = list((0.0 for _ in range(len(self._vocabulary))))
-        for token in tokenized_document:
-                bm25 = calculate_bm25(self._vocabulary, tokenized_document,
-                                      calculate_idf(self._vocabulary, [tokenized_document]),
-                                      avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
-                if bm25 is not None:
-                    vector[self._token2ind[token]] = bm25[token]
-        return tuple(vector)
+        vector = [0.0 for _ in self._vocabulary]
+        bm25 = calculate_bm25(self._vocabulary, tokenized_document,
+                              self._idf_values,
+                              avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
+        if not bm25:
+            return()
+        for index, word in enumerate(self._vocabulary):
+            vector[index] = bm25[word]
+        return Vector(vector)
 
 
 class DocumentVectorDB:
@@ -135,17 +134,11 @@ class DocumentVectorDB:
         Args:
             stop_words (list[str]): List with stop words.
         """
-        if not stop_words or not isinstance(stop_words, list) \
-            or not all(isinstance(s_word, str) for s_word in stop_words):
-            raise ValueError
-        if not Tokenizer(stop_words) or not BM25Vectorizer() \
-            or not Corpus() or not Vector():
-            raise ValueError
 
         self._tokenizer = Tokenizer(stop_words)
         self._vectorizer = BM25Vectorizer()
-        self.__documents = Corpus()
-        self.__vectors = Vector()
+        self.__documents = []
+        self.__vectors = {}
 
     def put_corpus(self, corpus: Corpus) -> None:
         """
@@ -162,8 +155,19 @@ class DocumentVectorDB:
         if not corpus:
             raise ValueError
 
-        #for text in corpus:
-        #    self.__documents.append(Tokenizer.tokenize(text))
+        tokenized_corpus = []
+        for doc in corpus:
+            tokenized_doc = self._tokenizer.tokenize(doc)
+            if not tokenized_doc:
+                continue
+            self.__documents.append(doc)
+            tokenized_corpus.append(tokenized_doc)
+
+        self._vectorizer.set_tokenized_corpus(tokenized_corpus)
+        self._vectorizer.build()
+        for index, tokenized_doc in enumerate(tokenized_corpus):
+            vector = self._vectorizer.vectorize(tokenized_doc)
+            self.__vectors[index] = vector
 
 
     def get_vectorizer(self) -> BM25Vectorizer:
@@ -173,6 +177,7 @@ class DocumentVectorDB:
         Returns:
             BM25Vectorizer: BM25Vectorizer class object.
         """
+        return self._vectorizer
 
     def get_tokenizer(self) -> Tokenizer:
         """
@@ -181,6 +186,7 @@ class DocumentVectorDB:
         Returns:
             Tokenizer: Tokenizer class object.
         """
+        return self._tokenizer
 
     def get_vectors(self, indices: list[int] | None = None) -> list[tuple[int, Vector]]:
         """
@@ -192,6 +198,9 @@ class DocumentVectorDB:
         Returns:
             list[tuple[int, Vector]]: List of index and vector for documents.
         """
+        if indices is None:
+            return list(self.__vectors.items())
+        return [(index, self.__vectors[index]) for index in indices]
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
         """
@@ -206,7 +215,10 @@ class DocumentVectorDB:
         Returns:
             Corpus: List of documents.
         """
+        if indices is None:
+            return self.__documents
 
+        return [self.__documents[index] for index in set(indices)]
 
 class VectorDBSearchEngine(BasicSearchEngine):
     """
@@ -222,6 +234,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        self._db = db
+        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -234,7 +248,18 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
-
+        if not query or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+            raise ValueError
+        tokenized_query = self._db.get_tokenizer().tokenize(query)
+        query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
+        vectors = [index[1] for index in self._db.get_vectors()]
+        if query_vector is None:
+            raise ValueError
+        knn = self._calculate_knn(query_vector, vectors, n_neighbours)
+        if not knn:
+            raise ValueError
+        relevant_documents = self._db.get_raw_documents(tuple([neighbor[0] for neighbor in knn]))
+        return [(neighbor[1], relevant_documents[index]) for index, neighbor in enumerate(knn)]
 
 class ClusterDTO:
     """

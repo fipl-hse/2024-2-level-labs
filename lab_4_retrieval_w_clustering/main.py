@@ -256,6 +256,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
                 or not isinstance(n_neighbours,int) or n_neighbours <= 0:
             raise ValueError
         tokenized_query = self._db.get_tokenizer().tokenize(query)
+        if not tokenized_query:
+            raise ValueError
         vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
         vectors_list = [pair[1] for pair in self._db.get_vectors()]
         neighbours = self._calculate_knn(vectorized_query,vectors_list,n_neighbours)
@@ -333,7 +335,7 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
-        if not isinstance(index,int) or not index or index < 0 :
+        if not isinstance(index,int) or index is None or index < 0:
             raise ValueError
         if index not in self.__indices:
             self.__indices.append(index)
@@ -429,6 +431,26 @@ class KMeans:
         Returns:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
+        if not isinstance(query_vector,tuple) or not query_vector\
+                or not isinstance(n_neighbours,int) or not n_neighbours:
+            raise ValueError
+        distances = []
+        for cluster in self.__clusters:
+            distance = calculate_distance(query_vector,cluster.get_centroid())
+            if distance is None:
+                raise ValueError
+            distances.append(distance)
+        closest = distances.index(min(distances))
+        used_cluster = self.__cluster[closest]
+        indices = used_cluster.get_indices()
+        used_vectors = self._db.get_vectors(indices)
+        new_distances = []
+        for index, vector in used_vectors:
+            distance = calculate_distance(query_vector,vector)
+            if distance is None:
+                raise ValueError
+            new_distances.append((distance,index))
+        return sorted(new_distances,key=lambda x:x[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """
@@ -495,6 +517,9 @@ class ClusteringSearchEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             n_clusters (int): Number of clusters.
         """
+        self._db = db
+        self.__algo = KMeans(db,n_clusters)
+        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -513,6 +538,22 @@ class ClusteringSearchEngine:
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
+        if not query or not isinstance(query,str) or not n_neighbours\
+                or not isinstance(n_neighbours,int):
+            raise ValueError
+        tokenized_query = self._db.get_tokenizer().tokenize(query)
+        if tokenized_query is None:
+            raise ValueError
+        query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
+        if query_vector is None:
+            raise ValueError
+        neighbours = self.__algo.infer(query_vector,n_neighbours)
+        if neighbours is None:
+            raise ValueError
+        indices = tuple(pair[-1] for pair in neighbours)
+        documents = self._db.get_raw_documents(indices)
+        return [(doc[0],documents[index]) for index,doc in enumerate(neighbours)]
+
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """

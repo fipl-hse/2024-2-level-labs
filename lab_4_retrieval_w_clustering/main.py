@@ -116,7 +116,7 @@ class BM25Vectorizer(Vectorizer):
         if not isinstance(tokenized_document, list) or not tokenized_document\
                 or not all(isinstance(token, str) for token in tokenized_document):
             raise ValueError
-        vector = [0.0 * num for num in range(len(self._vocabulary))]
+        vector = [0.0] * len(self._vocabulary)
         bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, 1.5, 0.75,
                                self._avg_doc_len, len(tokenized_document))
         for index, token in enumerate(self._vocabulary):
@@ -169,16 +169,10 @@ class DocumentVectorDB:
                 self.__documents.append(doc)
         if not all_tokens or not isinstance(all_tokens, list):
             raise ValueError
-        while [] in all_tokens:
-            all_tokens.remove([])
-        # self.__documents = [" ".join(tokens) for tokens in all_tokens if isinstance(tokens, list)]
         self._vectorizer.set_tokenized_corpus(all_tokens)
         self._vectorizer.build()
-        try:
-            for index, tokens in enumerate(all_tokens):
-                self.__vectors[index] = self._vectorizer.vectorize(tokens)
-        except StopIteration:
-            pass
+        for index, tokens in enumerate(all_tokens):
+            self.__vectors[index] = self._vectorizer.vectorize(tokens)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -397,8 +391,10 @@ class KMeans:
         for centroid in centroids:
             self.__clusters.append(ClusterDTO(centroid[-1]))
         self.run_single_train_iteration()
-        while not self._is_convergence_reached(self.__clusters):
+        while True:
             self.run_single_train_iteration()
+            if self._is_convergence_reached(self.__clusters):
+                break
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -460,12 +456,14 @@ class KMeans:
             distances_for_clusters.append(distance)
         nearest_index = distances_for_clusters.index(min(distances_for_clusters))
         current_cluster = self.__clusters[nearest_index]
+        if not current_cluster.get_centroid():
+            current_cluster = self.__clusters[0]
         indices = current_cluster.get_indices()
-        vectors = [self._db.get_vectors()[ind] for ind in indices]
+        vectors = self._db.get_vectors(indices)
         distances_for_vectors = []
         for index, vector in vectors:
             distance = calculate_distance(query_vector, vector)
-            if not isinstance(distance, float):
+            if not isinstance(distance, float) or distance is None:
                 raise ValueError
             distances_for_vectors.append((distance, index))
         return sorted(distances_for_vectors, key=lambda x: x[0])[:n_neighbours]

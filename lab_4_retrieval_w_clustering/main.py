@@ -7,7 +7,13 @@ Vector search with clusterization
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer, calculate_distance
+from lab_3_ann_retriever.main import (
+    BasicSearchEngine,
+    calculate_distance,
+    Tokenizer,
+    Vector,
+    Vectorizer,
+)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -105,8 +111,10 @@ class BM25Vectorizer(Vectorizer):
                 all(isinstance(paragraph,str) for paragraph in tokenized_document):
             raise ValueError
         vector_list = [0.0] * len(self._vocabulary)
-        bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, 1.5, 0.75, self._avg_doc_len,
-                                 len(tokenized_document))
+        bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, 1.5, 0.75,
+                              self._avg_doc_len, len(tokenized_document))
+        if not bm25:
+            return tuple(vector_list)
         for index, word in enumerate(self._vocabulary):
             vector_list[index] = bm25[word]
         return tuple(vector_list)
@@ -409,8 +417,8 @@ class KMeans:
             self.__clusters[close[1]].add_document_index(used_vectors.index(vector))
         for cluster in self.__clusters:
             cluster_vectors = [used_vectors[index][1] for index in cluster.get_indices()]
-            updated_centroid = [sum(vec[index] for index in range(len(vec))) / len(cluster_vectors) for
-                                vec in cluster_vectors]
+            updated_centroid = tuple([sum(vec[index] for index in range(len(vec)))
+                                      / len(cluster_vectors) for vec in cluster_vectors])
             cluster.set_new_centroid(updated_centroid)
         return self.__clusters
 
@@ -441,7 +449,7 @@ class KMeans:
                 raise ValueError
             distances.append(distance)
         closest = distances.index(min(distances))
-        used_cluster = self.__cluster[closest]
+        used_cluster = self.__clusters[closest]
         indices = used_cluster.get_indices()
         used_vectors = self._db.get_vectors(indices)
         new_distances = []

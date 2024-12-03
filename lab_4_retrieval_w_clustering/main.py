@@ -82,12 +82,10 @@ class BM25Vectorizer(Vectorizer):
             or not all(isinstance(item, str) for item in tokenized_document):
             raise ValueError
 
-        vectors = [0.0 * i for i in range(len(self._vocabulary))]
-        for i in range(len(self._vocabulary)):
-            vectors += []
-
-        result = self._calculate_bm25(tokenized_document)
-        return result
+        vector = self._calculate_bm25(tokenized_document)
+        if vector is None:
+            raise ValueError('Vector is None')
+        return vector
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
         """
@@ -106,16 +104,14 @@ class BM25Vectorizer(Vectorizer):
             or not all(isinstance(item, str) for item in tokenized_document):
             raise ValueError
 
-        bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, k1 = self._avg_doc_len,
-                              doc_len = len(tokenized_document))
+        vectors = [0.0] * len(self._vocabulary)
+        bm_25 = calculate_bm25(self._vocabulary, tokenized_document,
+                               self._idf_values, 1.5, 0.75,
+                               self._avg_doc_len, len(tokenized_document))
 
-        vectors = [0.0 * i for i in range(len(self._vocabulary))]
-        for index, word in enumerate(self._vocabulary):
-            # if not index or not word:
-            #     raise ValueError
-            vectors[index] = bm25[word]
-            if not vectors[index] or bm25[word]:
-                raise ValueError
+        for i, token in enumerate(self._vocabulary):
+            if token in tokenized_document:
+                vectors[i] = bm_25.get(token, 0.0)
         return tuple(vectors)
 
 class DocumentVectorDB:

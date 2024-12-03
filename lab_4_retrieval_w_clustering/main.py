@@ -5,12 +5,8 @@ Vector search with clusterization
 """
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
-from lab_3_ann_retriever.main import (
-    BasicSearchEngine,
-    Tokenizer,
-    Vector,
-    Vectorizer
-)
+from lab_3_ann_retriever.main import (BasicSearchEngine, Tokenizer, Vector, Vectorizer)
+
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 Corpus = list[str]
@@ -267,9 +263,9 @@ class VectorDBSearchEngine(BasicSearchEngine):
         most_relevant = self._calculate_knn(vector_query, vectors, n_neighbours)
         if most_relevant is None or not most_relevant or all(None in v for v in most_relevant):
             raise ValueError
-        indeces = tuple(range(n_neighbours))
+        indeces = tuple([pair[0] for pair in most_relevant])
         raw_documents = self._db.get_raw_documents(indeces)
-        return [(most_relevant[index][1], raw_documents[index]) for index in indeces]
+        return [(most_relevant[num][1], raw_documents[num]) for num, index in enumerate(indeces)]
 
 
 class ClusterDTO:

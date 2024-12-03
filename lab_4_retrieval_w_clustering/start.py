@@ -54,9 +54,9 @@ def main() -> None:
     db = DocumentVectorDB(stopwords)
     db.put_corpus(documents)
     vectordb = VectorDBSearchEngine(db)
-    result = vectordb.retrieve_relevant_documents("Первый был не кто иной,"
-                                                  "как Михаил Александрович Берлиоз,"
-                                                  "председатель правления", 3)
+    result = vectordb.retrieve_relevant_documents("""Первый был не кто иной,
+                                                  как Михаил Александрович Берлиоз,
+                                                  председатель правления""", 3)
     print(result)
     assert result, "Result is None"
 

@@ -417,9 +417,9 @@ class KMeans:
             self.__clusters[close[1]].add_document_index(used_vectors.index(vector))
         for cluster in self.__clusters:
             cluster_vectors = [used_vectors[index][1] for index in cluster.get_indices()]
-            updated_centroid = tuple([sum(vec[index] for index in range(len(vec)))
-                                      / len(cluster_vectors) for vec in cluster_vectors])
-            cluster.set_new_centroid(updated_centroid)
+            updated_centroid = [sum(vec[index] for index in range(len(vec))) / len(cluster_vectors)
+                                for vec in cluster_vectors]
+            cluster.set_new_centroid(tuple(updated_centroid))
         return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:

@@ -66,6 +66,7 @@ def main() -> None:
     print(searchengine.retrieve_relevant_documents(query,3))
 
     bm25vectorizer = BM25Vectorizer()
+    bm25vectorizer.build()
     result = '???'
     assert result, "Result is None"
 

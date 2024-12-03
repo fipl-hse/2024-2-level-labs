@@ -64,6 +64,8 @@ def main() -> None:
     dbase.put_corpus(paragraphs)
     searchengine = VectorDBSearchEngine(dbase)
     print(searchengine.retrieve_relevant_documents(query,3))
+
+    bm25vectorizer = BM25Vectorizer()
     result = '???'
     assert result, "Result is None"
 

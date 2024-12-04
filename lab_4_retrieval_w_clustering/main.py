@@ -463,10 +463,9 @@ class KMeans:
                                  else calculate_distance(query_vector, centroid))
             if not isinstance(centroid_distance, float):
                 raise ValueError("Failed to calculate the distance to the centroid")
-            centroid_distances.append((index, centroid_distance))
-        min_distance_index = min(centroid_distances, key=lambda a: a[1])[0]
+            centroid_distances.append((centroid_distance, index))
+        min_distance_index = min(centroid_distances)[1]
         closest_cluster = self.__clusters[min_distance_index]
-        #print(self._db.get_vectors(self.__clusters[0].get_indices()))
         index_vectors = self._db.get_vectors(closest_cluster.get_indices())
         vector_distances = []
         for index, vector in index_vectors:
@@ -474,7 +473,7 @@ class KMeans:
             if not isinstance(vector_distance, float):
                 raise ValueError("Failed to calculate the distance to the query")
             vector_distances.append((vector_distance, index))
-        return sorted(vector_distances, key=lambda a: a[0])[:n_neighbours]
+        return sorted(vector_distances)[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """

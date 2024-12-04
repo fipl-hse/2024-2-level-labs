@@ -6,7 +6,6 @@ Vector search with clusterization
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 
 import json
-from copy import copy
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
@@ -271,6 +270,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if not isinstance(tokenized_query, list):
             raise ValueError("Failed to tokenize the document")
         query_vector = self._vectorizer.vectorize(tokenized_query)
+        if not isinstance(query_vector, tuple):
+            raise ValueError("Failed to vectorize the tokenized document")
         vectors_with_indices = self._db.get_vectors()
         vectors_wo_indexes = [pair[1] for pair in vectors_with_indices]
         nearest_docs = self._calculate_knn(query_vector, vectors_wo_indexes, n_neighbours)
@@ -499,7 +500,10 @@ class KMeans:
                 vector_distances.append((index, vector_distance))
             vector_distances = sorted(vector_distances, key=lambda a: a[1])[:num_examples]
             doc_indices = tuple(pair[0] for pair in vector_distances)
-            info_dict["documents"] = self._db.get_raw_documents(doc_indices)
+            documents = self._db.get_raw_documents(doc_indices)
+            if not isinstance(documents, list):
+                raise ValueError("Failed to get documents from cluster indices")
+            info_dict["documents"] = documents
             list_of_cluster_info.append(info_dict)
         return list_of_cluster_info
 

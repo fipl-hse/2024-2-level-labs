@@ -29,7 +29,7 @@ def get_paragraphs(text: str) -> list[str]:
     """
     if not text:
         raise ValueError
-    return text.split('\n')
+    return [line for line in text.split('\n') if line]
 
 
 class BM25Vectorizer(Vectorizer):
@@ -79,6 +79,9 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        if not tokenized_document or not isinstance(tokenized_document, list)\
+                or not all(isinstance(doc, str) for doc in tokenized_document):
+            raise ValueError
         vector = self._calculate_bm25(tokenized_document)
         if not vector:
             raise ValueError
@@ -102,7 +105,7 @@ class BM25Vectorizer(Vectorizer):
         bm25vector = [0.0] * len(self._vocabulary)
         bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,\
                               1.5, 0.75, self._avg_doc_len, len(tokenized_document))
-        for index, word in enumerate(self._vocabulary):
+        for word, index in self._token2ind.items():
             bm25vector[index] = bm25[word]
         return tuple(bm25vector)
 
@@ -154,11 +157,8 @@ class DocumentVectorDB:
             raise ValueError
         self._vectorizer.set_tokenized_corpus(tokenized_texts)
         self._vectorizer.build()
-        try:
-            for index, doc in enumerate(tokenized_texts):
-                self.__vectors[index] = self._vectorizer.vectorize(doc)
-        except StopIteration:
-            pass
+        for index, doc in enumerate(tokenized_texts):
+            self.__vectors[index] = self._vectorizer.vectorize(doc)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -246,14 +246,17 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
+        if not query or not isinstance(query, str) or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+            raise ValueError
         tokenized_query = self._db.get_tokenizer().tokenize(query)
+
         vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
         vectors = [el[1] for el in self._db.get_vectors()]
         most_relevant = self._calculate_knn(vectorized_query, vectors, n_neighbours)
         if not most_relevant:
             raise ValueError
         documents = self._db.get_raw_documents(tuple(index[0]for index in most_relevant))
-        return [(distance, documents[index]) for index, distance in enumerate(most_relevant)]
+        return [(distance[-1], documents[index]) for index, distance in enumerate(most_relevant)]
 
 
 class ClusterDTO:

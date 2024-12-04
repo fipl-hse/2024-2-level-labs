@@ -3,9 +3,16 @@ Laboratory Work #3 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+import time
 from pathlib import Path
 
-from lab_3_ann_retriever.main import BasicSearchEngine, SearchEngine, Tokenizer, Vectorizer
+from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
+    BasicSearchEngine,
+    SearchEngine,
+    Tokenizer,
+    Vectorizer,
+)
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -30,39 +37,65 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    with open("assets/secrets/secret_2.txt", "r", encoding="utf-8") as text_file:
+    with open("assets/secrets/secret_1.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()
-    documents, stopwords = open_files()
+    vector_from_text = text.split(", ")
+    vector = tuple(float(value) for value in vector_from_text)
+    stopwords = open_files()[1]
+    documents = open_files()[0]
     tokenizer = Tokenizer(stopwords)
-    documents_tokenized = tokenizer.tokenize_documents(documents)
-    if not isinstance(documents_tokenized, list):
-        return
-    vectorizer = Vectorizer(documents_tokenized)
+    tokenized_documents = tokenizer.tokenize_documents(documents)
+    if tokenized_documents is None:
+        result = None
+        assert result, "Result is None"
+    vectorizer = Vectorizer(tokenized_documents)
     vectorizer.build()
+    question = vectorizer.vector2tokens(vector)
+    if question is None:
+        result = None
+        assert result, "Result is None"
+    preparing_answer = BasicSearchEngine(vectorizer, tokenizer)
+    preparing_answer.index_documents(documents)
+    answer = preparing_answer.retrieve_vectorized(vector)
+    if answer is None:
+        result = None
+        assert result, "Result is None"
+    print(answer)
 
-    knn_retriever = BasicSearchEngine(vectorizer, tokenizer)
-    knn_retriever.index_documents(documents)
-
-    text_vector = tuple(float(distance) for distance in text.split(","))
-    text_tokens = vectorizer.vector2tokens(text_vector)
-    text_knn = knn_retriever.retrieve_vectorized(text_vector)
-
-    basic_search_engine = BasicSearchEngine(vectorizer, tokenizer)
-    basic_search_engine.index_documents(documents)
+    query = "Нижний Новгород"
     search_engine = SearchEngine(vectorizer, tokenizer)
     search_engine.index_documents(documents)
-    query = "Нижний Новгород"
-    doc_bse_knn = basic_search_engine.retrieve_relevant_documents(query, 3)
-    doc_se_knn = search_engine.retrieve_relevant_documents(query, 3)
+    basic_search = BasicSearchEngine(vectorizer, tokenizer)
+    basic_search.index_documents(documents)
+    result_engine = search_engine.retrieve_relevant_documents(query)
+    print(f"Result returned by SearchEngine: {result_engine}\n")
+    start_for_basic = time.time()
+    basic_results = basic_search.retrieve_relevant_documents(query, 3)
+    if basic_results is None:
+        result = None
+        assert result, "Result is None"
+    print(f"Working time of BasicSearchEngine: {time.time() - start_for_basic}\n")
+    if result_engine is None or basic_results is None:
+        result = None
+        assert result, "Result is None"
+    for i, basic_result in enumerate(basic_results):
+        print(f"Result #{i + 1} returned by BasicSearchEngine: {basic_result}\n")
 
-    if not isinstance(documents_tokenized, list):
-        return
-    print(f'Demo 1: Documents Tokenization:\n{documents_tokenized[0]}\n')
-    print(f'Demo 2: Secret #2 Question\n{text_tokens}')
-    print(f'Demo 2: Answer\n{text_knn}')
-    print(f'Demo 3: Relevant News: Basic\n{doc_bse_knn}')
-    print(f'Demo 3: Relevant News\n{doc_se_knn}')
-    result = text_knn
+    vectorizer.save("assets/states/vectorizer_state.json")
+    new_vectorizer = Vectorizer(tokenized_documents)
+    new_vectorizer.load("assets/states/vectorizer_state.json")
+    search_engine.save("assets/states/engine_state.json")
+    advanced_search = AdvancedSearchEngine(new_vectorizer, tokenizer)
+    advanced_search.load("assets/states/engine_state.json")
+    start_for_advanced = time.time()
+    advanced_results = advanced_search.retrieve_relevant_documents(query, 3)
+    if advanced_results is None:
+        result = None
+        assert result, "Result is None"
+    print(f"Working time of AdvancedSearchEngine: {time.time() - start_for_advanced}\n")
+    for i, advanced_result in enumerate(advanced_results):
+        print(f"Result #{i + 1} returned by AdvancedSearchEngine: {advanced_result}\n")
+    result = advanced_results
     assert result, "Result is None"
 
 

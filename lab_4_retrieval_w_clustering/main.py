@@ -490,7 +490,7 @@ class KMeans:
             raise ValueError("The argument is not a natural number")
         list_of_cluster_info = []
         for cluster_index, cluster in enumerate(self.__clusters):
-            info_dict = {"cluster_id": cluster_index, "documents": []}
+            info_dict = {"cluster_id": cluster_index, "documents": ["stub"]}
             cluster_vectors = self._db.get_vectors(cluster.get_indices())
             vector_distances = []
             for index, vector in cluster_vectors:
@@ -500,10 +500,7 @@ class KMeans:
                 vector_distances.append((index, vector_distance))
             vector_distances = sorted(vector_distances, key=lambda a: a[1])[:num_examples]
             doc_indices = tuple(pair[0] for pair in vector_distances)
-            documents = self._db.get_raw_documents(doc_indices)
-            if not isinstance(documents, list):
-                raise ValueError("Failed to get documents from cluster indices")
-            info_dict["documents"] = documents
+            info_dict["documents"] = self._db.get_raw_documents(doc_indices)
             list_of_cluster_info.append(info_dict)
         return list_of_cluster_info
 

@@ -1,7 +1,14 @@
 """
 Laboratory Work #4 starter.
 """
-
+from lab_4_retrieval_w_clustering.main import (
+ClusteringSearchEngine,
+DocumentVectorDB,
+get_paragraphs,
+VectorDBAdvancedSearchEngine,
+VectorDBSearchEngine,
+VectorDBTreeSearchEngine
+)
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 
 
@@ -45,12 +52,21 @@ def open_files() -> tuple[list[str], list[str]]:
     return (documents, stopwords)
 
 
-
 def main() -> None:
     """
     Launch an implementation.
     """
-    result = None
+    documents = ''.join(open_files()[0])
+    paragraphs = get_paragraphs(documents)
+    stopwords = open_files()[-1]
+    query = ("Первый был не кто иной, как Михаил Александрович "
+             "Берлиоз, председатель правления")
+    db = DocumentVectorDB(stopwords)
+    db.put_corpus(paragraphs)
+    vector = VectorDBSearchEngine(db)
+    result = vector.retrieve_relevant_documents(query, 3)
+
+
     assert result, "Result is None"
 
 

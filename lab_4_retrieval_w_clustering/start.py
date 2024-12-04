@@ -3,7 +3,7 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-
+from main import DocumentVectorDB
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -49,6 +49,8 @@ def main() -> None:
     """
     Launch an implementation.
     """
+    documents, stopwords = open_files()
+    db = DocumentVectorDB(stopwords)
     result = None
     assert result, "Result is None"
 

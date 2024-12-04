@@ -111,7 +111,7 @@ class BM25Vectorizer(Vectorizer):
         """
         if not isinstance(tokenized_document, list):
             raise ValueError('Invalid document input')
-        vector_list = [0.0 * n for n in range(len(self._vocabulary))]
+        vector_list = [0.0] * len(self._vocabulary)
         bm_dict = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
                                  1.5, 0.75, self._avg_doc_len, len(tokenized_document))
         if not bm_dict:
@@ -409,7 +409,7 @@ class KMeans:
             for centroid in centroids:
                 distance = calculate_distance(vector[-1], centroid)
                 if distance is None:
-                    raise ValueError('Could not calculate distance')
+                    raise ValueError('Could not calculate the distance')
                 distances.append((distance, centroids.index(centroid)))
             closest = min(distances)
             self.__clusters[closest[-1]].add_document_index(vectors.index(vector))
@@ -443,20 +443,23 @@ class KMeans:
             raise ValueError('Invalid query/n_neighbours input')
         cluster_distances = []
         for ind, cluster in enumerate(self.__clusters):
-            distance = calculate_distance(query_vector, cluster.get_centroid())
+            centroid = cluster.get_centroid()
+            if not centroid:
+                continue
+            distance = calculate_distance(query_vector, centroid)
             if distance is None:
                 raise ValueError('Could not calculate the distance')
             cluster_distances.append((distance, ind))
         closest_cluster = min(cluster_distances)[-1]
         cluster_indices = self.__clusters[closest_cluster].get_indices()
-        vectors = [self._db.get_vectors()[num] for num in cluster_indices]
+        vectors = self._db.get_vectors(cluster_indices)
         distances = []
-        for index, vector in enumerate(vectors):
+        for vector in vectors:
             distance = calculate_distance(query_vector, vector[-1])
             if distance is None:
                 raise ValueError('Could not calculate the distance')
-            distances.append((distance, index))
-        return sorted(distances, key=lambda x: x[-1])[:n_neighbours]
+            distances.append((distance, vector[0]))
+        return sorted(distances, key=lambda x: x[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """

@@ -67,9 +67,7 @@ def main() -> None:
     db.put_corpus(paragraphs)
     vector_search = VectorDBSearchEngine(db)
     result = vector_search.retrieve_relevant_documents(query, 3)
-    clustering_search = ClusteringSearchEngine(db, n_clusters=2)
     print(result)
-    print(clustering_search.retrieve_relevant_documents(query, 5))
     for num in range(1, 15):
         clustering_search = ClusteringSearchEngine(db, n_clusters=num)
         print(clustering_search.calculate_square_sum())

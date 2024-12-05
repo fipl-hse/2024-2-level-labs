@@ -5,7 +5,6 @@ get_score() {
 
 get_labs() {
   jq -r '.labs[].name' project_config.json
-
 }
 
 configure_script() {
@@ -17,13 +16,6 @@ configure_script() {
   elif [[ "$OSTYPE" == "msys" ]]; then
     source venv/Scripts/activate
     export PYTHONPATH=$(pwd)
-  fi
-}
-
-check_skip () {
-  python config/skip_check.py --pr_name "$1" --pr_author "$2" --lab_path "$3"
-  if [ $? -eq 0 ]; then
-    echo 'skip check due to special conditions...' && exit 0
   fi
 }
 

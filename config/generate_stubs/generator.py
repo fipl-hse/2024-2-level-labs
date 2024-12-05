@@ -10,6 +10,10 @@ from typing import Optional
 import ast_comments
 from tap import Tap
 
+from config.console_logging import get_child_logger
+
+logger = get_child_logger(__file__)
+
 
 class NoDocStringForAMethodError(Exception):
     """
@@ -200,7 +204,7 @@ def main() -> None:
     source_code = cleanup_code(Path(args.source_code_path))
 
     with res_stub_path.open(mode="w", encoding="utf-8") as file:
-        print(f"Writing to {res_stub_path}")
+        logger.info(f"Writing to {res_stub_path}")
         file.write(source_code)
 
 

@@ -27,6 +27,7 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
+
     if not text or not isinstance(text,str):
         raise ValueError
     return text.split('\n')

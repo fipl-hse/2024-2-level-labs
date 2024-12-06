@@ -4,7 +4,6 @@ Laboratory Work #4 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from lab_4_retrieval_w_clustering.main import (
-    BM25Vectorizer,
     ClusteringSearchEngine,
     DocumentVectorDB,
     get_paragraphs,
@@ -71,7 +70,7 @@ def main() -> None:
 
     relevant_documents = search_engine.retrieve_relevant_documents(query, 3)
 
-    clustering_search = ClusteringSearchEngine(db, n_clusters=5)
+    clustering_search = ClusteringSearchEngine(db, 5)
 
     cluster_result = clustering_search.retrieve_relevant_documents(query, 5)
 

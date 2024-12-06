@@ -7,7 +7,13 @@ Vector search with clusterization
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
-from lab_3_ann_retriever.main import BasicSearchEngine, calculate_distance, Tokenizer, Vector, Vectorizer
+from lab_3_ann_retriever.main import (
+    BasicSearchEngine,
+    calculate_distance,
+    Tokenizer,
+    Vector,
+    Vectorizer,
+)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -268,8 +274,10 @@ class VectorDBSearchEngine(BasicSearchEngine):
         neighbours = self._calculate_knn(query_vector, vectors, n_neighbours)
         if not neighbours:
             raise ValueError
-        relevant_documents = self._db.get_raw_documents(tuple([neighbor[0] for neighbor in neighbours]))
-        return [(neighbor[-1], relevant_documents[index]) for index, neighbor in enumerate(neighbours)]
+        relevant_documents = (self._db.get_raw_documents
+                              (tuple(neighbor[0] for neighbor in neighbours)))
+        return [(neighbor[-1], relevant_documents[index])
+                for index, neighbor in enumerate(neighbours)]
 
 
 class ClusterDTO:
@@ -508,7 +516,8 @@ class KMeans:
                 or not isinstance(threshold, float) or not threshold):
             raise ValueError
         for i, old_cluster in enumerate(self.__clusters):
-            distance = calculate_distance(old_cluster.get_centroid(), new_clusters[i].get_centroid())
+            distance = calculate_distance(old_cluster.get_centroid(),
+                                          new_clusters[i].get_centroid())
             if not isinstance(distance, float):
                 raise ValueError
             if distance > threshold:

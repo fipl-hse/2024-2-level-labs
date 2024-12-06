@@ -28,8 +28,8 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
-    if not text:
-        raise ValueError
+    if not text or not isinstance(text, str):
+        raise ValueError('inappropriate type of input argument or input argument is empty')
 
     return text.split('\n')
 
@@ -60,8 +60,8 @@ class BM25Vectorizer(Vectorizer):
         Raises:
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
-        if not tokenized_corpus:
-            raise ValueError
+        if not tokenized_corpus or not isinstance(tokenized_corpus, list):
+            raise ValueError('inappropriate type of input argument or input argument is empty')
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(paragraph) for paragraph in self._corpus) / len(self._corpus)
 
@@ -81,10 +81,10 @@ class BM25Vectorizer(Vectorizer):
             Vector: BM25 vector for document.
         """
         if not isinstance(tokenized_document, list) or not tokenized_document:
-            raise ValueError
+            raise ValueError('inappropriate type of input argument or input argument is empty')
         vector = self._calculate_bm25(tokenized_document)
         if vector is None:
-            raise ValueError
+            raise ValueError('used method return None')
         return vector
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -100,6 +100,8 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        if not tokenized_document or not isinstance(tokenized_document, list):
+            raise ValueError('inappropriate type of input argument or input argument is empty')
         bm25_vector = [0.0] * len(self._vocabulary)
         bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
                               k1=1.5, b=0.75, avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
@@ -143,8 +145,8 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
-        if not corpus:
-            raise ValueError
+        if not corpus or not isinstance(corpus, list):
+            raise ValueError('inappropriate type of input argument or input argument is empty')
             
         self._vectorizer.build()
         
@@ -155,14 +157,14 @@ class DocumentVectorDB:
                 tokenized_corpus.append(tokenized_doc)
                 self.__documents.append(text)
         if tokenized_corpus is None:
-            raise ValueError
+            raise ValueError('used method return None')
                 
         self._vectorizer.set_tokenized_corpus(tokenized_corpus)
         
         for index, tokenized_doc in enumerate(tokenized_corpus):
             self.__vectors[index] = self._vectorizer.vectorize(tokenized_doc)
         if self.__vectors is None:
-            raise ValueError
+            raise ValueError('used method return None')
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """

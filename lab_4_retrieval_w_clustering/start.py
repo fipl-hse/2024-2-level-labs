@@ -1,6 +1,8 @@
 """
 Laboratory Work #4 starter.
 """
+from lab_4_retrieval_w_clustering.main import BM25Vectorizer
+
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 
@@ -49,7 +51,12 @@ def main() -> None:
     """
     Launch an implementation.
     """
+    tokenized_paragraphs = [['привет', 'твои', 'дела'], ['твои', 'дела']]
     vectorizer = BM25Vectorizer()
+    vectorizer.set_tokenized_corpus(tokenized_paragraphs)
+    vectorizer.build()
+    vectorizer.vectorize(tokenized_paragraphs[0])
+
     result = None
     assert result, "Result is None"
 

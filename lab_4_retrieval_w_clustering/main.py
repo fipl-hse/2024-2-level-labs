@@ -80,6 +80,14 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        if (not isinstance(tokenized_document, list) or not tokenized_document or
+                not all(isinstance(token, str) for token in tokenized_document)):
+            raise ValueError
+        vectorized_document = self._calculate_bm25(tokenized_document)
+        if vectorized_document is None:
+            raise ValueError
+
+        return self._calculate_bm25(tokenized_document)
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
         """
@@ -105,9 +113,6 @@ class BM25Vectorizer(Vectorizer):
             vector[index] = bm25_values
 
         return tuple(vector)
-
-
-print(calculate_bm25(['Привет! Как твои дела?']))
 
 
 class DocumentVectorDB:

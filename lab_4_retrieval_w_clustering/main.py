@@ -86,8 +86,8 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError
 
         result = self._calculate_bm25(tokenized_document)
-        # if not result:
-        #     raise ValueError
+        if not result:
+            raise ValueError
         return result
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -153,15 +153,17 @@ class DocumentVectorDB:
         if not isinstance(corpus, list) or not corpus:
             raise ValueError
 
-        self._vectorizer.build()
-        self.__documents = corpus
-
-        tokenized_corpus = [self._tokenizer.tokenize(text) for text in corpus]
-        if None in tokenized_corpus:
+        tokenized_corpus = []
+        for text in corpus:
+            tokenized_text = self._tokenizer.tokenize(text)
+            if tokenized_text:
+                tokenized_corpus.append(tokenized_text)
+                self.__documents.append(text)
+        if not tokenized_corpus:
             raise ValueError
 
         self._vectorizer.set_tokenized_corpus(tokenized_corpus)
-
+        self._vectorizer.build()
         self.__vectors = {index: self._vectorizer.vectorize(tokenized_text)
                           for index, tokenized_text in enumerate(tokenized_corpus)}
 
@@ -193,9 +195,6 @@ class DocumentVectorDB:
         Returns:
             list[tuple[int, Vector]]: List of index and vector for documents.
         """
-        # if not isinstance(indices, list):
-        #     raise ValueError
-
         if indices is None:
             return [(index, vector) for index, vector in self.__vectors.items()]
         return [(index, self.__vectors[index]) for index in indices]
@@ -375,6 +374,12 @@ class KMeans:
         """
         Train k-means algorithm.
         """
+        n_vectors = self._db.get_vectors()[:self._n_clusters]
+        self.__clusters = [ClusterDTO(centroid[-1]) for centroid in n_vectors]
+        while True:
+            self.run_single_train_iteration()
+            if self._is_convergence_reached(self.__clusters):
+                break
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -386,29 +391,29 @@ class KMeans:
         Returns:
             list[ClusterDTO]: List of clusters.
         """
-        self.__clusters = []
+        centroids = []
         for cluster in self.__clusters:
             cluster.erase_indices()
-            self.__clusters.append(cluster)
+            centroids.append(cluster.get_centroid())
 
-        new_clusters = []
         for index, vector in self._db.get_vectors():
             distances = []
-            for cluster in self.__clusters:
-                distance = calculate_distance(vector, cluster.get_centroid())
+            for centroid in centroids:
+                distance = calculate_distance(vector, centroid)
                 if distance is not None:
-                    distances.append((distance, cluster.get_centroid()))
+                    distances.append(distance)
                 else:
                     raise ValueError
 
-                nearest_centroid = sorted(distances, key=lambda pair: pair[0])[0][1]
-                cluster.add_document_index(index)
+            nearest_centroid = min(distances)
+            self.__clusters[distances.index(nearest_centroid)].add_document_index(index)
 
-                new_centroid_vector = tuple(((nearest_centroid[i] + vector[i]) / 2)
-                                            for i in range(len(vector)))
-                cluster.set_new_centroid(new_centroid_vector)
-                new_clusters.append(cluster)
-        return new_clusters
+        vectors = self._db.get_vectors()
+        for cluster in self.__clusters:
+            cluster_vectors = [vectors[index][-1] for index in cluster.get_indices()]
+            cluster.set_new_centroid(tuple([sum(vector[index] for index in range(
+                len(vector))) / len(cluster_vectors) for vector in cluster_vectors]))
+        return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -476,7 +481,7 @@ class KMeans:
             distance = calculate_distance(new_clusters[i].get_centroid(), old_clusters[i])
             if distance is None:
                 raise ValueError
-            if distance < threshold:
+            if distance >= threshold:
                 return False
         return True
 

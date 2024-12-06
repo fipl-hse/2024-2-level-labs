@@ -29,9 +29,9 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not text or not isinstance(text, str):
-        raise ValueError
+        raise ValueError('Invalid input')
 
-    return text.split('\n') #список параграфов, где строки - это абзацы
+    return text.split('\n')
 
 
 class BM25Vectorizer(Vectorizer):
@@ -64,7 +64,7 @@ class BM25Vectorizer(Vectorizer):
                 or not tokenized_corpus
                 or not isinstance(tokenized_corpus, list)
                 or not all(isinstance(tok_paragraph, list) for tok_paragraph in tokenized_corpus)):
-            raise ValueError
+            raise ValueError('Invalid input')
         self._corpus = tokenized_corpus
 
         self._avg_doc_len = sum(len(every_paragraph)
@@ -88,11 +88,11 @@ class BM25Vectorizer(Vectorizer):
         if (not tokenized_document
                 or not isinstance(tokenized_document, list)
                 or not all(isinstance(el, str) for el in tokenized_document)):
-            raise ValueError
+            raise ValueError('Invalid input')
 
         bm25_vector = self._calculate_bm25(tokenized_document)
         if not bm25_vector:
-            raise ValueError
+            raise ValueError('The function returned an empty Vector')
 
         return bm25_vector
 
@@ -112,16 +112,15 @@ class BM25Vectorizer(Vectorizer):
         if (not tokenized_document
                 or not isinstance(tokenized_document, list)
                 or not all(isinstance(elem, str) for elem in tokenized_document)):
-            raise ValueError
+            raise ValueError('Invalid input')
 
         doc_len = len(tokenized_document)
         bm25_vector = [0.0] * len(self._vocabulary)
-        k1 = 1.5
-        b = 0.75
+
         bm25 = calculate_bm25(self._vocabulary,
                               tokenized_document,
                               calculate_idf(self._vocabulary, self._corpus),
-                              k1, b,
+                              1.5, 0.75,
                               self._avg_doc_len, doc_len)
         for i, token in enumerate(self._vocabulary):
             bm25_vector[i] = bm25[token]
@@ -164,7 +163,7 @@ class DocumentVectorDB:
         """
         if (not corpus or not isinstance(corpus, list)
                 or not all(isinstance(element, str) for element in corpus)):
-            raise ValueError
+            raise ValueError('Invalid input')
 
         list_of_tok_paragraphs = []
         for doc_aka_str in corpus:
@@ -173,15 +172,12 @@ class DocumentVectorDB:
                 list_of_tok_paragraphs.append(doc_aka_list)
                 self.__documents.append(doc_aka_str)
         if not list_of_tok_paragraphs:
-            raise ValueError
+            raise ValueError('The function returned an empty list')
 
         self._vectorizer.set_tokenized_corpus(list_of_tok_paragraphs)
         self._vectorizer.build()
-        try:
-            for index_of_paragraph, tok_paragraph in enumerate(list_of_tok_paragraphs):
-                self.__vectors[index_of_paragraph] = self._vectorizer.vectorize(tok_paragraph)
-        except StopIteration:
-            pass
+        for index_of_paragraph, tok_paragraph in enumerate(list_of_tok_paragraphs):
+            self.__vectors[index_of_paragraph] = self._vectorizer.vectorize(tok_paragraph)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -272,17 +268,17 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if (not query or not isinstance(query, str)
                 or not isinstance(n_neighbours, int)
                 or n_neighbours <= 0):
-            raise ValueError
+            raise ValueError('Invalid input')
 
-        tok_query = self._db.get_tokenizer().tokenize(query)
+        tok_query = self._tokenizer.tokenize(query)
 
         c_knn_result = self._calculate_knn(self._db.get_vectorizer().vectorize(tok_query),
                                            [vec[1] for vec in self._db.get_vectors()], n_neighbours)
         if not c_knn_result:
-            raise ValueError
+            raise ValueError('The function returned an empty list of tuples')
         get_raw_docs_result = self._db.get_raw_documents(tuple(ind for ind in range(n_neighbours)))
         if not get_raw_docs_result:
-            raise ValueError
+            raise ValueError('The function returned an empty list')
 
         return [(float_figure, get_raw_docs_result[ind]) for ind, float_figure in c_knn_result]
 
@@ -302,6 +298,7 @@ class ClusterDTO:
         Args:
             centroid_vector (Vector): Centroid vector.
         """
+        self.__centroid = centroid_vector
 
     def __len__(self) -> int:
         """

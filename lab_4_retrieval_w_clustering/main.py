@@ -368,7 +368,7 @@ class KMeans:
         """
         Train k-means algorithm.
         """
-        start_centroids = self._db.get_vectors([ind for ind in range(self._n_clusters)])
+        start_centroids = self._db.get_vectors()[:self._n_clusters]
         for ind, centroid in start_centroids:
             self.__clusters.append(ClusterDTO(centroid))
         while True:
@@ -396,15 +396,15 @@ class KMeans:
             for centroid in centroids:
                 distance = calculate_distance(vector[1], centroid)
                 if distance is None:
-                    raise ValueError('Failed to calculate distance btwn vector and centroid')
+                    raise ValueError('Failed to calculate distance between vector and centroid')
                 distances.append((distance, centroids.index(centroid)))
-            closest_centroid = min(distances)
-            self.__clusters[closest_centroid[1]].add_document_index(vectors.index(vector))
+            closest_centroid = min(distances)[1]
+            self.__clusters[closest_centroid].add_document_index(vectors.index(vector))
 
         for cluster in self.__clusters:
             cluster_indices = cluster.get_indices()
             cluster_vectors = [vectors[ind][1] for ind in cluster_indices]
-            new_centroid = tuple(sum(score) / len(vectors) for score in zip(*cluster_vectors))
+            new_centroid = tuple(sum(scores) / len(scores) for scores in zip(*cluster_vectors))
             cluster.set_new_centroid(new_centroid)
         return self.__clusters
 
@@ -425,34 +425,26 @@ class KMeans:
         Returns:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
-        if not isinstance(query_vector, tuple) or not query_vector \
-                or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+        if not query_vector or n_neighbours <= 0:
             raise ValueError('Invalid input argument(s)')
         cent_distances = []
         for ind, cluster in enumerate(self.__clusters):
             centroid = cluster.get_centroid()
-            # if not cluster.get_centroid():
-            #     cluster_indices = cluster.get_indices()
-            #     cluster_vectors = [self._db.get_vectors()[ind][1] for ind in cluster_indices]
-            #     new_centroid = tuple(sum(score) / len(self._db.get_vectors())
-            #                          for score in zip(*cluster_vectors))
-            #     cluster.set_new_centroid(new_centroid)
             if not centroid:
-                continue
+                centroid = self.__clusters.pop(-1)
             cent_distance = calculate_distance(query_vector, centroid)
             if cent_distance is None:
-                raise ValueError('Failed to calculate distance btwn query vector and centroid')
+                raise ValueError('Failed to calculate distance between query vector and centroid')
             cent_distances.append((cent_distance, ind))
         closest_cent = min(cent_distances)[1]
         doc_indices = self.__clusters[closest_cent].get_indices()
         doc_vectors = self._db.get_vectors(doc_indices)
         doc_distances = []
-        for ind, vector in doc_vectors:
-            doc_distance = calculate_distance(query_vector, vector)
-            print(doc_distance)
+        for vector in zip(doc_vectors):
+            doc_distance = calculate_distance(query_vector, vector[0][1])
             if doc_distance is None:
-                raise ValueError('Failed to calculate distance btwn query and document vectors')
-            doc_distances.append((doc_distance, ind))
+                raise ValueError('Failed to calculate distance between query and document vectors')
+            doc_distances.append((doc_distance, vector[0][0]))
         return sorted(doc_distances, key=lambda pair: pair[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:

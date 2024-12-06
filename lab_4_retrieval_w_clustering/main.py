@@ -369,8 +369,8 @@ class KMeans:
         Train k-means algorithm.
         """
         start_centroids = self._db.get_vectors()[:self._n_clusters]
-        for ind, centroid in start_centroids:
-            self.__clusters.append(ClusterDTO(centroid))
+        for centroid in start_centroids:
+            self.__clusters.append(ClusterDTO(centroid[1]))
         while True:
             new_clusters = self.run_single_train_iteration()
             if self._is_convergence_reached(new_clusters):
@@ -431,20 +431,20 @@ class KMeans:
         for ind, cluster in enumerate(self.__clusters):
             centroid = cluster.get_centroid()
             if not centroid:
-                centroid = self.__clusters.pop(-1)
+                centroid = self.__clusters.pop()
             cent_distance = calculate_distance(query_vector, centroid)
             if cent_distance is None:
                 raise ValueError('Failed to calculate distance between query vector and centroid')
             cent_distances.append((cent_distance, ind))
-        closest_cent = min(cent_distances)[1]
-        doc_indices = self.__clusters[closest_cent].get_indices()
+        closest_cluster = min(cent_distances)[1]
+        doc_indices = self.__clusters[closest_cluster].get_indices()
         doc_vectors = self._db.get_vectors(doc_indices)
         doc_distances = []
-        for vector in zip(doc_vectors):
-            doc_distance = calculate_distance(query_vector, vector[0][1])
+        for ind, vector in doc_vectors:
+            doc_distance = calculate_distance(query_vector, vector)
             if doc_distance is None:
                 raise ValueError('Failed to calculate distance between query and document vectors')
-            doc_distances.append((doc_distance, vector[0][0]))
+            doc_distances.append((doc_distance, ind))
         return sorted(doc_distances, key=lambda pair: pair[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
@@ -534,6 +534,20 @@ class ClusteringSearchEngine:
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
+        if not isinstance(query, str) or not query or not isinstance(n_neighbours, int) \
+                or n_neighbours <= 0:
+            raise ValueError('Invalid Input argument(s)')
+        query_tokens = self._db.get_tokenizer().tokenize(query)
+        if not query_tokens:
+            raise ValueError('Failed to tokenize query')
+        query_vector = self._db.get_vectorizer().vectorize(query_tokens)
+        if not query_vector:
+            raise ValueError('Failed to vectorize query')
+        knn = self.__algo.infer(query_vector, n_neighbours)
+        if not knn:
+            raise ValueError('Failed to get k nearest neighbours')
+        docs = self._db.get_raw_documents()
+        return [(distance, docs[ind]) for distance, ind in knn]
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """

@@ -31,7 +31,7 @@ def get_paragraphs(text: str) -> list[str]:
 
     if not text:
         raise ValueError
-    return text.split("\n")
+    return [line for line in text.split("\n") if line.strip()]
 
 
 class BM25Vectorizer(Vectorizer):

@@ -54,9 +54,9 @@ def main() -> None:
     list_of_paragraphs = get_paragraphs(' '.join(open_files()[0]))
 
     db = DocumentVectorDB(open_files()[1])
+    db.put_corpus(list_of_paragraphs)
     vec_db_search_engine = VectorDBSearchEngine(db)
 
-    db.put_corpus(list_of_paragraphs)
     result = vec_db_search_engine.retrieve_relevant_documents(query, 3)
     print(result)
     assert result, "Result is None"

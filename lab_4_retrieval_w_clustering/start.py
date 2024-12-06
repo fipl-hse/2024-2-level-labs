@@ -70,8 +70,7 @@ def main() -> None:
 
     relevant_documents = search_engine.retrieve_relevant_documents(query, 3)
 
-    clustering_search = ClusteringSearchEngine(db, 5)
-
+    clustering_search = ClusteringSearchEngine(db)
     cluster_result = clustering_search.retrieve_relevant_documents(query, 5)
 
     result = relevant_documents

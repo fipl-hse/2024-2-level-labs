@@ -117,7 +117,8 @@ class BM25Vectorizer(Vectorizer):
         bm25_scores = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
                                      1.5, 0.75, self._avg_doc_len, len(tokenized_document))
         for index, word in enumerate(self._vocabulary):
-            bm25_vector[index] = bm25_scores[word]
+            if word in bm25_scores:
+                bm25_vector[index] = bm25_scores[word]
         return tuple(bm25_vector)
 
 
@@ -267,7 +268,11 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if not query or not isinstance(n_neighbours, int) or n_neighbours <= 0:
             raise ValueError
         tokenized_query = self._db.get_tokenizer().tokenize(query)
+        if tokenized_query is None:
+            raise ValueError
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
+        if query_vector is None:
+            raise ValueError
         vectors = [index[1] for index in self._db.get_vectors()]
         if query_vector is None:
             raise ValueError

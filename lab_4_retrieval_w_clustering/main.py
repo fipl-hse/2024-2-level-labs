@@ -6,6 +6,7 @@ Vector search with clusterization
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
+from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -45,7 +46,7 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
-        Vectorizer.__init__(self)
+        Vectorizer.__init__(self, corpus= [])
         self._corpus = []
         self._avg_doc_len = -1.0
 
@@ -99,6 +100,18 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
+        if not isinstance(tokenized_document, list) or not tokenized_document \
+            or not all(isinstance(par, str) for par in tokenized_document):
+            raise ValueError
+
+        vector = (0.0 for i in len(self._vocabulary))
+
+        for term in tokenized_document:
+            if term in self._vocabulary:
+                score = calculate_bm25(term, self._vocabulary)
+                vector[self._vocabulary.index(term)] = score
+
+        return vector
 
 
 class DocumentVectorDB:

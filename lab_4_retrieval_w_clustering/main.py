@@ -55,8 +55,8 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__([])
         self._corpus = []
-        super().__init__(self._corpus)
         self._avg_doc_len = -1
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -242,8 +242,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        super().__init__(db.get_vectorizer(), db.get_tokenizer())
         self._db = db
-        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -531,7 +531,6 @@ class KMeans:
             raise ValueError
 
         old_clusters = [cluster.get_centroid() for cluster in self.__clusters]
-        # for i in range(len(new_clusters)):
         for index, value in enumerate(new_clusters):
             distance = calculate_distance(value.get_centroid(), old_clusters[index])
             if distance is None:

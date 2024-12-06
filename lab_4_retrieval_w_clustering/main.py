@@ -419,8 +419,9 @@ class KMeans:
         vectors = self._db.get_vectors()
         for cluster in self.__clusters:
             cluster_vectors = [vectors[index][-1] for index in cluster.get_indices()]
-            cluster.set_new_centroid(tuple([sum(vector[index] for index in range(
-                len(vector))) / len(cluster_vectors) for vector in cluster_vectors]))
+            centroid_vector = [sum(vector[index] for index in range(
+                len(vector))) / len(cluster_vectors) for vector in cluster_vectors]
+            cluster.set_new_centroid(tuple(centroid_vector))
         return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
@@ -480,7 +481,7 @@ class KMeans:
         clusters_info: list[dict[str, int | list[str]]] = []
         for cluster in self.__clusters:
             inference = self.infer(cluster.get_centroid(), num_examples)
-            indices = (tuple(pair[1] for pair in inference))
+            indices = tuple(pair[1] for pair in inference)
             documents = self._db.get_raw_documents(indices)
             if documents is None:
                 raise ValueError

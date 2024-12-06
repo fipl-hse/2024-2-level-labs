@@ -4,10 +4,11 @@ Lab 4.
 Vector search with clusterization
 """
 
-# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
-from lab_3_ann_retriever.main import (BasicSearchEngine, Tokenizer, Vector, Vectorizer)
-
 from lab_2_retrieval_w_bm25.main import calculate_bm25
+
+# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+from lab_3_ann_retriever.main import (BasicSearchEngine, calculate_distance, Tokenizer, Vector,
+                                      Vectorizer)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -258,14 +259,14 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError
         vector_query = self._db.get_vectorizer().vectorize(tokenized_query)
         if vector_query is None:
-            raise ValueError
+            raise ValueError('The method returned None')
         vectors = [pair[1] for pair in self._db.get_vectors()]
         most_relevant = self._calculate_knn(vector_query, vectors, n_neighbours)
         if most_relevant is None or not most_relevant or all(None in v for v in most_relevant):
             raise ValueError
-        indeces = tuple([pair[0] for pair in most_relevant])
-        raw_documents = self._db.get_raw_documents(indeces)
-        return [(most_relevant[num][1], raw_documents[num]) for num, index in enumerate(indeces)]
+        indices = tuple([pair[0] for pair in most_relevant])
+        raw_documents = self._db.get_raw_documents(indices)
+        return [(most_relevant[num][1], raw_documents[num]) for num, index in enumerate(indices)]
 
 
 class ClusterDTO:
@@ -283,6 +284,8 @@ class ClusterDTO:
         Args:
             centroid_vector (Vector): Centroid vector.
         """
+        self.__centroid = centroid_vector
+        self.__indices = []
 
     def __len__(self) -> int:
         """
@@ -291,6 +294,7 @@ class ClusterDTO:
         Returns:
             int: The number of document indices.
         """
+        return len(self.__indices)
 
     def get_centroid(self) -> Vector:
         """
@@ -299,6 +303,7 @@ class ClusterDTO:
         Returns:
             Vector: Centroid of current cluster.
         """
+        return self.__centroid
 
     def set_new_centroid(self, new_centroid: Vector) -> None:
         """
@@ -311,11 +316,15 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
+        if not new_centroid or not isinstance(new_centroid, tuple):
+            raise ValueError
+        self.__centroid = new_centroid
 
     def erase_indices(self) -> None:
         """
         Clear indexes.
         """
+        self.__indices = []
 
     def add_document_index(self, index: int) -> None:
         """
@@ -328,6 +337,10 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
+        if not index or not isinstance(index, int) or index < 0:
+            raise ValueError
+        if index not in self.__indices:
+            self.__indices.append(index)
 
     def get_indices(self) -> list[int]:
         """
@@ -336,6 +349,7 @@ class ClusterDTO:
         Returns:
             list[int]: Indices of documents.
         """
+        return self.__indices
 
 
 class KMeans:
@@ -355,6 +369,9 @@ class KMeans:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             n_clusters (int): Number of clusters.
         """
+        self.__clusters = []
+        self._db = db
+        self._n_clusters = n_clusters
 
     def train(self) -> None:
         """
@@ -371,6 +388,14 @@ class KMeans:
         Returns:
             list[ClusterDTO]: List of clusters.
         """
+        for cluster in self.__clusters:
+            cluster.erase_indices()
+            centroid = cluster.get_centroid()
+            vectors = self._db.get_vectors()
+            for vector in vectors:
+                distance = calculate_distance(centroid, vector[1])
+
+
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """

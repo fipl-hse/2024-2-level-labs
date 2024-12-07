@@ -4,7 +4,6 @@ Laboratory Work #4 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from lab_4_retrieval_w_clustering.main import (
-    ClusteringSearchEngine,
     DocumentVectorDB,
     get_paragraphs,
     VectorDBSearchEngine,
@@ -74,7 +73,7 @@ def main() -> None:
     clustering_search = VectorDBAdvancedSearchEngine(db)
     cluster_result = clustering_search.retrieve_relevant_documents(query, 5)
 
-    result = relevant_documents
+    result = relevant_documents, cluster_result
     assert result, "Result is None"
 
 

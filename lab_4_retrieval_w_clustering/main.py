@@ -400,6 +400,12 @@ class KMeans:
         """
         Train k-means algorithm.
         """
+        first_n_centroids = self._db.get_vectors()[:self._n_clusters]
+        for centroid in first_n_centroids:
+            self.__clusters.append(ClusterDTO(centroid[1]))
+        self.run_single_train_iteration()
+        while self._is_convergence_reached(self.__clusters) is not True:
+            self.run_single_train_iteration()
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -419,20 +425,26 @@ class KMeans:
         for index, vector_tuple in self._db.get_vectors():
             distances = []
             for centroid in new_centroids:
-                dist_between_vec_from_db_to_centroid_of_cluster = calculate_distance(vector_tuple, centroid)
+                dist_between_vec_from_db_to_centroid_of_cluster = calculate_distance(vector_tuple,
+                                                                                     centroid)
+                if dist_between_vec_from_db_to_centroid_of_cluster is None:
+                    raise ValueError('calculate_distance() returned None')
                 if distances is None:
                     raise ValueError('calculate_distance() from lab3 returned None')
                 distances.append(dist_between_vec_from_db_to_centroid_of_cluster)
             self.__clusters[distances.index(min(distances))].add_document_index(index)
 
         for cluster_to_update in self.__clusters:
-            l_of_vecs_as_tuples = [self._db.get_vectors()[ind][1] for ind in cluster_to_update.get_indices()]
+            l_of_vecs_as_tuples = [self._db.get_vectors()[ind][1]
+                                   for ind in cluster_to_update.get_indices()]
+            if len(l_of_vecs_as_tuples) <= 0:
+                continue
             updated_centroid = []
-            for i in range(0, len(l_of_vecs_as_tuples[0]) - 1):
+            for i in range(len(l_of_vecs_as_tuples[0])):
                 summarized_el = 0
                 for vec in l_of_vecs_as_tuples:
-                    summarized_el += vec[i] // len(l_of_vecs_as_tuples)
-                updated_centroid.append(summarized_el)
+                    summarized_el += vec[i]
+                updated_centroid.append(summarized_el / len(l_of_vecs_as_tuples))
 
             cluster_to_update.set_new_centroid(tuple(updated_centroid))
 
@@ -499,6 +511,16 @@ class KMeans:
         if (not new_clusters or not isinstance(new_clusters, list)
                 or not isinstance(threshold, float) or threshold <= 0):
             raise ValueError('Invalid input')
+
+        for cl_index, cluster in enumerate(new_clusters):
+            current_centroid = cluster.get_centroid()
+            previous_centroid = self.__clusters[cl_index].get_centroid()
+            difference = calculate_distance(previous_centroid, current_centroid)
+            if difference is None:
+                raise ValueError('calculate_distance() returned None')
+            if difference <= threshold:
+                return True
+            return False
 
 
 class ClusteringSearchEngine:

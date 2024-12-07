@@ -69,13 +69,17 @@ def main() -> None:
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
 
     relevant_documents = search_engine.retrieve_relevant_documents(query, 3)
-    if relevant_documents is not None:
+    if relevant_documents:
         print(relevant_documents)
+    else:
+        return None
 
     clustering_search = VectorDBAdvancedSearchEngine(db)
     cluster_result = clustering_search.retrieve_relevant_documents(query, 5)
-    if cluster_result is not None:
+    if cluster_result:
         print(cluster_result)
+    else:
+        return None
 
     result = relevant_documents, cluster_result
     assert result, "Result is None"

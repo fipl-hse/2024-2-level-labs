@@ -3,8 +3,13 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from lab_4_retrieval_w_clustering.main import DocumentVectorDB, get_paragraphs, VectorDBSearchEngine
 from time import time
+from lab_4_retrieval_w_clustering.main import (
+    ClusteringSearchEngine,
+    DocumentVectorDB,
+    get_paragraphs,
+    VectorDBSearchEngine,
+)
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -58,9 +63,11 @@ def main() -> None:
     db = DocumentVectorDB(open_files()[1])
     db.put_corpus(corpus)
     vector_search = VectorDBSearchEngine(db)
-    result = vector_search.retrieve_relevant_documents(query, 3)
+    vector_result = vector_search.retrieve_relevant_documents(query, 3)
+    clustering_search = ClusteringSearchEngine(db, 2)
+    result = clustering_search.retrieve_relevant_documents(query, 1)
     finish = time()
-    print(result, "\n", finish - start)
+    print(vector_result, "\n", result, "\n", finish - start)
     assert result, "Result is None"
 
 

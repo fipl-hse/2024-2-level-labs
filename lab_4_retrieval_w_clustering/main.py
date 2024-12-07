@@ -6,7 +6,14 @@ Vector search with clusterization
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_2_retrieval_w_bm25.main import calculate_bm25
-from lab_3_ann_retriever.main import BasicSearchEngine, calculate_distance, Tokenizer, Vector, Vectorizer
+from lab_3_ann_retriever.main import (
+    BasicSearchEngine,
+    calculate_distance,
+    Tokenizer,
+    Vector,
+    Vectorizer,
+)
+
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -386,10 +393,11 @@ class KMeans:
         Returns:
             list[ClusterDTO]: List of clusters.
         """
-        centroids = [cluster.get_centroid() for cluster in self.__clusters]
+        centroids = []
         vectors = self._db.get_vectors()
         for cluster in self.__clusters:
             cluster.erase_indices()
+            centroids.append(cluster.get_centroid())
 
         for vector in vectors:
             distances = []
@@ -428,24 +436,31 @@ class KMeans:
         if not query_vector or n_neighbours <= 0:
             raise ValueError('Invalid input argument(s)')
         cent_distances = []
+        no_centroid = True
         for ind, cluster in enumerate(self.__clusters):
             centroid = cluster.get_centroid()
+            no_centroid = False
             if not centroid:
-                centroid = self.__clusters.pop()
+                no_centroid = True
+                centroid = 0
             cent_distance = calculate_distance(query_vector, centroid)
             if cent_distance is None:
                 raise ValueError('Failed to calculate distance between query vector and centroid')
             cent_distances.append((cent_distance, ind))
-        closest_cluster = min(cent_distances)[1]
+        if no_centroid:
+            closest_cluster = 0
+        else:
+            closest_cluster = min(cent_distances)[1]
         doc_indices = self.__clusters[closest_cluster].get_indices()
         doc_vectors = self._db.get_vectors(doc_indices)
         doc_distances = []
-        for ind, vector in doc_vectors:
-            doc_distance = calculate_distance(query_vector, vector)
+        for vector in doc_vectors:
+            doc_distance = calculate_distance(query_vector, vector[1])
             if doc_distance is None:
                 raise ValueError('Failed to calculate distance between query and document vectors')
-            doc_distances.append((doc_distance, ind))
-        return sorted(doc_distances, key=lambda pair: pair[0])[:n_neighbours]
+            doc_distances.append((doc_distance, vector[0]))
+        sorted_distances = sorted(doc_distances, key=lambda pair: pair[0])[:n_neighbours]
+        return sorted_distances
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """
@@ -544,9 +559,7 @@ class ClusteringSearchEngine:
         if not query_vector:
             raise ValueError('Failed to vectorize query')
         knn = self.__algo.infer(query_vector, n_neighbours)
-        if not knn:
-            raise ValueError('Failed to get k nearest neighbours')
-        docs = self._db.get_raw_documents()
+        docs = self._db.get_raw_documents(tuple(ind for distance, ind in knn))
         return [(distance, docs[ind]) for distance, ind in knn]
 
     def make_report(self, num_examples: int, output_path: str) -> None:

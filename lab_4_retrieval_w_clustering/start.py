@@ -6,8 +6,8 @@ Laboratory Work #4 starter.
 from lab_4_retrieval_w_clustering.main import (
     DocumentVectorDB,
     get_paragraphs,
+    VectorDBAdvancedSearchEngine,
     VectorDBSearchEngine,
-    VectorDBAdvancedSearchEngine
 )
 
 
@@ -69,9 +69,13 @@ def main() -> None:
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
 
     relevant_documents = search_engine.retrieve_relevant_documents(query, 3)
+    if relevant_documents is not None:
+        print(relevant_documents)
 
     clustering_search = VectorDBAdvancedSearchEngine(db)
     cluster_result = clustering_search.retrieve_relevant_documents(query, 5)
+    if cluster_result is not None:
+        print(cluster_result)
 
     result = relevant_documents, cluster_result
     assert result, "Result is None"

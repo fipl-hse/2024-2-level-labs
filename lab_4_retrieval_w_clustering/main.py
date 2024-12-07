@@ -117,7 +117,7 @@ class BM25Vectorizer(Vectorizer):
         bm25_scores = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
                                      1.5, 0.75, self._avg_doc_len, len(tokenized_document))
         for index, word in enumerate(self._vocabulary):
-            if word in bm25_scores and bm25_scores is not None:
+            if bm25_scores is not None and word in bm25_scores:
                 bm25_vector[index] = bm25_scores[word]
         return tuple(bm25_vector)
 

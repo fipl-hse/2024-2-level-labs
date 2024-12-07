@@ -3,7 +3,8 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from main import DocumentVectorDB
+from lab_4_retrieval_w_clustering.main import BM25Vectorizer, DocumentVectorDB, VectorDBSearchEngine
+
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -49,9 +50,18 @@ def main() -> None:
     """
     Launch an implementation.
     """
+    vectorizer = BM25Vectorizer()
     documents, stopwords = open_files()
     db = DocumentVectorDB(stopwords)
-    result = None
+    db.put_corpus(documents)
+    vector_search = VectorDBSearchEngine(db)
+
+    query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
+    n_neighbours = 3
+    relevant_documents = vector_search.retrieve_relevant_documents(query, n_neighbours)
+    print(f'Demo 1: KNN Search\n{relevant_documents}')
+
+    result = relevant_documents
     assert result, "Result is None"
 
 

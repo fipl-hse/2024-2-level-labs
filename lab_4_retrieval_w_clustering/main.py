@@ -444,7 +444,7 @@ class KMeans:
                 continue
             updated_centroid = []
             for i in range(len(l_of_vecs_as_tuples[0])):
-                summarized_el = 0
+                summarized_el = 0.0
                 for vec in l_of_vecs_as_tuples:
                     summarized_el += vec[i]
                 updated_centroid.append(summarized_el / len(l_of_vecs_as_tuples))

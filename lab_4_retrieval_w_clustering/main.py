@@ -463,7 +463,8 @@ class KMeans:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
 
-        if not query_vector or n_neighbours <= 0:
+        if (not isinstance(query_vector, tuple) or not query_vector
+                or not isinstance(n_neighbours, int) or not n_neighbours or n_neighbours <= 0):
             raise ValueError
         centroid_distances = []
         for cluster in self.__clusters:

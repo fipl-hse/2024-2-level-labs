@@ -8,6 +8,7 @@ from lab_4_retrieval_w_clustering.main import (
     DocumentVectorDB,
     get_paragraphs,
     VectorDBSearchEngine,
+    VectorDBAdvancedSearchEngine
 )
 
 
@@ -70,7 +71,7 @@ def main() -> None:
 
     relevant_documents = search_engine.retrieve_relevant_documents(query, 3)
 
-    clustering_search = ClusteringSearchEngine(db)
+    clustering_search = VectorDBAdvancedSearchEngine(db)
     cluster_result = clustering_search.retrieve_relevant_documents(query, 5)
 
     result = relevant_documents

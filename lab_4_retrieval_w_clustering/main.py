@@ -147,8 +147,6 @@ class DocumentVectorDB:
         """
         if not corpus or not isinstance(corpus, list):
             raise ValueError('inappropriate type of input argument or input argument is empty')
-            
-        self._vectorizer.build()
         
         tokenized_corpus = []
         for text in corpus:
@@ -158,8 +156,9 @@ class DocumentVectorDB:
                 self.__documents.append(text)
         if tokenized_corpus is None:
             raise ValueError('used method return None')
-                
+
         self._vectorizer.set_tokenized_corpus(tokenized_corpus)
+        self._vectorizer.build()
         
         for index, tokenized_doc in enumerate(tokenized_corpus):
             self.__vectors[index] = self._vectorizer.vectorize(tokenized_doc)
@@ -173,6 +172,7 @@ class DocumentVectorDB:
         Returns:
             BM25Vectorizer: BM25Vectorizer class object.
         """
+        return self._vectorizer
 
     def get_tokenizer(self) -> Tokenizer:
         """
@@ -181,6 +181,7 @@ class DocumentVectorDB:
         Returns:
             Tokenizer: Tokenizer class object.
         """
+        return self._tokenizer
 
     def get_vectors(self, indices: list[int] | None = None) -> list[tuple[int, Vector]]:
         """
@@ -192,6 +193,14 @@ class DocumentVectorDB:
         Returns:
             list[tuple[int, Vector]]: List of index and vector for documents.
         """
+        result = []
+        if indices is None:
+            for index, vector in self.__vectors.items():
+                result.append((index, vector))
+            return result
+        for index in indices:
+            result.append((index, self.__vectors[index]))
+        return result
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
         """
@@ -206,6 +215,14 @@ class DocumentVectorDB:
         Returns:
             Corpus: List of documents.
         """
+        result = []
+        if indices is None:
+            return self.__documents
+        if not isinstance(indices, tuple):
+            raise ValueError('inappropriate type input of argument')
+        for index in set(indices):
+            result.append(self.__documents[index])
+        return result
 
 
 class VectorDBSearchEngine(BasicSearchEngine):
@@ -222,6 +239,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        self._db = db
+        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -234,6 +253,27 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
+        if (not query or n_neighbours <= 0 or
+                not isinstance(query, str) or not isinstance(n_neighbours, int)):
+            raise ValueError('inappropriate type of input argument or input argument is empty')
+        tokenized_query = self._tokenizer.tokenize(query)
+        vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
+        document_vectors = []
+        for vector in self._db.get_vectors():
+            document_vectors.append(vector[1])
+        if document_vectors is None:
+            raise ValueError('used method return None')
+        knn = self._calculate_knn(vectorized_query, document_vectors, n_neighbours)
+        if knn is None:
+            raise ValueError('used method return None')
+        indices = []
+        for pair in knn:
+            indices.append(pair[0])
+        documents = self._db.get_raw_documents(tuple(indices))
+        relevant_documents = []
+        for pair in knn:
+            relevant_documents.append((pair[1], documents[pair[0]]))
+        return relevant_documents
 
 
 class ClusterDTO:

@@ -480,7 +480,7 @@ class KMeans:
             distance = calculate_distance(query_vector, vector)
             if distance is None:
                 raise ValueError
-            vector_distances = [].append((distance, i))
+            vector_distances.append((distance, i))
         return sorted(vector_distances, key=lambda x: x[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:

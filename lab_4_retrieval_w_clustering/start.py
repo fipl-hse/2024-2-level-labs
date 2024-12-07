@@ -72,9 +72,9 @@ def main() -> None:
     relevant_documents = search_engine.retrieve_relevant_documents(query, 3)
 
     clustering_search = VectorDBAdvancedSearchEngine(db)
-    cluster_result = clustering_search.retrieve_relevant_documents(query, 5)
+    print(clustering_search.retrieve_relevant_documents(query, 5))
 
-    result = basic_result, relevant_documents, cluster_result
+    result = basic_result, relevant_documents
     print(result)
     assert result, "Result is None"
 

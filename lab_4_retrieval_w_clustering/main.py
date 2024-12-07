@@ -4,7 +4,7 @@ Lab 4.
 Vector search with clusterization
 """
 
-from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
+from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import (
@@ -277,6 +277,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError('Invalid input')
 
         tok_query = self._tokenizer.tokenize(query)
+        if tok_query is None or not isinstance(tok_query, list):
+            raise ValueError('_tokenizer.tokenize() returned smth wrong')
 
         c_knn_result = self._calculate_knn(self._db.get_vectorizer().vectorize(tok_query),
                                            [vec[1] for vec in self._db.get_vectors()], n_neighbours)

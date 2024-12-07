@@ -129,7 +129,8 @@ class BM25Vectorizer(Vectorizer):
                               1.5, 0.75,
                               self._avg_doc_len, doc_len)
         for i, token in enumerate(self._vocabulary):
-            bm25_vector[i] = bm25[token]
+            if bm25 is not None:
+                bm25_vector[i] = bm25[token]
         return tuple(bm25_vector)
 
 

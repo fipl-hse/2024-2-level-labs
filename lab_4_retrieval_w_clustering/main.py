@@ -480,7 +480,7 @@ class KMeans:
         """
         if not isinstance(num_examples, int) or not num_examples or num_examples < 0:
             raise ValueError
-        result = []
+        result: list[dict[str, int | list[str]]] = []
         for cluster in self.__clusters:
             cluster_vectors = self._db.get_vectors(cluster.get_indices())
             distances = [(calculate_distance(vector[1], cluster.get_centroid()), index)

@@ -38,7 +38,7 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not isinstance(text, str) or not text:
-        raise ValueError
+        raise ValueError('Invalid arguments in get_paragraphs')
 
     return text.split('\n')
 
@@ -70,7 +70,7 @@ class BM25Vectorizer(Vectorizer):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(tokenized_corpus, list) or not tokenized_corpus:
-            raise ValueError
+            raise ValueError('Invalid arguments in set_tokenized_corpus')
 
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(paragraph) for paragraph in
@@ -92,11 +92,11 @@ class BM25Vectorizer(Vectorizer):
             Vector: BM25 vector for document.
         """
         if not isinstance(tokenized_document, list) or not tokenized_document:
-            raise ValueError
+            raise ValueError('Invalid arguments in vectorize')
 
         result = self._calculate_bm25(tokenized_document)
         if not result:
-            raise ValueError
+            raise ValueError('self._calculate_bm25 returned None')
         return result
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -113,7 +113,7 @@ class BM25Vectorizer(Vectorizer):
             Vector: BM25 vector for document.
         """
         if not isinstance(tokenized_document, list) or not tokenized_document:
-            raise ValueError
+            raise ValueError('Invalid arguments in _calculate_bm25')
 
         bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
                               avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
@@ -159,7 +159,7 @@ class DocumentVectorDB:
                 or if methods used return None.
         """
         if not isinstance(corpus, list) or not corpus:
-            raise ValueError
+            raise ValueError('Invalid arguments in put_corpus')
 
         tokenized_corpus = []
         for text in corpus:
@@ -168,7 +168,7 @@ class DocumentVectorDB:
                 tokenized_corpus.append(tokenized_text)
                 self.__documents.append(text)
         if not tokenized_corpus:
-            raise ValueError
+            raise ValueError('tokenized corpus is empty')
 
         self._vectorizer.set_tokenized_corpus(tokenized_corpus)
         self._vectorizer.build()
@@ -223,7 +223,7 @@ class DocumentVectorDB:
         if indices is None:
             return self.__documents
         if not isinstance(indices, tuple):
-            raise ValueError
+            raise ValueError('indices argument to get_raw_documents is not tuple')
 
         return [self.__documents[index] for index in set(indices)]
 
@@ -258,18 +258,18 @@ class VectorDBSearchEngine(BasicSearchEngine):
         """
         if not isinstance(query, str) or not query or not isinstance(n_neighbours, int) \
                 or n_neighbours <= 0:
-            raise ValueError
+            raise ValueError('Invalid arguments in retrieve_relevant_documents')
 
         tokenizer, vectorizer = self._db.get_tokenizer(), self._db.get_vectorizer()
         tokenized_query = tokenizer.tokenize(query)
         if tokenized_query is None:
-            raise ValueError
+            raise ValueError('tokenize returned None')
         vectorized_query = vectorizer.vectorize(tokenized_query)
 
         vectors = [vector[1] for vector in self._db.get_vectors()]
         neighbours = self._calculate_knn(vectorized_query, vectors, n_neighbours)
         if neighbours is None:
-            raise ValueError
+            raise ValueError('_calculate_knn returned None')
         documents = self._db.get_raw_documents(tuple(pair[0] for pair in neighbours))
         return [(distance, documents[index]) for index, distance in neighbours]
 
@@ -322,7 +322,7 @@ class ClusterDTO:
                 or if input arguments are empty.
         """
         if not isinstance(new_centroid, tuple) or not new_centroid:
-            raise ValueError
+            raise ValueError('Invalid argument in set_new_centroid')
         self.__centroid = new_centroid
 
     def erase_indices(self) -> None:
@@ -343,7 +343,7 @@ class ClusterDTO:
                 or if input arguments are empty.
         """
         if not isinstance(index, int) or index < 0:
-            raise ValueError
+            raise ValueError('Invalid arguments in add_document_index')
         self.__indices.append(index)
         self.__indices = list(set(self.__indices))
 
@@ -411,7 +411,7 @@ class KMeans:
                 if distance is not None:
                     distances.append(distance)
                 else:
-                    raise ValueError
+                    raise ValueError('calculate_distance returned None')
 
             nearest_centroid = min(distances)
             self.__clusters[distances.index(nearest_centroid)].add_document_index(index)
@@ -443,13 +443,13 @@ class KMeans:
         """
         if not isinstance(query_vector, tuple) or not query_vector or \
                 not isinstance(n_neighbours, int) or n_neighbours <= 0:
-            raise ValueError
+            raise ValueError('Invalid arguments in infer')
 
         min_distance_cluster: tuple[float, ClusterDTO] = (100, self.__clusters[0])
         for cluster in self.__clusters:
             distance = calculate_distance(cluster.get_centroid(), query_vector)
             if distance is None:
-                raise ValueError
+                raise ValueError('calculate_distance returned None')
             if distance < min_distance_cluster[0]:
                 min_distance_cluster = (distance, cluster)
 
@@ -460,7 +460,7 @@ class KMeans:
         for vector in vectors:
             distance = calculate_distance(vector[1], query_vector)
             if distance is None:
-                raise ValueError
+                raise ValueError('calculate_distance returned None')
             distances.append((distance, vector[0]))
 
         return sorted(distances, key=lambda x: x[0])[:n_neighbours]
@@ -476,15 +476,13 @@ class KMeans:
             list[dict[str, int| list[str]]]: List with information about each cluster
         """
         if not isinstance(num_examples, int) or num_examples <= 0:
-            raise ValueError
+            raise ValueError('Invalid arguments in get_clusters_info')
 
         clusters_info: list[dict[str, int | list[str]]] = []
         for cluster in self.__clusters:
             inference = self.infer(cluster.get_centroid(), num_examples)
             indices = tuple(pair[1] for pair in inference)
             documents = self._db.get_raw_documents(indices)
-            if documents is None:
-                raise ValueError
             clusters_info.append({
                 'cluster_id': self.__clusters.index(cluster),
                 'documents': documents
@@ -528,13 +526,13 @@ class KMeans:
         """
         if not isinstance(new_clusters, list) or not new_clusters or \
                 not isinstance(threshold, float):
-            raise ValueError
+            raise ValueError('Invalid arguments in _is_convergence_reached')
 
         old_clusters = [cluster.get_centroid() for cluster in self.__clusters]
         for index, value in enumerate(new_clusters):
             distance = calculate_distance(value.get_centroid(), old_clusters[index])
             if distance is None:
-                raise ValueError
+                raise ValueError('calculate_distance returned None')
             if distance >= threshold:
                 return False
         return True
@@ -578,14 +576,14 @@ class ClusteringSearchEngine:
         """
         if not isinstance(query, str) or not query or not isinstance(n_neighbours, int) or \
                 n_neighbours <= 0:
-            raise ValueError
+            raise ValueError('Invalid arguments in retrieve_relevant_documents')
 
         query_tokenized = self._db.get_tokenizer().tokenize(query)
         if query_tokenized is None:
-            raise ValueError
+            raise ValueError('tokenize returned None')
         query_vectorized = self._db.get_vectorizer().vectorize(query_tokenized)
         if query_vectorized is None:
-            raise ValueError
+            raise ValueError('vectorize returned None')
 
         infer_result = self.__algo.infer(query_vectorized, n_neighbours)
         indices = [neighbour[1] for neighbour in infer_result]
@@ -604,7 +602,7 @@ class ClusteringSearchEngine:
         """
         if not isinstance(num_examples, int) or num_examples <= 0 or \
                 not isinstance(output_path, str) or not output_path:
-            raise ValueError
+            raise ValueError('Invalid arguments in make_report')
 
         with open(output_path, 'w', encoding='utf-8') as file:
             dump(self.__algo.get_clusters_info(num_examples), file)
@@ -654,7 +652,7 @@ class VectorDBEngine:
         """
         if not isinstance(query, str) or not query or \
                 not isinstance(n_neighbours, int) or n_neighbours <= 0:
-            raise ValueError
+            raise ValueError('Invalid arguments in retrieve_relevant_documents')
         return self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
 
 

@@ -125,7 +125,7 @@ class BM25Vectorizer(Vectorizer):
 
         bm25 = calculate_bm25(self._vocabulary,
                               tokenized_document,
-                              calculate_idf(self._vocabulary, self._corpus),
+                              self._idf_values,
                               1.5, 0.75,
                               self._avg_doc_len, doc_len)
         for i, token in enumerate(self._vocabulary):

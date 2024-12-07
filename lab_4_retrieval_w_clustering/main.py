@@ -402,7 +402,7 @@ class KMeans:
         Train k-means algorithm.
         """
 
-        if not self.__clusters:
+        if not self._db or not self._db.get_vectors():
             raise ValueError
         vectors = self._db.get_vectors()[:self._n_clusters]
         if len(vectors) < self._n_clusters:
@@ -465,19 +465,23 @@ class KMeans:
 
         if not query_vector or n_neighbours <= 0:
             raise ValueError
-        min_distance = float('inf')
-        nearest_cluster = None
+        centroid_distances = []
         for cluster in self.__clusters:
-            distance = calculate_distance(query_vector, cluster.get_centroid())
-            if distance < min_distance:
-                min_distance = distance
-                nearest_cluster = cluster
-        cluster_indices = nearest_cluster.get_indices()
-        cluster_vectors = [self._db.get_vectors()[i] for i in cluster_indices]
-        distances = [(calculate_distance(query_vector, vector), i)
-                     for i, vector in zip(cluster_indices, cluster_vectors)]
-        distances.sort(key=lambda x: x[0])
-        return distances[:n_neighbours]
+            centroid_distance = calculate_distance(query_vector, cluster.get_centroid())
+            if centroid_distance is None:
+                raise ValueError
+            centroid_distances.append(centroid_distance)
+        cluster_idx = centroid_distances.index(min(centroid_distances))
+        closest_cluster = self.__clusters[cluster_idx]
+        cluster_indices = closest_cluster.get_indices()
+        cluster_vectors = self._db.get_vectors(cluster_indices)
+        vector_distances = []
+        for i, vector in cluster_vectors:
+            distance = calculate_distance(query_vector, vector)
+            if distance is None:
+                raise ValueError
+            vector_distances = [].append((distance, i))
+        return sorted(vector_distances, key=lambda x: x[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """

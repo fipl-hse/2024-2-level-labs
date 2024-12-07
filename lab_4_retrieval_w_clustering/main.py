@@ -7,8 +7,13 @@ Vector search with clusterization
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
-from lab_3_ann_retriever.main import (BasicSearchEngine, calculate_distance, Tokenizer, Vector,
-                                      Vectorizer)
+from lab_3_ann_retriever.main import (
+    BasicSearchEngine,
+    calculate_distance,
+    Tokenizer,
+    Vector,
+    Vectorizer,
+)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -160,8 +165,7 @@ class DocumentVectorDB:
                 tokenized_documents.append(tokenized_doc)
                 self.__documents.append(doc)
         self._vectorizer.set_tokenized_corpus(tokenized_documents)
-        if not self._vectorizer.build():
-            raise ValueError
+        self._vectorizer.build()
         vectors = []
         for tokenized_doc in tokenized_documents:
             vectors.append(self._vectorizer.vectorize(tokenized_doc))
@@ -253,18 +257,18 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
         if not isinstance(query, str) or not isinstance(n_neighbours, int) or n_neighbours <= 0:
-            raise ValueError
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         if tokenized_query is None:
-            raise ValueError
+            raise ValueError('The method returned None')
         vector_query = self._db.get_vectorizer().vectorize(tokenized_query)
         if vector_query is None:
             raise ValueError('The method returned None')
         vectors = [pair[1] for pair in self._db.get_vectors()]
         most_relevant = self._calculate_knn(vector_query, vectors, n_neighbours)
-        if most_relevant is None or not most_relevant or all(None in v for v in most_relevant):
+        if most_relevant is None:
             raise ValueError
-        indices = tuple([pair[0] for pair in most_relevant])
+        indices = tuple(pair[0] for pair in most_relevant)
         raw_documents = self._db.get_raw_documents(indices)
         return [(most_relevant[num][1], raw_documents[num]) for num, index in enumerate(indices)]
 
@@ -317,7 +321,7 @@ class ClusterDTO:
                 or if input arguments are empty.
         """
         if not new_centroid or not isinstance(new_centroid, tuple):
-            raise ValueError
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
         self.__centroid = new_centroid
 
     def erase_indices(self) -> None:
@@ -337,8 +341,8 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
-        if not index or not isinstance(index, int) or index < 0:
-            raise ValueError
+        if index is None or not isinstance(index, int) or index < 0:
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
         if index not in self.__indices:
             self.__indices.append(index)
 
@@ -377,6 +381,13 @@ class KMeans:
         """
         Train k-means algorithm.
         """
+        initial_centroids = self._db.get_vectors()[:self._n_clusters]
+        self.__clusters = [ClusterDTO(centroid[1]) for centroid in initial_centroids]
+        self.run_single_train_iteration()
+        while True:
+            self.run_single_train_iteration()
+            if self._is_convergence_reached(self.__clusters):
+                break
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -388,14 +399,27 @@ class KMeans:
         Returns:
             list[ClusterDTO]: List of clusters.
         """
+        centroids = []
         for cluster in self.__clusters:
             cluster.erase_indices()
             centroid = cluster.get_centroid()
-            vectors = self._db.get_vectors()
-            for vector in vectors:
-                distance = calculate_distance(centroid, vector[1])
-
-
+            centroids.append(centroid)
+        vectors = self._db.get_vectors()
+        for vector in vectors:
+            distances = []
+            for current_centroid in centroids:
+                distance = calculate_distance(current_centroid, vector[1])
+                if distance is None:
+                    raise ValueError('The function returned None')
+                distances.append(distance)
+            closest = min(distances)
+            self.__clusters[distances.index(closest)].add_document_index(vector[0])
+        for current_cluster in self.__clusters:
+            docs_vectors = [vector[1] for index in current_cluster.get_indices() for vector
+                            in vectors if index == vector[0]]
+            new_centroid = tuple(sum(row) / len(docs_vectors) for row in zip(*docs_vectors))
+            current_cluster.set_new_centroid(new_centroid)
+        return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -414,6 +438,28 @@ class KMeans:
         Returns:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
+        if not query_vector or not isinstance(query_vector, tuple) \
+                or not n_neighbours or not isinstance(n_neighbours, int):
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
+        query2centroid = []
+        for cluster in self.__clusters:
+            distance = calculate_distance(query_vector, cluster.get_centroid())
+            if distance is None:
+                raise ValueError('The function returned None')
+            query2centroid.append(distance)
+        nearest = sorted(query2centroid)[0]
+        nearest_cluster = self.__clusters[query2centroid.index(nearest)]
+        if not nearest_cluster.get_centroid():
+            nearest_cluster = self.__clusters[0]
+        indices = nearest_cluster.get_indices()
+        docs_vectors = self._db.get_vectors(indices)
+        query2vector = []
+        for vector in docs_vectors:
+            distance = calculate_distance(query_vector, vector[1])
+            if distance is None:
+                raise ValueError('The function returned None')
+            query2vector.append((distance, vector[0]))
+        return sorted(query2vector, key=lambda x: float(x[0]))[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """
@@ -452,6 +498,18 @@ class KMeans:
         Returns:
             bool: True if the distance is correct, False in other cases.
         """
+        if not new_clusters or not isinstance(new_clusters, list) \
+                or not isinstance(threshold, float):
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
+        old_centroids = [cluster.get_centroid() for cluster in self.__clusters]
+        for index, centroid in enumerate(new_clusters):
+            new_centroid = centroid.get_centroid()
+            distance = calculate_distance(new_centroid, old_centroids[index])
+            if distance is None:
+                raise ValueError('The function returned None')
+            if distance > threshold:
+                return False
+        return True
 
 
 class ClusteringSearchEngine:
@@ -470,6 +528,8 @@ class ClusteringSearchEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             n_clusters (int): Number of clusters.
         """
+        self._db = db
+        self.__algo = KMeans(self._db, n_clusters)
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -488,6 +548,22 @@ class ClusteringSearchEngine:
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
+        if not query or not isinstance(query, str) or not isinstance(n_neighbours, int) \
+                or n_neighbours <= 0:
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
+        tokenized_query = self._db.get_tokenizer().tokenize(query)
+        if tokenized_query is None:
+            raise ValueError('The method returned None')
+        vector_query = self._db.get_vectorizer().vectorize(tokenized_query)
+        if vector_query is None:
+            raise ValueError('The method returned None')
+        self.__algo.train()
+        most_relevant = self.__algo.infer(vector_query, n_neighbours)
+        if most_relevant is None:
+            raise ValueError
+        indices = tuple(pair[1] for pair in most_relevant)
+        raw_documents = self._db.get_raw_documents(indices)
+        return [(most_relevant[num][0], raw_documents[num]) for num, index in enumerate(indices)]
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """

@@ -64,24 +64,18 @@ def main() -> None:
     db = DocumentVectorDB(stopwords)
     db.put_corpus(paragraphs)
 
-    search_engine = VectorDBSearchEngine(db)
-
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
 
+    search_engine = VectorDBSearchEngine(db)
+    basic_result = search_engine.retrieve_relevant_documents(query, 1)
+
     relevant_documents = search_engine.retrieve_relevant_documents(query, 3)
-    if relevant_documents:
-        print(relevant_documents)
-    else:
-        return None
 
     clustering_search = VectorDBAdvancedSearchEngine(db)
     cluster_result = clustering_search.retrieve_relevant_documents(query, 5)
-    if cluster_result:
-        print(cluster_result)
-    else:
-        return None
 
-    result = relevant_documents, cluster_result
+    result = basic_result, relevant_documents, cluster_result
+    print(result)
     assert result, "Result is None"
 
 

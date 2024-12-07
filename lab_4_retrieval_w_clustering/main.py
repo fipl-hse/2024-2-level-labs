@@ -265,13 +265,14 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
 
-        if not query or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+        if (not isinstance(query, str) or not query
+                or not isinstance(n_neighbours, int) or n_neighbours <= 0):
             raise ValueError
         tokenized_query = self._db.get_tokenizer().tokenize(query)
-        if tokenized_query is None:
+        if tokenized_query is None or not tokenized_query:
             raise ValueError
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
-        if query_vector is None:
+        if query_vector is None or not query_vector:
             raise ValueError
         vectors = [index[1] for index in self._db.get_vectors()]
         if query_vector is None:

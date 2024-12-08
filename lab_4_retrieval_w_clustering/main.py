@@ -50,9 +50,9 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
-        Vectorizer.__init__(self, [])
         self._corpus = []
         self._avg_doc_len = -1.0
+        super().__init__(self._corpus)
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -137,7 +137,6 @@ class DocumentVectorDB:
         Args:
             stop_words (list[str]): List with stop words.
         """
-        self.stop_words = stop_words
         self._tokenizer = Tokenizer(stop_words)
         self._vectorizer = BM25Vectorizer()
         self.__documents = []
@@ -355,11 +354,10 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
-        if not index or not isinstance(index, int) or index < 0:
+        if index is None or not isinstance(index, int) or index < 0:
             raise ValueError('Value error index')
-        if index in self.__indices:
-            return
-        self.__indices.append(index)
+        if index not in self.__indices:
+            self.__indices.append(index)
 
     def get_indices(self) -> list[int]:
         """
@@ -398,6 +396,7 @@ class KMeans:
         new_centroids = self._db.get_vectors()[:self._n_clusters]
         for centroid in new_centroids:
             self.__clusters.append(ClusterDTO(centroid[1]))
+        self.run_single_train_iteration()
         while self._is_convergence_reached(self.__clusters) is False:
             self.run_single_train_iteration()
             self._is_convergence_reached(self.__clusters)
@@ -422,7 +421,7 @@ class KMeans:
         for i, vector in self._db.get_vectors():
             distances = []
             for centroid in centroids:
-                distance = calculate_distance(vector, centroid)
+                distance = calculate_distance(centroid, vector)
                 if distance is None:
                     raise ValueError('Distance is NoneType')
                 distances.append(distance)
@@ -430,8 +429,9 @@ class KMeans:
         for cluster in self.__clusters:
             cl_vectors = [vectors[index][1] for index in cluster.get_indices()]
             new_centroid = []
-            for vector in cl_vectors:
-                new_centroid.append(sum(vector) / len(cl_vectors))
+            for vector in zip(*cl_vectors):
+                value = sum(vector) / len(cl_vectors)
+                new_centroid.append(value)
             cluster.set_new_centroid(tuple(new_centroid))
         return self.__clusters
 
@@ -456,17 +456,15 @@ class KMeans:
         if not query_vector or not n_neighbours or\
                 not isinstance(query_vector, tuple) or not isinstance(n_neighbours, int):
             raise ValueError('Wrong type arguments or empty arguments')
-        centroids = []
-        for cluster in self.__clusters:
-            cluster.erase_indices()
-            centroids.append(cluster.get_centroid())
         distances = []
-        for centroid in centroids:
-            distance = calculate_distance(query_vector, centroid)
+        for cluster in self.__clusters:
+            distance = calculate_distance(query_vector, cluster.get_centroid())
             if distance is None:
                 raise ValueError('Distance is NoneType')
             distances.append(distance)
         near_cluster = self.__clusters[distances.index(min(distances))]
+        if not near_cluster.get_centroid():
+            near_cluster = self.__clusters[0]
         indices = near_cluster.get_indices()
         if indices is None:
             raise ValueError('Indices are NoneType')
@@ -549,7 +547,6 @@ class ClusteringSearchEngine:
         """
         self._db = db
         self.__algo = KMeans(self._db, n_clusters)
-        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -577,6 +574,7 @@ class ClusteringSearchEngine:
         vector_query = self._db.get_vectorizer().vectorize(token_query)
         if vector_query is None:
             raise ValueError('Query vector is NoneType')
+        self.__algo.train()
         infer = self.__algo.infer(vector_query, n_neighbours)
         if infer is None:
             raise ValueError('Infer is NoneType')

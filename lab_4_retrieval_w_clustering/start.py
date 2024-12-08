@@ -65,7 +65,7 @@ def main() -> None:
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
     relevant_docs_k_near = vector_db.retrieve_relevant_documents(query, 3)
     print(relevant_docs_k_near)
-    cluster_search_engine = ClusteringSearchEngine(doc_db, 5)
+    cluster_search_engine = ClusteringSearchEngine(doc_db)
     result = cluster_search_engine.retrieve_relevant_documents(query, 5)
     print(result)
     assert result, "Result is None"

@@ -95,7 +95,7 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError("Inappropriate type input argument")
         bm25 = self._calculate_bm25(tokenized_document)
         if bm25 is None:
-            raise ValueError
+            raise ValueError("Method returned None")
         return bm25
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -121,7 +121,7 @@ class BM25Vectorizer(Vectorizer):
         dict_bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
                                    avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         if dict_bm25 is None:
-            raise ValueError
+            raise ValueError("Method returned None")
         for token in dict_bm25:
             if token in self._vocabulary:
                 vector_bm25[self._token2ind[token]] = dict_bm25[token]
@@ -163,16 +163,16 @@ class DocumentVectorDB:
                 or if methods used return None.
         """
         if not corpus:
-            raise ValueError
+            raise ValueError("Input argument is empty")
         if not isinstance(corpus, list):
-            raise ValueError
+            raise ValueError("Inappropriate type input argument")
         documents = []
         vectors = {}
         corpus_tokenized = []
         for text in corpus:
             text_tokenized = self._tokenizer.tokenize(text)
             if text_tokenized is None:
-                raise ValueError
+                raise ValueError("Method returned None")
             if text_tokenized:
                 corpus_tokenized.append(text_tokenized)
                 documents.append(text)
@@ -182,7 +182,7 @@ class DocumentVectorDB:
         for text_tokenized in corpus_tokenized:
             text_vectorized = self._vectorizer.vectorize(text_tokenized)
             if text_vectorized is None:
-                raise ValueError
+                raise ValueError("Method returned None")
             vectors[i] = text_vectorized
             i += 1
         self.__documents = documents
@@ -267,16 +267,18 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
         if not query or not n_neighbours:
-            raise ValueError
-        if not isinstance(n_neighbours, int) or n_neighbours < 0:
-            raise ValueError
+            raise ValueError("Input argument is empty")
+        if not isinstance(n_neighbours, int):
+            raise ValueError("Inappropriate type input argument")
+        if n_neighbours < 0:
+            raise ValueError("Inappropriate value input argument")
         document_vectors = [vectors[1] for vectors in self._db.get_vectors()]
         query_vectorized = self._index_document(query)
         if not isinstance(query_vectorized, tuple):
-            raise ValueError
+            raise ValueError("Method returned None")
         knn = self._calculate_knn(query_vectorized, document_vectors, n_neighbours)
         if not isinstance(knn, list):
-            raise ValueError
+            raise ValueError("Method returned None")
         document_indexes = tuple([vectors[0]][0] for vectors in knn)
         documents_raw = self._db.get_raw_documents(document_indexes)
         relevant_documents = [(document[1], documents_raw[index])
@@ -331,8 +333,10 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
-        if not new_centroid or new_centroid is None or not isinstance(new_centroid, tuple):
-            raise ValueError
+        if not new_centroid or new_centroid is None:
+            raise ValueError("Input argument is empty")
+        if not isinstance(new_centroid, tuple):
+            raise ValueError("Inappropriate type input argument")
         self.__centroid = new_centroid
 
     def erase_indices(self) -> None:
@@ -352,8 +356,12 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
-        if not isinstance(index, int) or not index or index < 0 or isinstance(index, bool):
-            raise ValueError
+        if not isinstance(index, int) or isinstance(index, bool):
+            raise ValueError("Inappropriate type input argument")
+        if not index:
+            raise ValueError("Input argument is empty")
+        if index < 0:
+            raise ValueError("Inappropriate value input argument")
         if index not in self.__indices:
             self.__indices.append(index)
 
@@ -416,11 +424,11 @@ class KMeans:
             closest_centroid = centroids[0]
             distance_minimal = calculate_distance(vector, centroids[0])
             if distance_minimal is None:
-                raise ValueError
+                raise ValueError("Input argument is empty")
             for centroid in centroids:
                 distance = calculate_distance(vector, centroid)
                 if distance is None:
-                    raise ValueError
+                    raise ValueError("Input argument is empty")
                 if distance < distance_minimal:
                     distance_minimal = distance
                     closest_centroid = centroid
@@ -449,18 +457,21 @@ class KMeans:
         Returns:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
-        if (not isinstance(query_vector, tuple) or not query_vector or
-                not isinstance(n_neighbours, int) or n_neighbours < 1):
-            raise ValueError
+        if not isinstance(query_vector, tuple) or not isinstance(n_neighbours, int):
+            raise ValueError("Inappropriate type input argument")
+        if not query_vector:
+            raise ValueError("Input argument is empty")
+        if n_neighbours < 1:
+            raise ValueError("Inappropriate value input argument")
         centroids = [cluster.get_centroid() for cluster in self.__clusters]
         closest_centroid = centroids[0]
         distance_minimal = calculate_distance(query_vector, centroids[0])
         if distance_minimal is None:
-            raise ValueError
+            raise ValueError("Method returned None")
         for centroid in centroids:
             distance = calculate_distance(query_vector, centroid)
             if distance is None:
-                raise ValueError
+                raise ValueError("Method returned None")
             if distance < distance_minimal:
                 distance_minimal = distance
                 closest_centroid = centroid
@@ -471,11 +482,11 @@ class KMeans:
         documents_relevant = []
         distance_vector_minimal = calculate_distance(query_vector, centroids[0])
         if distance_vector_minimal is None:
-            raise ValueError
+            raise ValueError("Method returned None")
         for index, vector in vectors:
             distance_vector = calculate_distance(query_vector, vector)
             if distance_vector is None:
-                raise ValueError
+                raise ValueError("Method returned None")
             documents_relevant.append((distance_vector, index))
         documents_relevant.sort(key=lambda x: x[0])
         return documents_relevant[:n_neighbours]
@@ -518,13 +529,13 @@ class KMeans:
             bool: True if the distance is correct, False in other cases.
         """
         if not self.__clusters:
-            raise ValueError
+            raise ValueError("Input argument is empty")
         for index, old_cluster in enumerate(self.__clusters):
             new_centroid = new_clusters[index].get_centroid()
             old_centroid = old_cluster.get_centroid()
             distance = calculate_distance(new_centroid, old_centroid)
             if distance is None:
-                raise ValueError
+                raise ValueError("Method returned None")
             if distance > threshold:
                 return False
         return True

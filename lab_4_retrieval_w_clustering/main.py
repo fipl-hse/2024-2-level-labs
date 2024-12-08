@@ -216,12 +216,6 @@ class DocumentVectorDB:
         Returns:
             list[tuple[int, Vector]]: List of index and vector for documents.
         """
-        # document_vectors = list(self.__vectors.items())
-        # if indices is None:
-        #     return document_vectors
-        # else:
-        #     return [document_vectors[index] for index in indices]
-
         if indices is None:
             return list(self.__vectors.items())
         return [(index, self.__vectors[index]) for index in indices]
@@ -398,6 +392,10 @@ class KMeans:
         """
         Train k-means algorithm.
         """
+        vectors_initial = self._db.get_vectors(list(range(self._n_clusters)))
+        self.__clusters = [ClusterDTO(vector[1]) for vector in vectors_initial]
+        while not self._is_convergence_reached(self.__clusters):
+            self.run_single_train_iteration()
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -451,6 +449,34 @@ class KMeans:
         Returns:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
+        centroids = [cluster.get_centroid() for cluster in self.__clusters]
+        closest_centroid = centroids[0]
+        distance_minimal = calculate_distance(query_vector, centroids[0])
+        if distance_minimal is None:
+            raise ValueError
+        for centroid in centroids:
+            distance = calculate_distance(query_vector, centroid)
+            if distance is None:
+                raise ValueError
+            if distance < distance_minimal:
+                distance_minimal = distance
+                closest_centroid = centroid
+        closest_index = centroids.index(closest_centroid)
+        closest_cluster = self.__clusters[closest_index]
+        indices = closest_cluster.get_indices()
+        vectors = self._db.get_vectors(indices)
+
+        documents_relevant = []
+        distance_vector_minimal = calculate_distance(query_vector, centroids[0])
+        if distance_vector_minimal is None:
+            raise ValueError
+        for index, vector in vectors:
+            distance_vector = calculate_distance(query_vector, vector)
+            if distance_vector is None:
+                raise ValueError
+            documents_relevant.append((distance_vector, index))
+        documents_relevant.sort(key=lambda x: x[0])
+        return documents_relevant[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """
@@ -489,6 +515,8 @@ class KMeans:
         Returns:
             bool: True if the distance is correct, False in other cases.
         """
+        if not self.__clusters:
+            raise ValueError
         for index, old_cluster in enumerate(self.__clusters):
             new_centroid = new_clusters[index].get_centroid()
             old_centroid = old_cluster.get_centroid()

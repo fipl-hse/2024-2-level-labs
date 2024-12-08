@@ -285,11 +285,11 @@ class VectorDBSearchEngine(BasicSearchEngine):
                                            [vec[1] for vec in self._db.get_vectors()], n_neighbours)
         if not c_knn_result:
             raise ValueError('The function returned an empty list of tuples')
-        get_raw_docs_result = self._db.get_raw_documents(tuple(ind for ind in range(n_neighbours)))
+        get_raw_docs_result = self._db.get_raw_documents(tuple(t[0] for t in c_knn_result))
         if not get_raw_docs_result:
             raise ValueError('The function returned an empty list')
 
-        return [(float_figure, get_raw_docs_result[ind]) for ind, float_figure in c_knn_result]
+        return [(c_knn_result[ind][1], get_raw_docs_result[ind]) for ind, s in enumerate(get_raw_docs_result)]
 
 
 class ClusterDTO:

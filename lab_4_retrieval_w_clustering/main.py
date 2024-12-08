@@ -120,7 +120,8 @@ class BM25Vectorizer(Vectorizer):
         idf_document = calculate_idf(self._vocabulary, self._corpus)
         doc_len = len(tokenized_document)
 
-        bm25 = calculate_bm25(self._vocabulary, tokenized_document, idf_document, 1.5, 0.75, self._avg_doc_len, doc_len)
+        bm25 = calculate_bm25(self._vocabulary, tokenized_document,
+                              idf_document, 1.5, 0.75, self._avg_doc_len, doc_len)
 
         for index, word in enumerate(self._vocabulary):
             calculated_bm25[index] = bm25[word]
@@ -161,7 +162,8 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
-        if not corpus or not isinstance(corpus, list) or not all(isinstance(elem, str) for elem in corpus):
+        if (not corpus or not isinstance(corpus, list) or
+                not all(isinstance(elem, str) for elem in corpus)):
             raise ValueError('Invalid arguments')
 
         tokenized_docs = []
@@ -414,7 +416,7 @@ class KMeans:
                 if distance is None:
                     raise ValueError('calculate_distance returns None')
                 distances.append(distance)
-        
+
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
         Launch clustering model inference.

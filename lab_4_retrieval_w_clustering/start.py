@@ -1,7 +1,9 @@
 """
 Laboratory Work #4 starter.
 """
-from lab_4_retrieval_w_clustering.main import DocumentVectorDB, get_paragraphs, VectorDBSearchEngine
+from lab_4_retrieval_w_clustering.main import DocumentVectorDB, get_paragraphs, VectorDBSearchEngine, \
+    ClusteringSearchEngine
+
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 
@@ -58,7 +60,10 @@ def main() -> None:
     doc_db.put_corpus(corpus_paragraphs)
     vector_db = VectorDBSearchEngine(doc_db)
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
-    result = vector_db.retrieve_relevant_documents(query, 3)
+    relevant_docs_k_near = vector_db.retrieve_relevant_documents(query, 3)
+    print(relevant_docs_k_near)
+    cluster_search_engine = ClusteringSearchEngine(doc_db, 5)
+    result = cluster_search_engine.retrieve_relevant_documents(query, 5)
     print(result)
     assert result, "Result is None"
 

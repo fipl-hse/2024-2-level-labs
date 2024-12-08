@@ -474,6 +474,29 @@ class KMeans:
                 or n_neighbours <= 0 or not isinstance(n_neighbours, int)):
             raise ValueError('Invalid input')
 
+        dist_between_q_vec_and_cluster = []
+        for every_cluster in self.__clusters:
+            dist_between = calculate_distance(query_vector, every_cluster.get_centroid())
+            if dist_between is None:
+                raise ValueError('calculate_distance() returned None')
+            dist_between_q_vec_and_cluster.append(dist_between)
+
+        chosen_cluster = self.__clusters[dist_between_q_vec_and_cluster.index(min
+                                                                              (dist_between_q_vec_and_cluster))]
+        if chosen_cluster is None:
+            raise ValueError('chosen_cluster is None')
+
+        if chosen_cluster.get_indices() is None:
+            raise ValueError('get._indices() returned None')
+        final_list = []
+        for vec_index, vec in self._db.get_vectors(chosen_cluster.get_indices()):
+            distance_again = calculate_distance(query_vector, vec)
+            if distance_again is None:
+                raise ValueError('calculate_distance() returned None')
+            final_list.append((distance_again, vec_index))
+
+        return sorted(final_list, key=lambda x: x[0])[:n_neighbours]
+
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """
         Get clusters information.

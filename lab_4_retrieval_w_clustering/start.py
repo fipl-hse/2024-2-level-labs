@@ -50,7 +50,7 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    '''    query = 'Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления'
+    query = 'Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления'
     list_of_paragraphs = get_paragraphs(' '.join(open_files()[0]))
 
     db = DocumentVectorDB(open_files()[1])
@@ -58,8 +58,7 @@ def main() -> None:
     vec_db_search_engine = VectorDBSearchEngine(db)
 
     result = vec_db_search_engine.retrieve_relevant_documents(query, 3)
-    print(result)'''
-    result = None
+    print(result)
     assert result, "Result is None"
 
 

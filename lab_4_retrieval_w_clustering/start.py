@@ -3,6 +3,14 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+from lab_4_retrieval_w_clustering.main import (
+    ClusteringSearchEngine,
+    DocumentVectorDB,
+    get_paragraphs,
+    VectorDBAdvancedSearchEngine,
+    VectorDBSearchEngine,
+    VectorDBTreeSearchEngine,
+)
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -49,7 +57,32 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    result = None
+
+    documents = ''.join(open_files()[0])
+    stopwords = open_files()[1]
+
+    paragraphs = get_paragraphs(documents)
+
+    db = DocumentVectorDB(stopwords)
+    db.put_corpus(paragraphs)
+
+    query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
+
+    search_engine = VectorDBSearchEngine(db)
+    basic_result = search_engine.retrieve_relevant_documents(query, 1)
+
+    relevant_documents = search_engine.retrieve_relevant_documents(query, 3)
+
+    clustering_engine = ClusteringSearchEngine(db, 5)
+    clustering_engine.make_report(3, "./assets/report.json")
+
+    tree_search_engine = VectorDBTreeSearchEngine(db)
+    prev_relevant_documents = tree_search_engine.retrieve_relevant_documents(query, 1)
+
+    advanced_search_engine = VectorDBAdvancedSearchEngine(db)
+    upd_relevant_documents = advanced_search_engine.retrieve_relevant_documents(query, 5)
+
+    result = basic_result, relevant_documents, prev_relevant_documents, upd_relevant_documents
     assert result, "Result is None"
 
 

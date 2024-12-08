@@ -3,12 +3,13 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from time import time
 from lab_4_retrieval_w_clustering.main import (
     ClusteringSearchEngine,
     DocumentVectorDB,
     get_paragraphs,
+    VectorDBAdvancedSearchEngine,
     VectorDBSearchEngine,
+    VectorDBTreeSearchEngine,
 )
 
 
@@ -56,7 +57,6 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    start = time()
     documents = "".join(open_files()[0])
     corpus = get_paragraphs(documents)
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
@@ -64,10 +64,20 @@ def main() -> None:
     db.put_corpus(corpus)
     vector_search = VectorDBSearchEngine(db)
     vector_result = vector_search.retrieve_relevant_documents(query, 3)
-    clustering_search = ClusteringSearchEngine(db, 2)
-    result = clustering_search.retrieve_relevant_documents(query, 1)
-    finish = time()
-    print(vector_result, "\n", result, "\n", finish - start)
+    clustering_search = ClusteringSearchEngine(db)
+    clustering_result = clustering_search.retrieve_relevant_documents(query, 5)
+    tree_search = VectorDBTreeSearchEngine(db)
+    tree_result = tree_search.retrieve_relevant_documents(query, 5)
+    advanced_search = VectorDBAdvancedSearchEngine(db)
+    result = advanced_search.retrieve_relevant_documents(query, 5)
+    print(f"Results by VectorDBSearchEngine: \n {vector_result} \n"
+          f"Results by ClusteringSearchEngine: \n {clustering_result} \n"
+          f"Results by VectorDBTreeSearchEngine: \n {tree_result} \n"
+          f"Results by VectorDBAdvancedSearchEngine: \n {result} \n")
+    clustering_search.make_report(3, "assets/report.json")
+    for i in range(1, 15):
+        cluster_search = ClusteringSearchEngine(db, n_clusters=i)
+        print(f"Number of clusters: {i} SSE: {cluster_search.calculate_square_sum()} \n")
     assert result, "Result is None"
 
 

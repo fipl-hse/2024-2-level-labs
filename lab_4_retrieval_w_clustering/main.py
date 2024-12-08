@@ -5,10 +5,13 @@ Vector search with clusterization
 """
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+from json import dump
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
     BasicSearchEngine,
     calculate_distance,
+    SearchEngine,
     Tokenizer,
     Vector,
     Vectorizer,
@@ -394,11 +397,11 @@ class KMeans:
             list[ClusterDTO]: List of clusters.
         """
         centroids = []
-        vectors = self._db.get_vectors()
         for cluster in self.__clusters:
             cluster.erase_indices()
             centroids.append(cluster.get_centroid())
 
+        vectors = self._db.get_vectors()
         for vector in vectors:
             distances = []
             for centroid in centroids:
@@ -410,8 +413,7 @@ class KMeans:
             self.__clusters[closest_centroid].add_document_index(vectors.index(vector))
 
         for cluster in self.__clusters:
-            cluster_indices = cluster.get_indices()
-            cluster_vectors = [vectors[ind][1] for ind in cluster_indices]
+            cluster_vectors = [vectors[ind][1] for ind in cluster.get_indices()]
             new_centroid = tuple(sum(scores) / len(scores) for scores in zip(*cluster_vectors))
             cluster.set_new_centroid(new_centroid)
         return self.__clusters
@@ -442,7 +444,6 @@ class KMeans:
             no_centroid = False
             if not centroid:
                 no_centroid = True
-                centroid = 0
             cent_distance = calculate_distance(query_vector, centroid)
             if cent_distance is None:
                 raise ValueError('Failed to calculate distance between query vector and centroid')
@@ -459,8 +460,7 @@ class KMeans:
             if doc_distance is None:
                 raise ValueError('Failed to calculate distance between query and document vectors')
             doc_distances.append((doc_distance, vector[0]))
-        sorted_distances = sorted(doc_distances, key=lambda pair: pair[0])[:n_neighbours]
-        return sorted_distances
+        return sorted(doc_distances, key=lambda pair: pair[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """
@@ -472,6 +472,24 @@ class KMeans:
         Returns:
             list[dict[str, int| list[str]]]: List with information about each cluster
         """
+        if not isinstance(num_examples, int) or num_examples <= 0:
+            raise ValueError('Invalid input argument')
+        clusters_info = []
+        for index, cluster in enumerate(self.__clusters):
+            vectors = self._db.get_vectors(cluster.get_indices())
+            distances = []
+            for vector in vectors:
+                distance = calculate_distance(cluster.get_centroid(), vector[1])
+                if distance is None:
+                    raise ValueError('Failed to calculate distance')
+                distances.append((distance, vector[0]))
+            distances.sort(key=lambda pair: pair[0])
+            docs = self._db.get_raw_documents(tuple(pair[1] for pair in distances))
+            clusters_info.append({
+                'cluster_id': index,
+                'documents': docs[:num_examples]
+            })
+        return clusters_info
 
     def calculate_square_sum(self) -> float:
         """
@@ -480,6 +498,16 @@ class KMeans:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
+        sse = 0.0
+        for cluster in self.__clusters:
+            centroid = cluster.get_centroid()
+            vectors = self._db.get_vectors(cluster.get_indices())
+            cluster_sum = 0.0
+            for vector in vectors:
+                square_sum = sum((cent - vect) ** 2 for cent, vect in zip(centroid, vector[1]))
+                cluster_sum += square_sum
+            sse += cluster_sum
+        return sse
 
     def _is_convergence_reached(
         self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
@@ -558,9 +586,10 @@ class ClusteringSearchEngine:
         query_vector = self._db.get_vectorizer().vectorize(query_tokens)
         if not query_vector:
             raise ValueError('Failed to vectorize query')
-        knn = self.__algo.infer(query_vector, n_neighbours)
-        docs = self._db.get_raw_documents(tuple(ind for distance, ind in knn))
-        return [(distance, docs[ind]) for distance, ind in knn]
+        self.__algo.train()
+        inference = self.__algo.infer(query_vector, n_neighbours)
+        docs = self._db.get_raw_documents(tuple(ind for distance, ind in inference))
+        return [(dist[0], docs[ind]) for ind, dist in enumerate(inference)]
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """
@@ -570,6 +599,11 @@ class ClusteringSearchEngine:
             num_examples (int): number of examples for each cluster
             output_path (str): path to output file
         """
+        if not isinstance(output_path, str) or not output_path:
+            raise ValueError('Invalid input argument(s)')
+        clusters_info = self.__algo.get_clusters_info(num_examples)
+        with open(output_path, 'w', encoding='utf-8') as file:
+            dump(clusters_info, file, indent=4)
 
     def calculate_square_sum(self) -> float:
         """
@@ -578,6 +612,7 @@ class ClusteringSearchEngine:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
+        return self.__algo.calculate_square_sum()
 
 
 class VectorDBEngine:
@@ -596,6 +631,8 @@ class VectorDBEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             engine (BasicSearchEngine): A search engine.
         """
+        self._db = db
+        self._engine = engine
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -611,6 +648,7 @@ class VectorDBEngine:
             list[tuple[float, str]] | None: Relevant documents with their distances.
 
         """
+        return self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
 
 
 class VectorDBTreeSearchEngine(VectorDBEngine):
@@ -625,6 +663,8 @@ class VectorDBTreeSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        super().__init__(db, SearchEngine(db.get_vectorizer(), db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())
 
 
 class VectorDBAdvancedSearchEngine(VectorDBEngine):
@@ -639,3 +679,5 @@ class VectorDBAdvancedSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        super().__init__(db, AdvancedSearchEngine(db.get_vectorizer(), db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())

@@ -565,6 +565,8 @@ class ClusteringSearchEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             n_clusters (int): Number of clusters.
         """
+        self.__algo = KMeans(db, n_clusters)
+        self._db = db
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -583,9 +585,31 @@ class ClusteringSearchEngine:
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
-        if (not isinstance(query, str) or query is None
+        if (not isinstance(query, str) or query is None or not query
                 or n_neighbours <= 0 or not isinstance(n_neighbours, int)):
             raise ValueError('Invalid input')
+
+        tok_query = self._db.get_tokenizer().tokenize(query)
+        if tok_query is None:
+            raise ValueError('_db.get_tokenizer().tokenize() returned None')
+        vec_query = self._db.get_vectorizer().vectorize(tok_query)
+        if vec_query is None:
+            raise ValueError('_db.get_vectorizer().vectorize() returned None')
+
+        self.__algo.train()
+        t_dist_and_vec_index = self.__algo.infer(vec_query, n_neighbours)
+        if t_dist_and_vec_index is None:
+            raise ValueError('infer() returned None')
+
+        l_with_str_aka_docs = self._db.get_raw_documents(tuple(
+            [every_tuple[1] for every_tuple in t_dist_and_vec_index]))
+        if l_with_str_aka_docs is None:
+            raise ValueError('_db.get_raw_documents() returned None')
+
+        rel_docs_with_indices = []
+        for i in [one_t_dist_and_vec_index[1] for one_t_dist_and_vec_index in t_dist_and_vec_index]:
+            rel_docs_with_indices.append((t_dist_and_vec_index[i][0], l_with_str_aka_docs[i]))
+        return rel_docs_with_indices
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """

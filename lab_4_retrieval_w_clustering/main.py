@@ -289,7 +289,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if not get_raw_docs_result:
             raise ValueError('The function returned an empty list')
 
-        return [(c_knn_result[ind][1], get_raw_docs_result[ind]) for ind, s in enumerate(get_raw_docs_result)]
+        return [(c_knn_result[ind][1], s) for ind, s in enumerate(get_raw_docs_result)]
 
 
 class ClusterDTO:

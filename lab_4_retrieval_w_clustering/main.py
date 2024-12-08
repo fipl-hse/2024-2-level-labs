@@ -35,7 +35,7 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not text or not isinstance(text,str):
-        raise ValueError
+        raise ValueError('Get_paragraphs input error')
     return text.split('\n')
 
 
@@ -52,7 +52,7 @@ class BM25Vectorizer(Vectorizer):
         Initialize an instance of the BM25Vectorizer class.
         """
         self._corpus = []
-        Vectorizer.__init__(self, self._corpus)
+        super().__init__(self._corpus)
         self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -66,7 +66,7 @@ class BM25Vectorizer(Vectorizer):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not tokenized_corpus or not isinstance(tokenized_corpus,list):
-            raise ValueError
+            raise ValueError('bm25_set_tokenized_corpus input error')
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(doc) for doc in self._corpus) / len(self._corpus)
 
@@ -88,10 +88,10 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document,list)\
                 or not all(isinstance(paragraph,str) for paragraph in tokenized_document):
-            raise ValueError
+            raise ValueError('bm25_vectorize input error')
         vectorized = self._calculate_bm25(tokenized_document)
         if not vectorized:
-            raise ValueError
+            raise ValueError('bm25_vectorize vectorization error')
         return vectorized
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -109,10 +109,10 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document,list) or not\
                 all(isinstance(paragraph,str) for paragraph in tokenized_document):
-            raise ValueError
+            raise ValueError('bm25_calculate_bm25 input error')
         vector_list = [0.0] * len(self._vocabulary)
-        bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, 1.5, 0.75,
-                              self._avg_doc_len, len(tokenized_document))
+        bm25 = calculate_bm25(vocab=self._vocabulary, document=tokenized_document, idf_document=self._idf_values,
+                              avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         if not bm25:
             return tuple(vector_list)
         for index, word in enumerate(self._vocabulary):
@@ -156,7 +156,7 @@ class DocumentVectorDB:
                 or if methods used return None.
         """
         if not corpus or not isinstance(corpus, list):
-            raise ValueError
+            raise ValueError('DB_put_corpus input error')
         tokenized_docs = []
         for document in corpus:
             tokenized_doc = self._tokenizer.tokenize(document)
@@ -164,7 +164,7 @@ class DocumentVectorDB:
                 self.__documents.append(document)
                 tokenized_docs.append(tokenized_doc)
         if not tokenized_docs:
-            raise ValueError
+            raise ValueError('DB_put_corpus tokenized_docs error')
         self._vectorizer.set_tokenized_corpus(tokenized_docs)
         self._vectorizer.build()
         for doc in tokenized_docs:
@@ -204,7 +204,7 @@ class DocumentVectorDB:
             return list(self.__vectors.items())
         needed = []
         for i in indices:
-            needed.append((i,self.__vectors[i]))
+            needed.append((i, self.__vectors[i]))
         return needed
 
 
@@ -247,7 +247,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
         self._db = db
-        BasicSearchEngine.__init__(self,self._db.get_vectorizer(),self._db.get_tokenizer())
+        super().__init__(self._db.get_vectorizer(),self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -262,17 +262,17 @@ class VectorDBSearchEngine(BasicSearchEngine):
         """
         if not query or not isinstance(query, str) or not n_neighbours\
                 or not isinstance(n_neighbours,int) or n_neighbours <= 0:
-            raise ValueError
-        tokenized_query = self._db.get_tokenizer().tokenize(query)
+            raise ValueError('VectorDBSearchEngine retrieve_relevant_documents input error')
+        tokenized_query = self._tokenizer.tokenize(query)
         if not tokenized_query:
-            raise ValueError
-        vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
+            raise ValueError('VectorDBSearchEngine retrieve_relevant_documents query tokenization error')
+        vectorized_query = self._vectorizer.vectorize(tokenized_query)
         vectors_list = [pair[1] for pair in self._db.get_vectors()]
         neighbours = self._calculate_knn(vectorized_query,vectors_list,n_neighbours)
         if not neighbours:
-            raise ValueError
+            raise ValueError('VectorDBSearchEngine retrieve_relevant_documents neighbours error')
         needed_docs = self._db.get_raw_documents(tuple(pair[0] for pair in neighbours))
-        return [(pair[-1],needed_docs[index]) for index,pair in enumerate(neighbours)]
+        return [(pair[-1], needed_docs[index]) for index, pair in enumerate(neighbours)]
 
 
 class ClusterDTO:
@@ -323,7 +323,7 @@ class ClusterDTO:
                 or if input arguments are empty.
         """
         if not isinstance(new_centroid,tuple) or not new_centroid:
-            raise ValueError
+            raise ValueError('ClusterDT0 set_new_centroid input error')
         self.__centroid = new_centroid
 
     def erase_indices(self) -> None:
@@ -344,7 +344,7 @@ class ClusterDTO:
                 or if input arguments are empty.
         """
         if not isinstance(index,int) or index is None or index < 0:
-            raise ValueError
+            raise ValueError('ClusterDT0 add_document_index input error')
         if index not in self.__indices:
             self.__indices.append(index)
 
@@ -389,6 +389,7 @@ class KMeans:
             new_clusters = self.run_single_train_iteration()
             if self._is_convergence_reached(new_clusters):
                 break
+        self.__clusters = new_clusters
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -411,7 +412,7 @@ class KMeans:
             for centroid in used_centroids:
                 distance = calculate_distance(vector[1],centroid)
                 if distance is None:
-                    raise ValueError
+                    raise ValueError('Kmeans run_single_train_iteration vector distance error')
                 vector_distances.append((distance,used_centroids.index(centroid)))
             close = min(vector_distances)
             self.__clusters[close[1]].add_document_index(used_vectors.index(vector))
@@ -441,12 +442,12 @@ class KMeans:
         """
         if not isinstance(query_vector,tuple) or not query_vector\
                 or not isinstance(n_neighbours,int) or not n_neighbours:
-            raise ValueError
+            raise ValueError("KMeans infer input error")
         distances = []
         for cluster in self.__clusters:
             distance = calculate_distance(query_vector,cluster.get_centroid())
             if distance is None:
-                raise ValueError
+                raise ValueError('KMeans infer query_vector distance error')
             distances.append(distance)
         closest = distances.index(min(distances))
         used_cluster = self.__clusters[closest]
@@ -456,7 +457,7 @@ class KMeans:
         for index, vector in used_vectors:
             distance = calculate_distance(query_vector,vector)
             if distance is None:
-                raise ValueError
+                raise ValueError('KMeans infer new query_vector distance error')
             new_distances.append((distance,index))
         return sorted(new_distances,key=lambda x:x[0])[:n_neighbours]
 
@@ -499,11 +500,11 @@ class KMeans:
         """
         if not isinstance(new_clusters,list) or not new_clusters or not\
                 isinstance(threshold,float) or not threshold:
-            raise ValueError
+            raise ValueError('KMeans _is_convergence_reached input error')
         for index,old in enumerate(self.__clusters):
             distance = calculate_distance(old.get_centroid(),new_clusters[index].get_centroid())
             if not isinstance(distance,float):
-                raise ValueError
+                raise ValueError('KMeans _is_convergence_reached distance is float')
             if distance >= threshold:
                 return False
         return True
@@ -548,16 +549,16 @@ class ClusteringSearchEngine:
         """
         if not query or not isinstance(query,str) or not n_neighbours\
                 or not isinstance(n_neighbours,int):
-            raise ValueError
+            raise ValueError('ClusteringSearchEngine retrieve_relevant_documents input error')
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         if tokenized_query is None:
-            raise ValueError
+            raise ValueError('ClusteringSearchEngine retrieve_relevant_documents tokenized_query is None')
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
         if query_vector is None:
-            raise ValueError
+            raise ValueError('ClusteringSearchEngine retrieve_relevant_documents query_vector is None')
         neighbours = self.__algo.infer(query_vector,n_neighbours)
         if neighbours is None:
-            raise ValueError
+            raise ValueError('ClusteringSearchEngine retrieve_relevant_documents no neighbours')
         indices = tuple(pair[-1] for pair in neighbours)
         documents = self._db.get_raw_documents(indices)
         return [(doc[0],documents[index]) for index,doc in enumerate(neighbours)]

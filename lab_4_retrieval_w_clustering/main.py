@@ -481,8 +481,8 @@ class KMeans:
                 raise ValueError('calculate_distance() returned None')
             dist_between_q_vec_and_cluster.append(dist_between)
 
-        chosen_cluster = self.__clusters[dist_between_q_vec_and_cluster.index(min
-                                                                              (dist_between_q_vec_and_cluster))]
+        chosen_cluster = self.__clusters[
+            dist_between_q_vec_and_cluster.index(min(dist_between_q_vec_and_cluster))]
         if chosen_cluster is None:
             raise ValueError('chosen_cluster is None')
 
@@ -544,9 +544,9 @@ class KMeans:
             difference = calculate_distance(previous_centroid, current_centroid)
             if difference is None:
                 raise ValueError('calculate_distance() returned None')
-            if difference <= threshold:
-                return True
-            return False
+            if not difference <= threshold:
+                return False
+        return True
 
 
 class ClusteringSearchEngine:

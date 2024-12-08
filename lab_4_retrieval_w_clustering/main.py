@@ -544,7 +544,7 @@ class KMeans:
             difference = calculate_distance(previous_centroid, current_centroid)
             if difference is None:
                 raise ValueError('calculate_distance() returned None')
-            if not difference <= threshold:
+            if difference > threshold:
                 return False
         return True
 
@@ -602,7 +602,7 @@ class ClusteringSearchEngine:
             raise ValueError('infer() returned None')
 
         l_with_str_aka_docs = self._db.get_raw_documents(tuple(
-            [every_tuple[1] for every_tuple in t_dist_and_vec_index]))
+            every_tuple[1] for every_tuple in t_dist_and_vec_index))
         if l_with_str_aka_docs is None:
             raise ValueError('_db.get_raw_documents() returned None')
 

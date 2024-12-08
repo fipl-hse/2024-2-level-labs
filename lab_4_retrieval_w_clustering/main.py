@@ -111,7 +111,8 @@ class BM25Vectorizer(Vectorizer):
                 all(isinstance(paragraph,str) for paragraph in tokenized_document):
             raise ValueError('bm25_calculate_bm25 input error')
         vector_list = [0.0] * len(self._vocabulary)
-        bm25 = calculate_bm25(vocab=self._vocabulary, document=tokenized_document, idf_document=self._idf_values,
+        bm25 = calculate_bm25(vocab=self._vocabulary, document=tokenized_document,
+                              idf_document=self._idf_values,
                               avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         if not bm25:
             return tuple(vector_list)
@@ -265,8 +266,10 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError('VectorDBSearchEngine retrieve_relevant_documents input error')
         tokenized_query = self._tokenizer.tokenize(query)
         if not tokenized_query:
-            raise ValueError('VectorDBSearchEngine retrieve_relevant_documents query tokenization error')
+            raise ValueError('VectorDBSearchEngine retrieve_relevant_documents query token error')
         vectorized_query = self._vectorizer.vectorize(tokenized_query)
+        if not isinstance(vectorized_query,tuple):
+            raise ValueError('VectorDBSearchEngine retrieve_relevant_documents query vector error')
         vectors_list = [pair[1] for pair in self._db.get_vectors()]
         neighbours = self._calculate_knn(vectorized_query,vectors_list,n_neighbours)
         if not neighbours:
@@ -549,13 +552,13 @@ class ClusteringSearchEngine:
         """
         if not query or not isinstance(query,str) or not n_neighbours\
                 or not isinstance(n_neighbours,int):
-            raise ValueError('ClusteringSearchEngine retrieve_relevant_documents input error')
+            raise ValueError('ClusteringSE retrieve_relevant_documents input error')
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         if tokenized_query is None:
-            raise ValueError('ClusteringSearchEngine retrieve_relevant_documents tokenized_query is None')
+            raise ValueError('ClusteringSE retrieve_relevant_documents tokenized_query is None')
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
         if query_vector is None:
-            raise ValueError('ClusteringSearchEngine retrieve_relevant_documents query_vector is None')
+            raise ValueError('ClusteringSE retrieve_relevant_documents query_vector is None')
         neighbours = self.__algo.infer(query_vector,n_neighbours)
         if neighbours is None:
             raise ValueError('ClusteringSearchEngine retrieve_relevant_documents no neighbours')

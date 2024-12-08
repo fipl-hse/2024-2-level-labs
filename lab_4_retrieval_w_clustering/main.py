@@ -116,12 +116,10 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError('Invalid arguments')
 
         calculated_bm25 = [0.0] * len(self._vocabulary)
-
-        idf_document = calculate_idf(self._vocabulary, self._corpus)
         doc_len = len(tokenized_document)
 
         bm25 = calculate_bm25(self._vocabulary, tokenized_document,
-                              idf_document, 1.5, 0.75, self._avg_doc_len, doc_len)
+                              self._idf_values, 1.5, 0.75, self._avg_doc_len, doc_len)
 
         for index, word in enumerate(self._vocabulary):
             calculated_bm25[index] = bm25[word]

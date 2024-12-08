@@ -122,7 +122,8 @@ class BM25Vectorizer(Vectorizer):
                               self._idf_values, 1.5, 0.75, self._avg_doc_len, doc_len)
 
         for index, word in enumerate(self._vocabulary):
-            calculated_bm25[index] = bm25[word]
+            if bm25 is not None:
+                calculated_bm25[index] = bm25[word]
         return tuple(calculated_bm25)
 
 

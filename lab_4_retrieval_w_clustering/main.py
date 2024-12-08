@@ -449,6 +449,9 @@ class KMeans:
         Returns:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
+        if (not isinstance(query_vector, tuple) or not query_vector or
+                not isinstance(n_neighbours, int) or n_neighbours < 1):
+            raise ValueError
         centroids = [cluster.get_centroid() for cluster in self.__clusters]
         closest_centroid = centroids[0]
         distance_minimal = calculate_distance(query_vector, centroids[0])
@@ -465,7 +468,6 @@ class KMeans:
         closest_cluster = self.__clusters[closest_index]
         indices = closest_cluster.get_indices()
         vectors = self._db.get_vectors(indices)
-
         documents_relevant = []
         distance_vector_minimal = calculate_distance(query_vector, centroids[0])
         if distance_vector_minimal is None:

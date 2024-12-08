@@ -28,8 +28,8 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
-    if not isinstance(text, str) or not text or text == '':
-        raise ValueError
+    if not isinstance(text, str) or not text:
+        raise ValueError(f'Incorrect value: "{text}" is not a string or empty.')
 
     return text.split('\n')
 
@@ -64,7 +64,7 @@ class BM25Vectorizer(Vectorizer):
                 not all(all(isinstance(clause, str) for clause in doc)
                         for doc in tokenized_corpus) or
                 not tokenized_corpus):
-            raise ValueError
+            raise ValueError(f'Incorrect value: "{tokenized_corpus}" is not a list or empty.')
 
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(doc) for doc in tokenized_corpus) / len(tokenized_corpus)
@@ -87,11 +87,11 @@ class BM25Vectorizer(Vectorizer):
         if (not isinstance(tokenized_document, list) or
                 not all(isinstance(clause, str) for clause in tokenized_document) or
                 not tokenized_document):
-            raise ValueError
+            raise ValueError(f'Incorrect value: "{tokenized_document}" is not a list or empty.')
 
         bm25_document = self._calculate_bm25(tokenized_document)
         if bm25_document is None:
-            raise ValueError
+            raise ValueError(f'Incorrect value: "{bm25_document}" is None.')
         return bm25_document
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -110,7 +110,7 @@ class BM25Vectorizer(Vectorizer):
         if (not isinstance(tokenized_document, list) or
                 not all(isinstance(text, str) for text in tokenized_document) or
                 not tokenized_document):
-            raise ValueError
+            raise ValueError(f'Incorrect value: "{tokenized_document}" is not a list or empty.')
 
         if not self._vocabulary or not self._corpus:
             return ()
@@ -166,7 +166,7 @@ class DocumentVectorDB:
         if (not isinstance(corpus, list) or
                 not all(isinstance(text, str) for text in corpus) or
                 not corpus):
-            raise ValueError
+            raise ValueError(f'Incorrect value: "{corpus}" is not a list or empty.')
 
         tokenized_corpus = []
         for doc in corpus:
@@ -267,17 +267,18 @@ class VectorDBSearchEngine(BasicSearchEngine):
                 not isinstance(query, str) or
                 not isinstance(n_neighbours, int) or
                 n_neighbours <= 0):
-            raise ValueError
+            raise ValueError(f'Incorrect value: "{query}" is not a string or empty or '
+                             f'"{n_neighbours}" is not an integer or less than 0.')
 
         tokenized_query = self._tokenizer.tokenize(query)
         query_vector = self._vectorizer.vectorize(tokenized_query)
         if not query_vector:
-            raise ValueError
+            raise ValueError(f'Incorrect value: "{query}" is empty.')
 
         vectors = [vector_data[1] for vector_data in self._db.get_vectors()]
         neighbours = self._calculate_knn(query_vector, vectors, n_neighbours)
         if not neighbours:
-            raise ValueError
+            raise ValueError(f'Incorrect value: "{neighbours}" is empty.')
 
         relevant_documents = self._db.get_raw_documents(tuple([neighbor[0] for neighbor in neighbours]))
         return [(neighbor[1], relevant_documents[neighbor[0]]) for neighbor in neighbours]

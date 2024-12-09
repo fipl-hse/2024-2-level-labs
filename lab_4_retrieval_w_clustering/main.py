@@ -487,7 +487,9 @@ class KMeans:
             distances = sorted(distances, key=lambda x: x[-1])[:num_examples]
             indices = tuple(tup[-1] for tup in distances)
             docs = self._db.get_raw_documents(indices)
-            cluster_info = {'cluster_id': ind, 'documents': docs}
+            cluster_info = {}
+            if isinstance(ind, int) and isinstance(docs, list):
+                cluster_info.update(cluster_id=ind, documents=docs)
             clusters_info.append(cluster_info)
         return clusters_info
 

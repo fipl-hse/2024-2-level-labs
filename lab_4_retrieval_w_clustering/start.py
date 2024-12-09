@@ -3,7 +3,8 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from main import BM25Vectorizer, DocumentVectorDB, VectorDBSearchEngine, get_paragraphs
+from main import BM25Vectorizer, DocumentVectorDB, get_paragraphs, VectorDBSearchEngine
+
 
 def open_files() -> tuple[list[str], list[str]]:
     """

@@ -39,7 +39,7 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not isinstance(text, str) or not text:
-        raise ValueError
+        raise ValueError('Inappropriate type input argument or input argument is empty.')
     return text.split('\n')
 
 
@@ -73,7 +73,7 @@ class BM25Vectorizer(Vectorizer):
                 or not all(isinstance(paragraph, list) for paragraph in tokenized_corpus)\
                 or not all(isinstance(token, str)
                            for paragraph in tokenized_corpus for token in paragraph):
-            raise ValueError
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(paragraph) for paragraph in self._corpus) / len(self._corpus)
 
@@ -94,10 +94,10 @@ class BM25Vectorizer(Vectorizer):
         """
         if not isinstance(tokenized_document, list) or not tokenized_document\
                 or not all(isinstance(token, str) for token in tokenized_document):
-            raise ValueError
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
         bm_25 = self._calculate_bm25(tokenized_document)
         if not bm_25:
-            raise ValueError
+            raise ValueError('self._calculate_bm25 returns None')
         return bm_25
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -115,7 +115,7 @@ class BM25Vectorizer(Vectorizer):
         """
         if not isinstance(tokenized_document, list) or not tokenized_document\
                 or not all(isinstance(token, str) for token in tokenized_document):
-            raise ValueError
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
         vector = [0.0] * len(self._vocabulary)
         bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, 1.5, 0.75,
                                self._avg_doc_len, len(tokenized_document))
@@ -160,15 +160,15 @@ class DocumentVectorDB:
                 or if methods used return None.
         """
         if not isinstance(corpus, list) or not corpus:
-            raise ValueError
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
         all_tokens = []
         for doc in corpus:
             tokens = self._tokenizer.tokenize(doc)
             if tokens:
                 all_tokens.append(tokens)
                 self.__documents.append(doc)
-        if not all_tokens or not isinstance(all_tokens, list):
-            raise ValueError
+        if not all_tokens:
+            raise ValueError('self._tokenizer.tokenize returns None')
         self._vectorizer.set_tokenized_corpus(all_tokens)
         self._vectorizer.build()
         for index, tokens in enumerate(all_tokens):
@@ -262,19 +262,19 @@ class VectorDBSearchEngine(BasicSearchEngine):
         """
         if not isinstance(query, str) or not query\
                 or not isinstance(n_neighbours, int) or n_neighbours <= 0:
-            raise ValueError
+            raise ValueError('Inappropriate type input argument or input argument is empty.')
         tokenized_query = self._tokenizer.tokenize(query)
-        if not isinstance(tokenized_query, list):
-            raise ValueError
+        if not tokenized_query:
+            raise ValueError('self._tokenizer.tokenize returns None')
         vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
         if not vectorized_query:
-            raise ValueError
+            raise ValueError('self._db.get_vectorizer().vectorize  returns None')
         docs_vectors = [vector[1] for vector in self._db.get_vectors()]
         if len(docs_vectors[0]) < len(vectorized_query):
-            raise ValueError
+            raise ValueError('Vectors have different lengths')
         distances = self._calculate_knn(vectorized_query, docs_vectors, n_neighbours)
         if not distances:
-            raise ValueError
+            raise ValueError('self._calculate_knn returns None')
         documents = self._db.get_raw_documents(tuple(index for index in range(n_neighbours)))
         return [(dist, documents[ind]) for ind, dist in distances]
 
@@ -327,7 +327,7 @@ class ClusterDTO:
                 or if input arguments are empty.
         """
         if not isinstance(new_centroid, tuple) or not new_centroid:
-            raise ValueError
+            raise ValueError('Inappropriate type input arguments or input arguments are empty')
         self.__centroid = new_centroid
 
     def erase_indices(self) -> None:
@@ -348,7 +348,7 @@ class ClusterDTO:
                 or if input arguments are empty.
         """
         if not isinstance(index, int) or index < 0 or index is None:
-            raise ValueError
+            raise ValueError('Inappropriate type input arguments or input arguments are empty')
         if index not in self.__indices:
             self.__indices.append(index)
 

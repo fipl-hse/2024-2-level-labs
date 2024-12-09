@@ -11,7 +11,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from config.constants import PROJECT_ROOT
 from lab_4_retrieval_w_clustering.main import ClusteringSearchEngine
 

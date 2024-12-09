@@ -3,7 +3,7 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-
+from main import BM25Vectorizer, DocumentVectorDB, VectorDBSearchEngine, get_paragraphs
 
 def open_files() -> tuple[list[str], list[str]]:
     """
@@ -49,7 +49,27 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    result = None
+    query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
+    n_neighbours = 3
+    docs, stop_words = open_files()
+    paragraphs = []
+    for text in docs:
+        paragraph = get_paragraphs(text)
+        if not isinstance(paragraph, list):
+            return
+        paragraphs.append(paragraph)
+
+
+
+    vectorizer = BM25Vectorizer()
+    vectorizer.set_tokenized_corpus(paragraphs)
+    vectorizer.build()
+
+    db = DocumentVectorDB(stop_words)
+    db.put_corpus(docs)
+    vector_search = VectorDBSearchEngine(db)
+    result = vector_search.retrieve_relevant_documents(query, n_neighbours)
+    print(result)
     assert result, "Result is None"
 
 

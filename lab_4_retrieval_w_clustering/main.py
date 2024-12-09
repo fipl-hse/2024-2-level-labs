@@ -113,7 +113,7 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError('Invalid document input')
         vector_list = [0.0] * len(self._vocabulary)
         bm_dict = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
-                                 1.5, 0.75, self._avg_doc_len, len(tokenized_document))
+                                 avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         if not bm_dict:
             return tuple(vector_list)
         for ind, word in enumerate(self._vocabulary):
@@ -243,8 +243,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        super().__init__(db.get_vectorizer(), db.get_tokenizer())
         self._db = db
-        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -442,19 +442,15 @@ class KMeans:
                 or not isinstance(n_neighbours, int) or not n_neighbours):
             raise ValueError('Invalid query/n_neighbours input')
         cluster_distances = []
-        no_centroid = 0
         for ind, cluster in enumerate(self.__clusters):
             centroid = cluster.get_centroid()
             if not centroid:
-                no_centroid += 1
+                continue
             distance = calculate_distance(query_vector, centroid)
             if distance is None:
                 raise ValueError('Could not calculate the distance')
             cluster_distances.append((distance, ind))
-        if no_centroid:
-            closest_cluster = 0
-        else:
-            closest_cluster = min(cluster_distances)[-1]
+        closest_cluster = min(cluster_distances)[-1]
         cluster_indices = self.__clusters[closest_cluster].get_indices()
         vectors = self._db.get_vectors(cluster_indices)
         distances = []

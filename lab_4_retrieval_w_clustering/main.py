@@ -3,13 +3,11 @@ Lab 4.
 
 Vector search with clusterization
 """
-from sphinx.domains.changeset import versionlabel_classes
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
-from seminars.practice_3_lists import test_copy
+from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -92,6 +90,7 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError
         return res
 
+
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
         """
         Get BM25 vector for tokenized document.
@@ -114,6 +113,7 @@ class BM25Vectorizer(Vectorizer):
             empty_list[ind] = res[e]
 
         return tuple(empty_list)
+
 
 
 class DocumentVectorDB:
@@ -150,36 +150,19 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
-        # if not isinstance(corpus, list) or not corpus:
-        #     raise ValueError
-        #
-        # toks = []
-        # for elem in corpus:
-        #     toks1 = self._tokenizer.tokenize(elem)
-        #     if toks1:
-        #         self.__documents.append(elem)
-        #         toks.append(toks1)
-        #
-        # if not toks or not isinstance(toks, list):
-        #     raise ValueError
-        if not corpus or not isinstance(corpus, list):
+        if not isinstance(corpus, list) or not corpus:
             raise ValueError
 
-        tok_docs = []
-        for paragraph in corpus:
-            toks = self._tokenizer.tokenize(paragraph)
-            if toks:
-                tok_docs.append(toks)
-                self.__documents.append(paragraph)
+        toks = []
+        for elem in corpus:
+            toks1 = self._tokenizer.tokenize(elem)
+            if toks1:
+                self.__documents.append(elem)
+                toks.append(toks1)
 
-        if not tok_docs or not isinstance(tok_docs, list):
+        if not toks or not isinstance(toks, list):
             raise ValueError
 
-        self._vectorizer.set_tokenized_corpus(tok_docs)
-        self._vectorizer.build()
-
-        for ind, toks in enumerate(tok_docs):
-            self.__vectors[ind] = self._vectorizer.vectorize(toks)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -302,9 +285,6 @@ class VectorDBSearchEngine(BasicSearchEngine):
         return [(i[1], self._db.get_raw_documents(tuple([i[0]]))[0])
                 for i in knn_res]
 
-        # docs = self._db.get_raw_documents(tuple(i for i in range(n_neighbours)))
-        #
-        # return [(dist, docs[ind]) for ind, dist in knn_res]
 
 
 class ClusterDTO:

@@ -498,8 +498,12 @@ class KMeans:
                 vector_distances.append((index, vector_distance))
             vector_distances = sorted(vector_distances, key=lambda a: a[1])[:num_examples]
             doc_indices = tuple(pair[0] for pair in vector_distances)
+            documents = self._db.get_raw_documents(doc_indices)
+            if not (isinstance(documents, list) and
+                    all(isinstance(document, str) for document in documents)):
+                raise ValueError("Failed to get raw documents")
             info_dict = {"cluster_id": cluster_index,
-                         "documents": self._db.get_raw_documents(doc_indices)}
+                         "documents": documents}
             list_of_cluster_info.append(info_dict)
         return list_of_cluster_info
 

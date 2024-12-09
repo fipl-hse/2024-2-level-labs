@@ -4,9 +4,8 @@ Lab 4.
 Vector search with clusterization
 """
 
-from lab_2_retrieval_w_bm25.main import calculate_bm25
-
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
     BasicSearchEngine,
     calculate_distance,
@@ -274,7 +273,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         """
         if (not query or not isinstance(query, str)
                 or not isinstance(n_neighbours, int)
-                or n_neighbours <= 0):
+                or n_neighbours < 0):
             raise ValueError('Invalid input')
 
         tok_query = self._tokenizer.tokenize(query)
@@ -407,7 +406,7 @@ class KMeans:
         for centroid in first_n_centroids:
             self.__clusters.append(ClusterDTO(centroid[1]))
         self.run_single_train_iteration()
-        while self._is_convergence_reached(self.__clusters) is not True:
+        while self._is_convergence_reached(self.__clusters) is False:
             self.run_single_train_iteration()
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
@@ -468,7 +467,7 @@ class KMeans:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
         if (not query_vector or query_vector is None
-                or n_neighbours <= 0 or not isinstance(n_neighbours, int)):
+                or n_neighbours < 0 or not isinstance(n_neighbours, int)):
             raise ValueError('Invalid input')
 
         dist_between_q_vec_and_cluster = []

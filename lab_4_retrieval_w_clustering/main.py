@@ -4,11 +4,19 @@ Lab 4.
 Vector search with clusterization
 """
 
-# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer, calculate_distance
-from lab_2_retrieval_w_bm25.main import calculate_bm25
-import math
 import json
+import math
+
+from lab_2_retrieval_w_bm25.main import calculate_bm25
+
+# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+from lab_3_ann_retriever.main import (
+    BasicSearchEngine,
+    calculate_distance,
+    Tokenizer,
+    Vector,
+    Vectorizer,
+)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -106,8 +114,10 @@ class BM25Vectorizer(Vectorizer):
         vector = [0.0 for _ in self._vocabulary]
         document_len = len(tokenized_document)
         idf_value = self._idf_values
-        dict_bm25 = calculate_bm25(vocab=self._vocabulary, document=tokenized_document, idf_document=idf_value,
-                                   k1=1.5, b=0.75, avg_doc_len=self._avg_doc_len, doc_len=document_len)
+        dict_bm25 = calculate_bm25(vocab=self._vocabulary, document=tokenized_document,
+                                   idf_document=idf_value,
+                                   k1=1.5, b=0.75, avg_doc_len=self._avg_doc_len,
+                                   doc_len=document_len)
         if not dict_bm25:
             return tuple(vector)
         for i, word in enumerate(self._vocabulary):
@@ -192,9 +202,13 @@ class DocumentVectorDB:
         Returns:
             list[tuple[int, Vector]]: List of index and vector for documents.
         """
-        if not indices:
-            return sorted(list(self.__vectors.items()), key=lambda x: x[0])
-        return [(index, self.__vectors[index]) for index in indices if index in self.__vectors]
+        if indices is None:
+            return sorted(self.__vectors.items(), key=lambda x: x[0])
+
+        vectors = [(index, self.__vectors[index]) for index in indices if index in self.__vectors]
+        if not vectors:
+            raise ValueError
+        return vectors
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
         """
@@ -211,10 +225,9 @@ class DocumentVectorDB:
         """
         if indices is None:
             return self.__documents
-        else:
-            indices_set = set(indices)
-            real_docs = [doc for ind, doc in enumerate(self.__documents) if ind in indices_set]
-            return real_docs
+        indices_set = set(indices)
+        real_docs = [doc for ind, doc in enumerate(self.__documents) if ind in indices_set]
+        return real_docs
 
 
 class VectorDBSearchEngine(BasicSearchEngine):
@@ -262,9 +275,10 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if knn_indices is None:
             raise ValueError("KNN returned None")
 
-        indices = tuple([ind for ind, distance in knn_indices])
+        indices = tuple(ind for ind, distance in knn_indices)
 
-        relevant_docs = [(distance, self._db.get_raw_documents(indices)[0]) for distance, index in knn_indices]
+        relevant_docs = [(distance, self._db.get_raw_documents(indices)[0])
+                         for distance, index in knn_indices]
         return relevant_docs
 
 
@@ -381,12 +395,8 @@ class KMeans:
             raise ValueError("Lack of clusters")
 
         for centroid in starting_centroids:
-            # if not isinstance(centroid, tuple) or not all(isinstance(x, float) for x in centroid):
-            #     raise ValueError(f"Invalid centroid structure: {centroid}")
 
             self.__clusters.append(ClusterDTO(centroid_vector=centroid[1]))
-
-        previous_centroids = [centroid for centroid in starting_centroids]
 
         while True:
             new_clusters = self.run_single_train_iteration()
@@ -405,6 +415,7 @@ class KMeans:
         """
         for cluster in self.__clusters:
             cluster.erase_indices()
+
         document_vectors = self._db.get_vectors()
         if not document_vectors:
             raise ValueError("We can't get vectors")
@@ -412,33 +423,29 @@ class KMeans:
         centroids = [cluster.get_centroid() for cluster in self.__clusters]
 
         for index, doc in enumerate(document_vectors):
-            distances = []
-            for centroid in centroids:
-                distance = calculate_distance(doc[1], centroid)
-                if distance is None:
-                    raise ValueError("Distance is wrong")
-                distances.append((distance, centroids.index(centroid)))
+            distances_to_centroid = [(calculate_distance(doc[1], centroid), ind) for
+                                     ind, centroid in enumerate(centroids)]
+            if any(distance is None or isinstance(distance, bool) for distance, _ in distances_to_centroid):
+                raise ValueError(
+                    "calculate_distance returned None or a boolean value for document index")
 
-                closest = min(distances, key=lambda x: x[0])
-                self.__clusters[closest[-1]].add_document_index(index)
+            closest_distance, closest_index = min(distances_to_centroid, key=lambda x: x[0])
+            self.__clusters[closest_index].add_document_index(index)
 
-                for cluster in self.__clusters:
-                    cluster_vectors = []
-                    for num in cluster.get_indices():
-                        cluster_vectors.append(document_vectors[num])
+        for cluster in self.__clusters:
+            cluster_vectors = [document_vectors[num] for num in cluster.get_indices()]
 
-                    if cluster_vectors:
-                        vector_length = len(cluster_vectors[0][1])
-                        for vector in cluster_vectors:
-                            if len(vector[1]) != vector_length or not all(
-                                    isinstance(x, (int, float)) for x in vector[1]):
-                                raise ValueError("Invalid vector structure or non-numeric values in cluster vectors")
-                        zipped_vectors = list(zip(*[v[1] for v in cluster_vectors]))
+            if cluster_vectors:
+                vector_length = len(cluster_vectors[0][1])
+                for vector in cluster_vectors:
+                    if (len(vector[1]) != vector_length or not
+                    all(isinstance(x, (int, float)) for x in vector[1])):
+                        raise ValueError("Invalid vector structure or non-numeric values in cluster vectors")
+            zipped_vectors = list(zip(*[v[1] for v in cluster_vectors]))
+            new_centroid = tuple(sum(value) / len(value) for value in zipped_vectors)
+            cluster.set_new_centroid(new_centroid)
 
-                        new_centroid = tuple(sum(value) / len(value) for value in zipped_vectors)
-                        cluster.set_new_centroid(new_centroid)
-
-                return self.__clusters
+        return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -461,6 +468,7 @@ class KMeans:
             raise ValueError("Check, please, query vector input in infer")
         if not isinstance(n_neighbours, int) or n_neighbours < 0:
             raise ValueError("Check, please, n_neighbours input in infer")
+
         dict_for_clusters = {}
         no_centroid = True
         for cluster in self.__clusters:
@@ -483,7 +491,7 @@ class KMeans:
         for vector in vectors:
             vector_distance = calculate_distance(query_vector, vector[-1])
             if vector_distance is None:
-                raise ValueError
+                raise ValueError("Incorrect calculation, please check it")
             list_for_vectors.append((vector_distance, vector[0]))
 
         return sorted(list_for_vectors, key=lambda x: x[0])[:n_neighbours]
@@ -500,7 +508,6 @@ class KMeans:
         """
         if not isinstance(num_examples, int) or not num_examples or num_examples <= 0:
             raise ValueError("Incorrect input with number")
-        clusters_info = []
         for ind, cluster in enumerate(self.__clusters):
             info = {}
             centroid = cluster.get_centroid()
@@ -515,7 +522,6 @@ class KMeans:
             distances = sorted(distances, key=lambda x: x[-1])[:num_examples]
             indices = tuple(block[-1] for block in distances)
             documents = self._db.get_raw_documents(indices)
-
 
     def calculate_square_sum(self) -> float:
         """

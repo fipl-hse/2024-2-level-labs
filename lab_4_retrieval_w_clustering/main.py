@@ -261,7 +261,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
         if not query or not n_neighbours or \
-                isinstance(query, str) or not isinstance(n_neighbours, int):
+                not isinstance(query, str) or not isinstance(n_neighbours, int) :
             raise ValueError
 
         tokenized_query = self._db.get_tokenizer().tokenize(query)
@@ -273,7 +273,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         relevant_docs = self._db.get_raw_documents(tuple(index for index in range(n_neighbours)))
         if not relevant_docs:
             raise ValueError
-        return [(dist, relevant_docs[index]) for index, dist in relevant_docs]
+        return [(knn[index][1], smth) for index, smth in enumerate(relevant_docs)]
 
 
 class ClusterDTO:

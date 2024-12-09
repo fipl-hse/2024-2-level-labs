@@ -6,6 +6,7 @@ Vector search with clusterization
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from json import dump
+
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
@@ -16,7 +17,6 @@ from lab_3_ann_retriever.main import (
     Vector,
     Vectorizer,
 )
-
 
 Corpus = list[str]
 "Type alias for corpus of texts."

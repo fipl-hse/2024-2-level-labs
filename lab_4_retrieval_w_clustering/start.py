@@ -70,14 +70,14 @@ def main() -> None:
     tree_result = tree_search.retrieve_relevant_documents(query, 5)
     advanced_search = VectorDBAdvancedSearchEngine(db)
     result = advanced_search.retrieve_relevant_documents(query, 5)
+    for i in range(1, 15):
+        cluster_search = ClusteringSearchEngine(db, i)
+        print(f"Number of clusters: {i} SSE: {cluster_search.calculate_square_sum()} \n")
     print(f"Results by VectorDBSearchEngine: \n {vector_result} \n"
           f"Results by ClusteringSearchEngine: \n {clustering_result} \n"
           f"Results by VectorDBTreeSearchEngine: \n {tree_result} \n"
           f"Results by VectorDBAdvancedSearchEngine: \n {result} \n")
     clustering_search.make_report(3, "assets/report.json")
-    for i in range(1, 15):
-        cluster_search = ClusteringSearchEngine(db, n_clusters=i)
-        print(f"Number of clusters: {i} SSE: {cluster_search.calculate_square_sum()} \n")
     assert result, "Result is None"
 
 

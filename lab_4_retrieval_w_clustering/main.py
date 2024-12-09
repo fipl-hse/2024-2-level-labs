@@ -3,6 +3,7 @@ Lab 4.
 
 Vector search with clusterization
 """
+import json
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 
@@ -267,10 +268,11 @@ class VectorDBSearchEngine(BasicSearchEngine):
         vectors = [pair[1] for pair in self._db.get_vectors()]
         most_relevant = self._calculate_knn(vector_query, vectors, n_neighbours)
         if most_relevant is None:
-            raise ValueError
+            raise ValueError('The method returned None')
         indices = tuple(pair[0] for pair in most_relevant)
         raw_documents = self._db.get_raw_documents(indices)
-        return [(most_relevant[num][1], raw_documents[num]) for num, index in enumerate(indices)]
+        return [(most_relevant[ind][1], raw_document) for ind, raw_document in
+                enumerate(raw_documents)]
 
 
 class ClusterDTO:
@@ -471,6 +473,23 @@ class KMeans:
         Returns:
             list[dict[str, int| list[str]]]: List with information about each cluster
         """
+        if not num_examples or num_examples < 0:
+            raise ValueError('An inappropriate type input arguments')
+        info: list[dict[str, int | list[str]]] = []
+        for cluster_id, cluster in enumerate(self.__clusters):
+            distances = []
+            for vector in self._db.get_vectors(cluster.get_indices()):
+                distance = calculate_distance(cluster.get_centroid(), vector[1])
+                if distance is None:
+                    raise ValueError('The function returned None')
+                distances.append((distance, vector[0]))
+            info.append({
+                "cluster_id": cluster_id,
+                "documents": self._db.get_raw_documents(tuple(doc[1] for doc in
+                                                              sorted(distances, key=lambda x:
+                                                              float(x[0]))[:num_examples]))
+            })
+        return info
 
     def calculate_square_sum(self) -> float:
         """
@@ -479,6 +498,15 @@ class KMeans:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
+        result = []
+        for cluster in self.__clusters:
+            centroid = cluster.get_centroid()
+            vectors = self._db.get_vectors(cluster.get_indices())
+            sums_vectors_centroid = []
+            for vector in vectors:
+                sums_vectors_centroid.append(sum((x - y) ** 2 for x, y in zip(vector[1], centroid)))
+            result.append(sum(sums_vectors_centroid))
+        return sum(result)
 
     def _is_convergence_reached(
         self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
@@ -560,7 +588,7 @@ class ClusteringSearchEngine:
         self.__algo.train()
         most_relevant = self.__algo.infer(vector_query, n_neighbours)
         if most_relevant is None:
-            raise ValueError
+            raise ValueError('The method returned None')
         indices = tuple(pair[1] for pair in most_relevant)
         raw_documents = self._db.get_raw_documents(indices)
         return [(most_relevant[num][0], raw_documents[num]) for num, index in enumerate(indices)]
@@ -573,6 +601,13 @@ class ClusteringSearchEngine:
             num_examples (int): number of examples for each cluster
             output_path (str): path to output file
         """
+        if not num_examples or num_examples < 0 or not isinstance(output_path, str):
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
+        report = self.__algo.get_clusters_info(num_examples)
+        if not report:
+            raise ValueError('The method returned None')
+        with open(output_path, 'w', encoding='utf-8') as file_to_save:
+            json.dump(report, file_to_save)
 
     def calculate_square_sum(self) -> float:
         """
@@ -581,6 +616,7 @@ class ClusteringSearchEngine:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
+        return self.__algo.calculate_square_sum()
 
 
 class VectorDBEngine:

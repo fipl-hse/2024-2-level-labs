@@ -447,7 +447,10 @@ class KMeans:
 
         min_distance_cluster: tuple[float, ClusterDTO] = (100, self.__clusters[0])
         for cluster in self.__clusters:
-            distance = calculate_distance(cluster.get_centroid(), query_vector)
+            centroid = cluster.get_centroid()
+            if centroid is None:
+                continue
+            distance = calculate_distance(centroid, query_vector)
             if distance is None:
                 raise ValueError('calculate_distance returned None')
             if distance < min_distance_cluster[0]:

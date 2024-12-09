@@ -432,8 +432,6 @@ class KMeans:
                                                                                      centroid)
                 if dist_between_vec_from_db_to_centroid_of_cluster is None:
                     raise ValueError('calculate_distance() returned None')
-                if distances is None:
-                    raise ValueError('calculate_distance() from lab3 returned None')
                 distances.append(dist_between_vec_from_db_to_centroid_of_cluster)
             self.__clusters[distances.index(min(distances))].add_document_index(index)
 
@@ -476,6 +474,8 @@ class KMeans:
 
         dist_between_q_vec_and_cluster = []
         for every_cluster in self.__clusters:
+            if every_cluster.get_centroid() is None:
+                continue
             dist_between = calculate_distance(query_vector, every_cluster.get_centroid())
             if dist_between is None:
                 raise ValueError('calculate_distance() returned None')

@@ -459,7 +459,7 @@ class KMeans:
         for index, cluster in enumerate(self.__clusters):
             centroid = cluster.get_centroid()
             centroid_distance = (calculate_distance(query_vector, centroid)
-                                 if centroid != 0
+                                 if isinstance(centroid, tuple)
                                  else 0.0)
             if not isinstance(centroid_distance, float):
                 raise ValueError("Failed to calculate the distance to the centroid")

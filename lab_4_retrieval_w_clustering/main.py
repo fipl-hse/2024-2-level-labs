@@ -3,9 +3,9 @@ Lab 4.
 
 Vector search with clusterization
 """
-from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
     BasicSearchEngine,
     calculate_distance,
@@ -50,9 +50,9 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__([])
         self._corpus = []
         self._avg_doc_len = -1.0
-        super().__init__(self._corpus)
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -110,10 +110,10 @@ class BM25Vectorizer(Vectorizer):
             Vector: BM25 vector for document.
         """
         vector_bm_25 = [0.0] * len(self._vocabulary)
-
         bm_25 = calculate_bm25(self._vocabulary, tokenized_document,
-                        self._idf_values, 1.5, 0.75,
-                        self._avg_doc_len, len(tokenized_document))
+                               self._idf_values,
+                               avg_doc_len = self._avg_doc_len,
+                               doc_len = len(tokenized_document))
         for i, token in enumerate(self._vocabulary):
             if token in tokenized_document:
                 vector_bm_25[i] = bm_25.get(token, 0.0)

@@ -458,6 +458,8 @@ class KMeans:
             raise ValueError('Wrong type arguments or empty arguments')
         distances = []
         for cluster in self.__clusters:
+            if cluster.get_centroid() is None:
+                continue
             distance = calculate_distance(query_vector, cluster.get_centroid())
             if distance is None:
                 raise ValueError('Distance is NoneType')

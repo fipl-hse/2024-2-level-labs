@@ -417,7 +417,7 @@ class KMeans:
             for centroid in centroids:
                 distance = calculate_distance(vector, centroid)
                 if distance is None:
-                    raise ValueError
+                    raise ValueError('calculate_distance returns None')
                 distances.append(distance)
             nearest = min(distances)
             self.__clusters[distances.index(nearest)].add_document_index(index)
@@ -447,12 +447,15 @@ class KMeans:
         """
         if (not isinstance(query_vector, tuple) or not query_vector or not n_neighbours
                 or not isinstance(n_neighbours, int)):
-            raise ValueError
+            raise ValueError('inappropriate type input arguments, or input arguments are empty '
+                             'or input arguments are incorrect')
         distances_for_clusters = []
         for cluster in self.__clusters:
+            if cluster.get_centroid() is None:
+                continue
             distance = calculate_distance(query_vector, cluster.get_centroid())
             if distance is None:
-                raise ValueError
+                raise ValueError('calculate_distance returns None')
             distances_for_clusters.append(distance)
         nearest_index = distances_for_clusters.index(min(distances_for_clusters))
         current_cluster = self.__clusters[nearest_index]
@@ -463,8 +466,8 @@ class KMeans:
         distances_for_vectors = []
         for index, vector in vectors:
             distance = calculate_distance(query_vector, vector)
-            if not isinstance(distance, float) or distance is None:
-                raise ValueError
+            if distance is None:
+                raise ValueError('calculate_distance returns None')
             distances_for_vectors.append((distance, index))
         return sorted(distances_for_vectors, key=lambda x: x[0])[:n_neighbours]
 
@@ -479,14 +482,15 @@ class KMeans:
             list[dict[str, int| list[str]]]: List with information about each cluster
         """
         if not isinstance(num_examples, int) or not num_examples or num_examples < 0:
-            raise ValueError
+            raise ValueError('inappropriate type input arguments, or input arguments are empty '
+                             'or input arguments are incorrect')
         result: list[dict[str, int | list[str]]] = []
         for cluster in self.__clusters:
             cluster_vectors = self._db.get_vectors(cluster.get_indices())
             distances = [(calculate_distance(vector[1], cluster.get_centroid()), index)
                          for vector in cluster_vectors for index in cluster.get_indices()]
             if distances is None or any(distance[0] is None for distance in distances):
-                raise ValueError
+                raise ValueError('calculate_distance returns None')
             closest_docs_ind = [pair[1] for pair in distances[:num_examples]]
             closest_docs = self._db.get_raw_documents(tuple(closest_docs_ind))
             result.append({
@@ -534,15 +538,15 @@ class KMeans:
         """
         if not isinstance(new_clusters, list) or new_clusters is None \
                 or not isinstance(threshold, float):
-            raise ValueError
+            raise ValueError('inappropriate type input arguments or input arguments are empty')
         if not self.__clusters:
-            raise ValueError
+            raise ValueError('self.__clusters is None or self.__clusters is empty')
         for index, cluster in enumerate(new_clusters):
             old_centroid = self.__clusters[index].get_centroid()
             new_centroid = cluster.get_centroid()
             distance = calculate_distance(old_centroid, new_centroid)
             if distance is None:
-                raise ValueError
+                raise ValueError('calculate_distance returns None')
             if distance >= threshold:
                 return False
         return True
@@ -586,17 +590,18 @@ class ClusteringSearchEngine:
         """
         if (not isinstance(query, str) or not query or not isinstance(n_neighbours, int)
                 or not n_neighbours):
-            raise ValueError
+            raise ValueError('inappropriate type input arguments or input arguments are empty'
+                             'or input arguments are incorrect')
         query_tokens = self._db.get_tokenizer().tokenize(query)
         if query_tokens is None:
-            raise ValueError
+            raise ValueError('self._db.get_tokenizer().tokenize returns None')
         query_vector = self._db.get_vectorizer().vectorize(query_tokens)
         if query_vector is None:
-            raise ValueError
+            raise ValueError('self._db.get_vectorizer().vectorize returns None')
         self.__algo.train()
         pairs = self.__algo.infer(query_vector, n_neighbours)
         if pairs is None:
-            raise ValueError
+            raise ValueError('self.__algo.infer returns None')
         distances = [pair[0] for pair in pairs]
         indices = [pair[1] for pair in pairs]
         documents = self._db.get_raw_documents(tuple(indices))
@@ -615,10 +620,11 @@ class ClusteringSearchEngine:
         """
         if not isinstance(num_examples, int) or not num_examples or num_examples < 0\
                 or not isinstance(output_path, str) or not output_path:
-            raise ValueError
+            raise ValueError('inappropriate type input arguments or input arguments are empty'
+                             'or input arguments are incorrect')
         data = self.__algo.get_clusters_info(num_examples)
         if data is None:
-            raise ValueError
+            raise ValueError('self.__algo.get_clusters_info returns None')
         with open(output_path, "w", encoding="utf-8") as document:
             json.dump(data, document)
 

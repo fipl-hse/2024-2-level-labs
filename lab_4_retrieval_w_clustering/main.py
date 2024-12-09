@@ -8,6 +8,7 @@ Vector search with clusterization
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer, calculate_distance
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 import math
+import json
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -191,11 +192,9 @@ class DocumentVectorDB:
         Returns:
             list[tuple[int, Vector]]: List of index and vector for documents.
         """
-        if indices is None:
+        if not indices:
             return sorted(list(self.__vectors.items()), key=lambda x: x[0])
-        else:
-            return [(index, self.__vectors[index]) for index in indices if index in self.__vectors]
-
+        return [(index, self.__vectors[index]) for index in indices if index in self.__vectors]
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
         """
@@ -232,8 +231,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
-        super().__init__(self._db.get_vectorizer(), self._tokenizer)
         self._db = db
+        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -246,7 +245,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
-        if not query or n_neighbours <=0:
+        if not query or n_neighbours <= 0:
             raise ValueError("Query must be a non-empty string and n_neighbours "
                              "must be a positive integer")
         query_list = self._db.get_tokenizer().tokenize(query)
@@ -394,7 +393,6 @@ class KMeans:
             if self._is_convergence_reached(new_clusters):
                 break
 
-
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
         Run single train iteration.
@@ -421,7 +419,7 @@ class KMeans:
                     raise ValueError("Distance is wrong")
                 distances.append((distance, centroids.index(centroid)))
 
-                closest = min(distances)
+                closest = min(distances, key=lambda x: x[0])
                 self.__clusters[closest[-1]].add_document_index(index)
 
                 for cluster in self.__clusters:
@@ -430,7 +428,14 @@ class KMeans:
                         cluster_vectors.append(document_vectors[num])
 
                     if cluster_vectors:
-                        new_centroid = tuple(sum(value) / len(value) for value in zip(*cluster_vectors))
+                        vector_length = len(cluster_vectors[0][1])
+                        for vector in cluster_vectors:
+                            if len(vector[1]) != vector_length or not all(
+                                    isinstance(x, (int, float)) for x in vector[1]):
+                                raise ValueError("Invalid vector structure or non-numeric values in cluster vectors")
+                        zipped_vectors = list(zip(*[v[1] for v in cluster_vectors]))
+
+                        new_centroid = tuple(sum(value) / len(value) for value in zipped_vectors)
                         cluster.set_new_centroid(new_centroid)
 
                 return self.__clusters
@@ -452,24 +457,36 @@ class KMeans:
         Returns:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
-        if not query_vector or query_vector is None:
+        if not query_vector or not isinstance(query_vector, tuple):
             raise ValueError("Check, please, query vector input in infer")
-        if not n_neighbours or n_neighbours < 0:
+        if not isinstance(n_neighbours, int) or n_neighbours < 0:
             raise ValueError("Check, please, n_neighbours input in infer")
         dict_for_clusters = {}
+        no_centroid = True
         for cluster in self.__clusters:
             centroid = cluster.get_centroid()
+            if not centroid:
+                no_centroid = False
             distance = calculate_distance(query_vector, centroid)
+            if distance is None:
+                raise ValueError("Incorrect calculation, please check it")
             dict_for_clusters[cluster] = distance
-        min_cluster = min(dict_for_clusters, key=dict_for_clusters.get)
+
+        if no_centroid is False:
+            min_cluster = self.__clusters[0]
+        else:
+            min_cluster = min(dict_for_clusters, key=dict_for_clusters.get)
+
         indices = min_cluster.get_indices()
         vectors = self._db.get_vectors(indices)
         list_for_vectors = []
         for vector in vectors:
-            distance = calculate_distance(query_vector, vector[1])
-            list_for_vectors.append((distance, vector[0]))
-        sorted_list = sorted(list_for_vectors, reverse=True, key=lambda x: x[0])
-        return sorted_list[:n_neighbours]
+            vector_distance = calculate_distance(query_vector, vector[-1])
+            if vector_distance is None:
+                raise ValueError
+            list_for_vectors.append((vector_distance, vector[0]))
+
+        return sorted(list_for_vectors, key=lambda x: x[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """
@@ -496,6 +513,8 @@ class KMeans:
                     raise ValueError("Calculation is wrong")
                 distances.append((distance, vector[0]))
             distances = sorted(distances, key=lambda x: x[-1])[:num_examples]
+            indices = tuple(block[-1] for block in distances)
+            documents = self._db.get_raw_documents(indices)
 
 
     def calculate_square_sum(self) -> float:
@@ -545,7 +564,10 @@ class KMeans:
             new_centroid = new_cluster.get_centroid()
             if old_centroid is None or new_centroid is None:
                 raise ValueError("Please, check centroids in clusters")
-            if calculate_distance(old_centroid, new_centroid) >= threshold:
+            distance = calculate_distance(old_centroid, new_centroid)
+            if distance is None:
+                raise ValueError("Calculate_distance returned None")
+            if distance >= threshold:
                 return False
             return True
 
@@ -602,7 +624,6 @@ class ClusteringSearchEngine:
         documents = self._db.get_raw_documents(indices)
         return [(neighbour[0], documents[index]) for index, neighbour
                 in enumerate(distances)]
-
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """

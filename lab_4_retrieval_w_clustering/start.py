@@ -42,6 +42,8 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
+
+    print("do pr me")
     return (documents, stopwords)
 
 

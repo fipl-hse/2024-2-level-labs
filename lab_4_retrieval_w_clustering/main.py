@@ -29,9 +29,7 @@ def get_paragraphs(text: str) -> list[str]:
     if not isinstance(text, str) or len(text) == 0:
         raise ValueError
 
-    paragraphs = text.split("\n")
-
-    return paragraphs
+    return text.split("\n")
 
 
 class BM25Vectorizer(Vectorizer):
@@ -42,12 +40,12 @@ class BM25Vectorizer(Vectorizer):
     _corpus: TokenizedCorpus
     _avg_doc_len: float
 
-    def __init__(self, corpus: list[list[str]]) -> None:
+    def __init__(self) -> None:
         """
         Initialize an instance of the BM25Vectorizer class.
         """
-        super().__init__(corpus)
         self._corpus = []
+        super().__init__(self._corpus)
         self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -115,10 +113,11 @@ class BM25Vectorizer(Vectorizer):
         vector = [0.0] * len(self._vocabulary)
         avg_doc_len = self._avg_doc_len
         doc_len = len(tokenized_document)
-        bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, avg_doc_len, doc_len)
-        for e, ind in self._token2ind.items():
-            vector[ind] = bm_25[e]
-
+        print(self._vocabulary, tokenized_document, self._idf_values, avg_doc_len, doc_len)
+        bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, avg_doc_len=avg_doc_len, doc_len=doc_len)
+        for i, token in enumerate(self._vocabulary):
+            if token in tokenized_document:
+                vector[i] = bm_25.get(token, 0.0)
         return tuple(vector)
 
 

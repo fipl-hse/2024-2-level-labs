@@ -438,14 +438,13 @@ class KMeans:
         for cluster_to_update in self.__clusters:
             l_of_vecs_as_tuples = [self._db.get_vectors()[ind][1]
                                    for ind in cluster_to_update.get_indices()]
-            if len(l_of_vecs_as_tuples) <= 0:
-                continue
             updated_centroid = []
-            for i in range(len(l_of_vecs_as_tuples[0])):
-                summarized_el = 0.0
-                for vec in l_of_vecs_as_tuples:
-                    summarized_el += vec[i]
-                updated_centroid.append(summarized_el / len(l_of_vecs_as_tuples))
+            for vector in l_of_vecs_as_tuples:
+                for i in range(len(vector)):
+                    summarized_el = 0.0
+                    for vec in l_of_vecs_as_tuples:
+                        summarized_el += vec[i]
+                    updated_centroid.append(summarized_el / len(l_of_vecs_as_tuples))
 
             cluster_to_update.set_new_centroid(tuple(updated_centroid))
 

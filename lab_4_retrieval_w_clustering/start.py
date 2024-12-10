@@ -6,7 +6,7 @@ Laboratory Work #4 starter.
 from lab_4_retrieval_w_clustering.main import (
     DocumentVectorDB,
     get_paragraphs,
-    VectorDBAdvancedSearchEngine
+    VectorDBAdvancedSearchEngine,
 )
 
 

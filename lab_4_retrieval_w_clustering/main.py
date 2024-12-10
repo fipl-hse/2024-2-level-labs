@@ -426,7 +426,7 @@ class KMeans:
                 continue
             cluster_vectors = [pair[1] for pair in cluster_vectors_with_indices]
             new_centroid = [0.0] * len(cluster_vectors[0])
-            for idx in range(len(new_centroid)):
+            for idx, new_centroid_cor in enumerate(new_centroid):
                 new_centroid[idx] = sum(tup[idx] for tup in cluster_vectors) / len(cluster_vectors)
             cluster.set_new_centroid(Vector(new_centroid))
         return clusters
@@ -493,13 +493,13 @@ class KMeans:
             documents_indices = cluster.get_indices()
             docs_vectors_with_indices = self._db.get_vectors(documents_indices)
             docs_vectors = [pair[1] for pair in docs_vectors_with_indices]
-            for idx in range(len(docs_vectors)):
-                distance = calculate_distance(centroid, docs_vectors[idx])
+            for idx, docs_vector in enumerate(docs_vectors):
+                distance = calculate_distance(centroid, docs_vector)
                 if distance is None:
                     raise ValueError('Function returned None')
                 cluster_info.append((distance,
                                      *self._db.get_raw_documents((documents_indices[idx],))))
-            cluster_info.sort(key=lambda x: True if x[0] else False)
+            cluster_info.sort(key=lambda x: bool(x[0]))
             info.append({
                 'cluster_id': self.__clusters.index(cluster),
                 'documents': [pair[1] for pair in cluster_info][:num_examples]
@@ -521,8 +521,8 @@ class KMeans:
             docs_vectors_with_indices = self._db.get_vectors(documents_indices)
             docs_vectors = [pair[1] for pair in docs_vectors_with_indices]
             for doc_vector in docs_vectors:
-                cluster_result += sum([centroid[idx] ** 2 - doc_vector[idx] ** 2
-                                       for idx in range(len(centroid))])
+                cluster_result += sum(centroid[idx] ** 2 - doc_vector[idx] ** 2
+                                       for idx in range(len(centroid)))
             result += cluster_result
         return result
 
@@ -547,9 +547,9 @@ class KMeans:
         if not (new_clusters and threshold and isinstance(new_clusters, list)
                 and isinstance(threshold, float)):
             raise ValueError('Invalid input')
-        for idx in range(len(new_clusters)):
+        for idx, new_cluster in enumerate(new_clusters):
             distance = calculate_distance(self.__clusters[idx].get_centroid(),
-                                          new_clusters[idx].get_centroid())
+                                          new_cluster.get_centroid())
             if distance is None:
                 raise ValueError('Invalid input')
             if distance > threshold:

@@ -3,6 +3,7 @@ Lab 4.
 
 Vector search with clusterization
 """
+import json
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code,
 # unused-private-member, super-init-not-called
@@ -622,6 +623,8 @@ class ClusteringSearchEngine:
             num_examples (int): number of examples for each cluster
             output_path (str): path to output file
         """
+        with open(output_path, "w", encoding="UTF-8") as f:
+            json.dump(self.__algo.get_clusters_info(num_examples), f)
 
     def calculate_square_sum(self) -> float:
         """

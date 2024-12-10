@@ -55,8 +55,8 @@ def main() -> None:
     documents, stopwords = open_files()
     documents_paragraphs = []
     for document in documents:
-        documents_paragraphs = get_paragraphs(document)
-        documents_paragraphs.append(documents_paragraphs)
+        document_paragraphs = get_paragraphs(document)
+        documents_paragraphs.extend(document_paragraphs)
     db = DocumentVectorDB(stopwords)
     db.put_corpus(documents_paragraphs)
     search_engine = VectorDBSearchEngine(db)

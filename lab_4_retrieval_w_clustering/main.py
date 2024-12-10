@@ -270,6 +270,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         for pair in knn:
             indices.append(pair[0])
         documents = self._db.get_raw_documents(tuple(indices))
+        if not documents:
+            raise ValueError
         relevant_documents = []
         for i, distance in knn:
             relevant_documents.append((distance, documents[i]))

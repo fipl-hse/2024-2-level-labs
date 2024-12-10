@@ -220,8 +220,9 @@ class DocumentVectorDB:
             return self.__documents
         if not isinstance(indices, tuple):
             raise ValueError('inappropriate type input of argument')
-        for index in set(indices):
-            result.append(self.__documents[index])
+        for index in indices:
+            if self.__documents[index] not in result:
+                result.append(self.__documents[index])
         return result
 
 

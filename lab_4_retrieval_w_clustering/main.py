@@ -472,7 +472,10 @@ class KMeans:
                 or not isinstance(n_neighbours, int) or not n_neighbours or n_neighbours <= 0):
             raise ValueError("Oops! Invalid input")
         centroid_distances = []
-        for cluster in self.__clusters:
+        for cluster_index, cluster in enumerate(self.__clusters):
+            centroid = cluster.get_centroid()
+            if centroid is None:
+                continue
             centroid_distance = calculate_distance(query_vector, cluster.get_centroid())
             if centroid_distance is None:
                 raise ValueError("Oops! Distance is empty")

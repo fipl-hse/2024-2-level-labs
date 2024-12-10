@@ -29,7 +29,7 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not text or not isinstance(text, str):
-        raise ValueError
+        raise ValueError("Bad input")
 
     return text.split('\n')
 
@@ -61,7 +61,7 @@ class BM25Vectorizer(Vectorizer):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not tokenized_corpus:
-            raise ValueError
+            raise ValueError("Bad input")
 
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum((len(par) for par in self._corpus))/len(self._corpus)
@@ -83,11 +83,12 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document, list) \
             or not all(isinstance(token, str) for token in tokenized_document):
-            raise ValueError
-        if self._calculate_bm25(tokenized_document) is None:
-            raise ValueError
+            raise ValueError("Bad input")
+        result = self._calculate_bm25(tokenized_document)
+        if result is None:
+            raise ValueError("Method returns None")
 
-        return self._calculate_bm25(tokenized_document)
+        return result
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
         """
@@ -104,14 +105,14 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document, list) \
             or not all(isinstance(token, str) for token in tokenized_document):
-            raise ValueError
+            raise ValueError("Bad input")
 
         vector = [0.0 for _ in self._vocabulary]
         bm25 = calculate_bm25(self._vocabulary, tokenized_document,
                               self._idf_values,
                               avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         if not bm25:
-            return()
+            raise ValueError("Method returns None")
         for index, word in enumerate(self._vocabulary):
             vector[index] = bm25[word]
         return Vector(vector)
@@ -153,7 +154,7 @@ class DocumentVectorDB:
                 or if methods used return None.
         """
         if not corpus:
-            raise ValueError
+            raise ValueError("Bad input")
 
         tokenized_corpus = []
         for doc in corpus:
@@ -249,15 +250,15 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
         if not query or not isinstance(n_neighbours, int) or n_neighbours <= 0:
-            raise ValueError
+            raise ValueError("Bad input")
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
         vectors = [index[1] for index in self._db.get_vectors()]
         if query_vector is None:
-            raise ValueError
+            raise ValueError("Method returns None")
         knn = self._calculate_knn(query_vector, vectors, n_neighbours)
         if not knn:
-            raise ValueError
+            raise ValueError("Method returns None")
         relevant_documents = self._db.get_raw_documents(tuple([neighbor[0] for neighbor in knn]))
         return [(neighbor[1], relevant_documents[index]) for index, neighbor in enumerate(knn)]
 

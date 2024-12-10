@@ -3,7 +3,7 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
-from main import DocumentVectorDB, VectorDBSearchEngine
+from lab_4_retrieval_w_clustering.main import DocumentVectorDB, VectorDBSearchEngine
 
 
 def open_files() -> tuple[list[str], list[str]]:

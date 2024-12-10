@@ -112,8 +112,10 @@ class BM25Vectorizer(Vectorizer):
                 and all(isinstance(doc, str) for doc in tokenized_document)):
             raise ValueError('Invalid input')
         bm25_vector = [0.0] * len(self._vocabulary)
-        bm25 = calculate_bm25(self._vocabulary, tokenized_document,
-                              calculate_idf(self._vocabulary, self._corpus),
+        idf = calculate_idf(self._vocabulary, self._corpus)
+        if not idf:
+            return Vector(bm25_vector)
+        bm25 = calculate_bm25(self._vocabulary, tokenized_document, idf,
                               avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         if not bm25:
             return Vector(bm25_vector)
@@ -160,7 +162,7 @@ class DocumentVectorDB:
         if not corpus:
             raise ValueError('Invalid input')
 
-        tokenized_corpus = []
+        tokenized_corpus: list = []
         for doc in corpus:
             tokenized_doc = self._tokenizer.tokenize(doc)
             if tokenized_doc:
@@ -170,7 +172,7 @@ class DocumentVectorDB:
         self._vectorizer.set_tokenized_corpus(tokenized_corpus)
         self._vectorizer.build()
         for idx, doc in enumerate(tokenized_corpus):
-            self.__vectors[idx] = self._vectorizer.vectorize(doc)
+            self.__vectors[idx] = self._vectorizer.vectorize(list(doc))
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -410,9 +412,11 @@ class KMeans:
             for cluster in clusters:
                 centroid = cluster.get_centroid()
                 distance = calculate_distance(vector_doc[1], centroid)
-                if distance is None:
+                distance_to_nearest = calculate_distance(vector_doc[1],
+                                                         nearest_cluster.get_centroid())
+                if distance is None or distance_to_nearest is None:
                     raise ValueError('Function returned None')
-                if distance < calculate_distance(vector_doc[1], nearest_cluster.get_centroid()):
+                if distance < distance_to_nearest:
                     nearest_cluster = cluster
             nearest_cluster.add_document_index(vector_doc[0])
         for cluster in clusters:
@@ -482,7 +486,7 @@ class KMeans:
         """
         if not (num_examples and isinstance(num_examples, int) and num_examples > 0):
             raise ValueError('Invalid input')
-        info = []
+        info: list[dict] = []
         for cluster in self.__clusters:
             cluster_info = []
             centroid = cluster.get_centroid()
@@ -495,7 +499,7 @@ class KMeans:
                     raise ValueError('Function returned None')
                 cluster_info.append((distance,
                                      *self._db.get_raw_documents((documents_indices[idx],))))
-            cluster_info.sort(key=lambda x: x[0])
+            cluster_info.sort(key=lambda x: True if x[0] else False)
             info.append({
                 'cluster_id': self.__clusters.index(cluster),
                 'documents': [pair[1] for pair in cluster_info][:num_examples]
@@ -509,9 +513,9 @@ class KMeans:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
-        result = 0
+        result = 0.0
         for cluster in self.__clusters:
-            cluster_result = 0
+            cluster_result = 0.0
             centroid = cluster.get_centroid()
             documents_indices = cluster.get_indices()
             docs_vectors_with_indices = self._db.get_vectors(documents_indices)

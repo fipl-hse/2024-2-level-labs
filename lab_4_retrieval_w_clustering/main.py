@@ -273,8 +273,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if not documents:
             raise ValueError
         relevant_documents = []
-        for i, distance in knn:
-            relevant_documents.append((distance, documents[i]))
+        for i, text in enumerate(documents):
+            relevant_documents.append((knn[i][1], text))
         return relevant_documents
 
 

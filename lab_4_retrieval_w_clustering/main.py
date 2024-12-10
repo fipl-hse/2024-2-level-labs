@@ -426,7 +426,7 @@ class KMeans:
                 continue
             cluster_vectors = [pair[1] for pair in cluster_vectors_with_indices]
             new_centroid = [0.0] * len(cluster_vectors[0])
-            for idx, new_centroid_cor in enumerate(new_centroid):
+            for idx, _ in enumerate(new_centroid):
                 new_centroid[idx] = sum(tup[idx] for tup in cluster_vectors) / len(cluster_vectors)
             cluster.set_new_centroid(Vector(new_centroid))
         return clusters

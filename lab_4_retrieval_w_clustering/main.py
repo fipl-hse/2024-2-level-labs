@@ -479,17 +479,16 @@ class KMeans:
             centroid_distance = calculate_distance(query_vector, cluster.get_centroid())
             if centroid_distance is None:
                 raise ValueError("Oops! Distance is empty")
-            centroid_distances.append(centroid_distance)
+            centroid_distances.append((centroid_distance, cluster_index))
         cluster_idx = centroid_distances.index(min(centroid_distances))
-        closest_cluster = self.__clusters[cluster_idx]
-        cluster_indices = closest_cluster.get_indices()
+        cluster_indices = self.__clusters[cluster_idx].get_indices()
         cluster_vectors = self._db.get_vectors(cluster_indices)
         vector_distances = []
-        for i, vector in cluster_vectors:
+        for vector_index, vector in cluster_vectors:
             distance = calculate_distance(query_vector, vector)
             if distance is None:
                 raise ValueError("Oops! Distance is empty")
-            vector_distances.append((distance, i))
+            vector_distances.append((distance, vector_index))
         return sorted(vector_distances, key=lambda x: x[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:

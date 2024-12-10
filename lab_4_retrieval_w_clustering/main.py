@@ -505,7 +505,7 @@ class KMeans:
             info_dict = {"cluster_id": cluster_index,
                          "documents": documents}
             list_of_cluster_info.append(info_dict)
-        return list_of_cluster_info
+        return list_of_cluster_info.copy()
 
     def calculate_square_sum(self) -> float:
         """

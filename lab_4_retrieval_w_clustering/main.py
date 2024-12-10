@@ -55,8 +55,8 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__([])
         self._corpus = []
-        super().__init__(self._corpus)
         self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -238,8 +238,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        super().__init__(db.get_vectorizer(), db.get_tokenizer())
         self._db = db
-        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -438,17 +438,15 @@ class KMeans:
         if not query_vector or n_neighbours <= 0:
             raise ValueError('Invalid input argument(s)')
         cent_distances = []
-        no_centroid = True
         for ind, cluster in enumerate(self.__clusters):
             centroid = cluster.get_centroid()
-            no_centroid = False
             if not centroid:
-                no_centroid = True
+                continue
             cent_distance = calculate_distance(query_vector, centroid)
             if cent_distance is None:
                 raise ValueError('Failed to calculate distance between query vector and centroid')
             cent_distances.append((cent_distance, ind))
-        if no_centroid:
+        if not cent_distances:
             closest_cluster = 0
         else:
             closest_cluster = min(cent_distances)[1]
@@ -485,10 +483,9 @@ class KMeans:
                 distances.append((distance, vector[0]))
             distances.sort(key=lambda pair: pair[0])
             docs = self._db.get_raw_documents(tuple(pair[1] for pair in distances))
-            clusters_info.append({
-                'cluster_id': index,
-                'documents': docs[:num_examples]
-            })
+            cluster_info = {}
+            cluster_info.update(cluster_id=index, documents=docs[:num_examples])
+            clusters_info.append(cluster_info)
         return clusters_info
 
     def calculate_square_sum(self) -> float:
@@ -502,11 +499,8 @@ class KMeans:
         for cluster in self.__clusters:
             centroid = cluster.get_centroid()
             vectors = self._db.get_vectors(cluster.get_indices())
-            cluster_sum = 0.0
             for vector in vectors:
-                square_sum = sum((cent - vect) ** 2 for cent, vect in zip(centroid, vector[1]))
-                cluster_sum += square_sum
-            sse += cluster_sum
+                sse += sum((cent - vect) ** 2 for cent, vect in zip(centroid, vector[1]))
         return sse
 
     def _is_convergence_reached(

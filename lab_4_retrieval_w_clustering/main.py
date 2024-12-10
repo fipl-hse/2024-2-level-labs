@@ -16,6 +16,8 @@ from lab_3_ann_retriever.main import (
     Tokenizer,
     Vector,
     Vectorizer,
+    SearchEngine,
+    AdvancedSearchEngine
 )
 
 Corpus = list[str]
@@ -92,8 +94,11 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document, list):
             raise ValueError
-        if calculation := self._calculate_bm25(tokenized_document) is None:
-            raise ValueError('Calculation of the bm25 is wrong')
+        # if calculation := self._calculate_bm25(tokenized_document) is None:
+        #     raise ValueError('Calculation of the bm25 is wrong')
+        calculation = self._calculate_bm25(tokenized_document)
+        if calculation is None:
+            raise ValueError
         return calculation
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -206,8 +211,7 @@ class DocumentVectorDB:
             return sorted(self.__vectors.items(), key=lambda x: x[0])
 
         vectors = [(index, self.__vectors[index]) for index in indices if index in self.__vectors]
-        if not vectors:
-            raise ValueError
+
         return vectors
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
@@ -223,11 +227,15 @@ class DocumentVectorDB:
         Returns:
             Corpus: List of documents.
         """
-        if indices is None:
+        if not indices:
             return self.__documents
-        indices_set = set(indices)
-        real_docs = [doc for ind, doc in enumerate(self.__documents) if ind in indices_set]
-        return real_docs
+        unique_indices = []
+        for index in indices:
+            if index not in unique_indices:
+                unique_indices.append(index)
+        doc_for_texts = [self.__documents[ind] for ind in unique_indices]
+
+        return doc_for_texts
 
 
 class VectorDBSearchEngine(BasicSearchEngine):
@@ -258,27 +266,28 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
-        if not query or n_neighbours <= 0:
+        if (not query or not isinstance(query, str) or not
+        isinstance(n_neighbours, int) or n_neighbours <= 0):
             raise ValueError("Query must be a non-empty string and n_neighbours "
                              "must be a positive integer")
         query_list = self._db.get_tokenizer().tokenize(query)
         if not query_list:
-            raise ValueError("Could not tokenize the text")
+            raise ValueError("Failed to tokenize the text")
         query_vector = self._db.get_vectorizer().vectorize(query_list)
         if query_vector is None:
-            raise ValueError("Query vector calculation returned None")
-        document_vectors = self._db.get_vectors()
-        if document_vectors is None:
-            raise ValueError("Document vectors retrieval returned None")
-        vectors = [vector for _, vector in document_vectors]
-        knn_indices = self._calculate_knn(query_vector, vectors, n_neighbours)
-        if knn_indices is None:
-            raise ValueError("KNN returned None")
+            raise ValueError("Failed to vectorize the query vector")
+        vectors = [vector for _, vector in self._db.get_vectors()]
+        if vectors is None:
+            raise ValueError("Failed to vectorize vectors")
+        knn_indices = self._calculate_knn(query_vector=query_vector, document_vectors=vectors,
+                                          n_neighbours=n_neighbours)
+
+        if not knn_indices:
+            raise ValueError("Failed to calculate k nearest neighbours")
 
         indices = tuple(ind for ind, distance in knn_indices)
-
-        relevant_docs = [(distance, self._db.get_raw_documents(indices)[0])
-                         for distance, index in knn_indices]
+        relevant_docs = [(tup[1], self._db.get_raw_documents(indices)[index])
+                         for index, tup in enumerate(knn_indices)]
         return relevant_docs
 
 
@@ -351,7 +360,7 @@ class ClusterDTO:
                 or if input arguments are empty.
         """
         if not isinstance(index, int) or index < 0:
-            raise ValueError("Index must not be empty or negative, int!!!")
+            raise ValueError("Index of the document is expected to be integer")
         if index not in self.__indices:
             self.__indices.append(index)
 
@@ -465,23 +474,25 @@ class KMeans:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
         if not query_vector or not isinstance(query_vector, tuple):
-            raise ValueError("Check, please, query vector input in infer")
-        if not isinstance(n_neighbours, int) or n_neighbours < 0:
-            raise ValueError("Check, please, n_neighbours input in infer")
+            raise ValueError("Invalid input argument 'query_vector'")
+        if not isinstance(n_neighbours, int) or n_neighbours <= 0:
+            raise ValueError("Invalid input argument 'n_neighbours'")
 
         dict_for_clusters = {}
         no_centroid = True
         for cluster in self.__clusters:
             centroid = cluster.get_centroid()
             if not centroid:
-                no_centroid = False
+                continue
+            no_centroid = False
             distance = calculate_distance(query_vector, centroid)
             if distance is None:
-                raise ValueError("Incorrect calculation, please check it")
+                raise ValueError("Failed to calculate distance "
+                                 "between query_vector and centroid")
             dict_for_clusters[cluster] = distance
 
-        if no_centroid is False:
-            min_cluster = self.__clusters[0]
+        if no_centroid is True:
+            min_cluster = 0
         else:
             min_cluster = min(dict_for_clusters, key=dict_for_clusters.get)
 
@@ -491,7 +502,8 @@ class KMeans:
         for vector in vectors:
             vector_distance = calculate_distance(query_vector, vector[-1])
             if vector_distance is None:
-                raise ValueError("Incorrect calculation, please check it")
+                raise ValueError("Failed to calculate distance "
+                                 "between query and documents vector")
             list_for_vectors.append((vector_distance, vector[0]))
 
         return sorted(list_for_vectors, key=lambda x: x[0])[:n_neighbours]
@@ -508,20 +520,31 @@ class KMeans:
         """
         if not isinstance(num_examples, int) or not num_examples or num_examples <= 0:
             raise ValueError("Incorrect input with number")
+        every_cluster_info = []
+
         for ind, cluster in enumerate(self.__clusters):
             info = {}
             centroid = cluster.get_centroid()
             indices = cluster.get_indices()
             vectors = [self._db.get_vectors()[ind] for ind in indices]
             distances = []
+
             for vector in vectors:
                 distance = calculate_distance(centroid, vector[-1])
+
                 if distance is None:
                     raise ValueError("Calculation is wrong")
                 distances.append((distance, vector[0]))
+
             distances = sorted(distances, key=lambda x: x[-1])[:num_examples]
             indices = tuple(block[-1] for block in distances)
             documents = self._db.get_raw_documents(indices)
+
+            info['cluster_id'] = ind
+            info['documents'] = documents
+            every_cluster_info.append(info)
+
+        return every_cluster_info
 
     def calculate_square_sum(self) -> float:
         """
@@ -536,8 +559,10 @@ class KMeans:
             cluster_indices = cluster.get_indices()
             vectors = [self._db.get_vectors()[ind] for ind in cluster_indices]
             calculation = 0.0
+
             for vector in vectors:
-                calculation += math.sqrt(sum((cp - vp) ** 2 for cp, vp in zip(centroid, vector[1])))
+                calculation += math.sqrt(sum((one_centroid - two_centroid) ** 2
+                                             for one_centroid, two_centroid in zip(centroid, vector[1])))
             clusters_calculation += calculation
 
         return clusters_calculation
@@ -568,13 +593,16 @@ class KMeans:
         for old_cluster, new_cluster in zip(self.__clusters, new_clusters):
             old_centroid = old_cluster.get_centroid()
             new_centroid = new_cluster.get_centroid()
+
             if old_centroid is None or new_centroid is None:
                 raise ValueError("Please, check centroids in clusters")
+
             distance = calculate_distance(old_centroid, new_centroid)
             if distance is None:
                 raise ValueError("Calculate_distance returned None")
             if distance >= threshold:
                 return False
+
             return True
 
 
@@ -614,22 +642,31 @@ class ClusteringSearchEngine:
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
-        if not query or not n_neighbours:
-            raise ValueError("Please, check the input in retrieving relevant documents")
+        if (not query or not isinstance(query, str) or not n_neighbours
+                or not isinstance(n_neighbours, int) or n_neighbours <= 0):
+            raise ValueError("Invalid input types: query must be a string "
+                             "and n_neighbours must be an integer")
+
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         if not tokenized_query:
             raise ValueError("Tokenization is wrong")
+
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
         if not query_vector:
             raise ValueError("Vectorization is wrong")
+
         self.__algo.train()
-        distances = self.__algo.infer(query_vector, n_neighbours)
+        distances = self.__algo.infer(query_vector, n_neighbours=n_neighbours)
         if not distances:
             raise ValueError("Relevant distances are wrong")
+
         indices = tuple(x[-1] for x in distances)
         documents = self._db.get_raw_documents(indices)
-        return [(neighbour[0], documents[index]) for index, neighbour
-                in enumerate(distances)]
+        result = [(neighbour[0], documents[index]) for index, neighbour in enumerate(distances)]
+
+        if not result:
+            raise ValueError("No relevant documents found for the given query")
+        return result
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """
@@ -639,6 +676,12 @@ class ClusteringSearchEngine:
             num_examples (int): number of examples for each cluster
             output_path (str): path to output file
         """
+        if (not num_examples or not isinstance(num_examples, int)
+                or not output_path or not isinstance(output_path, str)):
+            raise ValueError("Input data is not relevant")
+        data = self.__algo.get_clusters_info(num_examples)
+        with open(output_path, "w", encoding='utf-8') as write_file:
+            json.dump(data, write_file)
 
     def calculate_square_sum(self) -> float:
         """
@@ -666,6 +709,8 @@ class VectorDBEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             engine (BasicSearchEngine): A search engine.
         """
+        self._db = db
+        self._engine = engine
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -681,6 +726,11 @@ class VectorDBEngine:
             list[tuple[float, str]] | None: Relevant documents with their distances.
 
         """
+        if (not query or not isinstance(query, str) or not n_neighbours
+                or not isinstance(n_neighbours, int)):
+            raise ValueError("Incorrect query or expected number of neighbours")
+        return (self._engine.retrieve_relevant_documents
+                (query, n_neighbours))
 
 
 class VectorDBTreeSearchEngine(VectorDBEngine):
@@ -695,6 +745,9 @@ class VectorDBTreeSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        super().__init__(db, SearchEngine(db.get_vectorizer(),
+                                          db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())
 
 
 class VectorDBAdvancedSearchEngine(VectorDBEngine):
@@ -709,3 +762,6 @@ class VectorDBAdvancedSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        super().__init__(db, AdvancedSearchEngine(db.get_vectorizer(),
+                                                  db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())

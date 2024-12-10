@@ -502,9 +502,9 @@ class KMeans:
             if (isinstance(cluster_index, int) and isinstance(documents, list) and
                 all(isinstance(document, str) for document in documents)):
                 info_dict = {"cluster_id": cluster_index, "documents": documents}
+                list_of_cluster_info.append(info_dict)
             else:
                 raise ValueError("Failed to get raw documents")
-            list_of_cluster_info.append(info_dict)
         return list_of_cluster_info
 
     def calculate_square_sum(self) -> float:

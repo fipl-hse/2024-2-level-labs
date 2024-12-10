@@ -3,14 +3,16 @@ Lab 4.
 
 Vector search with clusterization
 """
+
+# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 import json
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
-
-# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
     BasicSearchEngine,
     calculate_distance,
+    SearchEngine,
     Tokenizer,
     Vector,
     Vectorizer,
@@ -36,7 +38,7 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not text or not isinstance(text, str):
-        raise ValueError
+        raise ValueError('An inappropriate type input arguments or input arguments are empty')
     return text.split('\n')
 
 
@@ -52,9 +54,9 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__([])
         self._corpus = []
         self._avg_doc_len = -1.0
-        super().__init__(self._corpus)
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -68,7 +70,7 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_corpus or not isinstance(tokenized_corpus, list) \
                 or not all(isinstance(elem, list) for elem in tokenized_corpus):
-            raise ValueError
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(doc) for doc in self._corpus) / len(self._corpus)
 
@@ -89,10 +91,10 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document, list) \
                 or not all(isinstance(elem, str) for elem in tokenized_document):
-            raise ValueError
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
         vector = self._calculate_bm25(tokenized_document)
         if vector is None:
-            raise ValueError
+            raise ValueError('The method returned None')
         return vector
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -110,12 +112,12 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document, list) \
                 or not all(isinstance(elem, str) for elem in tokenized_document):
-            raise ValueError()
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
         bm25_vector = [0.0] * len(self._vocabulary)
         bm25_results = calculate_bm25(self._vocabulary, tokenized_document,
                                       self._idf_values, avg_doc_len=self._avg_doc_len,
                                       doc_len=len(tokenized_document))
-        if bm25_results is None or not bm25_results:
+        if not bm25_results:
             return ()
         for word, index in self._token2ind.items():
             bm25_vector[index] = bm25_results[word]
@@ -158,7 +160,7 @@ class DocumentVectorDB:
         """
         if not corpus or not isinstance(corpus, list) \
                 or not all(isinstance(elem, str) for elem in corpus):
-            raise ValueError
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
         tokenized_documents = []
         for doc in corpus:
             tokenized_doc = self._tokenizer.tokenize(doc)
@@ -167,10 +169,8 @@ class DocumentVectorDB:
                 self.__documents.append(doc)
         self._vectorizer.set_tokenized_corpus(tokenized_documents)
         self._vectorizer.build()
-        vectors = []
-        for tokenized_doc in tokenized_documents:
-            vectors.append(self._vectorizer.vectorize(tokenized_doc))
-        self.__vectors = dict(enumerate(vectors))
+        self.__vectors = dict(enumerate([self._vectorizer.vectorize(tokenized_doc) for tokenized_doc
+                                         in tokenized_documents]))
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -202,10 +202,7 @@ class DocumentVectorDB:
         """
         if indices is None:
             return list(self.__vectors.items())
-        pairs = []
-        for index in indices:
-            pairs.append((index, self.__vectors[index]))
-        return pairs
+        return [(index, self.__vectors[index]) for index in indices]
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
         """
@@ -243,8 +240,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        super().__init__(db.get_vectorizer(), db.get_tokenizer())
         self._db = db
-        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -404,8 +401,7 @@ class KMeans:
         centroids = []
         for cluster in self.__clusters:
             cluster.erase_indices()
-            centroid = cluster.get_centroid()
-            centroids.append(centroid)
+            centroids.append(cluster.get_centroid())
         vectors = self._db.get_vectors()
         for vector in vectors:
             distances = []
@@ -414,13 +410,13 @@ class KMeans:
                 if distance is None:
                     raise ValueError('The function returned None')
                 distances.append(distance)
-            closest = min(distances)
-            self.__clusters[distances.index(closest)].add_document_index(vector[0])
+            self.__clusters[distances.index(min(distances))].add_document_index(vector[0])
         for current_cluster in self.__clusters:
-            docs_vectors = [vector[1] for index in current_cluster.get_indices() for vector
-                            in vectors if index == vector[0]]
-            new_centroid = tuple(sum(row) / len(docs_vectors) for row in zip(*docs_vectors))
-            current_cluster.set_new_centroid(new_centroid)
+            docs_vectors = list(map(lambda index:
+                                    list(filter(lambda vec: vec[0] == index, vectors))[0][1],
+                                    current_cluster.get_indices()))
+            current_cluster.set_new_centroid(tuple(sum(row) / len(docs_vectors) for row
+                                                   in zip(*docs_vectors)))
         return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
@@ -445,16 +441,14 @@ class KMeans:
             raise ValueError('An inappropriate type input arguments or input arguments are empty')
         query2centroid = []
         for cluster in self.__clusters:
+            if cluster.get_centroid() is None:
+                continue
             distance = calculate_distance(query_vector, cluster.get_centroid())
             if distance is None:
                 raise ValueError('The function returned None')
             query2centroid.append(distance)
-        nearest = sorted(query2centroid)[0]
-        nearest_cluster = self.__clusters[query2centroid.index(nearest)]
-        if not nearest_cluster.get_centroid():
-            nearest_cluster = self.__clusters[0]
-        indices = nearest_cluster.get_indices()
-        docs_vectors = self._db.get_vectors(indices)
+        nearest_cluster = self.__clusters[query2centroid.index(min(query2centroid))]
+        docs_vectors = self._db.get_vectors(nearest_cluster.get_indices())
         query2vector = []
         for vector in docs_vectors:
             distance = calculate_distance(query_vector, vector[1])
@@ -531,8 +525,7 @@ class KMeans:
             raise ValueError('An inappropriate type input arguments or input arguments are empty')
         old_centroids = [cluster.get_centroid() for cluster in self.__clusters]
         for index, centroid in enumerate(new_clusters):
-            new_centroid = centroid.get_centroid()
-            distance = calculate_distance(new_centroid, old_centroids[index])
+            distance = calculate_distance(centroid.get_centroid(), old_centroids[index])
             if distance is None:
                 raise ValueError('The function returned None')
             if distance > threshold:
@@ -591,7 +584,8 @@ class ClusteringSearchEngine:
             raise ValueError('The method returned None')
         indices = tuple(pair[1] for pair in most_relevant)
         raw_documents = self._db.get_raw_documents(indices)
-        return [(most_relevant[num][0], raw_documents[num]) for num, index in enumerate(indices)]
+        return [(most_relevant[ind][0], raw_document) for ind, raw_document in
+                enumerate(raw_documents)]
 
     def make_report(self, num_examples: int, output_path: str) -> None:
         """
@@ -635,6 +629,8 @@ class VectorDBEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             engine (BasicSearchEngine): A search engine.
         """
+        self._db = db
+        self._engine = engine
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -650,6 +646,13 @@ class VectorDBEngine:
             list[tuple[float, str]] | None: Relevant documents with their distances.
 
         """
+        if not isinstance(query, str) or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
+        if not query or not isinstance(query, str) or not isinstance(n_neighbours, int) \
+                or n_neighbours <= 0:
+            raise ValueError('An inappropriate type input arguments or input arguments are empty')
+        most_relevant = self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
+        return most_relevant
 
 
 class VectorDBTreeSearchEngine(VectorDBEngine):
@@ -664,6 +667,8 @@ class VectorDBTreeSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        super().__init__(db, SearchEngine(db.get_vectorizer(), db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())
 
 
 class VectorDBAdvancedSearchEngine(VectorDBEngine):
@@ -678,3 +683,5 @@ class VectorDBAdvancedSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        super().__init__(db, AdvancedSearchEngine(db.get_vectorizer(), db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())

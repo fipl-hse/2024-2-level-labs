@@ -7,6 +7,8 @@ from lab_4_retrieval_w_clustering.main import (
     ClusteringSearchEngine,
     DocumentVectorDB,
     VectorDBSearchEngine,
+    VectorDBTreeSearchEngine,
+    VectorDBAdvancedSearchEngine
 )
 
 
@@ -58,15 +60,27 @@ def main() -> None:
     documents = open_files()[0]
     db = DocumentVectorDB(stopwords)
     db.put_corpus(documents)
-    vectordb = VectorDBSearchEngine(db)
-    result_1 = vectordb.retrieve_relevant_documents("""Первый был не кто иной,
-                                                  как Михаил Александрович Берлиоз,
-                                                  председатель правления""", 3)
-    clustering_search = ClusteringSearchEngine(db)
-    result = clustering_search.retrieve_relevant_documents("""Первый был не кто иной,
-                                                  как Михаил Александрович Берлиоз,
+    vectordb_search_engine = VectorDBSearchEngine(db)
+    search_engine_result = vectordb_search_engine.retrieve_relevant_documents("""Первый был
+                                                  не кто иной, как Михаил Александрович Берлиоз,
                                                   председатель правления""", 5)
-    print(result_1, '\n', result)
+    print(search_engine_result)
+    clustering_search = ClusteringSearchEngine(db)
+    clustering_search_result = clustering_search.retrieve_relevant_documents("""Первый был
+                                                 не кто иной, как Михаил Александрович Берлиоз,
+                                                 председатель правления""", 5)
+    print(clustering_search_result)
+    clustering_search.make_report(7, 'assets/report.json')
+    sse = clustering_search.calculate_square_sum()
+    print(sse)
+    vectordb_tree_search = VectorDBTreeSearchEngine(db)
+    tree_search = vectordb_tree_search.retrieve_relevant_documents("""Первый был не кто иной,
+    как Михаил Александрович Берлиоз, председатель правления""", 1)
+    print(tree_search)
+    vectordb_advanced_search = VectorDBAdvancedSearchEngine(db)
+    result = vectordb_advanced_search.retrieve_relevant_documents("""Первый был не кто иной,
+    как Михаил Александрович Берлиоз, председатель правления""", 5)
+    print(result)
     assert result, "Result is None"
 
 

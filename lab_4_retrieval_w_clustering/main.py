@@ -240,8 +240,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
-        self._db = db
         super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
+        self._db = db
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -294,6 +294,8 @@ class ClusterDTO:
         Args:
             centroid_vector (Vector): Centroid vector.
         """
+        self.__centroid = centroid_vector
+        self.__indices = []
 
     def __len__(self) -> int:
         """
@@ -302,6 +304,7 @@ class ClusterDTO:
         Returns:
             int: The number of document indices.
         """
+        return len(self.__indices)
 
     def get_centroid(self) -> Vector:
         """
@@ -310,6 +313,7 @@ class ClusterDTO:
         Returns:
             Vector: Centroid of current cluster.
         """
+        return self.__centroid
 
     def set_new_centroid(self, new_centroid: Vector) -> None:
         """
@@ -322,11 +326,15 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
+        if not new_centroid:
+            raise ValueError('input argument is empty')
+        self.__centroid = new_centroid
 
     def erase_indices(self) -> None:
         """
         Clear indexes.
         """
+        self.__indices = []
 
     def add_document_index(self, index: int) -> None:
         """
@@ -339,6 +347,10 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
+        if not index or not isinstance(index, int) or index < 0:
+            raise ValueError('inappropriate type of input argument or input argument is empty')
+        self.__indices.append(index)
+        self.__indices = list(set(self.__indices))
 
     def get_indices(self) -> list[int]:
         """
@@ -347,6 +359,7 @@ class ClusterDTO:
         Returns:
             list[int]: Indices of documents.
         """
+        return self.__indices
 
 
 class KMeans:

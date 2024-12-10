@@ -453,27 +453,25 @@ class KMeans:
                 and isinstance(query_vector, tuple) and all(isinstance(cor, float)
                                                             for cor in query_vector)):
             raise ValueError('Invalid input')
-        closest_cluster = self.__clusters[0]
 
-        for cluster in self.__clusters:
-            dist_cluster = calculate_distance(query_vector, cluster.get_centroid())
-            dist_closest_cluster = calculate_distance(query_vector, closest_cluster.get_centroid())
-            if dist_cluster is None or dist_closest_cluster is None:
-                raise ValueError('Function returned None')
-            if dist_cluster < dist_closest_cluster:
-                closest_cluster = cluster
-
-        indices = closest_cluster.get_indices()
-        docs_vectors = self._db.get_vectors(indices)
-        docs_with_distance = []
-        for doc in docs_vectors:
-            distance = calculate_distance(query_vector, doc[1])
+        clusters_idx_with_distances = []
+        for idx, cluster in enumerate(self.__clusters):
+            centroid = cluster.get_centroid()
+            distance = calculate_distance(query_vector, centroid) if centroid else 0.0
             if distance is None:
                 raise ValueError('Function returned None')
-            docs_with_distance.append((distance, doc[0]))
-        docs_with_distance.sort(key=lambda x: x[0])
+            clusters_idx_with_distances.append((distance, idx))
 
-        return docs_with_distance[:n_neighbours]
+        closest_cluster = self.__clusters[min(clusters_idx_with_distances)[1]]
+        docs_vectors = self._db.get_vectors(closest_cluster.get_indices())
+
+        docs_with_distance = []
+        for idx, vector in docs_vectors:
+            distance = calculate_distance(query_vector, vector)
+            if distance is None:
+                raise ValueError('Function returned None')
+            docs_with_distance.append((distance, idx))
+        return sorted(docs_with_distance)[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """

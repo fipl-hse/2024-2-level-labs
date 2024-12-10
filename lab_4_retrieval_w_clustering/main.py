@@ -4,10 +4,10 @@ Lab 4.
 Vector search with clusterization
 """
 
-from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
-
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code,
 # unused-private-member, super-init-not-called
+
+from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
     BasicSearchEngine,
@@ -37,7 +37,7 @@ def get_paragraphs(text: str) -> list[str]:
     Returns:
         list[str]: Paragraphs from document.
     """
-    if not (text and isinstance(text, str)):
+    if not text or not isinstance(text, str):
         raise ValueError('Invalid input')
     return text.split('\n')
 
@@ -111,12 +111,12 @@ class BM25Vectorizer(Vectorizer):
         if not (tokenized_document and isinstance(tokenized_document, list)
                 and all(isinstance(doc, str) for doc in tokenized_document)):
             raise ValueError('Invalid input')
-        bm25_vector = [0.0 for _ in self._vocabulary]
+        bm25_vector = [0.0] * len(self._vocabulary)
         bm25 = calculate_bm25(self._vocabulary, tokenized_document,
-                              calculate_idf(self._vocabulary, self._corpus), 1.5, 0.75,
-                              self._avg_doc_len, len(tokenized_document))
+                              calculate_idf(self._vocabulary, self._corpus),
+                              avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         if not bm25:
-            return ()
+            return Vector(bm25_vector)
         for token in bm25:
             if token in self._vocabulary:
                 bm25_vector[self._token2ind[token]] = bm25[token]
@@ -480,7 +480,7 @@ class KMeans:
         Returns:
             list[dict[str, int| list[str]]]: List with information about each cluster
         """
-        if not (num_examples and isinstance(num_examples, int) and num_examples>0):
+        if not (num_examples and isinstance(num_examples, int) and num_examples > 0):
             raise ValueError('Invalid input')
         info = []
         for cluster in self.__clusters:
@@ -523,7 +523,7 @@ class KMeans:
         return result
 
     def _is_convergence_reached(
-            self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
+        self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
     ) -> bool:
         """
         Check the convergence of centroids.

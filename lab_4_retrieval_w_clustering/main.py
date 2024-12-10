@@ -11,13 +11,13 @@ from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
     BasicSearchEngine,
     calculate_distance,
+    SearchEngine,
     Tokenizer,
     Vector,
     Vectorizer,
-    SearchEngine,
-    AdvancedSearchEngine
 )
 
 Corpus = list[str]
@@ -434,11 +434,12 @@ class KMeans:
         for index, doc in enumerate(document_vectors):
             distances_to_centroid = [(calculate_distance(doc[1], centroid), ind) for
                                      ind, centroid in enumerate(centroids)]
-            if any(distance is None or isinstance(distance, bool) for distance, _ in distances_to_centroid):
+            if any(distance is None or isinstance(distance, bool)
+                   for distance, _ in distances_to_centroid):
                 raise ValueError(
                     "calculate_distance returned None or a boolean value for document index")
 
-            closest_distance, closest_index = min(distances_to_centroid, key=lambda x: x[0])
+            closest_index = min(distances_to_centroid, key=lambda x: x[0])[1]
             self.__clusters[closest_index].add_document_index(index)
 
         for cluster in self.__clusters:
@@ -449,7 +450,8 @@ class KMeans:
                 for vector in cluster_vectors:
                     if (len(vector[1]) != vector_length or not
                     all(isinstance(x, (int, float)) for x in vector[1])):
-                        raise ValueError("Invalid vector structure or non-numeric values in cluster vectors")
+                        raise ValueError("Invalid vector structure or non-numeric "
+                                         "values in cluster vectors")
             zipped_vectors = list(zip(*[v[1] for v in cluster_vectors]))
             new_centroid = tuple(sum(value) / len(value) for value in zipped_vectors)
             cluster.set_new_centroid(new_centroid)
@@ -491,10 +493,10 @@ class KMeans:
                                  "between query_vector and centroid")
             dict_for_clusters[cluster] = distance
 
-        if no_centroid is True:
-            min_cluster = 0
-        else:
-            min_cluster = min(dict_for_clusters, key=dict_for_clusters.get)
+        if no_centroid:
+            raise ValueError("No centroids available in clusters")
+
+        min_cluster = min(dict_for_clusters, key=dict_for_clusters.get)
 
         indices = min_cluster.get_indices()
         vectors = self._db.get_vectors(indices)
@@ -523,25 +525,25 @@ class KMeans:
         every_cluster_info = []
 
         for ind, cluster in enumerate(self.__clusters):
-            info = {}
             centroid = cluster.get_centroid()
-            indices = cluster.get_indices()
-            vectors = [self._db.get_vectors()[ind] for ind in indices]
+            clust_indices = cluster.get_indices()
+            vectors = [self._db.get_vectors()[ind] for ind in clust_indices]
             distances = []
 
             for vector in vectors:
                 distance = calculate_distance(centroid, vector[-1])
-
                 if distance is None:
-                    raise ValueError("Calculation is wrong")
+                    raise ValueError('Could not calculate distance')
                 distances.append((distance, vector[0]))
 
             distances = sorted(distances, key=lambda x: x[-1])[:num_examples]
             indices = tuple(block[-1] for block in distances)
-            documents = self._db.get_raw_documents(indices)
+            docs = self._db.get_raw_documents(indices)
 
-            info['cluster_id'] = ind
-            info['documents'] = documents
+            info = {}
+            if isinstance(ind, int) and isinstance(docs, list):
+                info.update(cluster_id=ind, documents=docs)
+
             every_cluster_info.append(info)
 
         return every_cluster_info
@@ -562,7 +564,8 @@ class KMeans:
 
             for vector in vectors:
                 calculation += math.sqrt(sum((one_centroid - two_centroid) ** 2
-                                             for one_centroid, two_centroid in zip(centroid, vector[1])))
+                                             for one_centroid, two_centroid
+                                             in zip(centroid, vector[1])))
             clusters_calculation += calculation
 
         return clusters_calculation
@@ -603,7 +606,7 @@ class KMeans:
             if distance >= threshold:
                 return False
 
-            return True
+        return True
 
 
 class ClusteringSearchEngine:

@@ -3,6 +3,11 @@ Laboratory Work #4 starter.
 """
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+from lab_4_retrieval_w_clustering.main import (
+    DocumentVectorDB,
+    get_paragraphs,
+    VectorDBAdvancedSearchEngine
+)
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -49,7 +54,20 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    result = None
+    docs, stopwords = open_files()
+    documents = ''.join(docs)
+    paragraphs = get_paragraphs(documents)
+    db = DocumentVectorDB(stopwords)
+    db.put_corpus(paragraphs)
+
+    query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
+    vector_search_advanced = VectorDBAdvancedSearchEngine(db)
+    vector_search_advanced_relevant_documents = vector_search_advanced.retrieve_relevant_documents(
+        query, 5)
+    print('VectorDBAdvancedSearchEngine relevant documents:',
+          vector_search_advanced_relevant_documents)
+
+    result = vector_search_advanced_relevant_documents
     assert result, "Result is None"
 
 

@@ -38,7 +38,7 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not isinstance(text, str) or not text:
-        raise ValueError('Invalid arguments in get_paragraphs')
+        raise ValueError('Argument in get_paragraphs is either not of type str or empty')
 
     return text.split('\n')
 

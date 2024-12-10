@@ -119,14 +119,12 @@ class BM25Vectorizer(Vectorizer):
                 or not all(isinstance(elem, str) for elem in tokenized_document)):
             raise ValueError('Invalid input')
 
-        doc_len = len(tokenized_document)
         bm25_vector = [0.0] * len(self._vocabulary)
 
         bm25 = calculate_bm25(self._vocabulary,
                               tokenized_document,
                               self._idf_values,
-                              1.5, 0.75,
-                              self._avg_doc_len, doc_len)
+                              avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         for i, token in enumerate(self._vocabulary):
             if bm25 is not None:
                 bm25_vector[i] = bm25[token]

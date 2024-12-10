@@ -76,7 +76,7 @@ def main() -> None:
     print(f"Results by VectorDBSearchEngine: \n {vector_result} \n"
           f"Results by ClusteringSearchEngine: \n {clustering_result} \n"
           f"Results by VectorDBTreeSearchEngine: \n {tree_result} \n"
-          f"Results by VectorDBAdvancedSearchEngine: \n {result} \n {finish - start}")
+          f"Results by VectorDBAdvancedSearchEngine: \n {result}")
     clustering_search.make_report(3, "assets/report.json")
     assert result, "Result is None"
 

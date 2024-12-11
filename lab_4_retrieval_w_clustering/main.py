@@ -7,8 +7,6 @@ from json import dump
 from math import sqrt
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
-
-# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
     BasicSearchEngine,
@@ -18,6 +16,9 @@ from lab_3_ann_retriever.main import (
     Vector,
     Vectorizer,
 )
+
+# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -55,8 +56,8 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__([])
         self._corpus = []
-        super().__init__(self._corpus)
         self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -654,6 +655,7 @@ class VectorDBEngine:
 
         Returns:
             list[tuple[float, str]] | None: Relevant documents with their distances.
+
         """
         return self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
 

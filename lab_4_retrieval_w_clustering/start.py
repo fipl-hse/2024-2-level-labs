@@ -4,7 +4,6 @@ Laboratory Work #4 starter.
 
 import json
 
-# pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from lab_4_retrieval_w_clustering.main import (
     ClusteringSearchEngine,
     DocumentVectorDB,
@@ -13,6 +12,8 @@ from lab_4_retrieval_w_clustering.main import (
     VectorDBSearchEngine,
     VectorDBTreeSearchEngine,
 )
+
+# pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 
 
 def open_files() -> tuple[list[str], list[str]]:

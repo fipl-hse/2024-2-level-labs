@@ -132,6 +132,10 @@ class DocumentVectorDB:
         Args:
             stop_words (list[str]): List with stop words.
         """
+        self._tokenizer = Tokenizer(stop_words)
+        self._vectorizer = BM25Vectorizer()
+        self.__documents = []
+        self.__vectors = {}
 
     def put_corpus(self, corpus: Corpus) -> None:
         """
@@ -145,6 +149,21 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
+        if not corpus or not isinstance(corpus, list)\
+                or not all(isinstance(item, str) for item in corpus):
+            raise ValueError
+
+        tokenized_corpus = []
+        for text in corpus:
+            tokenized = self._tokenizer.tokenize(text)
+            if tokenized:
+                tokenized_corpus.append(tokenized)
+                self.__documents.append(text)
+
+        if not tokenized_corpus:
+            raise ValueError
+
+
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """

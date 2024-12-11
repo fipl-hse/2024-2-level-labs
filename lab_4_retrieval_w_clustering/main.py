@@ -28,7 +28,7 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not isinstance(text, str) or not text:
-        raise ValueError
+        raise ValueError('Inappropriate type input argument')
 
     return text.split('\n')
 
@@ -45,9 +45,9 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__(self._corpus)
         self._corpus = []
         self._avg_doc_len = -1.0
-        super().__init__(self._corpus)
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -61,7 +61,7 @@ class BM25Vectorizer(Vectorizer):
         """
         if not isinstance(tokenized_corpus, list) or not tokenized_corpus or \
                 not all(isinstance(item, list) for item in tokenized_corpus):
-            raise ValueError
+            raise ValueError('Inappropriate type input argument')
 
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(token_par) for token_par in tokenized_corpus)/len(self._corpus)
@@ -83,11 +83,11 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document, list) or \
                 not all(isinstance(doc, str) for doc in tokenized_document):
-            raise ValueError
+            raise ValueError('Inappropriate type input argument')
 
         vector_bm25 = self._calculate_bm25(tokenized_document)
         if not vector_bm25:
-            raise ValueError
+            raise ValueError('Input argument is empty')
 
         return vector_bm25
         
@@ -107,13 +107,15 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document, list) or \
                 not all(isinstance(item, str) for item in tokenized_document):
-            raise ValueError
+            raise ValueError('Inappropriate type input argument')
 
-        vector_bm25 = [0.0] * len(self._vocabulary)
-        bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, 1.5, 0.75,
+        k1 = 1.5
+        b = 0.75      
+        vector_bm25 = [0.0] * len(self._vocabulary)    # list of 0.0
+        bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, k1, b,
                                self._avg_doc_len, len(tokenized_document))
-        for index, voc in enumerate(self._vocabulary):
-            vector_bm25[index] = bm_25[voc]
+        for index, voc in enumerate(self._vocabulary):    # index and each inique_voc in vocabulary
+            vector_bm25[index] = bm_25[voc]    # replace each zero-vector with bm25 vector of unique_voc from vocab
         return tuple(vector_bm25)
 
 
@@ -134,10 +136,10 @@ class DocumentVectorDB:
         Args:
             stop_words (list[str]): List with stop words.
         """
-        self.__vectors = {}
-        self.__documents = []
-        self._tokenizer = Tokenizer(stop_words)
-        self._vectorizer = BM25Vectorizer()
+        self.__vectors = {}   # fill
+        self.__documents = []    # fill
+        self._tokenizer = Tokenizer(stop_words)    # attribute of Tokenizer
+        self._vectorizer = BM25Vectorizer()    # attribute of BM25Vectorizer
 
     def put_corpus(self, corpus: Corpus) -> None:
         """
@@ -153,7 +155,7 @@ class DocumentVectorDB:
         """
         if not corpus or not isinstance(corpus, list) or not \
                 all(isinstance(par, str) for par in corpus):
-            raise ValueError
+            raise ValueError('Inappropriate type input argument')
 
         tokenized_corpus = []
         for part in corpus:
@@ -162,15 +164,15 @@ class DocumentVectorDB:
                 tokenized_corpus.append(tokenized_part)
                 self.__documents.append(part)
         if not tokenized_corpus:
-            raise ValueError
+            raise ValueError('Input argument is empty')
 
-        self._vectorizer.set_tokenized_corpus(tokenized_corpus)
+        self._vectorizer.set_tokenized_corpus(tokenized_corpus)    # made corpus and len
         self._vectorizer.build()    # made vocab
 
         try:
-            for index, tok_part in enumerate(tokenized_corpus):
-                self.__vectors[index] = self._vectorizer.vectorize(tok_part)
-        except StopIteration:
+            for index, tok_part in enumerate(tokenized_corpus):    # num and ['a', ... 'b']
+                self.__vectors[index] = self._vectorizer.vectorize(tok_part)    # fill with tuples(vectors)
+        except StopIteration:    # thinkg about this part
             pass
 
     def get_vectorizer(self) -> BM25Vectorizer:
@@ -204,9 +206,7 @@ class DocumentVectorDB:
         if indices is None:
             return list(self.__vectors.items())
 
-        presented_vectors = [(index, self.__vectors[index]) for index in indices]
-
-        return presented_vectors
+        return [(index, self.__vectors[index]) for index in indices]
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
         """
@@ -229,9 +229,8 @@ class DocumentVectorDB:
             if index not in unique_indices:
                 unique_indices.append(index)
 
-        presented_documents = [self.__documents[index] for index in unique_indices]
-
-        return presented_documents
+        return [self.__documents[index] for index in unique_indices]
+    
 class VectorDBSearchEngine(BasicSearchEngine):
     """
     Engine based on VectorDB.
@@ -262,19 +261,18 @@ class VectorDBSearchEngine(BasicSearchEngine):
         """
         if not query or not n_neighbours or \
                 not isinstance(query, str) or not isinstance(n_neighbours, int) :
-            raise ValueError
+            raise ValueError('Inappropriate type input argument')
 
         tokenized_query = self._db.get_tokenizer().tokenize(query)
 
         knn = self._calculate_knn(self._db.get_vectorizer().vectorize(tokenized_query),
                                   [v[1] for v in self._db.get_vectors()], n_neighbours)
         if not knn:
-            raise ValueError
+            raise ValueError('Argument is empty')
         relevant_docs = self._db.get_raw_documents(tuple(index for index in range(n_neighbours)))
         if not relevant_docs:
-            raise ValueError
+            raise ValueError('Argument is empty')
         return [(knn[index][1], smth) for index, smth in enumerate(relevant_docs)]
-
 
 class ClusterDTO:
     """
@@ -418,7 +416,7 @@ class KMeans:
         """
 
     def _is_convergence_reached(
-            self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
+        self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
     ) -> bool:
         """
         Check the convergence of centroids.
@@ -508,7 +506,7 @@ class VectorDBEngine:
         """
 
     def retrieve_relevant_documents(
-            self, query: str, n_neighbours: int
+        self, query: str, n_neighbours: int
     ) -> list[tuple[float, str]] | None:
         """
         Index documents for retriever.

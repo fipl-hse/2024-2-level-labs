@@ -448,7 +448,10 @@ class KMeans:
             raise ValueError("KMeans infer input error")
         distances = []
         for cluster in self.__clusters:
-            distance = calculate_distance(query_vector,cluster.get_centroid())
+            used_centroid = cluster.get_centroid()
+            if not used_centroid:
+                continue
+            distance = calculate_distance(query_vector,used_centroid)
             if distance is None:
                 raise ValueError('KMeans infer query_vector distance error')
             distances.append(distance)

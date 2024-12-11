@@ -4,9 +4,10 @@ Lab 4.
 Vector search with clusterization
 """
 
-from lab_2_retrieval_w_bm25.main import calculate_bm25
+
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
     BasicSearchEngine,
     calculate_distance,
@@ -53,8 +54,8 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__([])
         self._corpus = []
-        super().__init__(self._corpus)
         self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -400,8 +401,10 @@ class KMeans:
         """
         vectors_initial = self._db.get_vectors(list(range(self._n_clusters)))
         self.__clusters = [ClusterDTO(vector[1]) for vector in vectors_initial]
-        while not self._is_convergence_reached(self.__clusters):
+        while True:
             self.run_single_train_iteration()
+            if self._is_convergence_reached(self.__clusters):
+                break
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -414,7 +417,8 @@ class KMeans:
             list[ClusterDTO]: List of clusters.
         """
         centroids = []
-        for cluster in self.__clusters:
+        clusters = self.__clusters
+        for cluster in clusters:
             cluster.erase_indices()
             centroids.append(cluster.get_centroid())
         vectors = self._db.get_vectors()
@@ -430,13 +434,12 @@ class KMeans:
                 if distance < distance_minimal:
                     distance_minimal = distance
                     closest_centroid = centroid
-            self.__clusters[centroids.index(closest_centroid)].add_document_index(vector_index)
-        for cluster in self.__clusters:
+            clusters[centroids.index(closest_centroid)].add_document_index(vector_index)
+        for cluster in clusters:
             cluster_vectors = [vectors[index][1] for index in cluster.get_indices()]
-            centroid_updated = (sum(cluster_vectors[index]) / len(cluster_vectors)
-                                for index in range(len(cluster_vectors)-1))
+            centroid_updated = (sum(value) / len(value) for value in zip(*cluster_vectors))
             cluster.set_new_centroid(tuple(centroid_updated))
-        return self.__clusters
+        return clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """

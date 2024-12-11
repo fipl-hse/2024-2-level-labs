@@ -54,11 +54,11 @@ def main() -> None:
     paragraphs = [paragraph for document in documents for paragraph in get_paragraphs(document)]
     db = DocumentVectorDB(stopwords)
     db.put_corpus(paragraphs)
-    search_engine = VectorDBSearchEngine(db)
+    vector_search = VectorDBSearchEngine(db)
 
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
     n_neighbours = 3
-    result = search_engine.retrieve_relevant_documents(query, n_neighbours)
+    result = vector_search.retrieve_relevant_documents(query, n_neighbours)
     print(result)
 
     assert result, "Result is None"

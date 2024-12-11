@@ -28,7 +28,7 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not isinstance(text, str) or not text:
-        raise ValueError
+        raise ValueError('A text must be a non-empty string. ')
     return text.split('\n')
 
 
@@ -219,8 +219,11 @@ class DocumentVectorDB:
         if not isinstance(indices, tuple):
             raise ValueError("Indices must be a tuple of integers.")
 
-        unique_indices = set(indices)
-        return [self.__documents[ind] for ind in unique_indices]
+        unique_documents = []
+        for index in indices:
+            if self.__documents[index] not in unique_documents:
+                unique_documents.append(self.__documents[index])
+        return unique_documents
 
 
 class VectorDBSearchEngine(BasicSearchEngine):
@@ -259,13 +262,12 @@ class VectorDBSearchEngine(BasicSearchEngine):
         vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
 
         vectors = [vector[1] for vector in self._db.get_vectors()]
-        most_relevant = self._calculate_knn(vectorized_query, vectors, n_neighbours)
-        if not most_relevant:
-            raise ValueError("No relevant documents found.")
+        neighbours = self._calculate_knn(vectorized_query, vectors, n_neighbours)
+        if not neighbours:
+            raise ValueError('No neighbours found.')
 
-        indices = tuple(item[0] for item in most_relevant)
-        documents = self._db.get_raw_documents(indices)
-        return [(distance, documents[ind]) for ind, distance in enumerate(most_relevant)]
+        relevant_documents = self._db.get_raw_documents(tuple(neighbour[0] for neighbour in neighbours))
+        return [(doc[-1], relevant_documents[ind]) for ind, doc in enumerate(neighbours)]
 
 
 class ClusterDTO:

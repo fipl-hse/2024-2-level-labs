@@ -516,9 +516,9 @@ class KMeans:
         if not new_clusters:
             raise ValueError('New clusters must be non-empty. ')
 
-        for old_cluster, new_clusters in zip(self.__clusters, new_clusters):
+        for old_cluster, new_cluster in zip(self.__clusters, new_clusters):
             distance = calculate_distance(old_cluster.get_centroid(),
-                                          new_clusters.get_centroid())
+                                          new_cluster.get_centroid())
             if distance is None:
                 raise ValueError('Distance must not be NoneType. ')
             if threshold <= distance:

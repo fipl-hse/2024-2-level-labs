@@ -6,7 +6,7 @@ Vector search with clusterization
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
-from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf, build_vocabulary
+from lab_2_retrieval_w_bm25.main import calculate_bm25
 Corpus = list[str]
 "Type alias for corpus of texts."
 TokenizedCorpus = list[list[str]]
@@ -138,6 +138,10 @@ class DocumentVectorDB:
         Args:
             stop_words (list[str]): List with stop words.
         """
+        self._tokenizer = Tokenizer(stop_words)
+        self._vectorizer = BM25Vectorizer()
+        self.__vectors = {}
+        self.__documents = []
 
     def put_corpus(self, corpus: Corpus) -> None:
         """
@@ -151,6 +155,19 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
+        if not isinstance(corpus, list) or len(corpus) == 0 or corpus is None or not isinstance(corpus, list) or not corpus or len(corpus) == 0:
+            raise ValueError
+
+        for text in corpus:
+            self.__documents = self._tokenizer.tokenize(text) # список токенизированных абзацев
+
+        if self.__documents is None or not isinstance(self.__documents, list) or not self.__documents or len(self.__documents) == 0 or corpus is None or not isinstance(corpus, list) or not corpus or len(corpus) == 0:
+            raise ValueError
+
+        vectorised_docs = self._vectorizer.vectorize(self.__documents) # векторизация токенизированного
+        for index, elem in enumerate(self.__documents): # обнаружение индекса и его присвоение
+            for vector in vectorised_docs:
+                self.__vectors[index] = vector
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """

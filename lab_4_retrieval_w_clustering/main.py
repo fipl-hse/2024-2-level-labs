@@ -109,8 +109,8 @@ class BM25Vectorizer(Vectorizer):
 
         empty_list = [0.0] * len(self._vocabulary)
         res = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
-        for e, ind in self._token2ind.items():
-            empty_list[ind] = res[e]
+        for val, ind in self._token2ind.items():
+            empty_list[ind] = res[val]
 
         return tuple(empty_list)
 
@@ -289,7 +289,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
         if (not isinstance(query, str)
-                or query is None or not query or not isinstance(n_neighbours, int) or not n_neighbours):
+                or query is None or not query or not isinstance(n_neighbours, int)):
             raise ValueError('Unacceptable arguments/types')
 
         if n_neighbours < 0:
@@ -300,7 +300,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError('Problem with tokenization')
 
         vect_query = self._vectorizer.vectorize(tok_query)
-        if vect_query is None or len(vect_query) == 0:
+        if vect_query is None or not vect_query:
             raise ValueError('Problem with vectorization')
 
         inf = [elem[1] for elem in self._db.get_vectors()]

@@ -203,10 +203,10 @@ class DocumentVectorDB:
         """
         if not indices:
             return list(self.__vectors.items())
-        needed = []
+        needed_vectors = []
         for i in indices:
-            needed.append((i, self.__vectors[i]))
-        return needed
+            needed_vectors.append((i, self.__vectors[i]))
+        return needed_vectors
 
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
@@ -225,12 +225,12 @@ class DocumentVectorDB:
         if not indices:
             return self.__documents
         repeats = []
-        needed = []
+        needed_docs = []
         for i in indices:
             if not i in repeats:
-                needed.append(self.__documents[i])
+                needed_docs.append(self.__documents[i])
                 repeats.append(i)
-        return needed
+        return needed_docs
 
 
 class VectorDBSearchEngine(BasicSearchEngine):

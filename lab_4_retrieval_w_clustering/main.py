@@ -283,7 +283,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError('_calculate_knn returns an empty list or None')
         documents = self._db.get_raw_documents(tuple(index for index in range(n_neighbours)))
 
-        return [(d, documents[ind]) for ind, d in calculated_knn]
+        return [(calculated_knn[index][1], paragr) for index, paragr in enumerate(documents)]
 
 
 class ClusterDTO:
@@ -417,6 +417,7 @@ class KMeans:
                 if distance is None:
                     raise ValueError('calculate_distance returns None')
                 distances.append(distance)
+            self.__clusters[distances.index(min(distances))].add_document_index(index)
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """

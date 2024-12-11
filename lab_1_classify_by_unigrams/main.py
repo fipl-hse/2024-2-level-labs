@@ -5,8 +5,6 @@ Language detection
 """
 # pylint:disable=too-many-locals, unused-argument, unused-variable
 
-
-
 def tokenize(text: str) -> list[str] | None:
     """
     Split a text into tokens.
@@ -21,14 +19,13 @@ def tokenize(text: str) -> list[str] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(text, str) is True:
-        text = text.lower()
-        token_list = []
-        for token in text:
-            if token.isalpha():
-                token_list.append(token)
-        return token_list
-    else: return None
+    if not isinstance(text, str):
+        return None
+    text = text.lower()
+    token_list = []
+    for token in text:
+        if token.isalpha():
+            return token_list
 
 def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
     """
@@ -42,12 +39,12 @@ def calculate_frequencies(tokens: list[str] | None) -> dict[str, float] | None:
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(tokens, list) is True:
-        freq_dict = {}
-        for token in tokens:
-            freq_dict[token] = tokens.count(token)/len(tokens)
+    if isinstance(tokens, list) is False:
+        return None
+    freq_dict = {}
+    for token in tokens:
+        freq_dict[token] = tokens.count(token)/len(tokens)
         return freq_dict
-    else: return None
 
 
 def create_language_profile(language: str, text: str) -> dict[str, str | dict[str, float]] | None:
@@ -63,13 +60,13 @@ def create_language_profile(language: str, text: str) -> dict[str, str | dict[st
 
     In case of corrupt input arguments, None is returned
     """
-    if isinstance(language, str) and isinstance(text, str) is True:
-        language_profile = {}
-        token_list = tokenize(text)
-        freq_dict = calculate_frequencies(token_list)
-        language_profile["name"] = language
-        language_profile["freq"] = freq_dict
-    else: return None
+    if isinstance(language, str) and isinstance(text, str) is False:
+        return None
+    language_profile = {}
+    token_list = tokenize(text)
+    freq_dict = calculate_frequencies(token_list)
+    language_profile["name"] = language
+    language_profile["freq"] = freq_dict
 
 def calculate_mse(predicted: list, actual: list) -> float | None:
     """

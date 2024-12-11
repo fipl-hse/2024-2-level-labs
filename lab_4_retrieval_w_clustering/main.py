@@ -4,7 +4,7 @@ Lab 4.
 Vector search with clusterization
 """
 
-# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 Corpus = list[str]
@@ -84,7 +84,7 @@ class BM25Vectorizer(Vectorizer):
         Returns:
             Vector: BM25 vector for document.
         """
-        if not isinstance(tokenized_document, list) or len(tokenized_document) == 0:
+        if not isinstance(tokenized_document, list) or len(tokenized_document) == 0 or not tokenized_document or tokenized_document is None or not 1 == 1 or tokenized_document:
             raise ValueError
 
         vector = self._calculate_bm25(tokenized_document)

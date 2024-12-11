@@ -74,7 +74,7 @@ def main() -> None:
     result_for_search = search.retrieve_relevant_documents(query, 5)
 
     advanced_search = VectorDBAdvancedSearchEngine(db)
-    result = (advanced_search.retrieve_relevant_documents(query, 5))
+    result = advanced_search.retrieve_relevant_documents(query, 5)
 
     for i in range(1, 15):
         cluster_search = ClusteringSearchEngine(db, i)

@@ -72,7 +72,8 @@ class BM25Vectorizer(Vectorizer):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not tokenized_corpus or not isinstance(tokenized_corpus, list):
-            raise ValueError("Incorrect input")
+            raise ValueError(f"Invalid input: tokenized_corpus cannot be empty and must be a list, "
+                             f"but got {type(tokenized_corpus).__name__}")
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(paragraph) for paragraph
                                 in self._corpus) / len(self._corpus)
@@ -165,10 +166,11 @@ class DocumentVectorDB:
                 or if methods used return None.
         """
         if not isinstance(corpus, list) or not corpus:
-            raise ValueError("Input arguments are wrong")
+            raise ValueError("Input arguments are not the list "
+                             "or this list is empty or consisted with None")
         tokenized_documents = self._tokenizer.tokenize_documents(corpus)
         if tokenized_documents is None:
-            raise ValueError("Tokenization returned None")
+            raise ValueError("Failed to tokenize the text")
         filtered_documents = [doc for doc in tokenized_documents if doc]
 
         self._vectorizer.set_tokenized_corpus(filtered_documents)
@@ -176,7 +178,7 @@ class DocumentVectorDB:
         self.__vectors = {index: self._vectorizer.vectorize(doc) for index, doc
                           in enumerate(filtered_documents)}
         if not self.__vectors:
-            raise ValueError("Vectorization returned None")
+            raise ValueError("Failed to vectorize")
         self.__documents = [corpus[i] for i in range(len(corpus)) if tokenized_documents[i]]
 
     def get_vectorizer(self) -> BM25Vectorizer:
@@ -437,9 +439,12 @@ class KMeans:
             if any(distance is None or isinstance(distance, bool)
                    for distance, _ in distances_to_centroid):
                 raise ValueError(
-                    "calculate_distance returned None or a boolean value for document index")
+                    f"Invalid distance value in document "
+                    f"with index {index}: {distances_to_centroid}")
 
-            closest_index = min(distances_to_centroid, key=lambda x: x[0])[1]
+            filtered_distances = [(dist, index) for dist, index in
+                                  distances_to_centroid if dist is not None]
+            closest_index = min(filtered_distances, key=lambda x: x[0])[1]
             self.__clusters[closest_index].add_document_index(index)
 
         for cluster in self.__clusters:
@@ -476,9 +481,9 @@ class KMeans:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
         if not query_vector or not isinstance(query_vector, tuple):
-            raise ValueError("Invalid input argument 'query_vector'")
+            raise ValueError("Invalid input argument 'query_vector' must be tuple")
         if not isinstance(n_neighbours, int) or n_neighbours <= 0:
-            raise ValueError("Invalid input argument 'n_neighbours'")
+            raise ValueError("Invalid input argument 'n_neighbours' must be integer")
 
         dict_for_clusters = {}
         no_centroid = True
@@ -496,7 +501,7 @@ class KMeans:
         if no_centroid:
             raise ValueError("No centroids available in clusters")
 
-        min_cluster = min(dict_for_clusters, key=dict_for_clusters.get)
+        min_cluster = min(dict_for_clusters, key=dict_for_clusters.__getitem__)
 
         indices = min_cluster.get_indices()
         vectors = self._db.get_vectors(indices)
@@ -589,20 +594,23 @@ class KMeans:
             bool: True if the distance is correct, False in other cases.
         """
         if not new_clusters:
-            raise ValueError("Incorrect input data in _is_convergence_reached")
+            raise ValueError("Incorrect input data in _is_convergence_reached: "
+                             "'new_clusters' is empty")
         if len(new_clusters) != len(self.__clusters):
-            raise ValueError("Check match the numbers of clusters")
+            raise ValueError("The number of clusters is not similar")
 
         for old_cluster, new_cluster in zip(self.__clusters, new_clusters):
             old_centroid = old_cluster.get_centroid()
             new_centroid = new_cluster.get_centroid()
 
             if old_centroid is None or new_centroid is None:
-                raise ValueError("Please, check centroids in clusters")
+                raise ValueError("Clusters are not properly initialized and "
+                                 "contain valid data")
 
             distance = calculate_distance(old_centroid, new_centroid)
             if distance is None:
-                raise ValueError("Calculate_distance returned None")
+                raise ValueError("Distance calculation failed "
+                                 "in _is_convergence_reached")
             if distance >= threshold:
                 return False
 
@@ -652,16 +660,19 @@ class ClusteringSearchEngine:
 
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         if not tokenized_query:
-            raise ValueError("Tokenization is wrong")
+            raise ValueError(f"Tokenization failed for query: '{query}'. "
+                             f"The result was empty")
 
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
         if not query_vector:
-            raise ValueError("Vectorization is wrong")
+            raise ValueError(f"Vectorization failed for tokenized query: '{tokenized_query}'. "
+                             f"The result was empty")
 
         self.__algo.train()
-        distances = self.__algo.infer(query_vector, n_neighbours=n_neighbours)
+        distances = self.__algo.infer(query_vector=query_vector, n_neighbours=n_neighbours)
         if not distances:
-            raise ValueError("Relevant distances are wrong")
+            raise ValueError(f"Inference returned no distances for query vector: '{query_vector}' "
+                             f"with n_neighbours={n_neighbours}")
 
         indices = tuple(x[-1] for x in distances)
         documents = self._db.get_raw_documents(indices)
@@ -681,7 +692,8 @@ class ClusteringSearchEngine:
         """
         if (not num_examples or not isinstance(num_examples, int)
                 or not output_path or not isinstance(output_path, str)):
-            raise ValueError("Input data is not relevant")
+            raise ValueError("Input data is not relevant: num_examples must be an integer and "
+                             "output_path must be a string")
         data = self.__algo.get_clusters_info(num_examples)
         with open(output_path, "w", encoding='utf-8') as write_file:
             json.dump(data, write_file)
@@ -732,8 +744,8 @@ class VectorDBEngine:
         if (not query or not isinstance(query, str) or not n_neighbours
                 or not isinstance(n_neighbours, int)):
             raise ValueError("Incorrect query or expected number of neighbours")
-        return (self._engine.retrieve_relevant_documents
-                (query, n_neighbours))
+        result = self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
+        return result
 
 
 class VectorDBTreeSearchEngine(VectorDBEngine):

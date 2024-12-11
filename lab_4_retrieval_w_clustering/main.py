@@ -412,6 +412,8 @@ class KMeans:
         for cluster in self.__clusters:
             cluster.erase_indices()
             centroid = cluster.get_centroid()
+            if centroid is None:
+                continue
             centroids.append(centroid)
         vectors = self._db.get_vectors()
         for vector in vectors:

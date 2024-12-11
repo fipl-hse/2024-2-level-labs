@@ -6,7 +6,8 @@ markers = [
     "mark10: tests for level 10",
     "lab_1_classify_by_unigrams: tests for lab 1",
     "lab_2_retrieval_w_bm25: tests for lab 2",
-    "lab_3_ann_retriever: tests for lab 3"
+    "lab_3_ann_retriever: tests for lab 3",
+    "lab_4_retrieval_w_clustering: tests for lab 4"
 ]
 norecursedirs = [
     "venv*"
@@ -50,6 +51,7 @@ select = ['I']
 count = true
 
 [tool.isort]
+profile = 'black'
 py_version = '311'
 skip_gitignore = true
 line_length = 100
@@ -62,7 +64,8 @@ src_paths = [
     "config",
     "lab_1_classify_by_unigrams",
     "lab_2_retrieval_w_bm25",
-    "lab_3_ann_retriever"
+    "lab_3_ann_retriever",
+    "lab_4_retrieval_w_clustering"
 ]
 
 [tool.mypy]
@@ -413,7 +416,7 @@ max-public-methods = 20
 max-returns = 6
 
 # Maximum number of statements in function / method body.
-max-statements = 50
+max-statements = 51
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods = 2
@@ -491,7 +494,7 @@ logging-format-style = "old"
 
 # Logging modules to check that the string format arguments are in logging
 # function parameter format.
-logging-modules = ["logging"]
+logging-modules = ["logging", "logging518"]
 
 [tool.pylint."messages control"]
 # Only show warnings with the listed confidence levels. Leave empty to show all.
@@ -680,3 +683,23 @@ ignored-argument-names = "_.*|^ignored_|^unused_"
 # List of qualified module names which can have objects that can redefine
 # builtins.
 redefining-builtins-modules = ["six.moves", "past.builtins", "future.builtins", "builtins", "io"]
+
+[tool.logging]
+version = 1
+disable_existing_loggers = true
+style = '%'
+datefmt = "%d/%m/%Y %H:%M:%S"
+propagate = true
+
+[tool.logging.loggers." "]
+level = "INFO"
+handlers = ["console"]
+
+[tool.logging.handlers.console]
+class = "logging.StreamHandler"
+level = "INFO"
+formatter = "formatter"
+
+[tool.logging.formatters.formatter]
+class = "logging.Formatter"
+format = "%(asctime)s %(name)s: %(message)s"

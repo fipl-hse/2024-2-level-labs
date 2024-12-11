@@ -1,14 +1,18 @@
 """
 Check mypy for type checking in Python code.
 """
+
 # pylint: disable=duplicate-code
 from os import listdir
 from pathlib import Path
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.console_logging import get_child_logger
 from config.constants import PROJECT_CONFIG_PATH, PROJECT_ROOT
 from config.lab_settings import LabSettings
 from config.project_config import ProjectConfig
+
+logger = get_child_logger(__file__)
 
 
 @handles_console_error()
@@ -26,10 +30,9 @@ def check_mypy_on_paths(paths: list[Path], path_to_config: Path) -> tuple[str, s
     mypy_args = [
         "-m",
         "mypy",
-        *map(str, filter(lambda x: x.exists(), paths))
-        ,
+        *map(str, filter(lambda x: x.exists(), paths)),
         "--config-file",
-        str(path_to_config)
+        str(path_to_config),
     ]
 
     return _run_console_tool(str(choose_python_exe()), mypy_args, debug=True)
@@ -44,23 +47,16 @@ def main() -> None:
 
     pyproject_path = PROJECT_ROOT / "pyproject.toml"
 
-    print("Running mypy on config, seminars, admin_utils")
+    logger.info("Running mypy on config, seminars, admin_utils")
     check_mypy_on_paths(
-        [
-            PROJECT_ROOT / "config",
-            PROJECT_ROOT / "seminars",
-            PROJECT_ROOT / "admin_utils"
-        ],
-        pyproject_path)
+        [PROJECT_ROOT / "config", PROJECT_ROOT / "seminars", PROJECT_ROOT / "admin_utils"],
+        pyproject_path,
+    )
 
     if (PROJECT_ROOT / "core_utils").exists():
-        print("core_utils exist")
-        print("Running mypy on core_utils")
-        check_mypy_on_paths(
-            [
-                PROJECT_ROOT / "core_utils"
-            ],
-            pyproject_path)
+        logger.info("core_utils exist")
+        logger.info("Running mypy on core_utils")
+        check_mypy_on_paths([PROJECT_ROOT / "core_utils"], pyproject_path)
 
     for lab_name in labs_list:
         lab_path = PROJECT_ROOT / lab_name
@@ -68,12 +64,8 @@ def main() -> None:
             target_score = LabSettings(PROJECT_ROOT / f"{lab_path}/settings.json").target_score
 
             if target_score > 7:
-                print(f"Running mypy for lab {lab_path}")
-                check_mypy_on_paths(
-                        [
-                            lab_path
-                        ],
-                        pyproject_path)
+                logger.info(f"Running mypy for lab {lab_path}")
+                check_mypy_on_paths([lab_path], pyproject_path)
 
 
 if __name__ == "__main__":

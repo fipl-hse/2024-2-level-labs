@@ -1,13 +1,17 @@
 """
 Script for updating student`s forks.
 """
+
 import json
 from pathlib import Path
 
 from tap import Tap
 
 from config.cli_unifier import _run_console_tool, choose_python_exe, handles_console_error
+from config.console_logging import get_child_logger
 from config.constants import CONFIG_PACKAGE_PATH
+
+logger = get_child_logger(__file__)
 
 
 class CommandLineInterface(Tap):
@@ -32,7 +36,7 @@ def update_fork(
     Args:
         python (Path): Path to python executable
         repositories (dict[str, str]): dict with URLs to repositories
-        authentication (dict[str, str]): dict with username and GitHub token 
+        authentication (dict[str, str]): dict with username and GitHub token
         strategy (str): strategy to update student`s repository
         paths_to_keep (dict[str, list[str]]): dict with files to keep as is from upstream and fork
 
@@ -72,14 +76,14 @@ def update_forks(
 
     Args:
         python (Path): Path to python executable
-        authentication (dict[str, str]): dict with username and GitHub token 
+        authentication (dict[str, str]): dict with username and GitHub token
         repositories (dict): dict with upstream and forks
         strategy (str): strategy to update student`s repository
         paths_to_keep (dict[str, list[str]]): dict with files to keep as is from upstream and fork
     """
-    upstream = repositories['upstream']
+    upstream = repositories["upstream"]
     for fork in repositories["forks"]:
-        print(f'Start update fork: {fork}')
+        logger.info(f"Start update fork: {fork}")
         update_fork(
             python=python,
             repositories={
@@ -88,7 +92,7 @@ def update_forks(
             },
             authentication=authentication,
             strategy=strategy,
-            paths_to_keep=paths_to_keep
+            paths_to_keep=paths_to_keep,
         )
 
 

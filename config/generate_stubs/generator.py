@@ -1,6 +1,7 @@
 """
 Generator of stubs for existing lab implementation.
 """
+
 import ast
 from _ast import alias, stmt
 from pathlib import Path
@@ -9,6 +10,10 @@ from typing import Optional
 import ast_comments
 from tap import Tap
 
+from config.console_logging import get_child_logger
+
+logger = get_child_logger(__file__)
+
 
 class NoDocStringForAMethodError(Exception):
     """
@@ -16,8 +21,9 @@ class NoDocStringForAMethodError(Exception):
     """
 
 
-def remove_implementation_from_function(original_declaration: ast.stmt,
-                                        parent: Optional[ast.ClassDef] = None) -> None:
+def remove_implementation_from_function(
+    original_declaration: ast.stmt, parent: Optional[ast.ClassDef] = None
+) -> None:
     """
     Remove reference implementation.
 
@@ -29,14 +35,14 @@ def remove_implementation_from_function(original_declaration: ast.stmt,
         return
     # print(ast.dump(ast.parse("raise NotImplementedError()"), annotate_fields=False, indent=4))
     expr = original_declaration.body[0]
-    if not isinstance(expr, ast.Expr) and \
-            (
-                    not hasattr(expr, 'value') or
-                    not isinstance(getattr(expr, 'value'), ast.Constant)
-            ):
-        raise NoDocStringForAMethodError(f'You have to provide docstring for a method '
-                                         f'{parent.name + "." if parent is not None else ""}'
-                                         f'{original_declaration.name}')
+    if not isinstance(expr, ast.Expr) and (
+        not hasattr(expr, "value") or not isinstance(getattr(expr, "value"), ast.Constant)
+    ):
+        raise NoDocStringForAMethodError(
+            f"You have to provide docstring for a method "
+            f'{parent.name + "." if parent is not None else ""}'
+            f"{original_declaration.name}"
+        )
 
     opening_files = []
     for decl in original_declaration.body:
@@ -44,7 +50,7 @@ def remove_implementation_from_function(original_declaration: ast.stmt,
             opening_files.extend(original_declaration.body[1:])
 
         if isinstance(decl, ast.With) and decl not in opening_files:
-            if 'assets' in ast.unparse(decl.items[0].context_expr.args[0]):  # type: ignore
+            if "assets" in ast.unparse(decl.items[0].context_expr.args[0]):  # type: ignore
                 opening_files.append(decl)
 
         if isinstance(decl, ast.Assert):
@@ -64,26 +70,35 @@ def cleanup_code(source_code_path: Path) -> str:
     Returns:
         str: Implementation without AST parsing of code
     """
-    with source_code_path.open(encoding='utf-8') as file:
+    with source_code_path.open(encoding="utf-8") as file:
         data = ast.parse(file.read(), source_code_path.name, type_comments=True)
 
-    with source_code_path.open(encoding='utf-8') as file:
+    with source_code_path.open(encoding="utf-8") as file:
         data_2 = ast_comments.parse(file.read(), source_code_path.name)
 
-    accepted_modules: dict[str, list[str]] = {
-        'typing': ['*'],
-        'pathlib': ['Path']
-    }
+    accepted_modules: dict[str, list[str]] = {"typing": ["*"], "pathlib": ["Path"]}
 
-    if source_code_path.name == 'pipeline.py':
-        accepted_modules['networkx'] = ['DiGraph']
-        accepted_modules['core_utils.pipeline'] = ['PipelineProtocol',
-                                                   'LibraryWrapper',
-                                                   'AbstractCoNLLUAnalyzer',
-                                                   'StanzaDocument',
-                                                   'CoNLLUDocument',
-                                                   'TreeNode']
-        accepted_modules['core_utils.article.article'] = ['Article']
+    if source_code_path.name == "pipeline.py":
+        accepted_modules["networkx"] = ["DiGraph"]
+        accepted_modules["core_utils.pipeline"] = [
+            "PipelineProtocol",
+            "LibraryWrapper",
+            "AbstractCoNLLUAnalyzer",
+            "StanzaDocument",
+            "CoNLLUDocument",
+            "TreeNode",
+        ]
+        accepted_modules["core_utils.article.article"] = ["Article"]
+    elif (
+        "lab_4_retrieval_w_clustering" in str(source_code_path)
+        and source_code_path.name == "main.py"
+    ):
+        accepted_modules["lab_3_ann_retriever.main"] = [
+            "BasicSearchEngine",
+            "Tokenizer",
+            "Vector",
+            "Vectorizer",
+        ]
 
     new_decl: list[stmt] = []
 
@@ -92,17 +107,18 @@ def cleanup_code(source_code_path: Path) -> str:
             data.body.insert(data_2.body.index(decl_2), decl_2)
 
     for decl in data.body:
-        if isinstance(decl, ast.AsyncFunctionDef) or \
-                isinstance(decl, ast.ClassDef) and \
-                decl.name == 'Query':
+        if (
+            isinstance(decl, ast.AsyncFunctionDef)
+            or isinstance(decl, ast.ClassDef)
+            and decl.name == "Query"
+        ):
             decl = []  # type: ignore
 
-        if source_code_path.name == 'service.py' and \
-                isinstance(decl, ast.Assign):
+        if source_code_path.name == "service.py" and isinstance(decl, ast.Assign):
             decl = ast.parse("app, pipeline = None, None")  # type: ignore
 
         if isinstance(decl, (ast.Import, ast.ImportFrom)):
-            if (module_name := getattr(decl, 'module', None)) is None:
+            if (module_name := getattr(decl, "module", None)) is None:
                 module_name = decl.names[0].name
 
             if module_name not in accepted_modules:
@@ -110,20 +126,25 @@ def cleanup_code(source_code_path: Path) -> str:
 
             if isinstance(decl, ast.ImportFrom):
                 accepted_names = accepted_modules.get(module_name, [])
-                names_to_import = [name for name in decl.names if name.name
-                                   in accepted_names or '*' in accepted_names]
+                names_to_import = [
+                    name
+                    for name in decl.names
+                    if name.name in accepted_names or "*" in accepted_names
+                ]
 
                 if not names_to_import:
                     continue
 
-                new_decl.append(ast.ImportFrom(module=module_name,
-                                               names=[alias(name=name.name)
-                                                      for name in names_to_import]))
+                new_decl.append(
+                    ast.ImportFrom(
+                        module=module_name,
+                        names=[alias(name=name.name) for name in names_to_import],
+                    )
+                )
                 continue
 
-        if isinstance(decl, ast.ClassDef) and \
-                isinstance(ast.get_docstring(decl), str):
-            if 'Note: remove' in ast.get_docstring(decl):  # type: ignore
+        if isinstance(decl, ast.ClassDef) and isinstance(ast.get_docstring(decl), str):
+            if "Note: remove" in ast.get_docstring(decl):  # type: ignore
                 decl = []  # type: ignore
             else:
                 for class_decl in decl.body:
@@ -133,18 +154,21 @@ def cleanup_code(source_code_path: Path) -> str:
                     docstring = ast.get_docstring(class_decl)
                     if docstring is None:
                         raise ValueError(
-                            f'{source_code_path.parent.name}.{source_code_path.stem}.'
-                            f'{decl.name}.{class_decl.name} does not have a docstring!'
+                            f"{source_code_path.parent.name}.{source_code_path.stem}."
+                            f"{decl.name}.{class_decl.name} does not have a docstring!"
                         )
 
-                    if 'Note: remove' in ast.get_docstring(class_decl):  # type: ignore
+                    if "Note: remove" in ast.get_docstring(class_decl):  # type: ignore
                         decl.body[decl.body.index(class_decl)] = []  # type: ignore
 
         if isinstance(decl, ast.ClassDef) and decl.bases:
             name = decl.bases[0]
-            if decl.bases and isinstance(name, ast.Name) and \
-                    hasattr(name, 'id') and \
-                    getattr(name, 'id') == 'Exception':
+            if (
+                decl.bases
+                and isinstance(name, ast.Name)
+                and hasattr(name, "id")
+                and getattr(name, "id") == "Exception"
+            ):
                 decl = []  # type: ignore
 
         if isinstance(decl, ast.ClassDef):
@@ -163,6 +187,7 @@ class ArgumentParser(Tap):
     """
     Types for CLI interface of a module.
     """
+
     source_code_path: str
     target_code_path: str
 
@@ -178,10 +203,10 @@ def main() -> None:
 
     source_code = cleanup_code(Path(args.source_code_path))
 
-    with res_stub_path.open(mode='w', encoding='utf-8') as file:
-        print(f'Writing to {res_stub_path}')
+    with res_stub_path.open(mode="w", encoding="utf-8") as file:
+        logger.info(f"Writing to {res_stub_path}")
         file.write(source_code)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

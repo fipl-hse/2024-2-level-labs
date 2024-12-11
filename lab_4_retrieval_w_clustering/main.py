@@ -18,7 +18,6 @@ from lab_3_ann_retriever.main import (
     Vectorizer,
 )
 
-
 Corpus = list[str]
 "Type alias for corpus of texts."
 TokenizedCorpus = list[list[str]]

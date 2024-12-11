@@ -172,8 +172,8 @@ class DocumentVectorDB:
         self._vectorizer.set_tokenized_corpus(tokenized_texts)
         self._vectorizer.build()
 
-        for index, text in enumerate(tokenized_texts):
-            self.__vectors[index] = self._vectorizer.vectorize(text)
+        for index, tokenized_text in enumerate(tokenized_texts):
+            self.__vectors[index] = self._vectorizer.vectorize(tokenized_text)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -267,8 +267,9 @@ class VectorDBSearchEngine(BasicSearchEngine):
                              'Number of neighbours must be a positive integer.')
 
         tokenized_query = self._db.get_tokenizer().tokenize(query)
+        if tokenized_query is None:
+            raise ValueError
         vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
-
         vectors = [vector[1] for vector in self._db.get_vectors()]
         neighbours = self._calculate_knn(vectorized_query, vectors, n_neighbours)
         if not neighbours:
@@ -425,9 +426,9 @@ class KMeans:
             cluster_vectors = []
             for ind in cluster.get_indices():
                 cluster_vectors.append(vectors[ind][1])
-            new_centroid = tuple([sum(vector[i] for i in range(len(vector))) /
-                                  len(cluster_vectors) for vector in cluster_vectors])
-            cluster.set_new_centroid(new_centroid)
+            new_centroid = [sum(vector[i] for i in range(len(vector))) /
+                            len(cluster_vectors) for vector in cluster_vectors]
+            cluster.set_new_centroid(tuple(new_centroid))
         return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:

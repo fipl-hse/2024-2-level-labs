@@ -235,7 +235,6 @@ class VectorDBSearchEngine(BasicSearchEngine):
         super().__init__(db.get_vectorizer(), db.get_tokenizer())
         self._db = db
 
-
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
         Get relevant documents.

@@ -1,8 +1,7 @@
 """
 Laboratory Work #4 starter.
 """
-from lab_4_retrieval_w_clustering.main import BM25Vectorizer
-
+from lab_4_retrieval_w_clustering.main import DocumentVectorDB, get_paragraphs, VectorDBSearchEngine
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 
@@ -44,20 +43,24 @@ def open_files() -> tuple[list[str], list[str]]:
             documents.append(file.read())
     with open("assets/stopwords.txt", "r", encoding="utf-8") as file:
         stopwords = file.read().split("\n")
-    return (documents, stopwords)
+    return documents, stopwords
 
 
 def main() -> None:
     """
     Launch an implementation.
     """
-    tokenized_paragraphs = [['привет', 'твои', 'дела'], ['твои', 'дела']]
-    vectorizer = BM25Vectorizer()
-    vectorizer.set_tokenized_corpus(tokenized_paragraphs)
-    vectorizer.build()
-    vectorizer.vectorize(tokenized_paragraphs[0])
+    documents, stopwords = open_files()
+    paragraphs = [paragraph for document in documents for paragraph in get_paragraphs(document)]
+    db = DocumentVectorDB(stopwords)
+    db.put_corpus(paragraphs)
+    search_engine = VectorDBSearchEngine(db)
 
-    result = None
+    query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
+    n_neighbours = 3
+    result = search_engine.retrieve_relevant_documents(query, n_neighbours)
+    print(result)
+
     assert result, "Result is None"
 
 

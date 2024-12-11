@@ -155,13 +155,13 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
-        if not isinstance(corpus, list) or len(corpus) == 0 or corpus is None or not isinstance(corpus, list) or not corpus or len(corpus) == 0:
+        if not isinstance(corpus, list) or len(corpus) == 0:
             raise ValueError
 
         for text in corpus:
             self.__documents = self._tokenizer.tokenize(text) # список токенизированных абзацев
 
-        if self.__documents is None or not isinstance(self.__documents, list) or not self.__documents or len(self.__documents) == 0 or corpus is None or not isinstance(corpus, list) or not corpus or len(corpus) == 0:
+        if self.__documents is None or not isinstance(self.__documents, list):
             raise ValueError
 
         vectorised_docs = self._vectorizer.vectorize(self.__documents) # векторизация токенизированного

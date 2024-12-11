@@ -115,7 +115,8 @@ class BM25Vectorizer(Vectorizer):
 
         vector = [0.0] * len(self._vocabulary)
         bm25_values = calculate_bm25(self._vocabulary, tokenized_document,
-                                     self._idf_values, self._avg_doc_len, len(tokenized_document))
+                                     self._idf_values, avg_doc_len=self._avg_doc_len,
+                                     doc_len=len(tokenized_document))
         for index, word in enumerate(self._vocabulary):
             if bm25_values is not None:
                 vector[index] = bm25_values[word]
@@ -262,7 +263,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
         if (not query or not isinstance(query, str)
-                or n_neighbours < 0 or not isinstance(n_neighbours, int)):
+                or n_neighbours < 1 or not isinstance(n_neighbours, int)):
             raise ValueError('Query must be a non-empty string; '
                              'Number of neighbours must be a positive integer.')
 

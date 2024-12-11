@@ -1,47 +1,32 @@
 """
 Common functions for checks.
 """
-import sys
 
-from config.cli_unifier import _run_console_tool, choose_python_exe
+from config.collect_coverage.run_coverage import get_target_score
 from config.constants import PROJECT_ROOT
 
 
-def check_result(return_code: int) -> None:
+def check_skip(pr_name: str, lab_path: str) -> bool:
     """
-    Check result and exit if failed.
-
-    Args:
-        return_code (int): Return code of check
-    """
-    if return_code != 0:
-        print("Check failed.")
-        sys.exit(1)
-    else:
-        print("Check passed.")
-
-
-def check_skip(pr_name: str, pr_author: str, lab_path: str) -> None:
-    """
-    Run skip check script and exit if skip conditions are met.
+    Exit if skip conditions are met.
 
     Args:
         pr_name (str): Pull request name.
-        pr_author (str): Pull request author.
         lab_path (str): Path to the lab.
+
+    Returns:
+        bool: True if should be skipped
     """
-    result = _run_console_tool(
-        str(choose_python_exe()),
-        [str('config/skip_check.py'), '--pr_name', pr_name,
-         '--pr_author', pr_author, '--lab_path', lab_path],
-        cwd=PROJECT_ROOT,
-        debug=True
-    )
+    if (pr_name is not None) and ("[skip-lab]" in str(pr_name)):
+        print("Skipping check due to label.")
+        return True
 
-    if result.returncode == 0:
-        print('skip check due to special conditions...')
-        sys.exit(0)
+    if lab_path:
+        score_path = PROJECT_ROOT / lab_path
+        score = get_target_score(lab_path=score_path)
+        if score == 0:
+            print(f"Skipping check due to no mark for lab {lab_path}.")
+            return True
 
-    if result.stderr:
-        print(result.stderr.decode('utf-8'))
-        raise ValueError('Error running skip_check tool!')
+    print("No special reasons for skip!")
+    return False

@@ -15,11 +15,11 @@ Data Type: String
 # strings are case-sensitive
 
 # Create a string
-example = 'Hello'  # or "Hello"
+example = "Hello"  # or "Hello"
 print(example)
 
 # String concatenation
-greeting = example + ' there!'
+greeting = example + " there!"
 print(greeting)
 
 # String multiplication
@@ -28,7 +28,7 @@ print(several_hellos)
 
 # String formatting
 # .format() method
-example = '{} there!'.format(example)  # pylint: disable=consider-using-f-string
+example = "{} there!".format(example)  # pylint: disable=consider-using-f-string
 print(example)
 # f-strings
 example = f'{greeting} - this is the "greeting" variable.'
@@ -45,6 +45,7 @@ print(example)
 # .find() - search the string for the specified value (return the index of the first occurrence)
 
 # TASKS
+
 
 # Task 1:
 def multiply_string(input_string: str, how_many: int) -> str:
@@ -187,6 +188,7 @@ def string_match(first_string: str, second_string: str) -> int:
     is found at the same position in both strings.
     """
     # student realisation goes here
+
 
 # Function calls with expected result:
 # string_match('xxcaazz', 'xxbaaz') → 3

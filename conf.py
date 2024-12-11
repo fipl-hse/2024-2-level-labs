@@ -27,6 +27,12 @@ exclude_patterns = [
     'docs/private/*'
 ]
 
+nitpick_ignore = [
+    ('py:class', 'Vector'),
+    ('py:class', 'Corpus'),
+    ('py:class', 'TokenizedCorpus'),
+]
+
 language = 'ru'
 
 html_theme = 'sphinx_rtd_theme'

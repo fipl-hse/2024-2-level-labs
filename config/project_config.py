@@ -1,16 +1,17 @@
 """
 Config class implementation: stores the configuration information.
 """
+
 import json
 import re
 from dataclasses import field
 from pathlib import Path
 from re import Pattern
 
+from pydantic import TypeAdapter
+
 # pylint: disable=no-name-in-module
 from pydantic.dataclasses import dataclass
-from pydantic.json import pydantic_encoder
-from pydantic.tools import parse_obj_as
 
 from config.constants import PROJECT_ROOT
 
@@ -20,6 +21,7 @@ class Lab:
     """
     BaseModel for labs.
     """
+
     name: str = field(default_factory=str)
     coverage: int = field(default_factory=int)
 
@@ -29,6 +31,7 @@ class Addon:
     """
     BaseModel for addons.
     """
+
     name: str = field(default_factory=str)
     coverage: int = field(default_factory=int)
 
@@ -38,6 +41,7 @@ class Repository:
     """
     BaseModel for repository.
     """
+
     admins: list = field(default_factory=list)
     pr_name_regex: str = field(default_factory=str)
     pr_name_example: str = field(default_factory=str)
@@ -48,6 +52,7 @@ class ProjectConfigDTO:
     """
     BaseModel for ProjectConfig.
     """
+
     labs: list[Lab] = field(default_factory=list[Lab])
     addons: list[Addon] = field(default_factory=list[Addon])
     repository: Repository = field(default_factory=Repository)
@@ -66,9 +71,9 @@ class ProjectConfig(ProjectConfigDTO):
              config_path (Path): Path to config
         """
         super().__init__()
-        with config_path.open(encoding='utf-8', mode='r') as config_file:
+        with config_path.open(encoding="utf-8", mode="r") as config_file:
             json_content = json.load(config_file)
-        self._dto = parse_obj_as(ProjectConfigDTO, json_content)
+        self._dto = TypeAdapter(ProjectConfigDTO).validate_python(json_content)
 
     def get_thresholds(self) -> dict:
         """
@@ -152,11 +157,13 @@ class ProjectConfig(ProjectConfigDTO):
             new_thresholds (dict[str, int]): Updated thresholds
         """
         for index, lab in enumerate(self._dto.labs):
-            self._dto.labs[index] = \
-                Lab(name=lab.name, coverage=new_thresholds.get(lab.name, lab.coverage))
+            self._dto.labs[index] = Lab(
+                name=lab.name, coverage=new_thresholds.get(lab.name, lab.coverage)
+            )
         for index, addon in enumerate(self._dto.addons):
-            self._dto.addons[index] = \
-                Addon(name=addon.name, coverage=new_thresholds.get(addon.name, addon.coverage))
+            self._dto.addons[index] = Addon(
+                name=addon.name, coverage=new_thresholds.get(addon.name, addon.coverage)
+            )
 
     def __str__(self) -> str:
         """
@@ -165,7 +172,7 @@ class ProjectConfig(ProjectConfigDTO):
         Returns:
             str: A string with fields
         """
-        return f'{self._dto}'
+        return f"{self._dto}"
 
     def get_json(self) -> str:
         """
@@ -174,4 +181,4 @@ class ProjectConfig(ProjectConfigDTO):
         Returns:
             str: A json view of ProjectConfig
         """
-        return json.dumps(self._dto, indent=4, default=pydantic_encoder)
+        return str(self._dto.model_dump_json(indent=4))

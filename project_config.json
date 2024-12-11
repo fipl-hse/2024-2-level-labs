@@ -3,6 +3,18 @@
         {
             "name": "lab_1_classify_by_unigrams",
             "coverage": 96
+        },
+        {
+            "name": "lab_2_retrieval_w_bm25",
+            "coverage": 97
+        },
+        {
+            "name": "lab_3_ann_retriever",
+            "coverage": 100
+        },
+        {
+            "name": "lab_4_retrieval_w_clustering",
+            "coverage": 91
         }
     ],
     "addons": [],

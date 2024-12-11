@@ -3,6 +3,7 @@ Lab 4.
 
 Vector search with clusterization
 """
+import json
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 
@@ -17,7 +18,6 @@ from lab_3_ann_retriever.main import (
     Vectorizer,
 )
 
-import json
 
 Corpus = list[str]
 "Type alias for corpus of texts."

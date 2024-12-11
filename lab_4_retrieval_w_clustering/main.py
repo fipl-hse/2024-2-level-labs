@@ -8,12 +8,16 @@ from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import (
+    AdvancedSearchEngine,
     BasicSearchEngine,
     calculate_distance,
+    SearchEngine,
     Tokenizer,
     Vector,
     Vectorizer,
 )
+
+import json
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -477,6 +481,28 @@ class KMeans:
         Returns:
             list[dict[str, int| list[str]]]: List with information about each cluster
         """
+        if not isinstance(num_examples, int) or num_examples <=0:
+            raise ValueError('KMeans get_clusters_info input error')
+        info = []
+        for index, cluster in enumerate(self.__clusters):
+            used_centroid = cluster.get_centroid()
+            used_indices = cluster.get_indices()
+            used_vectors = [self._db.get_vectors()[ind] for ind in used_indices]
+            distances = []
+            for vector in used_vectors:
+                distance = calculate_distance(used_centroid,vector[-1])
+                if distance is None:
+                    raise ValueError('KMeans get_cluster_info distance is None')
+                distances.append((distance,vector[0]))
+            distances.sort(key=lambda x:x[-1])
+            needed_distances = distances[:num_examples]
+            new_indices = tuple(pair[-1] for pair in needed_distances)
+            used_documents = self._db.get_raw_documents(new_indices)
+            single_info = {}
+            if isinstance(index,int) and isinstance(used_documents,list):
+                single_info.update(cluster_id=index,documents=used_documents)
+            info.append(single_info)
+        return info
 
     def calculate_square_sum(self) -> float:
         """
@@ -485,6 +511,15 @@ class KMeans:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
+        square_sum = 0.0
+        used_vectors = self._db.get_vectors()
+        for cluster in self.__clusters:
+            used_centroid = cluster.get_centroid()
+            used_indices = cluster.get_indices()
+            cluster_vecs = [used_vectors[i][1] for i in used_indices]
+            square_sum += sum(sum((used_centroid[i]) ** 2 for i
+                                in range(len(used_centroid))) for vec in cluster_vecs)
+        return square_sum
 
     def _is_convergence_reached(
         self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
@@ -578,6 +613,9 @@ class ClusteringSearchEngine:
             num_examples (int): number of examples for each cluster
             output_path (str): path to output file
         """
+        with open(output_path, 'w', encoding='utf-8') as file:
+            info = self.__algo.get_clusters_info(num_examples)
+            json.dump(info,file)
 
     def calculate_square_sum(self) -> float:
         """
@@ -586,6 +624,7 @@ class ClusteringSearchEngine:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
+        return self.__algo.calculate_square_sum()
 
 
 class VectorDBEngine:
@@ -604,6 +643,8 @@ class VectorDBEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             engine (BasicSearchEngine): A search engine.
         """
+        self._db = db
+        self._engine = engine
 
     def retrieve_relevant_documents(
         self, query: str, n_neighbours: int
@@ -619,6 +660,7 @@ class VectorDBEngine:
             list[tuple[float, str]] | None: Relevant documents with their distances.
 
         """
+        return self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
 
 
 class VectorDBTreeSearchEngine(VectorDBEngine):
@@ -633,7 +675,8 @@ class VectorDBTreeSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
-
+        super().__init__(db, SearchEngine(db.get_vectorizer(),db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())
 
 class VectorDBAdvancedSearchEngine(VectorDBEngine):
     """
@@ -647,3 +690,5 @@ class VectorDBAdvancedSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
+        super().__init__(db, AdvancedSearchEngine(db.get_vectorizer(), db.get_tokenizer()))
+        self._engine.index_documents(db.get_raw_documents())

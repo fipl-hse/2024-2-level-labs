@@ -358,8 +358,6 @@ class ClusterDTO:
         """
         if not isinstance(index, int) or isinstance(index, bool):
             raise ValueError("Inappropriate type input argument")
-        if not index:
-            raise ValueError("Input argument is empty")
         if index < 0:
             raise ValueError("Inappropriate value input argument")
         if index not in self.__indices:

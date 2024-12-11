@@ -3,10 +3,10 @@ Lab 4.
 
 Vector search with clusterization
 """
-from lab_2_retrieval_w_bm25.main import calculate_bm25
-
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument,
 # duplicate-code, unused-private-member, super-init-not-called
+
+from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
     BasicSearchEngine,
     calculate_distance,
@@ -113,9 +113,9 @@ class BM25Vectorizer(Vectorizer):
                 not all(isinstance(token, str) for token in tokenized_document)):
             raise ValueError('Inappropriate type input argument / argument')
 
-        vector = list(0.0 for _ in range(len(self._vocabulary)))
-        bm25_values = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
-                                     1.5, 0.75, self._avg_doc_len, len(tokenized_document))
+        vector = [0.0] * len(self._vocabulary)
+        bm25_values = calculate_bm25(self._vocabulary, tokenized_document,
+                                     self._idf_values, self._avg_doc_len, len(tokenized_document))
         for index, word in enumerate(self._vocabulary):
             if bm25_values is not None:
                 vector[index] = bm25_values[word]
@@ -262,7 +262,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
         if (not query or not isinstance(query, str)
-                or n_neighbours <= 0 or not isinstance(n_neighbours, int)):
+                or n_neighbours < 0 or not isinstance(n_neighbours, int)):
             raise ValueError('Query must be a non-empty string; '
                              'Number of neighbours must be a positive integer.')
 
@@ -393,7 +393,7 @@ class KMeans:
         new_centroids = self._db.get_vectors()[:self._n_clusters]
         self.__clusters = [ClusterDTO(centroid[1]) for centroid in new_centroids]
         self.run_single_train_iteration()
-        while self._is_convergence_reached(self.__clusters) is False:
+        while self._is_convergence_reached(self.__clusters) is not True:
             self.run_single_train_iteration()
             self._is_convergence_reached(self.__clusters)
 
@@ -516,9 +516,9 @@ class KMeans:
         if not new_clusters:
             raise ValueError('New clusters must be non-empty. ')
 
-        for ind, old_cluster in enumerate(self.__clusters):
+        for old_cluster, new_clusters in zip(self.__clusters, new_clusters):
             distance = calculate_distance(old_cluster.get_centroid(),
-                                          new_clusters[ind].get_centroid())
+                                          new_clusters.get_centroid())
             if distance is None:
                 raise ValueError('Distance must not be NoneType. ')
             if threshold <= distance:

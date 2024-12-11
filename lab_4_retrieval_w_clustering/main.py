@@ -400,7 +400,8 @@ class KMeans:
             list[ClusterDTO]: List of clusters.
         """
         centroids = []
-        for cluster in self.__clusters:
+        clusters = self.__clusters.copy()
+        for cluster in clusters:
             cluster.erase_indices()
             centroid = cluster.get_centroid()
             centroids.append(centroid)
@@ -413,14 +414,14 @@ class KMeans:
                     raise ValueError('Could not calculate the distance')
                 distances.append((distance, centroids.index(centroid)))
             closest = min(distances)
-            self.__clusters[closest[-1]].add_document_index(vectors.index(vector))
-        for cluster in self.__clusters:
+            clusters[closest[-1]].add_document_index(vectors.index(vector))
+        for cluster in clusters:
             cluster_vectors = []
             for num in cluster.get_indices():
                 cluster_vectors.append(vectors[num][-1])
             new_centroid = tuple(sum(value) / len(value) for value in zip(*cluster_vectors))
             cluster.set_new_centroid(new_centroid)
-        return self.__clusters
+        return clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """

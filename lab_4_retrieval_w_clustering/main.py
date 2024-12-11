@@ -5,6 +5,7 @@ Vector search with clusterization
 """
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+import copy
 import json
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
@@ -164,9 +165,10 @@ class DocumentVectorDB:
         tokenized_documents = []
         for doc in corpus:
             tokenized_doc = self._tokenizer.tokenize(doc)
-            if tokenized_doc:
-                tokenized_documents.append(tokenized_doc)
-                self.__documents.append(doc)
+            if not tokenized_doc:
+                continue
+            tokenized_documents.append(tokenized_doc)
+            self.__documents.append(doc)
         self._vectorizer.set_tokenized_corpus(tokenized_documents)
         self._vectorizer.build()
         self.__vectors = dict(enumerate([self._vectorizer.vectorize(tokenized_doc) for tokenized_doc
@@ -382,11 +384,13 @@ class KMeans:
         """
         initial_centroids = self._db.get_vectors()[:self._n_clusters]
         self.__clusters = [ClusterDTO(centroid[1]) for centroid in initial_centroids]
-        self.run_single_train_iteration()
+        new_clusters = self.run_single_train_iteration()
         while True:
-            self.run_single_train_iteration()
-            if self._is_convergence_reached(self.__clusters):
+            if self._is_convergence_reached(new_clusters):
                 break
+            self.__clusters = new_clusters
+            new_clusters = self.run_single_train_iteration()
+        self.__clusters = new_clusters
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -399,7 +403,8 @@ class KMeans:
             list[ClusterDTO]: List of clusters.
         """
         centroids = []
-        for cluster in self.__clusters:
+        new_clusters = copy.deepcopy(self.__clusters)
+        for cluster in new_clusters:
             cluster.erase_indices()
             centroids.append(cluster.get_centroid())
         vectors = self._db.get_vectors()
@@ -410,14 +415,14 @@ class KMeans:
                 if distance is None:
                     raise ValueError('The function returned None')
                 distances.append(distance)
-            self.__clusters[distances.index(min(distances))].add_document_index(vector[0])
-        for current_cluster in self.__clusters:
+            new_clusters[distances.index(min(distances))].add_document_index(vector[0])
+        for current_cluster in new_clusters:
             docs_vectors = list(map(lambda index:
                                     list(filter(lambda vec: vec[0] == index, vectors))[0][1],
                                     current_cluster.get_indices()))
             current_cluster.set_new_centroid(tuple(sum(row) / len(docs_vectors) for row
                                                    in zip(*docs_vectors)))
-        return self.__clusters
+        return new_clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -651,8 +656,7 @@ class VectorDBEngine:
         if not query or not isinstance(query, str) or not isinstance(n_neighbours, int) \
                 or n_neighbours <= 0:
             raise ValueError('An inappropriate type input arguments or input arguments are empty')
-        most_relevant = self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
-        return most_relevant
+        return self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
 
 
 class VectorDBTreeSearchEngine(VectorDBEngine):

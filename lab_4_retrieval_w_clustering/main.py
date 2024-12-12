@@ -4,7 +4,6 @@ Lab 4.
 Vector search with clusterization
 """
 from json import dump
-from math import sqrt
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
@@ -94,7 +93,7 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError('Invalid document input')
         vector = self._calculate_bm25(tokenized_document)
         if not vector:
-            raise ValueError('Could not vectorize document')
+            raise ValueError('Could not vectorize the document')
         return vector
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -165,12 +164,12 @@ class DocumentVectorDB:
                 self.__documents.append(doc)
                 tokenized_docs.append(tok_doc)
         if not tokenized_docs:
-            raise ValueError('Could not tokenize corpus')
+            raise ValueError('Could not tokenize the corpus')
         self._vectorizer.set_tokenized_corpus(tokenized_docs)
         self._vectorizer.build()
-        for tok_doc in tokenized_docs:
+        for ind, tok_doc in enumerate(tokenized_docs):
             vectorized = self._vectorizer.vectorize(tok_doc)
-            self.__vectors[tokenized_docs.index(tok_doc)] = vectorized
+            self.__vectors[ind] = vectorized
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -408,11 +407,11 @@ class KMeans:
         vectors = self._db.get_vectors()
         for vector in vectors:
             distances = []
-            for centroid in centroids:
+            for ind, centroid in enumerate(centroids):
                 distance = calculate_distance(vector[-1], centroid)
                 if distance is None:
                     raise ValueError('Could not calculate the distance')
-                distances.append((distance, centroids.index(centroid)))
+                distances.append((distance, ind))
             closest = min(distances)
             clusters[closest[-1]].add_document_index(vectors.index(vector))
         for cluster in clusters:
@@ -484,7 +483,7 @@ class KMeans:
             for vector in vectors:
                 distance = calculate_distance(centroid, vector[-1])
                 if distance is None:
-                    raise ValueError('Could not calculate distance')
+                    raise ValueError('Could not calculate the distance')
                 distances.append((distance, vector[0]))
             distances = sorted(distances, key=lambda x: x[-1])[:num_examples]
             indices = tuple(tup[-1] for tup in distances)
@@ -507,10 +506,8 @@ class KMeans:
             centroid = cluster.get_centroid()
             cluster_indices = cluster.get_indices()
             vectors = [self._db.get_vectors()[num] for num in cluster_indices]
-            sum_ = 0.0
             for vector in vectors:
-                sum_ += sqrt(sum((cx - vx) ** 2 for cx, vx in zip(centroid, vector[-1])))
-            clusters_sum += sum_
+                clusters_sum += sum((cx - vx) ** 2 for cx, vx in zip(centroid, vector[-1]))
         return clusters_sum
 
     def _is_convergence_reached(
@@ -544,7 +541,6 @@ class KMeans:
                 raise ValueError('Could not calculate the distance')
             if distance >= threshold:
                 return False
-            continue
         return True
 
 

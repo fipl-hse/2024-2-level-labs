@@ -499,8 +499,7 @@ class KMeans:
             doc_indices = tuple(pair[0] for pair in vector_distances)
             documents = self._db.get_raw_documents(doc_indices)
             cluster_info_dict[cluster_index] = documents
-        return [{"cluster_id": ind, "documents": cluster_info_dict[ind]}
-                for ind in cluster_info_dict]
+        return [{"cluster_id": ind, "documents": docs} for ind, docs in cluster_info_dict.items()]
 
     def calculate_square_sum(self) -> float:
         """

@@ -62,7 +62,7 @@ def main() -> None:
     db.put_corpus(list_of_paragraphs)
     vec_db_search_engine = VectorDBSearchEngine(db)
 
-    result = vec_db_search_engine.retrieve_relevant_documents(query, 3)
+    result_6 = vec_db_search_engine.retrieve_relevant_documents(query, 3)
 
     k_means_search_engine = ClusteringSearchEngine(db)
     result = k_means_search_engine.retrieve_relevant_documents(query, 5)

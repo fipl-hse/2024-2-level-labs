@@ -30,9 +30,8 @@ def get_paragraphs(text: str) -> list[str]:
     """
     if not text or not isinstance(text, str):
         raise ValueError()
-    paragraphs = text.split('\n')
 
-    return paragraphs
+    return text.split('\n')
 
 
 class BM25Vectorizer(Vectorizer):
@@ -156,6 +155,22 @@ class DocumentVectorDB:
             or not all(isinstance(text, str) for text in corpus):
             raise ValueError
 
+        tokenized_pars = []
+
+        for text in corpus:
+            tokenized_par = self._tokenizer.tokenize(text)
+            if tokenized_par:
+                tokenized_pars.append(tokenized_par)
+                self.__documents.append(text)
+        if not tokenized_pars:
+            raise ValueError
+
+        self._vectorizer.set_tokenized_corpus(tokenized_pars)
+        self._vectorizer.build()
+
+        for ind, doc in enumerate(tokenized_pars):
+            self.__vectors[ind] = self._vectorizer.vectorize(doc)
+
     def get_vectorizer(self) -> BM25Vectorizer:
         """
         Get an object of the BM25Vectorizer class.
@@ -163,6 +178,7 @@ class DocumentVectorDB:
         Returns:
             BM25Vectorizer: BM25Vectorizer class object.
         """
+        return self._vectorizer
 
     def get_tokenizer(self) -> Tokenizer:
         """
@@ -171,6 +187,7 @@ class DocumentVectorDB:
         Returns:
             Tokenizer: Tokenizer class object.
         """
+        return self._tokenizer
 
     def get_vectors(self, indices: list[int] | None = None) -> list[tuple[int, Vector]]:
         """
@@ -182,6 +199,16 @@ class DocumentVectorDB:
         Returns:
             list[tuple[int, Vector]]: List of index and vector for documents.
         """
+        if indices is None:
+            return list(self.__vectors.items())
+
+        indexes = []
+
+        for ind in indices:
+            if ind not in indexes:
+                indexes.append(ind)
+
+        return [(ind, self.__vectors[ind]) for ind in indexes]
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
         """
@@ -196,6 +223,16 @@ class DocumentVectorDB:
         Returns:
             Corpus: List of documents.
         """
+        if indices is None:
+            return self.__documents
+
+        docs = []
+
+        for ind in indices:
+            if self.__documents[ind] not in docs:
+                docs.append(self.__documents[ind])
+
+        return docs
 
 
 class VectorDBSearchEngine(BasicSearchEngine):
@@ -212,6 +249,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        super().__init__(db.get_vectorizer(), db.get_tokenizer())
+        self._db = db
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -224,6 +263,9 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
+        if not query or not isinstance(query, str) or not isinstance(n_neighbours, int) \
+            or n_neighbours <= 0:
+            raise ValueError
 
 
 class ClusterDTO:

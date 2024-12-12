@@ -7,7 +7,7 @@ Vector search with clusterization
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
+from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer, calculate_distance
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -46,9 +46,9 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__([])
         self._corpus = []
         self._avg_doc_len = -1
-        super().__init__(self._corpus)
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
         """
@@ -104,7 +104,7 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError('inappropriate type of input argument or input argument is empty')
         bm25_vector = [0.0] * len(self._vocabulary)
         bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,
-                              k1=1.5, b=0.75, avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
+                              avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         for i, token in enumerate(self._vocabulary):
             if token in tokenized_document:
                 bm25_vector[i] = bm25[token]
@@ -272,7 +272,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             indices.append(pair[0])
         documents = self._db.get_raw_documents(tuple(indices))
         if not documents:
-            raise ValueError
+            raise ValueError('used method return None')
         relevant_documents = []
         for i, text in enumerate(documents):
             relevant_documents.append((knn[i][1], text))
@@ -379,6 +379,9 @@ class KMeans:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             n_clusters (int): Number of clusters.
         """
+        self.__clusters = []
+        self._db = db
+        self._n_clusters = 0
 
     def train(self) -> None:
         """
@@ -395,6 +398,28 @@ class KMeans:
         Returns:
             list[ClusterDTO]: List of clusters.
         """
+        centroids = []
+        for cluster in self.__clusters:
+            cluster.erase_indices()
+            centroids.append(cluster.get_centroid())
+
+        for pair in self._db.get_vectors():
+            distances = []
+            for centroid in centroids:
+                distance = calculate_distance(pair[1], centroid)
+                if distances is None:
+                    raise ValueError('calculate_distance return None')
+                distances.append(distance)
+
+            nearest_centroid_index = distances.index(min(distances))
+            self.__clusters[nearest_centroid_index].add_document_index(pair[0])
+
+        vectors = self._db.get_vectors()
+        for cluster in self.__clusters:
+            cluster_vectors = [vectors[index][1] for index in cluster.get_indices()]
+            centroid_vector = sum(cluster_vectors) / len(cluster_vectors)
+            # cluster.set_new_centroid(tuple(centroid_vector))
+        # return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -451,6 +476,7 @@ class KMeans:
         Returns:
             bool: True if the distance is correct, False in other cases.
         """
+
 
 
 class ClusteringSearchEngine:

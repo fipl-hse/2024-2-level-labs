@@ -3,6 +3,10 @@ Lab 4.
 
 Vector search with clusterization
 """
+
+# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code,
+# unused-private-member, super-init-not-called
+
 import json
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
@@ -15,10 +19,6 @@ from lab_3_ann_retriever.main import (
     Vector,
     Vectorizer,
 )
-
-# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code,
-# unused-private-member, super-init-not-called
-
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -56,7 +56,8 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
-        super().__init__([])
+        self._corpus = []
+        super().__init__(self._corpus)
         self._avg_doc_len = -1
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -120,7 +121,7 @@ class BM25Vectorizer(Vectorizer):
         bm25 = calculate_bm25(self._vocabulary, tokenized_document, idf,
                               avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         if not bm25:
-            return Vector(bm25_vector)
+            raise ValueError("bm25 is None")
         for token in bm25:
             if token in self._vocabulary:
                 bm25_vector[self._token2ind[token]] = bm25[token]
@@ -390,10 +391,12 @@ class KMeans:
         initial_centroids = [pair[1] for pair in self._db.get_vectors()[:self._n_clusters]]
         for centroid in initial_centroids:
             self.__clusters.append(ClusterDTO(centroid))
-        new_clusters = self.run_single_train_iteration()
-        while not self._is_convergence_reached(new_clusters):
+
+        while True:
             new_clusters = self.run_single_train_iteration()
-        new_clusters = self.run_single_train_iteration()
+            if self._is_convergence_reached(new_clusters):
+                break
+            self.__clusters = new_clusters
         self.__clusters = new_clusters
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
@@ -622,8 +625,8 @@ class ClusteringSearchEngine:
             num_examples (int): number of examples for each cluster
             output_path (str): path to output file
         """
-        with open(output_path, "w", encoding="UTF-8") as f:
-            json.dump(self.__algo.get_clusters_info(num_examples), f)
+        with open(output_path, "w", encoding="UTF-8") as report_file:
+            json.dump(self.__algo.get_clusters_info(num_examples), report_file)
 
     def calculate_square_sum(self) -> float:
         """

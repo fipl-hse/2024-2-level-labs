@@ -7,7 +7,8 @@ Vector search with clusterization
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
-from lab_3_ann_retriever.main import BasicSearchEngine, calculate_distance, Tokenizer, Vector, Vectorizer
+from lab_3_ann_retriever.main import (BasicSearchEngine, calculate_distance,
+                                      Tokenizer, Vector, Vectorizer)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -283,7 +284,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError(f'Incorrect value: "{neighbours}" is empty, '
                              f'equal to None or is zero.')
 
-        relevant_documents = self._db.get_raw_documents(tuple([neighbor[0] for neighbor in neighbours]))
+        relevant_documents = self._db.get_raw_documents(
+                                            tuple(neighbor[0] for neighbor in neighbours))
         return [(neighbor[1], relevant_documents[neighbor[0]]) for neighbor in neighbours]
 
 
@@ -473,7 +475,8 @@ class KMeans:
                 not n_neighbours or
                 n_neighbours <= 0):
             raise ValueError(f'Incorrect value: "{query_vector}" is not a tuple, empty, '
-                             f'equal to None or is zero or "{n_neighbours}" is not an integer, empty, '
+                             f'equal to None or is zero or '
+                             f'"{n_neighbours}" is not an integer, empty, '
                              f'equal to None, is zero or is less than zero.')
 
         centroid_distances = []

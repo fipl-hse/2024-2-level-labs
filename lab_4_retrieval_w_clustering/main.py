@@ -275,10 +275,14 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError('Invalid input')
 
         tok_query = self._tokenizer.tokenize(query)
-        if tok_query is None or not isinstance(tok_query, list):
-            raise ValueError('tokenize() returned smth wrong')
+        if tok_query is None:
+            raise ValueError('tokenize() returned None')
 
-        c_knn_result = self._calculate_knn(self._vectorizer.vectorize(tok_query),
+        vec_query = self._vectorizer.vectorize(tok_query)
+        if vec_query is None:
+            raise ValueError('vectorize() returned None')
+
+        c_knn_result = self._calculate_knn(vec_query,
                                            [vec[1] for vec in self._db.get_vectors()], n_neighbours)
         if not c_knn_result:
             raise ValueError('The function returned an empty list of tuples')

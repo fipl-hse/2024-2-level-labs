@@ -51,8 +51,8 @@ def main() -> None:
     """
     result = None
     assert result, "Result is None"
-    query = "Всякий посетитель, если он, конечно, был не вовсе тупицей"
-    n_neighbours = 4
+    query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
+    n_neighbours = 3
     docs = open_files()[0]
     stopwords = open_files()[1]
     paragraphs_from_docs = []

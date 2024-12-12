@@ -5,7 +5,8 @@ Vector search with clusterization
 """
 from mypyc.primitives.set_ops import set_update_op
 
-from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_tf_idf, calculate_idf
+from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf, calculate_tf_idf
+
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
 
@@ -46,8 +47,8 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
+        super().__init__([])
         self._corpus = []
-        super().__init__(self._corpus)
         self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -84,6 +85,7 @@ class BM25Vectorizer(Vectorizer):
         if not tokenized_document or not isinstance(tokenized_document, list) \
             or not all(isinstance(token, str) for token in tokenized_document):
             raise ValueError("Bad input")
+
         result = self._calculate_bm25(tokenized_document)
         if result is None:
             raise ValueError("Method returns None")
@@ -107,12 +109,12 @@ class BM25Vectorizer(Vectorizer):
             or not all(isinstance(token, str) for token in tokenized_document):
             raise ValueError("Bad input")
 
-        vector = [0.0 for _ in self._vocabulary]
+        vector = [0.0] * len(self._vocabulary)
         bm25 = calculate_bm25(self._vocabulary, tokenized_document,
                               self._idf_values,
                               avg_doc_len=self._avg_doc_len, doc_len=len(tokenized_document))
         if not bm25:
-            raise ValueError("Method returns None")
+            return Vector(vector)
         for index, word in enumerate(self._vocabulary):
             vector[index] = bm25[word]
         return Vector(vector)
@@ -260,7 +262,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if not knn:
             raise ValueError("Method returns None")
         relevant_documents = self._db.get_raw_documents(tuple([neighbor[0] for neighbor in knn]))
-        return [(neighbor[1], relevant_documents[index]) for index, neighbor in enumerate(knn)]
+        return [(neighbor, relevant_documents[index]) for index, neighbor in knn]
 
 class ClusterDTO:
     """

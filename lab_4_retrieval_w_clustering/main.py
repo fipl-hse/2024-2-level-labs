@@ -4,9 +4,10 @@ Lab 4.
 Vector search with clusterization
 """
 
+from lab_2_retrieval_w_bm25.main import calculate_bm25
+
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
-from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -45,8 +46,7 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
-        super().__init__(self._corpus)
-        self._corpus = []
+        super().__init__([])
         self._avg_doc_len = -1.0
 
     def set_tokenized_corpus(self, tokenized_corpus: TokenizedCorpus) -> None:
@@ -90,7 +90,6 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError('Input argument is empty')
 
         return vector_bm25
-        
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
         """
@@ -109,13 +108,13 @@ class BM25Vectorizer(Vectorizer):
                 not all(isinstance(item, str) for item in tokenized_document):
             raise ValueError('Inappropriate type input argument')
 
-        k1 = 1.5
-        b = 0.75      
-        vector_bm25 = [0.0] * len(self._vocabulary)    # list of 0.0
+        k1, b = 1.5, 0.75
+        vector_bm25 = [0.0] * len(self._vocabulary)
         bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, k1, b,
                                self._avg_doc_len, len(tokenized_document))
-        for index, voc in enumerate(self._vocabulary):    # index and each inique_voc in vocabulary
-            vector_bm25[index] = bm_25[voc]    # replace each zero-vector with bm25 vector of unique_voc from vocab
+        for index, voc in enumerate(self._vocabulary):
+            if isinstance(bm_25, dict):
+                vector_bm25[index] = bm_25[voc]
         return tuple(vector_bm25)
 
 
@@ -166,14 +165,11 @@ class DocumentVectorDB:
         if not tokenized_corpus:
             raise ValueError('Input argument is empty')
 
-        self._vectorizer.set_tokenized_corpus(tokenized_corpus)    # made corpus and len
-        self._vectorizer.build()    # made vocab
+        self._vectorizer.set_tokenized_corpus(tokenized_corpus)
+        self._vectorizer.build()
 
-        try:
-            for index, tok_part in enumerate(tokenized_corpus):    # num and ['a', ... 'b']
-                self.__vectors[index] = self._vectorizer.vectorize(tok_part)    # fill with tuples(vectors)
-        except StopIteration:    # thinkg about this part
-            pass
+        for index, tok_part in enumerate(tokenized_corpus):
+            self.__vectors[index] = self._vectorizer.vectorize(tok_part)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -230,7 +226,8 @@ class DocumentVectorDB:
                 unique_indices.append(index)
 
         return [self.__documents[index] for index in unique_indices]
-    
+
+
 class VectorDBSearchEngine(BasicSearchEngine):
     """
     Engine based on VectorDB.
@@ -259,20 +256,22 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
-        if not query or not n_neighbours or \
-                not isinstance(query, str) or not isinstance(n_neighbours, int) :
+        if not query or not n_neighbours or n_neighbours <= 0 or \
+                not isinstance(query, str) or not isinstance(n_neighbours, int):
             raise ValueError('Inappropriate type input argument')
 
         tokenized_query = self._db.get_tokenizer().tokenize(query)
+        if not tokenized_query:
+            raise ValueError
 
         knn = self._calculate_knn(self._db.get_vectorizer().vectorize(tokenized_query),
-                                  [v[1] for v in self._db.get_vectors()], n_neighbours)
+                                  [vect[1] for vect in self._db.get_vectors()], n_neighbours)
         if not knn:
             raise ValueError('Argument is empty')
-        relevant_docs = self._db.get_raw_documents(tuple(index for index in range(n_neighbours)))
+        relevant_docs = self._db.get_raw_documents(tuple(index[0] for index in knn))
         if not relevant_docs:
             raise ValueError('Argument is empty')
-        return [(knn[index][1], smth) for index, smth in enumerate(relevant_docs)]
+        return [(knn[index][1], doc) for index, doc in enumerate(relevant_docs)]
 
 class ClusterDTO:
     """

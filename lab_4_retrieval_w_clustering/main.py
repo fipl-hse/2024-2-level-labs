@@ -273,7 +273,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
 
         tokenized_query = self._tokenizer.tokenize(query)
         if not tokenized_query or not isinstance(tokenized_query, list):
-            raise ValueError
+            raise ValueError('self._tokenizer.tokenize returns None')
         query_vectors = self._db.get_vectorizer().vectorize(tokenized_query)
         document_vectors = [vector[1] for vector in self._db.get_vectors()]
         calculated_knn = self._calculate_knn(query_vectors, document_vectors, n_neighbours)

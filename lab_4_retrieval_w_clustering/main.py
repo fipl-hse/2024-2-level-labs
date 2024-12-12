@@ -123,7 +123,7 @@ class BM25Vectorizer(Vectorizer):
 
         vector = [0.0] * len(self._vocabulary)
         for index, token in enumerate(self._vocabulary):
-            if token in bm25_dict:
+            if bm25_dict is not None and token in bm25_dict:
                 vector[index] = bm25_dict[token]
 
         return tuple(vector)

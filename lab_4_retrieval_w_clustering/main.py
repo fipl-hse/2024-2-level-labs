@@ -4,7 +4,6 @@ Lab 4.
 Vector search with clusterization
 """
 
-
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
@@ -93,7 +92,6 @@ class BM25Vectorizer(Vectorizer):
             raise ValueError('Invalid arguments')
         vector_tok_doc = self._calculate_bm25(tokenized_document)
         if not vector_tok_doc:
-            # добавить сообщение об ошибке
             raise ValueError
         return vector_tok_doc
 
@@ -281,7 +279,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         calculated_knn = self._calculate_knn(query_vectors, document_vectors, n_neighbours)
         if not calculated_knn:
             raise ValueError('_calculate_knn returns an empty list or None')
-        documents = self._db.get_raw_documents(tuple(index for index in range(n_neighbours)))
+        documents = self._db.get_raw_documents(tuple(t[0] for t in calculated_knn))
 
         return [(calculated_knn[index][1], paragr) for index, paragr in enumerate(documents)]
 
@@ -419,6 +417,18 @@ class KMeans:
                 distances.append(distance)
             self.__clusters[distances.index(min(distances))].add_document_index(index)
 
+        for cluster in self.__clusters:
+            current_cluster_vec = [self._db.get_vectors()[index][1] for index in cluster.get_indices()]
+            new_centroid = []
+            for vector in current_cluster_vec:
+                for i in range(len(vector)):
+                    summ_of_elems = 0.0
+                    for vec in current_cluster_vec:
+                        summ_of_elems += vec[i]
+                    new_centroid.append(summ_of_elems / len(current_cluster_vec))
+            cluster.set_new_centroid(tuple(new_centroid))
+        return self.__clusters
+
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
         Launch clustering model inference.
@@ -474,6 +484,9 @@ class KMeans:
         Returns:
             bool: True if the distance is correct, False in other cases.
         """
+        if (not new_clusters or not isinstance(new_clusters, list)
+                or not isinstance(threshold, float) or threshold <= 0):
+            raise ValueError('Invalid arguments')
 
 
 class ClusteringSearchEngine:

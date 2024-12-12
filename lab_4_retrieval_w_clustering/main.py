@@ -593,7 +593,7 @@ class ClusteringSearchEngine:
         if list_dist_ind is None:
             raise ValueError('infer() returned None')
 
-        docs_aka_str_in_list = self._db.get_raw_documents(tuple([pair[1] for pair in list_dist_ind]))
+        docs_aka_str_in_list = self._db.get_raw_documents(tuple(pair[1] for pair in list_dist_ind))
         distances = [pair[0] for pair in list_dist_ind]
         rel_docs_with_indices = []
         for ind, doc in enumerate(docs_aka_str_in_list):

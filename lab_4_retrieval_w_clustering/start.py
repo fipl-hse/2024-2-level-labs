@@ -63,9 +63,10 @@ def main() -> None:
     vec_db_search_engine = VectorDBSearchEngine(db)
 
     result_6 = vec_db_search_engine.retrieve_relevant_documents(query, 3)
+    print(result_6)
 
-    k_means_search_engine = ClusteringSearchEngine(db)
-    result = k_means_search_engine.retrieve_relevant_documents(query, 5)
+    cluster_search_engine = ClusteringSearchEngine(db)
+    result = cluster_search_engine.retrieve_relevant_documents(query, 5)
     print(result)
     assert result, "Result is None"
 

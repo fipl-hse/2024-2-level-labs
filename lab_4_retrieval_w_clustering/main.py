@@ -626,8 +626,8 @@ class ClusteringSearchEngine:
                              f'is None or is zero.')
 
         relevant_documents = []
-        for index, distance in enumerate(neighbours):
-            relevant_documents.append((distance[0], raw_documents[index]))
+        # for index, distance in enumerate(neighbours):
+        #     relevant_documents.append((distance[0], raw_documents[index]))
         return relevant_documents
 
     def make_report(self, num_examples: int, output_path: str) -> None:

@@ -50,8 +50,6 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    result = None
-    assert result, "Result is None"
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
     n_neighbours = 3
     docs = open_files()[0]

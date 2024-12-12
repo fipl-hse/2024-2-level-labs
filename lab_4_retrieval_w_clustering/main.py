@@ -276,9 +276,9 @@ class VectorDBSearchEngine(BasicSearchEngine):
 
         tok_query = self._tokenizer.tokenize(query)
         if tok_query is None or not isinstance(tok_query, list):
-            raise ValueError('_tokenizer.tokenize() returned smth wrong')
+            raise ValueError('tokenize() returned smth wrong')
 
-        c_knn_result = self._calculate_knn(self._db.get_vectorizer().vectorize(tok_query),
+        c_knn_result = self._calculate_knn(self._vectorizer.vectorize(tok_query),
                                            [vec[1] for vec in self._db.get_vectors()], n_neighbours)
         if not c_knn_result:
             raise ValueError('The function returned an empty list of tuples')
@@ -432,18 +432,10 @@ class KMeans:
                 distances.append(dist_between_vec_from_db_to_centroid_of_cluster)
             self.__clusters[distances.index(min(distances))].add_document_index(index)
 
-        for cluster_to_update in self.__clusters:
-            l_of_vecs_as_tuples = [self._db.get_vectors()[ind][1]
-                                   for ind in cluster_to_update.get_indices()]
-            updated_centroid = []
-            for vector in l_of_vecs_as_tuples:
-                for i in range(len(vector)):
-                    summarized_el = 0.0
-                    for vec in l_of_vecs_as_tuples:
-                        summarized_el += vec[i]
-                    updated_centroid.append(summarized_el / len(l_of_vecs_as_tuples))
-
-            cluster_to_update.set_new_centroid(tuple(updated_centroid))
+        for cluster in self.__clusters:
+            current_vectors = [self._db.get_vectors()[index][-1] for index in cluster.get_indices()]
+            cluster.set_new_centroid(tuple(sum(row) / len(current_vectors) for row
+                                           in zip(*current_vectors)))
 
         return self.__clusters
 
@@ -483,7 +475,7 @@ class KMeans:
             raise ValueError('chosen_cluster is None')
 
         if chosen_cluster.get_indices() is None:
-            raise ValueError('get._indices() returned None')
+            raise ValueError('get_indices() returned None')
         final_list = []
         for vec_index, vec in self._db.get_vectors(chosen_cluster.get_indices()):
             distance_again = calculate_distance(query_vector, vec)
@@ -561,9 +553,8 @@ class ClusteringSearchEngine:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
             n_clusters (int): Number of clusters.
         """
-        self.__algo = KMeans(db, n_clusters)
         self._db = db
-        self.__algo.train()
+        self.__algo = KMeans(self._db, n_clusters)
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -593,6 +584,8 @@ class ClusteringSearchEngine:
         if vec_query is None:
             raise ValueError('_db.get_vectorizer().vectorize() returned None')
 
+        self.__algo.train()
+
         t_dist_and_vec_index = self.__algo.infer(vec_query, n_neighbours)
         if t_dist_and_vec_index is None:
             raise ValueError('infer() returned None')
@@ -603,8 +596,11 @@ class ClusteringSearchEngine:
             raise ValueError('get_raw_documents() returned None')
 
         rel_docs_with_indices = []
-        for i in [one_t_dist_and_vec_index[1] for one_t_dist_and_vec_index in t_dist_and_vec_index]:
-            rel_docs_with_indices.append((t_dist_and_vec_index[i][0], l_with_str_aka_docs[i]))
+        t_dist_and_vec_index = [t[0] for t in self.__algo.infer(vec_query, n_neighbours)]
+        indices = [pair[1] for pair in self.__algo.infer(vec_query, n_neighbours)]
+        for index, doc in enumerate(self._db.get_raw_documents(tuple(indices))):
+            rel_docs_with_indices.append((t_dist_and_vec_index[index], doc))
+
         return rel_docs_with_indices
 
     def make_report(self, num_examples: int, output_path: str) -> None:

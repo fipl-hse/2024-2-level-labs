@@ -267,6 +267,19 @@ class VectorDBSearchEngine(BasicSearchEngine):
             or n_neighbours <= 0:
             raise ValueError
 
+        tokenized_query = self._db.get_tokenizer().tokenize(query)
+        vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
+        vectors = [el[1] for el in self._db.get_vectors()]
+        relevant = self._calculate_knn(vectorized_query, vectors, n_neighbours)
+        if not relevant:
+            raise ValueError
+
+        ind = tuple([doc_data[0] for doc_data in relevant])
+        docs = self._db.get_raw_documents(ind)
+        result = [(distance[-1], docs[ind]) for ind, distance in enumerate(relevant)]
+
+        return result
+
 
 class ClusterDTO:
     """

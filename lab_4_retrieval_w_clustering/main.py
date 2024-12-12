@@ -402,6 +402,7 @@ class KMeans:
             centroids.append(cluster.get_centroid())
 
         vectors = self._db.get_vectors()
+        clusters = self.__clusters[:]
         for vector in vectors:
             distances = []
             for centroid in centroids:
@@ -410,13 +411,13 @@ class KMeans:
                     raise ValueError('Failed to calculate distance between vector and centroid')
                 distances.append((distance, centroids.index(centroid)))
             closest_centroid = min(distances)[1]
-            self.__clusters[closest_centroid].add_document_index(vectors.index(vector))
+            clusters[closest_centroid].add_document_index(vectors.index(vector))
 
-        for cluster in self.__clusters:
+        for cluster in clusters:
             cluster_vectors = [vectors[ind][1] for ind in cluster.get_indices()]
-            new_centroid = tuple(sum(scores) / len(scores) for scores in zip(*cluster_vectors))
-            cluster.set_new_centroid(new_centroid)
-        return self.__clusters
+            cluster.set_new_centroid(tuple(sum(scores) / len(scores)
+                                           for scores in zip(*cluster_vectors)))
+        return clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """

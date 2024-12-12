@@ -5,7 +5,6 @@ Vector search with clusterization
 """
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
-
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer, calculate_distance
 
@@ -57,7 +56,7 @@ class BM25Vectorizer(Vectorizer):
             ValueError: In case of inappropriate type input argument or if input argument is empty.
         """
         if not isinstance(tokenized_corpus, list) or len(tokenized_corpus) == 0:
-            raise ValueError
+            raise ValueError ('Invalid arguments')
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum([len(text) for text
                                  in self._corpus]) / len(self._corpus)
@@ -78,10 +77,10 @@ class BM25Vectorizer(Vectorizer):
             Vector: BM25 vector for document.
         """
         if not isinstance(tokenized_document, list) or len(tokenized_document) == 0:
-            raise ValueError
+            raise ValueError ('Invalid input')
         vector = self._calculate_bm25(tokenized_document)
         if vector is None:
-            raise ValueError
+            raise ValueError ('Could not calculate bm25')
         return vector
 
     def _calculate_bm25(self, tokenized_document: list[str]) -> Vector:
@@ -99,14 +98,14 @@ class BM25Vectorizer(Vectorizer):
         """
         if not isinstance(tokenized_document, list) or len(tokenized_document) == 0:
             raise ValueError
-        vector = [0.0 for elem in range(len(self._vocabulary))]
+        vector = [0.0] * (len(self._vocabulary))
         bm = calculate_bm25(self._vocabulary, tokenized_document,
-                            self._idf_values, 1.5, 0.75,
-                            self._avg_doc_len, len(tokenized_document))
+                            self._idf_values, avg_doc_len= self._avg_doc_len,
+                            doc_len= len(tokenized_document))
         if len(self._vocabulary) == 0:
             return tuple(vector)
         if bm is None:
-            raise ValueError
+            raise ValueError ('Bm25 value is None')
         for key, value in bm.items():
             if key in self._vocabulary:
                 vector[self._token2ind[key]] = value
@@ -148,7 +147,7 @@ class DocumentVectorDB:
                 or if methods used return None.
         """
         if not isinstance(corpus, list) or len(corpus) == 0:
-            raise ValueError
+            raise ValueError ('Invalid input arguments')
         tokenized_paragraphs = []
         for text in corpus:
             token_text = self._tokenizer.tokenize(text)
@@ -258,24 +257,21 @@ class VectorDBSearchEngine(BasicSearchEngine):
         """
         if (n_neighbours > len(self._db.get_vectors()) or not isinstance(query, str)
                 or query is None or len(query) == 0 or not isinstance(n_neighbours, int)):
-            raise ValueError
+            raise ValueError ('Invalid input arguments')
         if n_neighbours < 0:
-            raise ValueError
+            raise ValueError ('Invalid input arguments')
         tokenized_query = self._tokenizer.tokenize(query)
         if tokenized_query is None or len(tokenized_query) == 0:
-            raise ValueError
+            raise ValueError ('Could not get tokenised version of query')
         query_vector = self._vectorizer.vectorize(tokenized_query)
         if query_vector is None or len(query_vector) == 0:
-            raise ValueError
+            raise ValueError ('Could not get vectorised version of query')
         vector_data = [x[1] for x in self._db.get_vectors()]
         answer = self._calculate_knn(query_vector, vector_data, n_neighbours)
-        print(answer)
         if answer is None or len(answer) == 0:
-            raise ValueError
+            raise ValueError ('Could not find neighbours')
         ind = tuple([doc_data[0] for doc_data in answer])
-        print(ind)
         docs = self._db.get_raw_documents(ind)
-        print(docs)
         result = [(doc_data[1], docs[ind]) for ind, doc_data in enumerate(answer)]
         return result
 
@@ -441,20 +437,29 @@ class KMeans:
         if (not isinstance(query_vector, tuple) or len(query_vector) == 0
                 or not isinstance(n_neighbours, int) or n_neighbours < 1):
             raise ValueError
-        centroids_list = [cluster.get_centroid for cluster in self.__clusters]
-        distances = [(ind, calculate_distance(query_vector, centroid))
-                     for ind, centroid in enumerate(centroids_list)]
-        if all(distance[0] is not None for distance in distances):
-            print('yeah')
-            raise ValueError
+        distances = []
+        for ind, cluster in enumerate(self.__clusters):
+            centroid = cluster.get_centroid()
+            if centroid:
+                distance = calculate_distance(query_vector, centroid)
+            else:
+                distance = 0.0
+            if distance is None or not isinstance(distance, float):
+                print('yeah')
+                raise ValueError
+            distances.append((ind, distance))
         min_distance_cluster = self.__clusters[min(distances, key=lambda x: x[1])[0]]
         indices = min_distance_cluster.get_indices()
         vectors = self._db.get_vectors(indices)
-        vectors_distance = [(calculate_distance(query_vector, vector), ind)
-                            for ind, vector in enumerate(vectors)]
-        if all(distance[0] is not None for distance in vectors_distance):
-            raise ValueError
+        vectors_distance = []
+        for ind, vector in enumerate(vectors):
+            vector_distance = calculate_distance(query_vector, vector[1])
+            if vector_distance is None or not isinstance(vector_distance, float):
+                print('yeah')
+                raise ValueError
+            vectors_distance.append((vector_distance, ind))
         vectors_distance = sorted(vectors_distance, key=lambda x: x[0])
+        print(vectors_distance)
         return vectors_distance[:n_neighbours]
 
 

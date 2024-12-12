@@ -404,7 +404,7 @@ class KMeans:
         for centroid in first_n_centroids:
             self.__clusters.append(ClusterDTO(centroid[1]))
         self.run_single_train_iteration()
-        while self._is_convergence_reached(self.__clusters) is False:
+        while self._is_convergence_reached(self.__clusters):
             self.run_single_train_iteration()
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
@@ -563,6 +563,7 @@ class ClusteringSearchEngine:
         """
         self.__algo = KMeans(db, n_clusters)
         self._db = db
+        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -592,7 +593,6 @@ class ClusteringSearchEngine:
         if vec_query is None:
             raise ValueError('_db.get_vectorizer().vectorize() returned None')
 
-        self.__algo.train()
         t_dist_and_vec_index = self.__algo.infer(vec_query, n_neighbours)
         if t_dist_and_vec_index is None:
             raise ValueError('infer() returned None')
@@ -600,7 +600,7 @@ class ClusteringSearchEngine:
         l_with_str_aka_docs = self._db.get_raw_documents(tuple(
             every_tuple[1] for every_tuple in t_dist_and_vec_index))
         if l_with_str_aka_docs is None:
-            raise ValueError('_db.get_raw_documents() returned None')
+            raise ValueError('get_raw_documents() returned None')
 
         rel_docs_with_indices = []
         for i in [one_t_dist_and_vec_index[1] for one_t_dist_and_vec_index in t_dist_and_vec_index]:

@@ -56,7 +56,7 @@ def main() -> None:
     paragraphs = m.get_paragraphs(documents)
 
     db = m.DocumentVectorDB(stopwords)
-    db.put_corpus(paragraphs)
+    db.put_corpus(paragraphs[:50])
     search_engine = m.VectorDBSearchEngine(db)
 
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"

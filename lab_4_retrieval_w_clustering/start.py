@@ -52,8 +52,8 @@ def main() -> None:
     """
     Launch an implementation.
     """
-    documents = ''.join(open_files()[0])
-    stopwords = open_files()[1]
+    docs, stopwords = open_files()
+    documents = ''.join(docs)
 
     paragraphs = get_paragraphs(documents)
 

@@ -65,7 +65,6 @@ def main() -> None:
     vectorizer = BM25Vectorizer()
     vectorizer.set_tokenized_corpus(tokenized_paragraphs)
     vectorizer.build()
-    vectors = []
     vector = vectorizer.vectorize(tokenized_paragraphs[0])
 
     corpus = get_paragraphs(''.join(documents))

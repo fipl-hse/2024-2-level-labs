@@ -821,7 +821,7 @@ class KDTree(NaiveKDTree):
                 if ((vector[axis] - node.vector[axis]) ** 2) < max(closest_nodes,
                                                                    key=lambda x: x[0])[0]:
                     current_pairs.append((node.left_node, depth + 1))
-        return sorted(closest_nodes)
+        return closest_nodes
 
 
 class SearchEngine(BasicSearchEngine):

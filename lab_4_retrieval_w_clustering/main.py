@@ -39,8 +39,7 @@ def get_paragraphs(text: str) -> list[str]:
     """
     if not (isinstance(text, str) and len(text) > 0):
         raise ValueError("The argument is empty or not a string")
-    split_text = text.split("\n")
-    return split_text[:-1] if split_text[-1] == "" else split_text
+    return [paragraph for paragraph in text.split("\n") if paragraph]
 
 
 class BM25Vectorizer(Vectorizer):
@@ -487,7 +486,7 @@ class KMeans:
         """
         if not (isinstance(num_examples, int) and num_examples > 0):
             raise ValueError("The argument is not a natural number")
-        list_of_cluster_info = []
+        cluster_info_dict = {}
         for cluster_index, cluster in enumerate(self.__clusters):
             cluster_vectors = self._db.get_vectors(cluster.get_indices())
             vector_distances = []
@@ -499,13 +498,9 @@ class KMeans:
             vector_distances = sorted(vector_distances, key=lambda a: a[1])[:num_examples]
             doc_indices = tuple(pair[0] for pair in vector_distances)
             documents = self._db.get_raw_documents(doc_indices)
-            if (isinstance(cluster_index, int) and isinstance(documents, list) and
-                all(isinstance(document, str) for document in documents)):
-                info_dict = {"cluster_id": cluster_index, "documents": documents}
-                list_of_cluster_info.append(info_dict)
-            else:
-                raise ValueError("Failed to get raw documents")
-        return list_of_cluster_info
+            cluster_info_dict[cluster_index] = documents
+        return [{"cluster_id": ind, "documents": cluster_info_dict[ind]}
+                for ind in cluster_info_dict]
 
     def calculate_square_sum(self) -> float:
         """

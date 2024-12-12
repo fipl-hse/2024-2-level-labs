@@ -512,9 +512,9 @@ class KMeans:
             cluster_indices = cluster.get_indices()
             if not cluster_indices:
                 continue
-            cluster_vectors = [self._db.get_vectors()[idx] for idx in cluster_indices]
             distances = []
-            for vector_data in cluster_vectors:
+            for idx in cluster_indices:
+                vector_data = self._db.get_vectors()[idx]
                 vector_id, vector = vector_data[0], vector_data[-1]
                 distance = calculate_distance(centroid, vector)
                 if distance is None:

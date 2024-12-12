@@ -6,7 +6,7 @@ Vector search with clusterization
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer
-from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
+from lab_2_retrieval_w_bm25.main import calculate_bm25
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -63,13 +63,7 @@ class BM25Vectorizer(Vectorizer):
         if not tokenized_corpus or not isinstance(tokenized_corpus, list):
             raise ValueError()
 
-        self._corpus = tokenized_corpus
-        sum = 0
-
-        for index, paragraph in enumerate(self._corpus):
-            sum += len(paragraph)
-
-        self._avg_doc_len = sum / len(self._corpus)
+        self._avg_doc_len = sum(len(paragraph) for paragraph in self._corpus) / len(self._corpus)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
         """

@@ -5,7 +5,6 @@ Vector search with clusterization
 """
 
 import json
-import math
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 
@@ -95,8 +94,6 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document, list):
             raise ValueError
-        # if calculation := self._calculate_bm25(tokenized_document) is None:
-        #     raise ValueError('Calculation of the bm25 is wrong')
         calculation = self._calculate_bm25(tokenized_document)
         if calculation is None:
             raise ValueError
@@ -429,7 +426,7 @@ class KMeans:
 
         document_vectors = self._db.get_vectors()
         if not document_vectors:
-            raise ValueError("We can't get vectors")
+            raise ValueError("Failed to get vectors")
 
         centroids = [cluster.get_centroid() for cluster in self.__clusters]
 
@@ -538,7 +535,7 @@ class KMeans:
             for vector in vectors:
                 distance = calculate_distance(centroid, vector[-1])
                 if distance is None:
-                    raise ValueError('Could not calculate distance')
+                    raise ValueError('Failed to calculate distance')
                 distances.append((distance, vector[0]))
 
             distances = sorted(distances, key=lambda x: x[-1])[:num_examples]
@@ -560,20 +557,15 @@ class KMeans:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
-        clusters_calculation = 0.0
+        sse = 0.0
         for cluster in self.__clusters:
             centroid = cluster.get_centroid()
-            cluster_indices = cluster.get_indices()
-            vectors = [self._db.get_vectors()[ind] for ind in cluster_indices]
-            calculation = 0.0
-
+            indices = cluster.get_indices()
+            vectors = self._db.get_vectors(indices)
             for vector in vectors:
-                calculation += math.sqrt(sum((one_centroid - two_centroid) ** 2
-                                             for one_centroid, two_centroid
-                                             in zip(centroid, vector[1])))
-            clusters_calculation += calculation
-
-        return clusters_calculation
+                for index, value in enumerate(vector[1]):
+                    sse += (value - centroid[index]) ** 2
+        return sse
 
     def _is_convergence_reached(
         self, new_clusters: list[ClusterDTO], threshold: float = 1e-07

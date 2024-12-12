@@ -506,7 +506,7 @@ class KMeans:
             raise ValueError("Oops! Invalid input")
         if not self.__clusters:
             return []
-        clusters_info: list[dict[str, int | list[str]]] = []
+        clusters_info = []
         for cluster_id, cluster in enumerate(self.__clusters):
             centroid = cluster.get_centroid()
             cluster_indices = cluster.get_indices()
@@ -523,7 +523,10 @@ class KMeans:
             distances = sorted(distances, key=lambda x: x[0])[:num_examples]
             indices = [tup[1] for tup in distances]
             docs = self._db.get_raw_documents(tuple(indices))
-            clusters_info.append({"cluster_id": cluster_id, "documents": docs})
+            another_info = {}
+            if isinstance(cluster_id, int) and isinstance(docs, list):
+                another_info.update(cluster_id=cluster_id, documents=docs)
+            clusters_info.append(another_info)
         return clusters_info
 
     def calculate_square_sum(self) -> float:
@@ -622,10 +625,10 @@ class ClusteringSearchEngine:
             raise ValueError("Oops! Invalid input")
         query_token = self._db.get_tokenizer().tokenize(query)
         if query_token is None:
-            raise ValueError("Oops! It's empty")
+            raise ValueError("Oops! Cannot tokenize query")
         query_vector = self._db.get_vectorizer().vectorize(query_token)
         if query_vector is None:
-            raise ValueError("Oops! It's empty")
+            raise ValueError("Oops! Cannot vectorize query")
         neighbours = self.__algo.infer(query_vector, n_neighbours)
         if not neighbours:
             raise ValueError("Oops! Something's not ok")

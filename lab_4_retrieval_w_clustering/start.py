@@ -4,12 +4,17 @@ Laboratory Work #4 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 
+import json
+
 from lab_4_retrieval_w_clustering.main import (
-    BM25Vectorizer,
+    ClusteringSearchEngine,
     DocumentVectorDB,
     get_paragraphs,
+    VectorDBAdvancedSearchEngine,
     VectorDBSearchEngine,
+    VectorDBTreeSearchEngine,
 )
+
 
 
 def open_files() -> tuple[list[str], list[str]]:
@@ -65,8 +70,23 @@ def main() -> None:
     searchengine = VectorDBSearchEngine(dbase)
     print(searchengine.retrieve_relevant_documents(query,3))
 
-    bm25vectorizer = BM25Vectorizer()
-    bm25vectorizer.build()
+    cluster_searchengine = ClusteringSearchEngine(dbase)
+    # print(cluster_searchengine.retrieve_relevant_documents(query, 5))
+    cluster_searchengine.make_report(5, 'assets/report.json')
+    with open('assets/report.json', 'r', encoding='utf-8') as file:
+        state = json.load(file)
+    print(state)
+
+    for i in range(1,15):
+        new_cluster_searchengine = ClusteringSearchEngine(dbase,n_clusters=i)
+        print(new_cluster_searchengine.calculate_square_sum())
+
+    tree_engine = VectorDBTreeSearchEngine(dbase)
+    print(tree_engine.retrieve_relevant_documents(query,1))
+
+    advanced_engine = VectorDBAdvancedSearchEngine(dbase)
+    print(advanced_engine.retrieve_relevant_documents(query,5))
+
     result = '???'
     assert result, "Result is None"
 

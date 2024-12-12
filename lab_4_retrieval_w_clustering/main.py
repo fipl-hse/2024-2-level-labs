@@ -559,6 +559,7 @@ class ClusteringSearchEngine:
         """
         self._db = db
         self.__algo = KMeans(self._db, n_clusters)
+        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -583,27 +584,20 @@ class ClusteringSearchEngine:
 
         tok_query = self._db.get_tokenizer().tokenize(query)
         if tok_query is None:
-            raise ValueError('_db.get_tokenizer().tokenize() returned None')
+            raise ValueError('tokenize() returned None')
         vec_query = self._db.get_vectorizer().vectorize(tok_query)
         if vec_query is None:
-            raise ValueError('_db.get_vectorizer().vectorize() returned None')
+            raise ValueError('vectorize() returned None')
 
-        self.__algo.train()
-
-        t_dist_and_vec_index = self.__algo.infer(vec_query, n_neighbours)
-        if t_dist_and_vec_index is None:
+        list_dist_ind = self.__algo.infer(vec_query, n_neighbours)
+        if list_dist_ind is None:
             raise ValueError('infer() returned None')
 
-        l_with_str_aka_docs = self._db.get_raw_documents(tuple(
-            every_tuple[1] for every_tuple in t_dist_and_vec_index))
-        if l_with_str_aka_docs is None:
-            raise ValueError('get_raw_documents() returned None')
-
+        docs_aka_str_in_list = self._db.get_raw_documents(tuple([pair[1] for pair in list_dist_ind]))
+        distances = [pair[0] for pair in list_dist_ind]
         rel_docs_with_indices = []
-        t_dist_and_vec_index = [t[0] for t in self.__algo.infer(vec_query, n_neighbours)]
-        indices = [pair[1] for pair in self.__algo.infer(vec_query, n_neighbours)]
-        for index, doc in enumerate(self._db.get_raw_documents(tuple(indices))):
-            rel_docs_with_indices.append((t_dist_and_vec_index[index], doc))
+        for ind, doc in enumerate(docs_aka_str_in_list):
+            rel_docs_with_indices.append((distances[ind], doc))
 
         return rel_docs_with_indices
 

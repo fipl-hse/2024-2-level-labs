@@ -119,7 +119,7 @@ class BM25Vectorizer(Vectorizer):
         avg_doc_len = sum(len(doc) for doc in self._corpus) / len(self._corpus)
         doc_len = len(tokenized_document)
         bm25_dict = calculate_bm25(self._vocabulary, tokenized_document,
-                                   idf_document, 1.5, 0.75, avg_doc_len, doc_len)
+                                   idf_document, avg_doc_len, doc_len)
 
         vector = [0.0] * len(self._vocabulary)
         for index, token in enumerate(self._vocabulary):
@@ -249,8 +249,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
-        self._db = db
         super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
+        self._db = db
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """

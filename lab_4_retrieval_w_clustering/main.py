@@ -163,7 +163,8 @@ class DocumentVectorDB:
         if not tokenized_corpus:
             raise ValueError
 
-
+        self._vectorizer.set_tokenized_corpus(tokenized_pars)
+        self._vectorizer.build()
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """
@@ -172,6 +173,7 @@ class DocumentVectorDB:
         Returns:
             BM25Vectorizer: BM25Vectorizer class object.
         """
+        return self._vectorizer
 
     def get_tokenizer(self) -> Tokenizer:
         """
@@ -180,6 +182,7 @@ class DocumentVectorDB:
         Returns:
             Tokenizer: Tokenizer class object.
         """
+        return self._tokenizer
 
     def get_vectors(self, indices: list[int] | None = None) -> list[tuple[int, Vector]]:
         """
@@ -191,6 +194,12 @@ class DocumentVectorDB:
         Returns:
             list[tuple[int, Vector]]: List of index and vector for documents.
         """
+        if indices is None:
+            return list(self.__vectors.items())
+
+        ind = [index for i, index in enumerate(indices) if index not in indices[:i]]
+
+        return [(index, self.__vectors[index]) for index in ind]
 
     def get_raw_documents(self, indices: tuple[int, ...] | None = None) -> Corpus:
         """
@@ -205,6 +214,10 @@ class DocumentVectorDB:
         Returns:
             Corpus: List of documents.
         """
+        if not indices:
+            return self.__documents
+
+        return [item for item in self.__documents if self.__documents.index(item) in indices]
 
 
 class VectorDBSearchEngine(BasicSearchEngine):
@@ -221,6 +234,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        super().__init__(db.get_vectorizer(), db.get_tokenizer())
+        self._db = db
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -233,6 +248,20 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
+        if not query or not isinstance(query, str) or not isinstance(n_neighbours, int) \
+                or n_neighbours <= 0:
+            raise ValueError()
+
+        tokenized_query = self._db.get_tokenizer().tokenize(query)
+        vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
+        vector_docs = [el[1] for el in self._db.get_vectors()]
+
+        relevant = self._calculate_knn(vectorized_query,vector_docs, n_neighbours)
+        if not relevant:
+            raise ValueError
+        ind = tuple([item[0] for item in relevant])
+        doc = self._db.get_raw_documents(ind)
+        return [(vector, doc[ind]) for ind, vector in relevant]
 
 
 class ClusterDTO:

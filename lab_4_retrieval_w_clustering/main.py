@@ -5,7 +5,7 @@ Vector search with clusterization
 """
 import json
 
-from lab_2_retrieval_w_bm25.main import calculate_bm25
+from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
     BasicSearchEngine,
@@ -690,8 +690,8 @@ class ClusteringSearchEngine:
                              f'is None or is zero.')
 
         relevant_documents = []
-        for i in range(len(neighbours)):
-            relevant_documents.append((neighbours[i][0], raw_documents[i]))
+        for i, distance in enumerate(neighbours):
+            relevant_documents.append((distance[0], raw_documents[i]))
         return relevant_documents
 
     def make_report(self, num_examples: int, output_path: str) -> None:

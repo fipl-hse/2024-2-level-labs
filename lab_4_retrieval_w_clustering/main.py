@@ -116,6 +116,9 @@ class BM25Vectorizer(Vectorizer):
         if not self._vocabulary or not self._corpus:
             return ()
         idf_document = calculate_idf(self._vocabulary, self._corpus)
+        if idf_document is None:
+            raise ValueError(f'Incorrect value: "{idf_document}" is empty, '
+                             f'is None or is zero.')
 
         avg_doc_len = sum(len(doc) for doc in self._corpus) / len(self._corpus)
         doc_len = len(tokenized_document)
@@ -274,6 +277,10 @@ class VectorDBSearchEngine(BasicSearchEngine):
                              f'is zero or is less than zero.')
 
         tokenized_query = self._tokenizer.tokenize(query)
+        if not tokenized_query:
+            raise ValueError(f'Incorrect value: "{tokenized_query}" is empty, '
+                             f'is None or is zero.')
+
         query_vector = self._vectorizer.vectorize(tokenized_query)
         if not query_vector:
             raise ValueError(f'Incorrect value: "{query_vector}" is empty, '

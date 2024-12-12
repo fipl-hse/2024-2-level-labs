@@ -521,8 +521,7 @@ class KMeans:
                     raise ValueError("Oops! Distance is empty")
                 distances.append((distance, vector_id))
             distances = sorted(distances, key=lambda x: x[0])[:num_examples]
-            indices = [tup[1] for tup in distances]
-            docs = self._db.get_raw_documents(tuple(indices))
+            docs = self._db.get_raw_documents(tuple([tup[1] for tup in distances]))
             another_info = {}
             if isinstance(cluster_id, int) and isinstance(docs, list):
                 another_info.update(cluster_id=cluster_id, documents=docs)

@@ -149,8 +149,8 @@ class DocumentVectorDB:
                 or if input arguments are empty,
                 or if methods used return None.
         """
-        if not corpus or not isinstance(corpus, list)\
-                or not all(isinstance(item, str) for item in corpus):
+        if not corpus or not isinstance(corpus, list) \
+                or not all(isinstance(text, str) for text in corpus):
             raise ValueError
 
         tokenized_corpus = []
@@ -163,8 +163,11 @@ class DocumentVectorDB:
         if not tokenized_corpus:
             raise ValueError
 
-        self._vectorizer.set_tokenized_corpus(tokenized_pars)
+        self._vectorizer.set_tokenized_corpus(tokenized_corpus)
         self._vectorizer.build()
+
+        for ind, doc in enumerate(tokenized_corpus):
+            self.__vectors[ind] = self._vectorizer.vectorize(doc)
 
     def get_vectorizer(self) -> BM25Vectorizer:
         """

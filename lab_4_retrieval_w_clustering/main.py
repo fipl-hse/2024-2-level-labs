@@ -508,7 +508,6 @@ class KMeans:
             return []
         clusters_info = []
         for cluster_id, cluster in enumerate(self.__clusters):
-            centroid = cluster.get_centroid()
             cluster_indices = cluster.get_indices()
             if not cluster_indices:
                 continue
@@ -516,12 +515,13 @@ class KMeans:
             for idx in cluster_indices:
                 vector_data = self._db.get_vectors()[idx]
                 vector_id, vector = vector_data[0], vector_data[-1]
-                distance = calculate_distance(centroid, vector)
+                distance = calculate_distance(cluster.get_centroid(), vector)
                 if distance is None:
                     raise ValueError("Oops! Distance is empty")
                 distances.append((distance, vector_id))
             distances = sorted(distances, key=lambda x: x[0])[:num_examples]
-            docs = self._db.get_raw_documents(tuple([tup[1] for tup in distances]))
+            indices = [tup[1] for tup in distances]
+            docs = self._db.get_raw_documents(tuple(indices))
             another_info = {}
             if isinstance(cluster_id, int) and isinstance(docs, list):
                 another_info.update(cluster_id=cluster_id, documents=docs)

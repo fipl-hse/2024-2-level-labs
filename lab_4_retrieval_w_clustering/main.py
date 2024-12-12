@@ -3,7 +3,7 @@ Lab 4.
 
 Vector search with clusterization
 """
-
+import copy
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code,
 # unused-private-member, super-init-not-called
 import json
@@ -261,7 +261,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
         if not isinstance(query, str) or not query\
-                or not isinstance(n_neighbours, int) or n_neighbours <= 0:
+                or not isinstance(n_neighbours, int) or n_neighbours < 0:
             raise ValueError('Inappropriate type input argument or input argument is empty.')
         tokenized_query = self._tokenizer.tokenize(query)
         if not tokenized_query:
@@ -275,8 +275,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         distances = self._calculate_knn(vectorized_query, docs_vectors, n_neighbours)
         if not distances:
             raise ValueError('self._calculate_knn returns None')
-        documents = self._db.get_raw_documents(tuple(index for index in range(n_neighbours)))
-        return [(dist, documents[ind]) for ind, dist in distances]
+        documents = self._db.get_raw_documents(tuple(index[0] for index in distances))
+        return [(dist[-1], documents[index]) for index, dist in enumerate(distances)]
 
 
 class ClusterDTO:
@@ -390,11 +390,13 @@ class KMeans:
         centroids = self._db.get_vectors()[:self._n_clusters]
         for centroid in centroids:
             self.__clusters.append(ClusterDTO(centroid[-1]))
-        self.run_single_train_iteration()
+        clusters = self.run_single_train_iteration()
         while True:
-            self.run_single_train_iteration()
-            if self._is_convergence_reached(self.__clusters):
+            if self._is_convergence_reached(clusters):
                 break
+            self.__clusters = clusters
+            clusters = self.run_single_train_iteration()
+        self.__clusters = clusters
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -407,26 +409,25 @@ class KMeans:
             list[ClusterDTO]: List of clusters.
         """
         centroids = []
-        for cluster in self.__clusters:
+        clusters = copy.deepcopy(self.__clusters)
+        for cluster in clusters:
             cluster.erase_indices()
-            centroid = cluster.get_centroid()
-            centroids.append(centroid)
+            centroids.append(cluster.get_centroid())
         doc_vectors = self._db.get_vectors()
-        for index, vector in doc_vectors:
+        for vector in doc_vectors:
             distances = []
             for centroid in centroids:
-                distance = calculate_distance(vector, centroid)
+                distance = calculate_distance(centroid, vector[1])
                 if distance is None:
                     raise ValueError('calculate_distance returns None')
                 distances.append(distance)
             nearest = min(distances)
-            self.__clusters[distances.index(nearest)].add_document_index(index)
-        for cluster in self.__clusters:
+            clusters[distances.index(nearest)].add_document_index(vector[0])
+        for cluster in clusters:
             current_vectors = [doc_vectors[index][-1] for index in cluster.get_indices()]
-            new_centroid = [sum(vector[ind] for ind in range(len(vector))) / len(current_vectors)
-                            for vector in current_vectors]
-            cluster.set_new_centroid(tuple(new_centroid))
-        return self.__clusters
+            cluster.set_new_centroid(tuple(sum(row) / len(current_vectors) for row
+                                     in zip(*current_vectors)))
+        return clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -570,6 +571,7 @@ class ClusteringSearchEngine:
         """
         self._db = db
         self.__algo = KMeans(self._db, n_clusters)
+        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -598,7 +600,6 @@ class ClusteringSearchEngine:
         query_vector = self._db.get_vectorizer().vectorize(query_tokens)
         if query_vector is None:
             raise ValueError('self._db.get_vectorizer().vectorize returns None')
-        self.__algo.train()
         pairs = self.__algo.infer(query_vector, n_neighbours)
         if pairs is None:
             raise ValueError('self.__algo.infer returns None')
@@ -606,8 +607,8 @@ class ClusteringSearchEngine:
         indices = [pair[1] for pair in pairs]
         documents = self._db.get_raw_documents(tuple(indices))
         result = []
-        for index in indices:
-            result.append((distances[index], documents[index]))
+        for index, document in enumerate(documents):
+            result.append((distances[index], document))
         return result
 
     def make_report(self, num_examples: int, output_path: str) -> None:
@@ -623,7 +624,7 @@ class ClusteringSearchEngine:
             raise ValueError('inappropriate type input arguments or input arguments are empty'
                              'or input arguments are incorrect')
         data = self.__algo.get_clusters_info(num_examples)
-        if data is None:
+        if not data:
             raise ValueError('self.__algo.get_clusters_info returns None')
         with open(output_path, "w", encoding="utf-8") as document:
             json.dump(data, document)

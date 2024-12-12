@@ -5,6 +5,8 @@ Vector search with clusterization
 """
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
+from copy import deepcopy
+
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
     BasicSearchEngine,
@@ -66,12 +68,8 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_corpus:
             raise ValueError("Empty tokenized_corpus")
-        if self._corpus:
-            self._corpus = []
-        summary_len = 0
-        for token in tokenized_corpus:
-            summary_len += len(token)
-            self._corpus.append(token)
+        self._corpus = tokenized_corpus
+        summary_len = sum(len(token) for token in tokenized_corpus)
         self._avg_doc_len = summary_len / len(self._corpus)
 
     def vectorize(self, tokenized_document: list[str]) -> Vector:
@@ -252,8 +250,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        super().__init__(db.get_vectorizer(), db.get_tokenizer())
         self._db = db
-        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -280,7 +278,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         docs_vectors = [vec[1] for vec in self._db.get_vectors()]
         relevant_documents = self._calculate_knn(query_vector, docs_vectors, n_neighbours)
         if relevant_documents is None:
-            raise ValueError
+            raise ValueError('Relevant_documents is NoneType')
         return [(doc[1], self._db.get_raw_documents(tuple([doc[0]]))[0])
                 for doc in relevant_documents]
 
@@ -396,10 +394,11 @@ class KMeans:
         new_centroids = self._db.get_vectors()[:self._n_clusters]
         for centroid in new_centroids:
             self.__clusters.append(ClusterDTO(centroid[1]))
-        self.run_single_train_iteration()
-        while self._is_convergence_reached(self.__clusters) is False:
-            self.run_single_train_iteration()
-            self._is_convergence_reached(self.__clusters)
+        new_clusters = self.run_single_train_iteration()
+        while self._is_convergence_reached(new_clusters) is False:
+            new_clusters = self.run_single_train_iteration()
+            self.__clusters = new_clusters
+        self.__clusters = new_clusters
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -412,28 +411,28 @@ class KMeans:
             list[ClusterDTO]: List of clusters.
         """
         centroids = []
-        for cluster in self.__clusters:
+        new_clusters = deepcopy(self.__clusters)
+        for cluster in new_clusters:
             cluster.erase_indices()
             centroids.append(cluster.get_centroid())
         if None in centroids:
             raise ValueError('NoneType in centroids')
         vectors = self._db.get_vectors()
-        for i, vector in self._db.get_vectors():
+        for i, vector in vectors:
             distances = []
             for centroid in centroids:
                 distance = calculate_distance(centroid, vector)
                 if distance is None:
                     raise ValueError('Distance is NoneType')
                 distances.append(distance)
-            self.__clusters[distances.index(min(distances))].add_document_index(i)
-        for cluster in self.__clusters:
+            new_clusters[distances.index(min(distances))].add_document_index(i)
+        for cluster in new_clusters:
             cl_vectors = [vectors[index][1] for index in cluster.get_indices()]
             new_centroid = []
             for vector in zip(*cl_vectors):
-                value = sum(vector) / len(cl_vectors)
-                new_centroid.append(value)
+                new_centroid.append(sum(vector) / len(cl_vectors))
             cluster.set_new_centroid(tuple(new_centroid))
-        return self.__clusters
+        return new_clusters
 
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:

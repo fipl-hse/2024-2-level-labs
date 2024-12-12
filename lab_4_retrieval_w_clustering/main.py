@@ -404,7 +404,7 @@ class KMeans:
         for centroid in first_n_centroids:
             self.__clusters.append(ClusterDTO(centroid[1]))
         self.run_single_train_iteration()
-        while self._is_convergence_reached(self.__clusters):
+        while not self._is_convergence_reached(self.__clusters):
             self.run_single_train_iteration()
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:

@@ -183,16 +183,9 @@ class DocumentVectorDB:
         self._vectorizer.set_tokenized_corpus(tok_pars)
         self._vectorizer.build()
 
-        vect_pars = []
 
-        for text in tok_pars:
-            vector = self._vectorizer.vectorize(text)
-            if not isinstance(vector, tuple) or not vector:
-                raise ValueError('No vector or vector not isinstance tuple')
 
-            vect_pars.append(vector)
-
-        self.__vectors = {ind: vector for ind, vector in enumerate(vect_pars)}
+        self.__vectors = {ind: vector for ind, text in enumerate(tok_pars) for vector in [self._vectorizer.vectorize(text)] if isinstance(vector, tuple) and vector}
 
         if None in self.__vectors.values():
             raise ValueError('Vector(-s) is None')
@@ -228,8 +221,7 @@ class DocumentVectorDB:
         res = []
 
         if indices is None:
-            for key, value in self.__vectors.items():
-                res.append((key, value))
+            res = [(key, value) for key, value in self.__vectors.items()]
             return res
 
         for key, value in self.__vectors.items():

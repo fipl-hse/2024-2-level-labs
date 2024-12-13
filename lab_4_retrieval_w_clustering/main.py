@@ -307,9 +307,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
                                             tuple(neighbor[0] for neighbor in neighbours))
         relevant_documents_with_distances = []
         for neighbor in neighbours:
-            neighbor_1 = neighbor[1]
-            doc_neighbour = relevant_documents[neighbor[0]]
-            relevant_documents.extend((neighbor_1, doc_neighbour))
+            relevant_documents_with_distances.append((neighbor[1], relevant_documents[neighbor[0]]))
         return relevant_documents_with_distances
 
 

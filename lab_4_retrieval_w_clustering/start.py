@@ -8,7 +8,6 @@ from lab_4_retrieval_w_clustering.main import (
     ClusteringSearchEngine,
     DocumentVectorDB,
     get_paragraphs,
-    VectorDBAdvancedSearchEngine,
     VectorDBSearchEngine,
     VectorDBTreeSearchEngine,
 )

@@ -68,7 +68,7 @@ def main() -> None:
     clustering_search = ClusteringSearchEngine(db)
     clustering_search.make_report(5, 'assets/report.json')
     sse = []
-    for num in range(1, 15):
+    for num in range(1, 3):
         clustering_search = ClusteringSearchEngine(db, n_clusters=num)
         sse.append(clustering_search.calculate_square_sum())
     vectordb_tree_search = VectorDBTreeSearchEngine(db)

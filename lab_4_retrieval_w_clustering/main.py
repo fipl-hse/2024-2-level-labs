@@ -4,7 +4,6 @@ Lab 4.
 Vector search with clusterization
 """
 import copy
-import json
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
 from lab_3_ann_retriever.main import (
@@ -310,7 +309,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         for neighbor in neighbours:
             neighbor_1 = neighbor[1]
             doc_neighbour = relevant_documents[neighbor[0]]
-            relevant_documents.append(tuple(neighbor_1, doc_neighbour))
+            relevant_documents.extend((neighbor_1, doc_neighbour))
         return relevant_documents_with_distances
 
 
@@ -451,7 +450,6 @@ class KMeans:
             list[ClusterDTO]: List of clusters.
         """
         centroids = []
-        new_centroids = copy.deepcopy(self.__clusters)
         for cluster in self.__clusters:
             cluster.erase_indices()
             centroids.append(cluster.get_centroid())
@@ -466,15 +464,15 @@ class KMeans:
                 distances_to_centroids.append((distance, centroids.index(centroid)))
 
             min_cluster_index = min(distances_to_centroids)[1]
-            new_centroids[min_cluster_index].add_document_index(vectors.index(vector))
+            self.__clusters[min_cluster_index].add_document_index(vectors.index(vector))
 
-        for cluster in new_centroids:
+        for cluster in self.__clusters:
             cluster_vectors = [vectors[index][1] for index in cluster.get_indices()]
             new_centroid = [sum(coord[i] for i in range(len(coord))) / len(cluster_vectors)
                             for coord in cluster_vectors]
             cluster.set_new_centroid(tuple(new_centroid))
 
-        return new_centroids
+        return self.__clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """

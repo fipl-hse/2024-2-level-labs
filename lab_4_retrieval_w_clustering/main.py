@@ -131,8 +131,10 @@ class BM25Vectorizer(Vectorizer):
 
         avg_doc_len = sum(len(doc) for doc in self._corpus) / len(self._corpus)
         doc_len = len(tokenized_document)
+        k1 = 1.5
+        b = 0.75
         bm25_dict = calculate_bm25(self._vocabulary, tokenized_document,
-                                   idf_document, avg_doc_len, doc_len)
+                                   idf_document, k1, b, avg_doc_len, doc_len)
 
         vector = [0.0] * len(self._vocabulary)
         for index, token in enumerate(self._vocabulary):

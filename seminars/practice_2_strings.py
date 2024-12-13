@@ -49,6 +49,7 @@ print(example)
 
 # Task 1:
 def multiply_string(input_string: str, how_many: int) -> str:
+
     """
     Given a string and a non-negative number,
     display the given string the number of times given in the `how_many`.
@@ -70,6 +71,8 @@ def front_times(input_string: str, how_many: int) -> str:
     and display them that many times as in `how_many`.
     """
     # student realisation goes here
+    return input_string[:3]*how_many
+print(front_times("Harbringer", 3))
 
 
 # Function calls with expected result:
@@ -87,7 +90,8 @@ def extra_end(input_string: str) -> str:
     Given the string, take its two last characters and display them three times.
     """
     # student realisation goes here
-
+    return input_string[-2:]*3
+print(extra_end("Binaha"))
 
 # Function calls with expected result:
 # extra_end('Hello') → 'lololo'
@@ -102,7 +106,8 @@ def make_abba(first_string: str, second_string: str) -> str:
     Given two strings, concatenate them as a reflection.
     """
     # student realisation goes here
-
+    return first_string+second_string*2+first_string
+print(make_abba("po", "pi"))
 
 # make_abba('Hi', 'Bye') → 'HiByeByeHi'
 # make_abba('Yo', 'Alice') → 'YoAliceAliceYo'
@@ -120,7 +125,17 @@ def reverse_word(sentence: str) -> str:
     Spaces will be included only when more than one word is present.
     """
     # student realisation goes here
+    result = []
+    sentence_split = sentence.split(' ')
+    if (len(sentence_split) < 1):
+        return False
+    for word in sentence_split:
+        if len(word) > 5:
+            word = word[::-1]
+        result.append(word)
+    return ' '.join(result)
 
+print(reverse_word("Welcome to my beloved HSE"))
 
 # reverse_word("Hey fellow warriors") == "Hey wollef sroirraw"
 #
@@ -155,7 +170,11 @@ def combo_string(first_string: str, second_string: str) -> str:
     Given two strings, concatenate like the following: shorter+longer+shorter
     """
     # student realisation goes here
+    if len(first_string) < len(second_string):
+        return "".join([first_string, second_string, first_string])
+    else: return "".join([second_string, first_string, second_string])
 
+print(combo_string("хахахах", "ыбыбыбыб"))
 
 # combo_string('Hello', 'hi') → 'hiHellohi'
 # combo_string('hi', 'Hello') → 'hiHellohi'
@@ -172,7 +191,12 @@ def string_splosion(input_string: str) -> str:
     """
     # student realisation goes here
 
-
+    result = ''
+    for i in range (len(input_string)+1):
+        result += input_string[:i]
+        return result
+    
+print(string_splosion("Code"))
 # Function calls with expected result:
 # string_splosion('Code') → 'CCoCodCode'
 # string_splosion('abc') → 'aababc'

@@ -6,7 +6,7 @@ Laboratory Work #3 starter.
 import time
 from pathlib import Path
 
-from lab_3_ann_retriever.main import (
+from lab_3_ann_retriever___vhkefbckemvkjo.main import (
     AdvancedSearchEngine,
     BasicSearchEngine,
     SearchEngine,

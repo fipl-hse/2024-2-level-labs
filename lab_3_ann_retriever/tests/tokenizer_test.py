@@ -10,7 +10,7 @@ from unittest import mock
 import pytest
 
 from config.constants import PROJECT_ROOT
-from lab_3_ann_retriever.main import Tokenizer
+from lab_3_ann_retriever___vhkefbckemvkjo.main import Tokenizer
 
 
 def get_tokens_assets() -> tuple[list[str], list[str]]:
@@ -20,7 +20,7 @@ def get_tokens_assets() -> tuple[list[str], list[str]]:
     Returns:
          tuple[list[str], list[str]]: Assets for tests.
     """
-    path = PROJECT_ROOT / "lab_3_ann_retriever" / "tests" / "assets" / "tokens.json"
+    path = PROJECT_ROOT / "lab_3_ann_retriever___vhkefbckemvkjo" / "tests" / "assets" / "tokens.json"
     with open(path, "r", encoding="utf-8") as file:
         data = json.load(file)
     return data["tokens"], data["sorted_tokens"]
@@ -33,7 +33,7 @@ def get_documents_assets() -> tuple[list[str], list[str]]:
     Returns:
          tuple[list[str], list[str]]: Assets for tests.
     """
-    path = PROJECT_ROOT / "lab_3_ann_retriever" / "tests" / "assets" / "documents.json"
+    path = PROJECT_ROOT / "lab_3_ann_retriever___vhkefbckemvkjo" / "tests" / "assets" / "documents.json"
     with open(path, "r", encoding="utf-8") as file:
         data = json.load(file)
     return data["documents"], data["tokenized_documents"]

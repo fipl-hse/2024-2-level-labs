@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from lab_3_ann_retriever.main import AdvancedSearchEngine, Tokenizer, Vectorizer
-from lab_3_ann_retriever.tests.tokenizer_test import get_documents_assets
+from lab_3_ann_retriever___vhkefbckemvkjo.main import AdvancedSearchEngine, Tokenizer, Vectorizer
+from lab_3_ann_retriever___vhkefbckemvkjo.tests.tokenizer_test import get_documents_assets
 
 
 class AdvancedSearchEngineTest(unittest.TestCase):

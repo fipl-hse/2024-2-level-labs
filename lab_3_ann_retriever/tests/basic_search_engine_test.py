@@ -10,8 +10,8 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vectorizer
-from lab_3_ann_retriever.tests.tokenizer_test import get_documents_assets
+from lab_3_ann_retriever___vhkefbckemvkjo.main import BasicSearchEngine, Tokenizer, Vectorizer
+from lab_3_ann_retriever___vhkefbckemvkjo.tests.tokenizer_test import get_documents_assets
 
 
 class BasicSearchEngineTest(unittest.TestCase):
@@ -1004,7 +1004,7 @@ class BasicSearchEngineTest(unittest.TestCase):
         document_vectors = []
         n_neighbors = 2
 
-        with mock.patch("lab_3_ann_retriever.main.calculate_distance", return_value=None):
+        with mock.patch("lab_3_ann_retriever___vhkefbckemvkjo.main.calculate_distance", return_value=None):
             result = self.retriever._calculate_knn(query_vector, document_vectors, n_neighbors)
         self.assertIsNone(result)
 
@@ -1508,6 +1508,6 @@ class BasicSearchEngineTest(unittest.TestCase):
         """
         Empty load_vector scenario for _load_documents
         """
-        with mock.patch("lab_3_ann_retriever.main.load_vector", return_value=None):
+        with mock.patch("lab_3_ann_retriever___vhkefbckemvkjo.main.load_vector", return_value=None):
             actual = self.retriever.load(str(self.exp_path))
         self.assertFalse(actual)

@@ -9,7 +9,7 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from lab_3_ann_retriever.main import KDTree
+from lab_3_ann_retriever___vhkefbckemvkjo.main import KDTree
 
 
 class KDTreeTest(unittest.TestCase):
@@ -85,7 +85,7 @@ class KDTreeTest(unittest.TestCase):
         Empty distance scenario
         """
         self.kdtree.build(self.points)
-        with mock.patch("lab_3_ann_retriever.main.calculate_distance", return_value=None):
+        with mock.patch("lab_3_ann_retriever___vhkefbckemvkjo.main.calculate_distance", return_value=None):
             result = self.kdtree._find_closest(self.point)
         self.assertIsNone(result)
 

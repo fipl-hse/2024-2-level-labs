@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 import pytest
 
-from lab_3_ann_retriever.main import calculate_distance
+from lab_3_ann_retriever___vhkefbckemvkjo.main import calculate_distance
 
 
 class CalculateDistance(unittest.TestCase):

@@ -8,7 +8,7 @@ from unittest import mock
 
 import pytest
 
-from lab_3_ann_retriever.main import Node
+from lab_3_ann_retriever___vhkefbckemvkjo.main import Node
 
 
 class NodeTest(unittest.TestCase):
@@ -146,7 +146,7 @@ class NodeTest(unittest.TestCase):
         """
         Handling the case where load_vector returns None
         """
-        with mock.patch("lab_3_ann_retriever.main.load_vector", return_value=None):
+        with mock.patch("lab_3_ann_retriever___vhkefbckemvkjo.main.load_vector", return_value=None):
             result = self.node.load(self.state)
         self.assertFalse(result)
 

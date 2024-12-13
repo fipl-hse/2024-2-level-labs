@@ -6,7 +6,7 @@ import unittest
 
 import pytest
 
-from lab_3_ann_retriever.main import save_vector
+from lab_3_ann_retriever___vhkefbckemvkjo.main import save_vector
 
 
 class SaveVector(unittest.TestCase):

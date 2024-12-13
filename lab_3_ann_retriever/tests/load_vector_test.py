@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 import pytest
 
-from lab_3_ann_retriever.main import load_vector
+from lab_3_ann_retriever___vhkefbckemvkjo.main import load_vector
 
 
 class LoadVector(unittest.TestCase):

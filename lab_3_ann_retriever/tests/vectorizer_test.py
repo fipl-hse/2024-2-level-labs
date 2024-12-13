@@ -10,7 +10,7 @@ from unittest import mock
 import numpy as np
 import pytest
 
-from lab_3_ann_retriever.main import Vectorizer
+from lab_3_ann_retriever___vhkefbckemvkjo.main import Vectorizer
 
 
 class VectorizerTest(unittest.TestCase):
@@ -251,7 +251,7 @@ class VectorizerTest(unittest.TestCase):
         """
         Empty calculate_idf scenario
         """
-        with mock.patch("lab_3_ann_retriever.main.calculate_idf", return_value=None):
+        with mock.patch("lab_3_ann_retriever___vhkefbckemvkjo.main.calculate_idf", return_value=None):
             self.assertFalse(self.vectorizer.build())
 
     @pytest.mark.lab_3_ann_retriever

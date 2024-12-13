@@ -15,6 +15,7 @@ from lab_3_ann_retriever.main import (
     Vector,
     Vectorizer,
 )
+import copy
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -405,6 +406,13 @@ class KMeans:
             self.run_single_train_iteration()
             if self._is_convergence_reached(self.__clusters):
                 break
+        # centroids = self._db.get_vectors()[:self._n_clusters]
+        # for centroid in centroids:
+        #     self.__clusters.append(ClusterDTO(centroid[-1]))
+        # while True:
+        #     new_clusters = self.run_single_train_iteration()
+        #     if self._is_convergence_reached(new_clusters):
+        #         break
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -417,7 +425,7 @@ class KMeans:
             list[ClusterDTO]: List of clusters.
         """
         centroids = []
-        clusters = self.__clusters
+        clusters = copy.deepcopy(self.__clusters)
         for cluster in clusters:
             cluster.erase_indices()
             centroids.append(cluster.get_centroid())
@@ -440,6 +448,29 @@ class KMeans:
             centroid_updated = (sum(value) / len(value) for value in zip(*cluster_vectors))
             cluster.set_new_centroid(tuple(centroid_updated))
         return clusters
+        # centroids = []
+        # clusters = self.__clusters.copy()
+        # for cluster in clusters:
+        #     cluster.erase_indices()
+        #     centroid = cluster.get_centroid()
+        #     centroids.append(centroid)
+        # vectors = self._db.get_vectors()
+        # for vector in vectors:
+        #     distances = []
+        #     for ind, centroid in enumerate(centroids):
+        #         distance = calculate_distance(vector[-1], centroid)
+        #         if distance is None:
+        #             raise ValueError('Could not calculate the distance')
+        #         distances.append((distance, ind))
+        #     closest = min(distances)
+        #     clusters[closest[-1]].add_document_index(vectors.index(vector))
+        # for cluster in clusters:
+        #     cluster_vectors = []
+        #     for num in cluster.get_indices():
+        #         cluster_vectors.append(vectors[num][-1])
+        #     new_centroid = tuple(sum(value) / len(value) for value in zip(*cluster_vectors))
+        #     cluster.set_new_centroid(new_centroid)
+        # return clusters
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -470,6 +501,7 @@ class KMeans:
         if distance_minimal is None:
             raise ValueError("Method returned None")
         for centroid in centroids:
+
             distance = calculate_distance(query_vector, centroid)
             if distance is None:
                 raise ValueError("Method returned None")
@@ -491,6 +523,28 @@ class KMeans:
             documents_relevant.append((distance_vector, index))
         documents_relevant.sort(key=lambda x: x[0])
         return documents_relevant[:n_neighbours]
+        # if (not isinstance(query_vector, tuple) or not query_vector
+        #         or not isinstance(n_neighbours, int) or not n_neighbours):
+        #     raise ValueError('Invalid query/n_neighbours input')
+        # cluster_distances = []
+        # for ind, cluster in enumerate(self.__clusters):
+        #     centroid = cluster.get_centroid()
+        #     if not centroid:
+        #         continue
+        #     distance = calculate_distance(query_vector, centroid)
+        #     if distance is None:
+        #         raise ValueError('Could not calculate the distance')
+        #     cluster_distances.append((distance, ind))
+        # closest_cluster = min(cluster_distances)[-1]
+        # cluster_indices = self.__clusters[closest_cluster].get_indices()
+        # vectors = self._db.get_vectors(cluster_indices)
+        # distances = []
+        # for vector in vectors:
+        #     vectors_distance = calculate_distance(query_vector, vector[-1])
+        #     if vectors_distance is None:
+        #         raise ValueError('Could not calculate the distance')
+        #     distances.append((vectors_distance, vector[0]))
+        # return sorted(distances, key=lambda x: x[0])[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """

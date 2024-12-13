@@ -400,12 +400,14 @@ class KMeans:
         """
         Train k-means algorithm.
         """
-        vectors_initial = self._db.get_vectors(list(range(self._n_clusters)))
+        vectors_initial = self._db.get_vectors()[:self._n_clusters]
         self.__clusters = [ClusterDTO(vector[1]) for vector in vectors_initial]
         while True:
-            self.run_single_train_iteration()
-            if self._is_convergence_reached(self.__clusters):
+            new_clusters = self.run_single_train_iteration()
+            if self._is_convergence_reached(new_clusters):
                 break
+            self.__clusters = new_clusters
+
         # centroids = self._db.get_vectors()[:self._n_clusters]
         # for centroid in centroids:
         #     self.__clusters.append(ClusterDTO(centroid[-1]))
@@ -431,20 +433,22 @@ class KMeans:
             centroids.append(cluster.get_centroid())
         vectors = self._db.get_vectors()
         for vector_index, vector in vectors:
-            closest_centroid = centroids[0]
-            distance_minimal = calculate_distance(vector, centroids[0])
+            closest_centroid = 0
+            distance_minimal = calculate_distance(vector, centroids[closest_centroid])
             if distance_minimal is None:
                 raise ValueError("Input argument is empty")
-            for centroid in centroids:
+
+            for i, centroid in enumerate(centroids):
                 distance = calculate_distance(vector, centroid)
                 if distance is None:
                     raise ValueError("Input argument is empty")
                 if distance < distance_minimal:
                     distance_minimal = distance
-                    closest_centroid = centroid
-            clusters[centroids.index(closest_centroid)].add_document_index(vector_index)
+                    closest_centroid = i
+
+            clusters[closest_centroid].add_document_index(vector_index)
         for cluster in clusters:
-            cluster_vectors = [vectors[index][1] for index in cluster.get_indices()]
+            cluster_vectors = [vector for i, vector in self._db.get_vectors(cluster.get_indices()) ]
             centroid_updated = (sum(value) / len(value) for value in zip(*cluster_vectors))
             cluster.set_new_centroid(tuple(centroid_updated))
         return clusters
@@ -501,7 +505,6 @@ class KMeans:
         if distance_minimal is None:
             raise ValueError("Method returned None")
         for centroid in centroids:
-
             distance = calculate_distance(query_vector, centroid)
             if distance is None:
                 raise ValueError("Method returned None")

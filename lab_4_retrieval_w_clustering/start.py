@@ -75,10 +75,10 @@ def main() -> None:
     for num in range(1, 15):
         clustering_search = ClusteringSearchEngine(db, n_clusters=num)
         print(clustering_search.calculate_square_sum())
-    # vector_tree_search = VectorDBTreeSearchEngine(db)
-    # print(vector_tree_search.retrieve_relevant_documents(query, 1))
-    # adv_vector_tree_search = VectorDBAdvancedSearchEngine(db)
-    # print(adv_vector_tree_search.retrieve_relevant_documents(query, 5))
+    vector_tree_search = VectorDBTreeSearchEngine(db)
+    print(vector_tree_search.retrieve_relevant_documents(query, 1))
+    adv_vector_tree_search = VectorDBAdvancedSearchEngine(db)
+    print(adv_vector_tree_search.retrieve_relevant_documents(query, 5))
     assert result, "Result is None"
 
 

@@ -80,7 +80,7 @@ def main() -> None:
         neighbours = method.retrieve_relevant_documents(query, 2)
         result.append(neighbours)
     print(result)
-    assert result, "Result is None"
+    assert result[0], "Result is None"
 
 
 if __name__ == "__main__":

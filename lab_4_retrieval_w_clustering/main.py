@@ -433,8 +433,8 @@ class KMeans:
             self.__clusters[closest_ind].add_document_index(vectors.index(vector))
 
         for cluster in self.__clusters:
-            vectors = [v for i, v in self._db.get_vectors(cluster.get_indices())]
-            new_centroid = [sum(x)/len(x) for x in zip(*vectors)]
+            cluster_vectors = [v for i, v in self._db.get_vectors(cluster.get_indices())]
+            new_centroid = [sum(x)/len(x) for x in zip(*cluster_vectors)]
             cluster.set_new_centroid(tuple(new_centroid))
         return self.__clusters
 

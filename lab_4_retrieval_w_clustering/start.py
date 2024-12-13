@@ -7,7 +7,9 @@ from lab_4_retrieval_w_clustering.main import (
     ClusteringSearchEngine,
     DocumentVectorDB,
     get_paragraphs,
+    VectorDBAdvancedSearchEngine,
     VectorDBSearchEngine,
+    VectorDBTreeSearchEngine,
 )
 
 
@@ -72,7 +74,15 @@ def main() -> None:
     result_2 = clustering_search.retrieve_relevant_documents(query, 5)
     print('ClusteringSearchEngine: ', result_2)
 
-    result = result_2
+    tree_search = VectorDBTreeSearchEngine(db)
+    result_3 = tree_search.retrieve_relevant_documents(query, 1)
+    print('VectorDBTreeSearchEngine: ', result_3)
+    print()
+
+    advanced_search = VectorDBAdvancedSearchEngine(db)
+    result_4 = advanced_search.retrieve_relevant_documents(query, 5)
+
+    result = result_4
 
     assert result, "Result is None"
 

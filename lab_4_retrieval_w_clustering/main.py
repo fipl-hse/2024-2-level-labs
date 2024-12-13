@@ -271,7 +271,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
         if neighbours is None:
             raise ValueError('_calculate_knn returned None')
         documents = self._db.get_raw_documents(tuple(pair[0] for pair in neighbours))
-        return [(distance, documents[index]) for index, distance in neighbours]
+        return [(distance[1], documents[index]) for index, distance in enumerate(neighbours)]
 
 
 class ClusterDTO:
@@ -559,6 +559,7 @@ class ClusteringSearchEngine:
         """
         self._db = db
         self.__algo = KMeans(db, n_clusters)
+        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -656,7 +657,10 @@ class VectorDBEngine:
         if not isinstance(query, str) or not query or \
                 not isinstance(n_neighbours, int) or n_neighbours <= 0:
             raise ValueError('Invalid arguments in retrieve_relevant_documents')
-        return self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
+        result = self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
+        if result is None:
+            raise ValueError('self._engine.retrieve_relevant_documents returned None')
+        return result
 
 
 class VectorDBTreeSearchEngine(VectorDBEngine):
@@ -671,7 +675,7 @@ class VectorDBTreeSearchEngine(VectorDBEngine):
         Args:
             db (DocumentVectorDB): An instance of DocumentVectorDB class.
         """
-        super().__init__(db, SearchEngine(db.get_vectorizer(), db.get_tokenizer()))
+        super().__init__(db, AdvancedSearchEngine(db.get_vectorizer(), db.get_tokenizer()))
         self._engine.index_documents(db.get_raw_documents())
 
 

@@ -4,9 +4,12 @@ Laboratory Work #4 starter.
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from lab_4_retrieval_w_clustering.main import (
+    ClusteringSearchEngine,
     DocumentVectorDB,
     get_paragraphs,
     VectorDBAdvancedSearchEngine,
+    VectorDBSearchEngine,
+    VectorDBTreeSearchEngine,
 )
 
 
@@ -61,6 +64,19 @@ def main() -> None:
     db.put_corpus(paragraphs)
 
     query = "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления"
+
+    clustering_search_engine = ClusteringSearchEngine(db)
+    clustering_search_engine_result = clustering_search_engine.retrieve_relevant_documents(query, 5)
+    print('ClusteringSearchEngine:', clustering_search_engine_result)
+
+    vector_search_engine = VectorDBSearchEngine(db)
+    vector_search_engine_result = vector_search_engine.retrieve_relevant_documents(query, 3)
+    print('VectorDBSearchEngine:', vector_search_engine_result)
+
+    vector_tree_engine = VectorDBTreeSearchEngine(db)
+    vector_tree_engine_result = vector_tree_engine.retrieve_relevant_documents(query, 3)
+    print('VectorDBTreeSearchEngine', vector_tree_engine_result)
+
     vector_search_advanced = VectorDBAdvancedSearchEngine(db)
     vector_search_advanced_relevant_documents = vector_search_advanced.retrieve_relevant_documents(
         query, 5)

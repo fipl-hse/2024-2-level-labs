@@ -50,19 +50,17 @@ def main() -> None:
     """
     Launch an implementation.
     """
+    documents, stopwords = open_files()
+    doc = ''.join(documents)
+    corpus = get_paragraphs(doc)
+    corpus.pop(-1)
+    db_doc = DocumentVectorDB(stopwords)
+    db_doc.put_corpus(corpus)
+    vect = VectorDBSearchEngine(db_doc)
     query = 'Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления'
-    pars = get_paragraphs(''.join(open_files()[0]))
-
-    db = DocumentVectorDB(open_files()[1])
-    db.put_corpus(pars)
-
-    engine = VectorDBSearchEngine(db)
-
-    result = engine.retrieve_relevant_documents(query, 3)
+    result = vect.retrieve_relevant_documents(query, 3)
 
     assert result, "Result is None"
-
-
 
 if __name__ == "__main__":
     main()

@@ -13,6 +13,7 @@ from lab_3_ann_retriever.main import (
     Vector,
     Vectorizer,
 )
+import copy
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -407,9 +408,10 @@ class KMeans:
         first_n_centroids = self._db.get_vectors()[:self._n_clusters]
         for centroid in first_n_centroids:
             self.__clusters.append(ClusterDTO(centroid[1]))
-        self.run_single_train_iteration()
+        new_cls = self.run_single_train_iteration()
         while not self._is_convergence_reached(self.__clusters):
             self.run_single_train_iteration()
+        self.__clusters = new_cls
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -421,27 +423,28 @@ class KMeans:
         Returns:
             list[ClusterDTO]: List of clusters.
         """
+        self_clusters_copy = copy.deepcopy(self.__clusters)
         new_centroids = []
-        for every_cluster in self.__clusters:
+        for every_cluster in self_clusters_copy:
             every_cluster.erase_indices()
             new_centroids.append(every_cluster.get_centroid())
 
-        for index, vector_tuple in self._db.get_vectors():
+        for t_ind_vec in self._db.get_vectors():
             distances = []
             for centroid in new_centroids:
-                dist_between_vec_from_db_to_centroid_of_cluster = calculate_distance(vector_tuple,
-                                                                                     centroid)
+                dist_between_vec_from_db_to_centroid_of_cluster = calculate_distance(centroid,
+                                                                                     t_ind_vec[1])
                 if dist_between_vec_from_db_to_centroid_of_cluster is None:
                     raise ValueError('calculate_distance() returned None')
                 distances.append(dist_between_vec_from_db_to_centroid_of_cluster)
-            self.__clusters[distances.index(min(distances))].add_document_index(index)
+            self_clusters_copy[distances.index(min(distances))].add_document_index(t_ind_vec[0])
 
-        for cluster in self.__clusters:
+        for cluster in self_clusters_copy:
             current_vectors = [self._db.get_vectors()[index][-1] for index in cluster.get_indices()]
             cluster.set_new_centroid(tuple(sum(row) / len(current_vectors) for row
                                            in zip(*current_vectors)))
 
-        return self.__clusters
+        return self_clusters_copy
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -475,11 +478,9 @@ class KMeans:
 
         chosen_cluster = self.__clusters[
             dist_between_q_vec_and_cluster.index(min(dist_between_q_vec_and_cluster))]
-        if chosen_cluster is None:
-            raise ValueError('chosen_cluster is None')
 
-        if chosen_cluster.get_indices() is None:
-            raise ValueError('get_indices() returned None')
+        if not chosen_cluster.get_centroid():
+            chosen_cluster = self.__clusters[0]
         final_list = []
         for vec_index, vec in self._db.get_vectors(chosen_cluster.get_indices()):
             distance_again = calculate_distance(query_vector, vec)

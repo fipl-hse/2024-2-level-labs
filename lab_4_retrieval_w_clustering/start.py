@@ -69,9 +69,6 @@ def main() -> None:
     vector_db_search = VectorDBSearchEngine(db)
     clustering_search = ClusteringSearchEngine(db)
     clustering_search.make_report(5, 'assets/report.json')
-    with open('assets/report.json', 'r', encoding='utf-8') as document:
-        result_after_12_steps = json.load(document)
-    print('Clusters info: ', result_after_12_steps)
     sse = []
     for num in range(1, 15):
         clustering_search = ClusteringSearchEngine(db, n_clusters=num)

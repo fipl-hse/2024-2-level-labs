@@ -28,7 +28,7 @@ def get_paragraphs(text: str) -> list[str]:
         list[str]: Paragraphs from document.
     """
     if not text:
-        raise ValueError
+        raise ValueError("Text argument is empty")
     return [line for line in text.split('\n') if line]
 
 
@@ -60,7 +60,7 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_corpus or not isinstance(tokenized_corpus, list)\
                 or not all(isinstance(paragraph, list) for paragraph in tokenized_corpus):
-            raise ValueError
+            raise ValueError("Corpus argument is empty or invalid")
         self._corpus = tokenized_corpus
         self._avg_doc_len = sum(len(paragraph) for paragraph in self._corpus) / len(self._corpus)
 
@@ -81,7 +81,7 @@ class BM25Vectorizer(Vectorizer):
         """
         if not tokenized_document or not isinstance(tokenized_document, list)\
                 or not all(isinstance(doc, str) for doc in tokenized_document):
-            raise ValueError
+            raise ValueError("Document argument is empty or invalid")
         vector = self._calculate_bm25(tokenized_document)
         if not vector:
             raise ValueError
@@ -101,7 +101,7 @@ class BM25Vectorizer(Vectorizer):
             Vector: BM25 vector for document.
         """
         if not isinstance(tokenized_document, list):
-            raise ValueError
+            raise ValueError("Invalid argument")
         bm25vector = [0.0] * len(self._vocabulary)
         bm25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values,\
                               1.5, 0.75, self._avg_doc_len, len(tokenized_document))
@@ -145,7 +145,7 @@ class DocumentVectorDB:
                 or if methods used return None.
         """
         if not corpus or not isinstance(corpus, list):
-            raise ValueError
+            raise ValueError("Corpus argument is empty or invalid")
 
         tokenized_texts = []
         for text in corpus:
@@ -154,7 +154,7 @@ class DocumentVectorDB:
                 tokenized_texts.append(tokenized_text)
                 self.__documents.append(text)
         if not tokenized_texts:
-            raise ValueError
+            raise ValueError("Texts argument is empty")
         self._vectorizer.set_tokenized_corpus(tokenized_texts)
         self._vectorizer.build()
         for index, doc in enumerate(tokenized_texts):
@@ -247,7 +247,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
             list[tuple[float, str]]: Relevant documents with their distances.
         """
         if not query or not isinstance(query, str) or not isinstance(n_neighbours, int) or n_neighbours <= 0:
-            raise ValueError
+            raise ValueError("Query and n_neighbours arguments are empty or invalid")
         tokenized_query = self._db.get_tokenizer().tokenize(query)
 
         vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)

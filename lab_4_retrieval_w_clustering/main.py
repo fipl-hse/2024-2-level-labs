@@ -497,15 +497,15 @@ class KMeans:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
-        result = []
+        result = 0.0
         for cluster in self.__clusters:
             centroid = cluster.get_centroid()
             vectors = self._db.get_vectors(cluster.get_indices())
-            sums_vectors_centroid = []
+            sums_vectors_centroid = 0.0
             for vector in vectors:
-                sums_vectors_centroid.append(sum((x - y) ** 2 for x, y in zip(vector[1], centroid)))
-            result.append(sum(sums_vectors_centroid))
-        return sum(result)
+                sums_vectors_centroid += (sum((x - y) ** 2 for x, y in zip(vector[1], centroid)))
+            result += sums_vectors_centroid
+        return result
 
     def _is_convergence_reached(
         self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
@@ -556,6 +556,7 @@ class ClusteringSearchEngine:
         """
         self._db = db
         self.__algo = KMeans(self._db, n_clusters)
+        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -583,7 +584,6 @@ class ClusteringSearchEngine:
         vector_query = self._db.get_vectorizer().vectorize(tokenized_query)
         if vector_query is None:
             raise ValueError('The method returned None')
-        self.__algo.train()
         most_relevant = self.__algo.infer(vector_query, n_neighbours)
         if most_relevant is None:
             raise ValueError('The method returned None')

@@ -431,12 +431,10 @@ class KMeans:
                 distances.append((distance, centroids.index(centroid)))
             closest_ind = min(distances)[1]
             self.__clusters[closest_ind].add_document_index(vectors.index(vector))
+
         for cluster in self.__clusters:
-            cluster_vectors = []
-            for ind in cluster.get_indices():
-                cluster_vectors.append(vectors[ind][1])
-            new_centroid = [sum(vector[i] for i in range(len(vector))) /
-                            len(cluster_vectors) for vector in cluster_vectors]
+            vectors = [v for i, v in self._db.get_vectors(cluster.get_indices())]
+            new_centroid = [sum(x)/len(x) for x in zip(*vectors)]
             cluster.set_new_centroid(tuple(new_centroid))
         return self.__clusters
 

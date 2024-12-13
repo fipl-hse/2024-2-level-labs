@@ -276,54 +276,30 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Returns:
             list[tuple[float, str]]: Relevant documents with their distances.
         """
-        if (not isinstance(query, str) or not query
-                or not isinstance(n_neighbours, int) or n_neighbours <= 0):
-            raise ValueError("Oops! Invalid input")
-        tokenized_query = self._db.get_tokenizer().tokenize(query)
-        if tokenized_query is None or not tokenized_query:
-            raise ValueError("Oops! Something's not ok")
-        query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
-        if query_vector is None or not query_vector:
-            raise ValueError("Oops! Something's not ok")
-        vectors = [index[1] for index in self._db.get_vectors()]
-        if query_vector is None:
-            raise ValueError("Oops! It' empty")
+        if (not query or
+                not isinstance(query, str) or
+                not isinstance(n_neighbours, int) or
+                n_neighbours <= 0):
+            raise ValueError(f'Incorrect value: "{query}" is not a string, empty, '
+                             f'is None or is zero or '
+                             f'"{n_neighbours}" is not an integer, '
+                             f'is zero or is less than zero.')
+        tokenized_query = self._tokenizer.tokenize(query)
+        if not tokenized_query:
+            raise ValueError(f'Incorrect value: "{tokenized_query}" is empty, '
+                             f'is None or is zero.')
+        query_vector = self._vectorizer.vectorize(tokenized_query)
+        if not query_vector:
+            raise ValueError(f'Incorrect value: "{query_vector}" is empty, '
+                             f'is None or is zero.')
+        vectors = [vector_data[1] for vector_data in self._db.get_vectors()]
         neighbours = self._calculate_knn(query_vector, vectors, n_neighbours)
         if not neighbours:
-            raise ValueError("Oops! Something's not ok")
-        relevant_documents = (self._db.get_raw_documents
-                              (tuple(neighbor[0] for neighbor in neighbours)))
-        return [(neighbor[-1], relevant_documents[index])
-                for index, neighbor in enumerate(neighbours)]
-        # if (not query or
-        #         not isinstance(query, str) or
-        #         not isinstance(n_neighbours, int) or
-        #         n_neighbours <= 0):
-        #     raise ValueError(f'Incorrect value: "{query}" is not a string, empty, '
-        #                      f'is None or is zero or '
-        #                      f'"{n_neighbours}" is not an integer, '
-        #                      f'is zero or is less than zero.')
-        #
-        # tokenized_query = self._tokenizer.tokenize(query)
-        # if not tokenized_query:
-        #     raise ValueError(f'Incorrect value: "{tokenized_query}" is empty, '
-        #                      f'is None or is zero.')
-        #
-        # query_vector = self._vectorizer.vectorize(tokenized_query)
-        # if not query_vector:
-        #     raise ValueError(f'Incorrect value: "{query_vector}" is empty, '
-        #                      f'is None or is zero.')
-        #
-        # vectors = [vector_data[1] for vector_data in self._db.get_vectors()]
-        # neighbours = self._calculate_knn(query_vector, vectors, n_neighbours)
-        # if not neighbours:
-        #     raise ValueError(f'Incorrect value: "{neighbours}" is empty, '
-        #                      f'is None or is zero.')
-        #
-        # relevant_documents = self._db.get_raw_documents(
-        #                                     tuple(neighbor[0] for neighbor in neighbours))
-        # return [(neighbor[-1], relevant_documents[index])
-        #         for index, neighbor in enumerate(neighbours)]
+            raise ValueError(f'Incorrect value: "{neighbours}" is empty, '
+                             f'is None or is zero.')
+        relevant_documents = self._db.get_raw_documents(
+            tuple(neighbor[0] for neighbor in neighbours))
+        return [(neighbor[1], relevant_documents[neighbor[0]]) for neighbor in neighbours]
 
 
 class ClusterDTO:

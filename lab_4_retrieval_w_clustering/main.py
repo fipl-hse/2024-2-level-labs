@@ -398,6 +398,7 @@ class KMeans:
             new_clusters = self.run_single_train_iteration()
             if self._is_convergence_reached(new_clusters):
                 break
+            self.__clusters = new_clusters
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -409,19 +410,20 @@ class KMeans:
         Returns:
             list[ClusterDTO]: List of clusters.
         """
-        for cluster in self.__clusters:
+        clusters_copy = self.__clusters.copy()
+        for cluster in clusters_copy:
             cluster.erase_indices()
         db_vectors = self._db.get_vectors()
         for index, vector in db_vectors:
             distance_list = []
-            for cluster_index, cluster in enumerate(self.__clusters):
+            for cluster_index, cluster in enumerate(clusters_copy):
                 centroid_distance = calculate_distance(cluster.get_centroid(), vector)
                 if not isinstance(centroid_distance, float):
                     raise ValueError("Failed to calculate the distance to the centroid")
                 distance_list.append((cluster_index, centroid_distance))
             min_distance_index = min(distance_list, key=lambda a: a[1])[0]
-            self.__clusters[min_distance_index].add_document_index(index)
-        for cluster in self.__clusters:
+            clusters_copy[min_distance_index].add_document_index(index)
+        for cluster in clusters_copy:
             vector_sums = [0.0] * len(cluster.get_centroid())
             vectors_from_indices = self._db.get_vectors(cluster.get_indices())
             for pair in vectors_from_indices:
@@ -433,7 +435,7 @@ class KMeans:
                            if len(vectors_from_indices) > 0
                            else tuple(vector_sums))
             cluster.set_new_centroid(mean_vector)
-        return self.__clusters
+        return clusters_copy
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """

@@ -233,15 +233,12 @@ class KMeansTest(unittest.TestCase):
         self.kmeans.train()
         query_vector = (0.5, 0.5)
         n_neighbours = 2
-        for cluster in self.kmeans._KMeans__clusters:
-            setattr(cluster, "_ClusterDTO__centroid", 0)
+        for cluster in self.kmeans._KMeans__clusters[1:]:
+            setattr(cluster, "_ClusterDTO__centroid", None)
 
-        with patch(
-            "lab_4_retrieval_w_clustering.main.calculate_distance", side_effect=[0.3, 0.1, 0.9, 0.1]
-        ):
-            result = self.kmeans.infer(query_vector, n_neighbours)
+        result = self.kmeans.infer(query_vector, n_neighbours)
 
-        expected_vectors = [0.1, 0.9]
+        expected_vectors = [0.7071067811865476, 0.7071067811865476]
         expected_ids = [0, 2]
         for idx, pair in enumerate(result):
             self.assertEqual(expected_ids[idx], pair[1])

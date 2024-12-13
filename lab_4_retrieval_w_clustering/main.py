@@ -257,16 +257,15 @@ class VectorDBSearchEngine(BasicSearchEngine):
 
         tokenized_query = self._db.get_tokenizer().tokenize(query)
         vectorized_query = self._db.get_vectorizer().vectorize(tokenized_query)
-        vector_docs = [el[1] for el in self._db.get_vectors()]
-
-        relevant = self._calculate_knn(vectorized_query,vector_docs, n_neighbours)
+        vectors = [item[1] for item in self._db.get_vectors()]
+        relevant = self._calculate_knn(vectorized_query, vectors, n_neighbours)
         if not relevant:
             raise ValueError
-        ind = tuple([item[0] for item in relevant])
-        doc = self._db.get_raw_documents(ind)
-        result = []
-        for ind, vector in enumerate(relevant):
-            result.append((vector[0], doc[ind]))
+
+        ind = tuple([doc_data[0] for doc_data in relevant])
+        docs = self._db.get_raw_documents(ind)
+        result = [(distance[-1], docs[ind]) for ind, distance in enumerate(relevant)]
+
         return result
 
 

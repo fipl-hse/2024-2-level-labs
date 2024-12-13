@@ -534,7 +534,7 @@ class KMeans:
             cluster_vecs = [used_vectors[i][1] for i in used_indices]
             square_sum += sum(
                 sum((used_centroid[i]) ** 2 for i in range(len(used_centroid)))
-                for vec in cluster_vecs
+                for _ in cluster_vecs
             )
         return square_sum
 

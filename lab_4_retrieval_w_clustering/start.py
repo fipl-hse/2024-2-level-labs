@@ -68,19 +68,17 @@ def main() -> None:
     vectordb_search_engine = VectorDBSearchEngine(db)
     search_engine_result = vectordb_search_engine.retrieve_relevant_documents(query, 5)
     print(f"Result returned by SearchEngine: {search_engine_result}\n")
-    for num in range(1, 15):
-        clustering_search = ClusteringSearchEngine(db, n_clusters=num)
-        sse = clustering_search.calculate_square_sum()
-        print(f"SSE: {sse}\n")
-    """clustering_search_result = clustering_search.retrieve_relevant_documents(query, 5)
+    clustering_search = ClusteringSearchEngine(db)
+    sse = clustering_search.calculate_square_sum()
+    print(f"SSE: {sse}\n")
+    clustering_search_result = clustering_search.retrieve_relevant_documents(query, 5)
     print(f"Result returned by ClusteringSearch: {clustering_search_result}\n")
     clustering_search.make_report(7, 'assets/report.json')
     vectordb_tree_search = VectorDBTreeSearchEngine(db)
     tree_search = vectordb_tree_search.retrieve_relevant_documents(query, 1)
     print(f"Result returned by TreeSearchEngine: {tree_search}\n")
     vectordb_advanced_search = VectorDBAdvancedSearchEngine(db)
-    result = vectordb_advanced_search.retrieve_relevant_documents(query, 5)"""
-    result = 1
+    result = vectordb_advanced_search.retrieve_relevant_documents(query, 5)
     print(f"Result returned by AdvancedSearchEngine: {result}\n")
     assert result, "Result is None"
 

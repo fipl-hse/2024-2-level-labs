@@ -1,6 +1,7 @@
 """
 Laboratory Work #4 starter.
 """
+import json
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
 from lab_4_retrieval_w_clustering.main import (
@@ -72,9 +73,16 @@ def main() -> None:
 
     clustering_search = ClusteringSearchEngine(db)
     result_2 = clustering_search.retrieve_relevant_documents(query, 5)
-    clustering_search.make_report(3, './assets/report.json')
-    print('VectorDBSearchEngine: ', result_2)
+    print('ClusteringSearchEngine: ', result_2)
+
+    clustering_search.make_report(5, './assets/report.json')
+    with open("assets/report.json", "r", encoding="UTF-8") as file:
+        report = json.load(file)
+    print('ClusteringSearchEngine - report: ', report)
     print()
+    for i in range(1, 15):
+        clustering_search = ClusteringSearchEngine(db, n_clusters=i)
+        print(clustering_search.calculate_square_sum())
 
     tree_search = VectorDBTreeSearchEngine(db)
     result_3 = tree_search.retrieve_relevant_documents(query, 1)

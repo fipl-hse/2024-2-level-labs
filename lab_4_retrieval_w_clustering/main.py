@@ -265,8 +265,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         ind = tuple([item[0] for item in relevant])
         doc = self._db.get_raw_documents(ind)
         result = []
-        for ind, vector in relevant:
-            result.append((vector, doc[ind]))
+        for ind, vector in enumerate(relevant):
+            result.append((vector[0], doc[ind]))
         return result
 
 

@@ -3,6 +3,7 @@ Lab 4.
 
 Vector search with clusterization
 """
+import copy
 import json
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
@@ -305,7 +306,12 @@ class VectorDBSearchEngine(BasicSearchEngine):
 
         relevant_documents = self._db.get_raw_documents(
                                             tuple(neighbor[0] for neighbor in neighbours))
-        return [(neighbor[1], relevant_documents[neighbor[0]]) for neighbor in neighbours]
+        relevant_documents_with_distances = []
+        for neighbor in neighbours:
+            neighbor_1 = neighbor[1]
+            doc_neighbour = relevant_documents[neighbor[0]]
+            relevant_documents.append(tuple(neighbor_1, doc_neighbour))
+        return relevant_documents_with_distances
 
 
 class ClusterDTO:
@@ -377,9 +383,7 @@ class ClusterDTO:
             ValueError: In case of inappropriate type input arguments,
                 or if input arguments are empty.
         """
-        if (not index or
-                not isinstance(index, int) or
-                index < 0):
+        if (not isinstance(index, int) or index < 0):
             raise ValueError(f'Incorrect value: "{index}" is empty, is None, '
                              f'is not an integer or is less than zero.')
 
@@ -431,9 +435,10 @@ class KMeans:
 
         self.__clusters = [ClusterDTO(vector[1]) for vector in vectors]
         while True:
-            prev_centroids = self.run_single_train_iteration()
-            if self._is_convergence_reached(prev_centroids):
+            new_centroids = self.run_single_train_iteration()
+            if self._is_convergence_reached(new_centroids):
                 break
+            self.__clusters = new_centroids
 
     def run_single_train_iteration(self) -> list[ClusterDTO]:
         """
@@ -446,10 +451,10 @@ class KMeans:
             list[ClusterDTO]: List of clusters.
         """
         centroids = []
+        new_centroids = copy.deepcopy(self.__clusters)
         for cluster in self.__clusters:
             cluster.erase_indices()
             centroids.append(cluster.get_centroid())
-
         vectors = self._db.get_vectors()
         for vector in vectors:
             distances_to_centroids = []
@@ -461,15 +466,15 @@ class KMeans:
                 distances_to_centroids.append((distance, centroids.index(centroid)))
 
             min_cluster_index = min(distances_to_centroids)[1]
-            self.__clusters[min_cluster_index].add_document_index(vectors.index(vector))
+            new_centroids[min_cluster_index].add_document_index(vectors.index(vector))
 
-        for cluster in self.__clusters:
+        for cluster in new_centroids:
             cluster_vectors = [vectors[index][1] for index in cluster.get_indices()]
             new_centroid = [sum(coord[i] for i in range(len(coord))) / len(cluster_vectors)
                             for coord in cluster_vectors]
             cluster.set_new_centroid(tuple(new_centroid))
 
-        return self.__clusters
+        return new_centroids
 
     def infer(self, query_vector: Vector, n_neighbours: int) -> list[tuple[float, int]]:
         """
@@ -535,40 +540,6 @@ class KMeans:
         Returns:
             list[dict[str, int| list[str]]]: List with information about each cluster
         """
-        if not isinstance(num_examples, int) or num_examples <= 0:
-            raise ValueError(f'Incorrect value: "{num_examples}" is not an integer, '
-                             f'is zero or is less than zero.')
-        if not self.__clusters:
-            return []
-
-        clusters_info = []
-        for cluster_id, cluster in enumerate(self.__clusters):
-            cluster_indices = cluster.get_indices()
-            if not cluster_indices:
-                continue
-
-            distances = []
-            for idx in cluster_indices:
-                vector_data = self._db.get_vectors()[idx]
-                vector_id = vector_data[0]
-                vector = vector_data[-1]
-                if not isinstance(vector, tuple):
-                    continue
-
-                distance = calculate_distance(cluster.get_centroid(), vector)
-                if distance is None:
-                    raise ValueError(f'Incorrect value: "{distance}" is empty, '
-                                     f'is None or is zero.')
-                distances.append((distance, vector_id))
-
-            distances = sorted(distances, key=lambda x: x[0])[:num_examples]
-            indices = [tup[1] for tup in distances]
-            docs = self._db.get_raw_documents(tuple(indices))
-            another_info = {}
-            if isinstance(cluster_id, int) and isinstance(docs, list):
-                another_info.update(cluster_id=cluster_id, documents=docs)
-            clusters_info.append(another_info)
-        return clusters_info
 
     def calculate_square_sum(self) -> float:
         """
@@ -577,16 +548,6 @@ class KMeans:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
-        total_sse = 0.0
-        vectors = self._db.get_vectors()
-        for cluster in self.__clusters:
-            centroid = cluster.get_centroid()
-            cluster_indices = cluster.get_indices()
-            cluster_vectors = [vectors[idx][1] for idx in cluster_indices]
-            sse = sum(sum((centroid[i] - vector[i]) ** 2 for
-                          i in range(len(centroid))) for vector in cluster_vectors)
-            total_sse += sse
-        return total_sse
 
     def _is_convergence_reached(
         self, new_clusters: list[ClusterDTO], threshold: float = 1e-07
@@ -704,9 +665,6 @@ class ClusteringSearchEngine:
             num_examples (int): number of examples for each cluster
             output_path (str): path to output file
         """
-        clusters_info = self.__algo.get_clusters_info(num_examples)
-        with open(output_path, "w", encoding="utf-8") as file:
-            json.dump(clusters_info, file)
 
     def calculate_square_sum(self) -> float:
         """
@@ -715,7 +673,6 @@ class ClusteringSearchEngine:
         Returns:
             float: Sum of squares of distance from vector of clusters to centroid.
         """
-        return self.__algo.calculate_square_sum()
 
 
 class VectorDBEngine:

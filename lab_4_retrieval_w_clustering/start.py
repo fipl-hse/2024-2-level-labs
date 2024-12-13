@@ -65,7 +65,7 @@ def main() -> None:
     db.put_corpus(paragraphs)
     vector_db_search = VectorDBSearchEngine(db)
     clustering_search = ClusteringSearchEngine(db)
-    clustering_search.make_report(2, 'assets/report.json')
+
     sse = []
     for num in range(1, 3):
         clustering_search = ClusteringSearchEngine(db, n_clusters=num)

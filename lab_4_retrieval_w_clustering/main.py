@@ -3,8 +3,6 @@ Lab 4.
 
 Vector search with clusterization
 """
-import copy
-
 from lab_2_retrieval_w_bm25.main import calculate_bm25, calculate_idf
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
@@ -305,10 +303,7 @@ class VectorDBSearchEngine(BasicSearchEngine):
 
         relevant_documents = self._db.get_raw_documents(
                                             tuple(neighbor[0] for neighbor in neighbours))
-        relevant_documents_with_distances = []
-        for neighbor in neighbours:
-            relevant_documents_with_distances.append((neighbor[1], relevant_documents[neighbor[0]]))
-        return relevant_documents_with_distances
+        return [(neighbor[-1], relevant_documents[index]) for index, neighbor in enumerate(neighbours)]
 
 
 class ClusterDTO:

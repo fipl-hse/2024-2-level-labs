@@ -264,7 +264,10 @@ class VectorDBSearchEngine(BasicSearchEngine):
             raise ValueError
         ind = tuple([item[0] for item in relevant])
         doc = self._db.get_raw_documents(ind)
-        result = [(distance[-1], doc[ind]) for ind, distance in enumerate(relevant)]
+        result = []
+        for ind, vector in relevant:
+            result.append((vector, doc[ind]))
+        return result
 
 
 class ClusterDTO:

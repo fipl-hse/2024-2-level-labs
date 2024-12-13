@@ -66,18 +66,16 @@ def main() -> None:
     db.put_corpus(paragraphs)
     vector_db_search = VectorDBSearchEngine(db)
     clustering_search = ClusteringSearchEngine(db)
-    clustering_search.make_report(5, 'assets/report.json')
+    clustering_search.make_report(2, 'assets/report.json')
     sse = []
     for num in range(1, 3):
         clustering_search = ClusteringSearchEngine(db, n_clusters=num)
         sse.append(clustering_search.calculate_square_sum())
     vectordb_tree_search = VectorDBTreeSearchEngine(db)
-    vectordb_advanced_search = VectorDBAdvancedSearchEngine(db)
-    all_searches = [vector_db_search, clustering_search, vectordb_tree_search,
-                    vectordb_advanced_search]
+    all_searches = [vector_db_search, clustering_search, vectordb_tree_search]
     result = []
     for method in all_searches:
-        neighbours = method.retrieve_relevant_documents(query, 2)
+        neighbours = method.retrieve_relevant_documents(query, 1)
         result.append(neighbours)
     print(result)
     assert result[0], "Result is None"

@@ -251,8 +251,8 @@ class VectorDBSearchEngine(BasicSearchEngine):
         Args:
             db (DocumentVectorDB): Object of DocumentVectorDB class.
         """
+        super().__init__(db.get_vectorizer(), db.get_tokenizer())
         self._db = db
-        super().__init__(self._db.get_vectorizer(), self._db.get_tokenizer())
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -688,7 +688,7 @@ class ClusteringSearchEngine:
                              "output_path must be a string")
         data = self.__algo.get_clusters_info(num_examples)
         with open(output_path, "w", encoding='utf-8') as write_file:
-            json.dump(data, write_file)
+            json.dump(data, write_file, ensure_ascii=False, indent=4)
 
     def calculate_square_sum(self) -> float:
         """

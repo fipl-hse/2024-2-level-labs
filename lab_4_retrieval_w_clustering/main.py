@@ -45,7 +45,7 @@ class BM25Vectorizer(Vectorizer):
         """
         Initialize an instance of the BM25Vectorizer class.
         """
-        super().__init__(self._corpus)
+        super().__init__([])
         self._corpus = []
         self._avg_doc_len = -1.0
 
@@ -114,7 +114,6 @@ class BM25Vectorizer(Vectorizer):
         vector = [0.0] * len(self._vocabulary)
         avg_doc_len = self._avg_doc_len
         doc_len = len(tokenized_document)
-        print(self._vocabulary, tokenized_document, self._idf_values, avg_doc_len, doc_len)
         bm_25 = calculate_bm25(self._vocabulary, tokenized_document, self._idf_values, avg_doc_len=avg_doc_len,
                                doc_len=doc_len)
         for i, token in enumerate(self._vocabulary):

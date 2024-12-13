@@ -4,6 +4,8 @@ Laboratory Work #4 starter.
 
 
 # pylint:disable=duplicate-code, too-many-locals, too-many-statements, unused-variable
+import json
+
 from lab_4_retrieval_w_clustering.main import (
     ClusteringSearchEngine,
     DocumentVectorDB,
@@ -65,25 +67,24 @@ def main() -> None:
     db = DocumentVectorDB(stopwords)
     db.put_corpus(paragraphs)
     vector_db_search = VectorDBSearchEngine(db)
-    result_after_6_steps = vector_db_search.retrieve_relevant_documents(query, 3)
-    print('Vector DB Search result: ', result_after_6_steps)
     clustering_search = ClusteringSearchEngine(db)
-    result_after_9_steps = clustering_search.retrieve_relevant_documents(query, 5)
-    print('Clustering Search result: ', result_after_9_steps)
-    # clustering_search.make_report(5, 'assets/report.json')
-    # with open('assets/report.json', 'r', encoding='utf-8') as document:
-    #     result_after_12_steps = json.load(document)
-    # print('Clusters info: ', result_after_12_steps)
-    # sse = []
-    # for num in range(1, 15):
-    #     clustering_search = ClusteringSearchEngine(db, n_clusters=num)
-    #     sse.append(clustering_search.calculate_square_sum())
+    clustering_search.make_report(5, 'assets/report.json')
+    with open('assets/report.json', 'r', encoding='utf-8') as document:
+        result_after_12_steps = json.load(document)
+    print('Clusters info: ', result_after_12_steps)
+    sse = []
+    for num in range(1, 15):
+        clustering_search = ClusteringSearchEngine(db, n_clusters=num)
+        sse.append(clustering_search.calculate_square_sum())
     vectordb_tree_search = VectorDBTreeSearchEngine(db)
-    tree_search = vectordb_tree_search.retrieve_relevant_documents(query, 1)
-    print('Tree search result: ', tree_search)
     vectordb_advanced_search = VectorDBAdvancedSearchEngine(db)
-    result = vectordb_advanced_search.retrieve_relevant_documents(query, 5)
-    print('Vector DB Advanced Search result', result)
+    all_searches = [vector_db_search, clustering_search, vectordb_tree_search,
+                    vectordb_advanced_search]
+    result = []
+    for method in all_searches:
+        neighbours = method.retrieve_relevant_documents(query, 2)
+        result.append(neighbours)
+    print(result)
     assert result, "Result is None"
 
 

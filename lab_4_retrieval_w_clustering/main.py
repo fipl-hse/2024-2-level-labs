@@ -12,7 +12,6 @@ from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
     BasicSearchEngine,
     calculate_distance,
-    SearchEngine,
     Tokenizer,
     Vector,
     Vectorizer,
@@ -225,7 +224,11 @@ class DocumentVectorDB:
         if not isinstance(indices, tuple):
             raise ValueError('indices argument to get_raw_documents is not tuple')
 
-        return [self.__documents[index] for index in set(indices)]
+        documents = []
+        for index in indices:
+            if self.__documents[index] not in documents:
+                documents.append(self.__documents[index])
+        return documents
 
 
 class VectorDBSearchEngine(BasicSearchEngine):
@@ -657,10 +660,7 @@ class VectorDBEngine:
         if not isinstance(query, str) or not query or \
                 not isinstance(n_neighbours, int) or n_neighbours <= 0:
             raise ValueError('Invalid arguments in retrieve_relevant_documents')
-        result = self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
-        if result is None:
-            raise ValueError('self._engine.retrieve_relevant_documents returned None')
-        return result
+        return self._engine.retrieve_relevant_documents(query, n_neighbours=n_neighbours)
 
 
 class VectorDBTreeSearchEngine(VectorDBEngine):

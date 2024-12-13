@@ -217,10 +217,16 @@ class DocumentVectorDB:
         Returns:
             Corpus: List of documents.
         """
-        if not indices:
+        if indices is None:
             return self.__documents
 
-        return [item for item in self.__documents if self.__documents.index(item) in indices]
+        docs = []
+
+        for ind in indices:
+            if self.__documents[ind] not in docs:
+                docs.append(self.__documents[ind])
+
+        return docs
 
 
 class VectorDBSearchEngine(BasicSearchEngine):

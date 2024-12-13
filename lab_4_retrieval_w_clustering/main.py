@@ -3,12 +3,17 @@ Lab 4.
 
 Vector search with clusterization
 """
-from astroid import Raise
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 
 from lab_2_retrieval_w_bm25.main import calculate_bm25
-from lab_3_ann_retriever.main import BasicSearchEngine, Tokenizer, Vector, Vectorizer, calculate_distance
+from lab_3_ann_retriever.main import (
+    BasicSearchEngine,
+    calculate_distance,
+    Tokenizer,
+    Vector,
+    Vectorizer,
+)
 
 Corpus = list[str]
 "Type alias for corpus of texts."
@@ -497,34 +502,63 @@ class KMeans:
         Returns:
             list[tuple[float, int]]: Distance to relevant document and document index.
         """
-        if not query_vector or not isinstance(query_vector, tuple) or n_neighbours < 0:
-            raise ValueError('Problem(-s) with arguments')
-        if query_vector is None:
-            raise ValueError('Query is None')
+        # if not query_vector or not isinstance(query_vector, tuple) or n_neighbours < 0:
+        #     raise ValueError('Problem(-s) with arguments')
+        # if query_vector is None:
+        #     raise ValueError('Query is None')
+        #
+        # dist_to_cluster = []
+        # for cluster in self.__clusters:
+        #     if cluster.get_centroid() is None:
+        #         continue
+        #     dist = calculate_distance(query_vector, cluster.get_centroid())
+        #     if dist is None:
+        #         raise ValueError('1-st distance is None')
+        #     dist_to_cluster.append(dist)
+        #
+        # close_cluster = self.__clusters[dist_to_cluster.index(min(dist_to_cluster))]
+        #
+        # if close_cluster is None:
+        #     raise ValueError('No closest cluster')
+        #
+        # if close_cluster.get_indices() is None:
+        #     raise ValueError('Get indices return None')
+        #
+        # res = []
+        # for ind, val in self._db.get_vectors(close_cluster.get_indices()):
+        #     final_dist = calculate_distance(query_vector, val)
+        #     if final_dist is None:
+        #         raise ValueError('Distance between query and vector in None')
+        #     res.append((final_dist, ind))
 
-        dist_to_cluster = []
+        if not query_vector or not n_neighbours or\
+                not isinstance(query_vector, tuple) or not isinstance(n_neighbours, int):
+            raise ValueError('Wrong type arguments or empty arguments')
+        distances = []
         for cluster in self.__clusters:
             if cluster.get_centroid() is None:
                 continue
-            dist = calculate_distance(query_vector, cluster.get_centroid())
-            if dist is None:
-                raise ValueError('1-st distance is None')
-            dist_to_cluster.append(dist)
-
-        close_cluster = self.__clusters[dist_to_cluster.index(min(dist_to_cluster))]
-
-        if close_cluster is None:
-            raise ValueError('No closest cluster')
-
-        if close_cluster.get_indices() is None:
-            raise ValueError('Get indices return None')
-
-        res = []
-        for ind, val in self._db.get_vectors(close_cluster.get_indices()):
-            final_dist = calculate_distance(query_vector, val)
-            if final_dist is None:
-                raise ValueError('Distance between query and vector in None')
-            res.append((final_dist, ind))
+            distance = calculate_distance(query_vector, cluster.get_centroid())
+            if distance is None:
+                raise ValueError('Distance is NoneType')
+            distances.append(distance)
+        near_cluster = self.__clusters[distances.index(min(distances))]
+        if not near_cluster.get_centroid():
+            near_cluster = self.__clusters[0]
+        indices = near_cluster.get_indices()
+        if indices is None:
+            raise ValueError('Indices are NoneType')
+        cl_vectors = self._db.get_vectors(indices)
+        if cl_vectors is None:
+            raise ValueError('Cluster vectors are NoneType')
+        n_distances = []
+        for i, vector in cl_vectors:
+            distance = calculate_distance(query_vector, vector)
+            if distance is None:
+                raise ValueError('Distance is NoneType')
+            n_distances.append((distance, i))
+        n_distances.sort(key=lambda x: x[0])
+        return n_distances[:n_neighbours]
 
     def get_clusters_info(self, num_examples: int) -> list[dict[str, int | list[str]]]:
         """

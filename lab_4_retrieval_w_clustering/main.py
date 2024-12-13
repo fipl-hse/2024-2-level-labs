@@ -3,8 +3,8 @@ Lab 4.
 
 Vector search with clusterization
 """
+# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from json import dump
-
 from lab_2_retrieval_w_bm25.main import calculate_bm25
 from lab_3_ann_retriever.main import (
     AdvancedSearchEngine,
@@ -15,8 +15,6 @@ from lab_3_ann_retriever.main import (
     Vector,
     Vectorizer,
 )
-
-# pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 
 
 Corpus = list[str]
@@ -564,6 +562,7 @@ class ClusteringSearchEngine:
             raise ValueError('Invalid database/n_clusters input')
         self._db = db
         self.__algo = KMeans(db, n_clusters)
+        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -591,7 +590,6 @@ class ClusteringSearchEngine:
         query_vector = self._db.get_vectorizer().vectorize(tokenized_query)
         if not query_vector:
             raise ValueError('Could not vectorize the query')
-        self.__algo.train()
         relevant_distances = self.__algo.infer(query_vector, n_neighbours)
         if not relevant_distances:
             raise ValueError('Could not find close documents')

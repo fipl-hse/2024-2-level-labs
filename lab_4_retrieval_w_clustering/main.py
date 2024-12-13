@@ -6,7 +6,6 @@ Vector search with clusterization
 
 # pylint: disable=undefined-variable, too-few-public-methods, unused-argument, duplicate-code, unused-private-member, super-init-not-called
 from lab_2_retrieval_w_bm25.main import calculate_bm25
-
 from lab_3_ann_retriever.main import (
     BasicSearchEngine,
     calculate_distance,

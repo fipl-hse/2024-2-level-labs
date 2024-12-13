@@ -67,7 +67,7 @@ def main() -> None:
     clustering_search = ClusteringSearchEngine(db)
     clustering_result = clustering_search.retrieve_relevant_documents(query, 5)
     tree_search = VectorDBTreeSearchEngine(db)
-    tree_result = tree_search.retrieve_relevant_documents(query, 5)
+    tree_result = tree_search.retrieve_relevant_documents(query, 1)
     advanced_search = VectorDBAdvancedSearchEngine(db)
     result = advanced_search.retrieve_relevant_documents(query, 5)
     for i in range(1, 15):

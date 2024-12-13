@@ -554,6 +554,7 @@ class ClusteringSearchEngine:
         """
         self.__algo = KMeans(db, n_clusters)
         self._db = db
+        self.__algo.train()
 
     def retrieve_relevant_documents(self, query: str, n_neighbours: int) -> list[tuple[float, str]]:
         """
@@ -581,7 +582,6 @@ class ClusteringSearchEngine:
         query_vector = self._db.get_vectorizer().vectorize(query_tokens)
         if not query_vector:
             raise ValueError('Failed to vectorize query')
-        self.__algo.train()
         inference = self.__algo.infer(query_vector, n_neighbours)
         docs = self._db.get_raw_documents(tuple(ind for distance, ind in inference))
         return [(dist[0], docs[ind]) for ind, dist in enumerate(inference)]
@@ -598,7 +598,7 @@ class ClusteringSearchEngine:
             raise ValueError('Invalid input argument(s)')
         clusters_info = self.__algo.get_clusters_info(num_examples)
         with open(output_path, 'w', encoding='utf-8') as file:
-            dump(clusters_info, file, indent=4)
+            dump(clusters_info, file, indent=4, ensure_ascii=False)
 
     def calculate_square_sum(self) -> float:
         """

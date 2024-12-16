@@ -460,7 +460,7 @@ collections, itertools, а также сторонние модули.**
 текущего класса. Для того чтобы после обновления сохранить актуальную информацию
 о центроиде, реализуйте метод
 :py:meth:`lab_4_retrieval_w_clustering.main.ClusterDTO.set_new_centroid`,
-который изменяет текущее состояние атрибута ``self._centroid``.
+который изменяет текущее состояние атрибута ``self.__centroid``.
 
 .. note:: Если на вход подаётся пустой аргумент,
           то необходимо поднять исключение ``ValueError``.
@@ -788,6 +788,12 @@ collections, itertools, а также сторонние модули.**
                :py:meth:`lab_4_retrieval_w_clustering.main.ClusterDTO.get_indices` и
                :py:meth:`lab_4_retrieval_w_clustering.main.DocumentVectorDB.get_raw_documents`.
 
+Пример структурированной информации о кластерах сохранён в файле
+``"./assets/states/report_example.json"``,
+индекс кластера и документы, которые образуют данный кластер,
+можно найти по соответствующим ключам ``"cluster_id"``
+и ``"documents"``.
+
 Шаг 11.2. Сохранить отчёт в формате json
 """"""""""""""""""""""""""""""""""""""""
 
@@ -855,7 +861,7 @@ collections, itertools, а также сторонние модули.**
 :py:class:`lab_4_retrieval_w_clustering.main.VectorDBEngine`.
 
 При инициализации данного класса необходимо создать объект класса
-:py:class:`lab_3_ann_retriever.main.BasicSearchEngine` и проиндексировать
+:py:class:`lab_3_ann_retriever.main.SearchEngine` и проиндексировать
 все документы, используя векторную базу данных.
 
 .. important:: При инициализации необходимо вызвать методы:

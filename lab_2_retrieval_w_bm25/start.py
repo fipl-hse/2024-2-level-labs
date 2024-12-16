@@ -1,4 +1,3 @@
-
 """
 Laboratory Work #2 starter
 """

@@ -45,9 +45,9 @@ def remove_stopwords(tokens: list[str], stopwords: list[str]) -> list[str] | Non
     if not isinstance(tokens, list) or not all(isinstance(token, str) for token in tokens) or \
             not tokens:
         return None
-    # if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords) or \
-    #         not stopwords:
-    #     return None
+    if not isinstance(stopwords, list) or not all(isinstance(word, str) for word in stopwords) or \
+            not stopwords:
+        return None
 
     return [token for token in tokens if token not in stopwords]
 
@@ -250,3 +250,121 @@ def rank_documents(
     return sorted(result, reverse=True, key=lambda tuple_: tuple_[1])
 
 
+def calculate_bm25_with_cutoff(
+    vocab: list[str],
+    document: list[str],
+    idf_document: dict[str, float],
+    alpha: float,
+    k1: float = 1.5,
+    b: float = 0.75,
+    avg_doc_len: float | None = None,
+    doc_len: int | None = None,
+) -> dict[str, float] | None:
+    """
+    Calculate BM25 scores for a document with IDF cutoff.
+
+    Args:
+        vocab (list[str]): Vocabulary list.
+        document (list[str]): Tokenized document.
+        idf_document (dict[str, float]): Inverse document frequencies.
+        alpha (float): IDF cutoff threshold.
+        k1 (float): BM25 parameter.
+        b (float): BM25 parameter.
+        avg_doc_len (float | None): Average document length.
+        doc_len (int | None): Length of the document.
+
+    Returns:
+        dict[str, float] | None: Mapping from terms to their BM25 scores with cutoff applied.
+
+    In case of corrupt input arguments, None is returned.
+    """
+    if not vocab or not isinstance(vocab, list) or not all(isinstance(item, str) for item in vocab)\
+            or not document or not isinstance(document, list):
+        return None
+    if not all(isinstance(item, str) for item in document) or not idf_document \
+            or not isinstance(idf_document, dict) \
+            or not all(isinstance(key, str) for key in idf_document) \
+            or not all(isinstance(value, float) for value in idf_document.values()):
+        return None
+    if not isinstance(alpha, float) or not isinstance(k1, float) \
+            or not isinstance(b, float) or not isinstance(avg_doc_len, float):
+        return None
+    if not isinstance(doc_len, int) or isinstance(doc_len, bool) or doc_len < 0:
+        return None
+
+    bm25_with_cutoff = {}
+    for word in vocab:
+        if word in idf_document and idf_document[word] >= alpha:
+            word_count = document.count(word)
+            bm25_with_cutoff[word] = idf_document[word] * ((word_count * (k1 + 1)) / (
+                    word_count + k1 * (1 - b + (b * doc_len / avg_doc_len))))
+    return bm25_with_cutoff
+
+
+def save_index(index: list[dict[str, float]], file_path: str) -> None:
+    """
+    Save the index to a file.
+
+    Args:
+        index (list[dict[str, float]]): The index to save.
+        file_path (str): The path to the file where the index will be saved.
+    """
+    if not index or not isinstance(index, list) or \
+            not all(isinstance(item, dict) for item in index) or \
+            not all(isinstance(key, str) for item in index for key in item) or \
+            not all(isinstance(value, float) for item in index for value in item.values()):
+        return None
+    if not isinstance(file_path, str) or not file_path:
+        return None
+
+    with open(file_path, 'w', encoding='utf-8') as file:
+        dump(index, file)
+    return None
+
+
+def load_index(file_path: str) -> list[dict[str, float]] | None:
+    """
+    Load the index from a file.
+
+    Args:
+        file_path (str): The path to the file from which to load the index.
+
+    Returns:
+        list[dict[str, float]] | None: The loaded index.
+
+    In case of corrupt input arguments, None is returned.
+    """
+    if not file_path or not isinstance(file_path, str):
+        return None
+
+    with open(file_path, 'r', encoding='utf-8') as file:
+        index: list[dict[str, float]] = load(file)
+    return index
+
+
+def calculate_spearman(rank: list[int], golden_rank: list[int]) -> float | None:
+    """
+    Calculate Spearman's rank correlation coefficient between two rankings.
+
+    Args:
+        rank (list[int]): Ranked list of document indices.
+        golden_rank (list[int]): Golden ranked list of document indices.
+
+    Returns:
+        float | None: Spearman's rank correlation coefficient.
+
+    In case of corrupt input arguments, None is returned.
+    """
+    if not rank or not isinstance(rank, list) or not all(isinstance(item, int) for item in rank):
+        return None
+    if not golden_rank or not isinstance(golden_rank, list) or \
+            not all(isinstance(item, int) for item in golden_rank) or \
+            len(rank) != len(golden_rank):
+        return None
+
+    n = len(rank)
+    rank_differences = 0
+    for item in rank:
+        if item in golden_rank:
+            rank_differences += (golden_rank.index(item) - rank.index(item)) ** 2
+    return 1 - (6 * rank_differences) / (n * (n**2 - 1))
